@@ -1,3 +1,8 @@
+cbuffer TrancsFormationMatrix : register(b0)
+{
+    float4x4 WVP;
+};
+
 struct VertexShaderOutput
 {
     float4 position : SV_POSITION;
@@ -12,7 +17,7 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    output.position = input.position;
+    output.position = mul(input.position, WVP);
     return output;
 }
 

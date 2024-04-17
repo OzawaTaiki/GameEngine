@@ -15,6 +15,8 @@
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
+#include "myLib/MyLib.h"
+
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
@@ -41,7 +43,6 @@ struct Vector4
 {
 	float x, y, z, w;
 };
-
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -306,10 +307,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0とバインド
+	rootParameters[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
 
@@ -413,6 +417,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 
+
+	ID3D12Resource* materialResource = CreateBufferResources(device, sizeof(Vector4) * 3);
+	Vector4* materialData = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	*materialData = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	//wvp用のリソースを作る。Matrix4x4 1つ分のサイズをサイズを用意する
+	ID3D12Resource* wvpResource = CreateBufferResources(device, sizeof(Matrix4x4));
+	//データを書き込む
+	Matrix4x4* wvpData = nullptr;
+	//書き込むためのアドレスを取得
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	//単位行列を書き込んでおく
+	*wvpData = MatrixFunction::MakeIdentity4x4();
+
+
 	/// Resourceにデータを書き込む
 	// 頂点バッファーフォーマットが定義されて
 	Vector4* vertexData = nullptr;
@@ -425,10 +445,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 右下
 	vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
 
-	ID3D12Resource* materialResource = CreateBufferResources(device, sizeof(Vector4) * 3);
-	Vector4* materialData = nullptr;
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 
 
 	D3D12_VIEWPORT viewport{};
@@ -448,9 +464,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
 
+	///
+	/// 変数宣言
+	///
+
+	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,-5.0f} };
 
 
+	///
 	/// メインループ
+	/// 
 	MSG msg{};
 	// ウィンドウのｘボタンが押されるまでループ
 	while (msg.message != WM_QUIT)
@@ -502,9 +526,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
 			// 描画（DrawCall／ドローコール）。引数でエントリのインデックス、インスタンスには使わない場合は0。
 			commandList->DrawInstanced(3, 1, 0, 0);
+
 			/// コマンドを積む(仮)
 
 
@@ -515,6 +541,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			/// 
 
 
+			transform.rotate.y += 6.28f / 300.0f;
+			Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+			//*wvpData = worldMatrix;
+			Matrix4x4 cameraMatrix = MatrixFunction::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			Matrix4x4 viewMatrix = MatrixFunction::Inverse(cameraMatrix);
+			Matrix4x4 projectionMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+			Matrix4x4 worldViewProjectionMatrix = MatrixFunction::Multiply(worldMatrix, MatrixFunction::Multiply(viewMatrix, projectionMatrix));
+			*wvpData = worldViewProjectionMatrix;
 
 			///
 			/// 処理ここまで
@@ -563,6 +597,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 	}
 
+
+	wvpResource->Release();
 	materialResource->Release();
 	vertexResource->Release();
 	graphicsPipelineState->Release();

@@ -13,8 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{bb130762-2970-4019-a3d8-157336b101b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\ソース">
+      <UniqueIdentifier>{1ab94441-ab1c-484b-b497-22a5cbb86397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\ヘッダ">
+      <UniqueIdentifier>{d87e9a38-2f70-4b3a-beb7-0aa29da1fb44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="myLib\MatrixFunction.cpp">
+      <Filter>Lib\ソース</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\MyLib.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -22,5 +37,22 @@
   <ItemGroup>
     <FxCompile Include="Object3d.VS.hlsl" />
     <FxCompile Include="Object3d.PS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="myLib\MyLib.h">
+      <Filter>Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MatrixFunction.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Matrix4x4.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Transform.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Vector3.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
