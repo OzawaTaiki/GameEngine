@@ -252,12 +252,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないのでShaderVisibleはfalse
 	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);              //viewの情報を格納している場所(Discriptor)の束(配列)
 
-	//D3D12_DESCRIPTOR_HEAP_DESC rtvDescRiptorHeapDesc{};
-	//rtvDescRiptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;    //レンダーターゲットビュー(RTV)用
-	//rtvDescRiptorHeapDesc.NumDescriptors = 2;                       //ダブルバッファ用に２つ。多くもかまわない
-	//hr = device->CreateDescriptorHeap(&rtvDescRiptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
-	////ディスクリプターヒープが生成できなかったので起動できない
-	//assert(SUCCEEDED(hr));
 
 	//imguiを使うためSRV用のが必要
 	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなのでShaderVisivleはtrue
