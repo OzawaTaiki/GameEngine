@@ -836,5 +836,3 @@ ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* _device, D3D12_DESCRIPT
 	assert(SUCCEEDED(hr));
 	return descriptorHeap;
 }
-
-
