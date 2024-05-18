@@ -102,10 +102,19 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Vector4.h">
+      <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Object3d.hlsli" />
   </ItemGroup>
 </Project>
