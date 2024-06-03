@@ -27,9 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="myLib\MatrixFunction.cpp">
-      <Filter>Lib\ソース</Filter>
-    </ClCompile>
     <ClCompile Include="myLib\MyLib.cpp">
       <Filter>Lib</Filter>
     </ClCompile>
@@ -57,6 +54,9 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="myLib\MatrixFunction.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.VS.hlsl" />
@@ -65,9 +65,6 @@
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
       <Filter>Lib</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\MatrixFunction.h">
-      <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
     <ClInclude Include="myLib\Matrix4x4.h">
       <Filter>Lib\ヘッダ</Filter>
@@ -107,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="myLib\Vector4.h">
       <Filter>Lib\ヘッダ</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MatrixFunction.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
