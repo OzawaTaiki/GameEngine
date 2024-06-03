@@ -73,7 +73,25 @@ struct VertexData
 	Vector2 texcoord;
 };
 
-struct  Object
+struct NonTextureObject
+{
+	Vector3* vertexData;
+	ID3D12Resource* vertexResource;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+	Vector4* materialData;
+	ID3D12Resource* materialResource;
+	Matrix4x4* wvpData;
+	ID3D12Resource* wvpResource;
+	uint32_t vertexNum;
+
+	~NonTextureObject() {
+		wvpResource->Release();
+		vertexResource->Release();
+		materialResource->Release();
+	};
+};
+
+struct  TextureObject
 {
 	Vector4* materialData;
 	Matrix4x4* wvpData;
@@ -84,18 +102,16 @@ struct  Object
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	uint32_t vertexNum;
 
-	~Object() {
+	~TextureObject() {
 		wvpResource->Release();
 		vertexResource->Release();
 		materialResource->Release();
 	};
 };
 
-void  MakeTriangleData(ID3D12Device* _device, Object* _obj);
+void  MakeTriangleData(ID3D12Device* _device, TextureObject* _obj);
 
-void MakeSphereData(ID3D12Device* _device, Object* _obj);
-
-
+void MakeSphereData(ID3D12Device* _device, TextureObject* _obj);
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -547,9 +563,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//vertexData[5].position = { 0.5f, -0.5f,-0.5f, 1.0f };
 	//vertexData[5].texcoord = { 1.0f,1.0f };
 
-	Object* triangle1 = new Object();
+	TextureObject* triangle1 = new TextureObject();
 	MakeTriangleData(device, triangle1);
-	Object* triangle2 = new Object();
+	TextureObject* triangle2 = new TextureObject();
 	MakeTriangleData(device, triangle2);
 
 #pragma endregion
@@ -1393,7 +1409,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* _descri
 	return handleGPU;
 }
 
-void MakeTriangleData(ID3D12Device* _device, Object* _obj)
+void MakeTriangleData(ID3D12Device* _device, TextureObject* _obj)
 {
 	/// VertexResourcesを生成する
 	_obj->vertexResource = CreateBufferResource(_device, sizeof(VertexData) * 3);
@@ -1445,7 +1461,7 @@ void MakeTriangleData(ID3D12Device* _device, Object* _obj)
 
 }
 
-void MakeSphereData(ID3D12Device* _device, Object* _obj)
+void MakeSphereData(ID3D12Device* _device, TextureObject* _obj)
 {
 	//分割数
 	const uint32_t kSubdivision = 16;
