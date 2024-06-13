@@ -114,6 +114,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
     <ClCompile Include="myLib\MatrixFunction.cpp" />
     <ClCompile Include="myLib\MyLib.cpp" />
+    <ClCompile Include="myLib\VectorFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">
@@ -141,6 +142,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="myLib\Transform.h" />
     <ClInclude Include="myLib\Vector3.h" />
     <ClInclude Include="myLib\Vector4.h" />
+    <ClInclude Include="myLib\VectorFunction.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <ItemGroup>

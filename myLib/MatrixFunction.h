@@ -27,3 +27,5 @@ public:
 	static Matrix4x4 MakeOrthographicMatrix(float _left, float _top, float _right, float _bottom, float _nearClip, float _farClip);
 	static Matrix4x4 MakeViewportMatrix(float _left, float _top, float _width, float _height, float _minDepth, float _maxDepth);
 };
+
+Matrix4x4 operator* (const Matrix4x4& _mat1, const Matrix4x4& _mat2);

@@ -465,3 +465,7 @@ Matrix4x4 MatrixFunction::MakeViewportMatrix(float _left, float _top, float _wid
 	return result;
 }
 
+Matrix4x4 operator*(const Matrix4x4& _mat1, const Matrix4x4& _mat2)
+{
+	return Matrix4x4(MatrixFunction::Multiply(_mat1, _mat2));
+}

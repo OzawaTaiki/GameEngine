@@ -1,10 +1,23 @@
 #include "Object3d.hlsli" 
 
-cbuffer Material : register(b0)
+cbuffer gMaterial : register(b0)
 {
-    float4 color;
+    float4 materialColor;
+    int enableLighting;
 };
 
+cbuffer gTexVisibility : register(b1)
+{
+    float isVisible;
+};
+
+cbuffer gDirectionalLight : register(b2)
+{
+    float4 lightColor; //ライトの色
+    float3 lightDirection; //ライトの向き
+    float intensity; //輝度
+    int isHalf;
+}
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -17,11 +30,28 @@ PixelShaderOutput main(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
     //output.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 textureColor;
     
+    if (isVisible == 1.0f)
+        textureColor = materialColor * gTexture.Sample(gSampler, _input.texcoord);
+    else
+        textureColor = materialColor;
     
-    float4 textureColor = gTexture.Sample(gSampler, _input.texcoord);
+    float cos;
+    float NdotL = dot(normalize(_input.normal), -lightDirection);
+    if (isHalf != 0)
+    { //halfLambertを使うとき
+        cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    }
+    else
+        cos = saturate(NdotL);
     
-    output.color = color * textureColor;
+    if (enableLighting != 0)
+    {
+        output.color = materialColor * textureColor * lightColor * cos * intensity;
+    }
+    else
+        output.color = materialColor * textureColor;
     
     return output;
 }
