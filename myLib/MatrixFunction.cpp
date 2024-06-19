@@ -3,7 +3,7 @@
 
 
 
-Matrix4x4 MatrixFunction::Add(const Matrix4x4& _m1, const Matrix4x4& _m2)
+Matrix4x4  Add(const Matrix4x4& _m1, const Matrix4x4& _m2)
 {
 	Matrix4x4 result;
 	result.m[0][0] = _m1.m[0][0] + _m2.m[0][0];
@@ -29,7 +29,7 @@ Matrix4x4 MatrixFunction::Add(const Matrix4x4& _m1, const Matrix4x4& _m2)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::Subtract(const Matrix4x4& _m1, const Matrix4x4& _m2)
+Matrix4x4  Subtract(const Matrix4x4& _m1, const Matrix4x4& _m2)
 {
 	Matrix4x4 result;
 	result.m[0][0] = _m1.m[0][0] - _m2.m[0][0];
@@ -55,7 +55,7 @@ Matrix4x4 MatrixFunction::Subtract(const Matrix4x4& _m1, const Matrix4x4& _m2)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::Multiply(const Matrix4x4& _m1, const Matrix4x4& _m2)
+Matrix4x4  Multiply(const Matrix4x4& _m1, const Matrix4x4& _m2)
 {
 	Matrix4x4 result;
 	result.m[0][0] = _m1.m[0][0] * _m2.m[0][0] + _m1.m[0][1] * _m2.m[1][0] + _m1.m[0][2] * _m2.m[2][0] + _m1.m[0][3] * _m2.m[3][0];
@@ -80,7 +80,7 @@ Matrix4x4 MatrixFunction::Multiply(const Matrix4x4& _m1, const Matrix4x4& _m2)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::Inverse(const Matrix4x4& _m)
+Matrix4x4  Inverse(const Matrix4x4& _m)
 {
 	float denominator =
 		_m.m[0][0] * _m.m[1][1] * _m.m[2][2] * _m.m[3][3]
@@ -255,7 +255,7 @@ Matrix4x4 MatrixFunction::Inverse(const Matrix4x4& _m)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::Transpose(const Matrix4x4& _m)
+Matrix4x4  Transpose(const Matrix4x4& _m)
 {
 	Matrix4x4 result;
 
@@ -282,7 +282,7 @@ Matrix4x4 MatrixFunction::Transpose(const Matrix4x4& _m)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeIdentity4x4()
+Matrix4x4  MakeIdentity4x4()
 {
 	Matrix4x4 result =
 	{
@@ -297,7 +297,7 @@ Matrix4x4 MatrixFunction::MakeIdentity4x4()
 	return result;
 }
 
-void MatrixFunction::MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m)
+void  MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -308,7 +308,7 @@ void MatrixFunction::MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m)
 	}
 }
 
-void MatrixFunction::MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m, const char* _label)
+void  MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m, const char* _label)
 {
 	//Novice::ScreenPrintf(_x, _y, "%s", _label);
 	for (int i = 0; i < 4; i++)
@@ -320,7 +320,7 @@ void MatrixFunction::MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m, con
 	}
 }
 
-Matrix4x4 MatrixFunction::MakeScaleMatrix(const Vector3& _scale)
+Matrix4x4  MakeScaleMatrix(const Vector3& _scale)
 {
 	Matrix4x4 result =
 	{
@@ -335,7 +335,7 @@ Matrix4x4 MatrixFunction::MakeScaleMatrix(const Vector3& _scale)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeTranslateMatrix(const Vector3& _translate)
+Matrix4x4  MakeTranslateMatrix(const Vector3& _translate)
 {
 	Matrix4x4 result =
 	{
@@ -350,7 +350,7 @@ Matrix4x4 MatrixFunction::MakeTranslateMatrix(const Vector3& _translate)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeRotateXMatrix(float _radian)
+Matrix4x4  MakeRotateXMatrix(float _radian)
 {
 	Matrix4x4 result =
 	{
@@ -364,7 +364,7 @@ Matrix4x4 MatrixFunction::MakeRotateXMatrix(float _radian)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeRotateYMatrix(float _radian)
+Matrix4x4  MakeRotateYMatrix(float _radian)
 {
 	Matrix4x4 result =
 	{
@@ -378,7 +378,7 @@ Matrix4x4 MatrixFunction::MakeRotateYMatrix(float _radian)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeRotateZMatrix(float _radian)
+Matrix4x4  MakeRotateZMatrix(float _radian)
 {
 	Matrix4x4 result =
 	{
@@ -392,7 +392,7 @@ Matrix4x4 MatrixFunction::MakeRotateZMatrix(float _radian)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeRotateMatrix(const Vector3& _rotate)
+Matrix4x4  MakeRotateMatrix(const Vector3& _rotate)
 {
 	Matrix4x4 rotateX = MakeRotateXMatrix(_rotate.x);
 	Matrix4x4 rotateY = MakeRotateYMatrix(_rotate.y);
@@ -403,7 +403,7 @@ Matrix4x4 MatrixFunction::MakeRotateMatrix(const Vector3& _rotate)
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeAffineMatrix(const Vector3& _scale, const Vector3& _rotate, const Vector3& _translate)
+Matrix4x4  MakeAffineMatrix(const Vector3& _scale, const Vector3& _rotate, const Vector3& _translate)
 {
 	Matrix4x4 rotateMatrix = MakeRotateMatrix(_rotate);
 
@@ -420,7 +420,7 @@ Matrix4x4 MatrixFunction::MakeAffineMatrix(const Vector3& _scale, const Vector3&
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakePerspectiveFovMatrix(float _fovY, float _aspectRatio, float _nearClip, float _farClip)
+Matrix4x4  MakePerspectiveFovMatrix(float _fovY, float _aspectRatio, float _nearClip, float _farClip)
 {
 	Matrix4x4 result =
 	{
@@ -435,7 +435,7 @@ Matrix4x4 MatrixFunction::MakePerspectiveFovMatrix(float _fovY, float _aspectRat
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeOrthographicMatrix(float _left, float _top, float _right, float _bottom, float _nearClip, float _farClip)
+Matrix4x4  MakeOrthographicMatrix(float _left, float _top, float _right, float _bottom, float _nearClip, float _farClip)
 {
 	Matrix4x4 result =
 	{
@@ -450,7 +450,7 @@ Matrix4x4 MatrixFunction::MakeOrthographicMatrix(float _left, float _top, float 
 	return result;
 }
 
-Matrix4x4 MatrixFunction::MakeViewportMatrix(float _left, float _top, float _width, float _height, float _minDepth, float _maxDepth)
+Matrix4x4  MakeViewportMatrix(float _left, float _top, float _width, float _height, float _minDepth, float _maxDepth)
 {
 	Matrix4x4 result =
 	{
@@ -467,5 +467,5 @@ Matrix4x4 MatrixFunction::MakeViewportMatrix(float _left, float _top, float _wid
 
 Matrix4x4 operator*(const Matrix4x4& _mat1, const Matrix4x4& _mat2)
 {
-	return Matrix4x4(MatrixFunction::Multiply(_mat1, _mat2));
+	return Matrix4x4(Multiply(_mat1, _mat2));
 }

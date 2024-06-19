@@ -169,9 +169,9 @@ void MakeSpriteData(ID3D12Device* _device, Object* _obj);
 /// </summary>
 /// <param name="_transform">トランスフォームデータ</param>
 /// <returns>WVPt および WorldMat</returns>
-TransformationMatrix CalculateSpriteWVPMat(const Transform& _transform);
+TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform);
 
-TransformationMatrix CalculateObjectWVPMat(const Transform& _transform, const Matrix4x4& _VPmat);
+TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const Matrix4x4& _VPmat);
 
 /// <summary>
 /// 三角形の描画
@@ -632,7 +632,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	////書き込むためのアドレスを取得
 	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	////単位行列を書き込んでおく
-	//*wvpData = MatrixFunction::MakeIdentity4x4();
+	//*wvpData =  MakeIdentity4x4();
 	//
 	//
 	//ID3D12Resource* texVisiblity = CreateBufferResource(device, sizeof(float));
@@ -674,20 +674,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 #pragma region 画像
-	////sprite用の頂点リソ－スデータを作成
+	//sprite用の頂点リソ－スデータを作成
 	//ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 
-	////頂点バッファビューを作成
+	//頂点バッファビューを作成
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-	//// リソースの先頭のアドレスから使う
+	// リソースの先頭のアドレスから使う
 	//vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
-	//// 構造付きバッファのサイズは頂点6つ分のサイズ
+	// 構造付きバッファのサイズは頂点6つ分のサイズ
 	//vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
-	//// 1頂点あたりのサイズ
+	// 1頂点あたりのサイズ
 	//vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
+
 	//VertexData* vertexDataSprite = nullptr;
-	//vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	////vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 
 	//// 1枚目の三角形
 	//vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f }; // 左下
@@ -724,7 +725,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//// 書き込むためのアドレスを取得
 	//WvpMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&WvpMatrixDataSprite));
 	//// 単位行列を書きこんでおく
-	//*WvpMatrixDataSprite = MatrixFunction::MakeIdentity4x4();
+	//*WvpMatrixDataSprite = MakeIdentity4x4();
 
 	//ID3D12Resource* materialResorceSprite = CreateBufferResource(device, sizeof(Material));
 	//Material* colorSprite;
@@ -732,9 +733,74 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//colorSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	//colorSprite->enabledLighthig = false;
 
+	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 
-	Object* sprite = new Object;
-	MakeSpriteData(device, sprite);
+	//頂点バッファビューを作成
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+	//リソースの先頭のアドレスから使う
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	// 構造付きバッファのサイズは頂点6つ分のサイズ
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	// 1頂点あたりのサイズ
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+
+	// 1枚目の三角形
+	vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f }; // 左下
+	vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
+	vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f }; // 左上
+	vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
+	vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f }; // 右下
+	vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
+
+	vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f }; // 右上
+	vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
+
+	vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
+	vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
+	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
+	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
+	vertexDataSprite[4].normal = { 0.0f,0.0f,-1.0f };
+	vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
+
+	ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
+
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
+	uint32_t* indexDataSprite = nullptr;
+	indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+	indexDataSprite[0] = 0;	indexDataSprite[1] = 1;	indexDataSprite[2] = 2;
+	indexDataSprite[3] = 1;	indexDataSprite[4] = 3;	indexDataSprite[5] = 2;
+
+
+	ID3D12Resource* texVisiblitySprite = CreateBufferResource(device, sizeof(float));
+	float* visible = nullptr;
+	texVisiblitySprite->Map(0, nullptr, reinterpret_cast<void**>(&visible));
+	*visible = 1.0f;
+
+	// Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
+	ID3D12Resource* WvpMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
+	// データを書き込む
+	TransformationMatrix* WvpMatrixDataSprite = nullptr;
+	// 書き込むためのアドレスを取得
+	WvpMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&WvpMatrixDataSprite));
+	// 単位行列を書きこんでおく
+	WvpMatrixDataSprite->World = MakeIdentity4x4();
+
+	ID3D12Resource* materialResorceSprite = CreateBufferResource(device, sizeof(Material));
+	Material* colorSprite;
+	materialResorceSprite->Map(0, nullptr, reinterpret_cast<void**>(&colorSprite));
+	colorSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	colorSprite->enabledLighthig = false;
+
+	//Object* sprite = new Object;
+	//MakeSpriteData(device, sprite);
 
 #pragma endregion
 
@@ -762,7 +828,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//	// 書き込むためのアドレスを取得
 	//	transformationMatrixResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
 	//	// 単位行列を書きこんでおく
-	//	*transformationMatrixDataSphere = MatrixFunction::MakeIdentity4x4();
+	//	*transformationMatrixDataSphere =  MakeIdentity4x4();
 	//
 	//
 	//	VertexData* vertexDataSphere = nullptr;
@@ -935,10 +1001,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	/// 変数宣言
 	///
 
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,-10.0f} };
+	stTransform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	stTransform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,-10.0f} };
 
-	Transform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	stTransform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	Vector4 objColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool ishalf = true;
@@ -983,12 +1049,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::End();
 			triangle1->materialData->color = objColor1;
 
-			/*ImGui::Begin("sprite");
+			ImGui::Begin("sprite");
 			ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
 			ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
 			ImGui::DragFloat3("translate", &spriteTrans.translate.x, 0.01f);
-			ImGui::End();*/
+			ImGui::End();
 			//sprite->materialData->color = objColor1;
 
 			ImGui::Begin("DL");
@@ -998,7 +1064,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Checkbox("isHalf", &ishalf);
 			ImGui::End();
 			directionalLightData->isHalf = ishalf;
-			directionalLightData->direction = VectorFunction::Normalize(directionalLightData->direction);
+			directionalLightData->direction = Normalize(directionalLightData->direction);
 
 			/*
 			ImGui::Begin("Triangle2");
@@ -1023,34 +1089,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::DragFloat3("translate", &transformSphere.translate.x, 0.01f);
 			ImGui::End();*/
 
-			Matrix4x4 cameraMatrix = MatrixFunction::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-			Matrix4x4 viewMatrix = MatrixFunction::Inverse(cameraMatrix);
-			Matrix4x4 projectionMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 			Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
 
 			/*TransformationMatrix transMat;
-			transMat.World = MatrixFunction::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-			transMat.WVP = MatrixFunction::Multiply(transMat.World, MatrixFunction::Multiply(viewMatrix, projectionMatrix));
+			transMat.World =  MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+			transMat.WVP =  Multiply(transMat.World,  Multiply(viewMatrix, projectionMatrix));
 			*triangle1->transformMat = transMat;*/
 
 			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
 
-			/*worldMatrix = MatrixFunction::MakeAffineMatrix(spriteTrans.scale, spriteTrans.rotate, spriteTrans.translate);
-			Matrix4x4 viewMatSprite = MatrixFunction::MakeIdentity4x4();
-			projectionMatrix = MatrixFunction::MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-			worldViewProjectionMatrix = MatrixFunction::Multiply(worldMatrix, MatrixFunction::Multiply(viewMatSprite, projectionMatrix));
+			/*worldMatrix =  MakeAffineMatrix(spriteTrans.scale, spriteTrans.rotate, spriteTrans.translate);
+			Matrix4x4 viewMatSprite =  MakeIdentity4x4();
+			projectionMatrix =  MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+			worldViewProjectionMatrix =  Multiply(worldMatrix,  Multiply(viewMatSprite, projectionMatrix));
 			*WvpMatrixDataSprite = worldViewProjectionMatrix;*/
-			*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
+			*WvpMatrixDataSprite = CalculateSpriteWVPMat(spriteTrans);
 
 			/*
 			transformSphere.rotate.y += 0.01f;
-			Matrix4x4 worldMatrix = MatrixFunction::MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
-			Matrix4x4 cameraMatrix = MatrixFunction::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-			Matrix4x4 viewMatrix = MatrixFunction::Inverse(cameraMatrix);
-			Matrix4x4 projectionMatrix = MatrixFunction::MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
-			Matrix4x4 worldViewProjectionMatrix = MatrixFunction::Multiply(worldMatrix, MatrixFunction::Multiply(viewMatrix, projectionMatrix));*/
-			//worldMatrix = MatrixFunction::MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
-			//worldViewProjectionMatrix = MatrixFunction::Multiply(worldMatrix, MatrixFunction::Multiply(viewMatrix, projectionMatrix));
+			Matrix4x4 worldMatrix =  MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
+			Matrix4x4 cameraMatrix =  MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			Matrix4x4 viewMatrix =  Inverse(cameraMatrix);
+			Matrix4x4 projectionMatrix =  MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+			Matrix4x4 worldViewProjectionMatrix =  Multiply(worldMatrix,  Multiply(viewMatrix, projectionMatrix));*/
+			//worldMatrix =  MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
+			//worldViewProjectionMatrix =  Multiply(worldMatrix,  Multiply(viewMatrix, projectionMatrix));
 			//*sphere->wvpData = worldViewProjectionMatrix;
 
 			///
@@ -1126,6 +1192,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			commandList->DrawInstanced(6, 1, 0, 0);*/
 
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+			commandList->IASetIndexBuffer(&indexBufferViewSprite);
+
+			commandList->SetGraphicsRootConstantBufferView(0, materialResorceSprite->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourceSprite->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(1));
+			commandList->SetGraphicsRootConstantBufferView(3, texVisiblitySprite->GetGPUVirtualAddress());
+
+			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 			//commandList->IASetVertexBuffers(0, 1, &triangle2->vertexBufferView);             // VBを設定
 			//*triangle2->materialData = objColor2;
@@ -1605,7 +1680,7 @@ void MakeTriangleData(ID3D12Device* _device, Object* _obj)
 	//書き込むためのアドレスを取得
 	_obj->wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->transformMat));
 	//単位行列を書き込んでおく
-	_obj->transformMat->World = MatrixFunction::MakeIdentity4x4();
+	_obj->transformMat->World = MakeIdentity4x4();
 
 	_obj->texVisiblity = CreateBufferResource(_device, sizeof(float));
 	_obj->visible = nullptr;
@@ -1664,7 +1739,7 @@ void MakeSphereData(ID3D12Device* _device, Object* _obj)
 	// 書き込むためのアドレスを取得
 	_obj->wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->transformMat));
 	// 単位行列を書きこんでおく
-	_obj->transformMat->World = MatrixFunction::MakeIdentity4x4();
+	_obj->transformMat->World = MakeIdentity4x4();
 
 
 	_obj->texVisiblity = CreateBufferResource(_device, sizeof(float));
@@ -1707,7 +1782,7 @@ void MakeSphereData(ID3D12Device* _device, Object* _obj)
 			_obj->vertexData[startIndex].normal.x = _obj->vertexData[startIndex].position.x;
 			_obj->vertexData[startIndex].normal.y = _obj->vertexData[startIndex].position.y;
 			_obj->vertexData[startIndex].normal.z = _obj->vertexData[startIndex].position.z;
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex++].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex++].normal);
 
 			//b
 			_obj->vertexData[startIndex].position.x = std::cosf(lat + kLatEvery) * std::cosf(lon);
@@ -1719,7 +1794,7 @@ void MakeSphereData(ID3D12Device* _device, Object* _obj)
 			_obj->vertexData[startIndex].normal.x = _obj->vertexData[startIndex].position.x;
 			_obj->vertexData[startIndex].normal.y = _obj->vertexData[startIndex].position.y;
 			_obj->vertexData[startIndex].normal.z = _obj->vertexData[startIndex].position.z;
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex++].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex++].normal);
 
 			//c
 			_obj->vertexData[startIndex].position.x = std::cosf(lat) * std::cosf(lon + kLonEvery);
@@ -1731,11 +1806,11 @@ void MakeSphereData(ID3D12Device* _device, Object* _obj)
 			_obj->vertexData[startIndex].normal.x = _obj->vertexData[startIndex].position.x;
 			_obj->vertexData[startIndex].normal.y = _obj->vertexData[startIndex].position.y;
 			_obj->vertexData[startIndex].normal.z = _obj->vertexData[startIndex].position.z;
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex++].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex++].normal);
 
 			//bコピー
 			_obj->vertexData[startIndex] = _obj->vertexData[startIndex - 2];
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex++].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex++].normal);
 
 			//d
 			_obj->vertexData[startIndex].position.x = std::cosf(lat + kLatEvery) * std::cosf(lon + kLonEvery);
@@ -1747,11 +1822,11 @@ void MakeSphereData(ID3D12Device* _device, Object* _obj)
 			_obj->vertexData[startIndex].normal.x = _obj->vertexData[startIndex].position.x;
 			_obj->vertexData[startIndex].normal.y = _obj->vertexData[startIndex].position.y;
 			_obj->vertexData[startIndex].normal.z = _obj->vertexData[startIndex].position.z;
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex++].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex++].normal);
 
 			//cコピー
 			_obj->vertexData[startIndex] = _obj->vertexData[startIndex - 3];
-			_obj->vertexData[startIndex].normal = VectorFunction::Normalize(_obj->vertexData[startIndex].normal);
+			_obj->vertexData[startIndex].normal = Normalize(_obj->vertexData[startIndex].normal);
 		};
 	}
 	_obj->vertexNum = sphereVertexNum;
@@ -1816,26 +1891,26 @@ void MakeSpriteData(ID3D12Device* _device, Object* _obj)
 	// 書き込むためのアドレスを取得
 	_obj->wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->transformMat));
 	// 単位行列を書きこんでおく
-	_obj->transformMat->World = MatrixFunction::MakeIdentity4x4();
-	_obj->transformMat->WVP = MatrixFunction::MakeIdentity4x4();
+	_obj->transformMat->World = MakeIdentity4x4();
+	_obj->transformMat->WVP = MakeIdentity4x4();
 }
 
-TransformationMatrix CalculateSpriteWVPMat(const Transform& _transform)
+TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
 {
-	Matrix4x4 viewMatrix = MatrixFunction::MakeIdentity4x4();
-	Matrix4x4 projectionMatrix = MatrixFunction::MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
+	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
 
 	TransformationMatrix transMat;
-	transMat.World = MatrixFunction::MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
-	transMat.WVP = MatrixFunction::Multiply(transMat.World, MatrixFunction::Multiply(viewMatrix, projectionMatrix));
+	transMat.World = MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
+	transMat.WVP = Multiply(transMat.World, Multiply(viewMatrix, projectionMatrix));
 
 	return TransformationMatrix(transMat);
 }
 
-TransformationMatrix CalculateObjectWVPMat(const Transform& _transform, const Matrix4x4& _VPmat)
+TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const Matrix4x4& _VPmat)
 {
 	TransformationMatrix transMat;
-	transMat.World = MatrixFunction::MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
+	transMat.World = MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
 	transMat.WVP = transMat.World * _VPmat;
 	return TransformationMatrix(transMat);
 }

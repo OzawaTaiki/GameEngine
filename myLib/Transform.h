@@ -2,7 +2,7 @@
 
 #include "Vector3.h"
 
-struct Transform
+struct stTransform
 {
 	Vector3 scale;
 	Vector3	rotate;
