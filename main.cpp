@@ -78,6 +78,8 @@ struct Material
 {
 	Vector4 color;
 	int32_t enabledLighthig;
+	float padding[3];
+	Matrix4x4 uvTransform;
 };
 
 struct DirectionalLight
@@ -100,17 +102,21 @@ struct  Object
 	TransformationMatrix* transformMat;
 	VertexData* vertexData;
 	ID3D12Resource* wvpResource;
+	ID3D12Resource* indexResource;
 	ID3D12Resource* vertexResource;
 	ID3D12Resource* materialResource;
 	float* visible;
 	ID3D12Resource* texVisiblity;
+	D3D12_VERTEX_BUFFER_VIEW indexBufferView;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	uint32_t vertexNum;
+
 
 	~Object() {
 		wvpResource->Release();
 		vertexResource->Release();
 		materialResource->Release();
+		indexResource->Release();
 	};
 };
 
@@ -665,10 +671,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//vertexData[5].position = { 0.5f, -0.5f,-0.5f, 1.0f };
 	//vertexData[5].texcoord = { 1.0f,1.0f };
 
-	Object* triangle1 = new Object();
-	MakeTriangleData(device, triangle1);
-	Object* triangle2 = new Object();
-	MakeTriangleData(device, triangle2);
+	//Object* triangle1 = new Object();
+	//MakeTriangleData(device, triangle1);
+	//Object* triangle2 = new Object();
+	//MakeTriangleData(device, triangle2);
 
 #pragma endregion
 
@@ -755,7 +761,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
 	vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f }; // 右下
 	vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
-
 	vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f }; // 右上
 	vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
 
@@ -763,8 +768,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
-	vertexDataSprite[4].normal = { 0.0f,0.0f,-1.0f };
-	vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
 
 	ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
 
@@ -794,10 +797,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	WvpMatrixDataSprite->World = MakeIdentity4x4();
 
 	ID3D12Resource* materialResorceSprite = CreateBufferResource(device, sizeof(Material));
-	Material* colorSprite;
-	materialResorceSprite->Map(0, nullptr, reinterpret_cast<void**>(&colorSprite));
-	colorSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	colorSprite->enabledLighthig = false;
+	Material* materialDataSprite;
+	materialResorceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
+	materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialDataSprite->enabledLighthig = false;
+	materialDataSprite->uvTransform = MakeIdentity4x4();
 
 	//Object* sprite = new Object;
 	//MakeSpriteData(device, sprite);
@@ -893,8 +897,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//
 	//
 
-	Object* sphere = new Object();
-	MakeSphereData(device, sphere);
+	//Object* sphere = new Object();
+	//MakeSphereData(device, sphere);
 
 #pragma region 平行光源
 	DirectionalLight* directionalLightData = nullptr;
@@ -1009,6 +1013,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Vector4 objColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool ishalf = true;
 
+	stTransform unTransformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
 
 	int currentTexture = 0;
 	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
@@ -1040,31 +1046,55 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			//ImGui::ShowDemoWindow();
 
-			ImGui::Begin("Triangle1");
-			ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-			ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-			ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
-			ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
-			ImGui::End();
-			triangle1->materialData->color = objColor1;
+			ImGui::Begin("Window");
+			if (ImGui::CollapsingHeader("object"))
+			{
+				if (ImGui::TreeNode("Sphere"))
+				{
+					ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
+					ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+					ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
+					//triangle1->materialData->color = objColor1;
+					ImGui::TreePop();
+				}
 
-			ImGui::Begin("sprite");
-			ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
-			ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
-			ImGui::DragFloat3("translate", &spriteTrans.translate.x, 0.01f);
-			ImGui::End();
-			//sprite->materialData->color = objColor1;
+				if (ImGui::TreeNode("Sprite"))
+				{
+					ImGui::ColorEdit3("color", &objColor1.x);
+					ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
+					materialDataSprite->color = objColor1;
 
-			ImGui::Begin("DL");
-			ImGui::DragFloat4("color", &directionalLightData->color.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
-			ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
-			ImGui::Checkbox("isHalf", &ishalf);
+					if (ImGui::TreeNode("uvTransform"))
+					{
+						ImGui::DragFloat2("uvTranslate", &unTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+						ImGui::DragFloat2("uvScale", &unTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+						ImGui::SliderAngle("uvRotate", &unTransformSprite.rotate.z);
+						ImGui::TreePop();
+					}
+					ImGui::TreePop();
+				}
+
+				if (ImGui::TreeNode("DirectionalLight"))
+				{
+					ImGui::DragFloat4("color", &directionalLightData->color.x, 0.01f, 0.0f, 1.0f);
+					ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
+					ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
+					ImGui::Checkbox("isHalf", &ishalf);
+
+					directionalLightData->isHalf = ishalf;
+					directionalLightData->direction = Normalize(directionalLightData->direction);
+					ImGui::TreePop();
+				}
+
+			}
+
 			ImGui::End();
-			directionalLightData->isHalf = ishalf;
-			directionalLightData->direction = Normalize(directionalLightData->direction);
+
+
 
 			/*
 			ImGui::Begin("Triangle2");
@@ -1099,7 +1129,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			transMat.WVP =  Multiply(transMat.World,  Multiply(viewMatrix, projectionMatrix));
 			*triangle1->transformMat = transMat;*/
 
-			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
+			//*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
 
 			/*worldMatrix =  MakeAffineMatrix(spriteTrans.scale, spriteTrans.rotate, spriteTrans.translate);
 			Matrix4x4 viewMatSprite =  MakeIdentity4x4();
@@ -1107,6 +1137,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			worldViewProjectionMatrix =  Multiply(worldMatrix,  Multiply(viewMatSprite, projectionMatrix));
 			*WvpMatrixDataSprite = worldViewProjectionMatrix;*/
 			*WvpMatrixDataSprite = CalculateSpriteWVPMat(spriteTrans);
+
+			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(unTransformSprite.scale);
+			uvTransformMatrix = uvTransformMatrix * MakeRotateZMatrix(unTransformSprite.rotate.z);
+			uvTransformMatrix = uvTransformMatrix * MakeTranslateMatrix(unTransformSprite.translate);
+			materialDataSprite->uvTransform = uvTransformMatrix;
 
 			/*
 			transformSphere.rotate.y += 0.01f;
@@ -1179,7 +1214,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			// 頂点形式を。PSOに設定しているものと同じだが別途、同じものを設定することが必要らしい。
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			DrawSphere(commandList, sphere, directionalLightResource, ballGH);
+			//DrawSphere(commandList, sphere, directionalLightResource, ballGH);
 			//DrawTriangle(commandList, triangle1, currentTexture);
 			//DrawSprite(commandList, sprite, uvGH);
 
@@ -1199,6 +1234,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourceSprite->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(1));
 			commandList->SetGraphicsRootConstantBufferView(3, texVisiblitySprite->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 
 			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -1855,21 +1891,13 @@ void MakeSpriteData(ID3D12Device* _device, Object* _obj)
 	_obj->vertexData[1].texcoord = { 0.0f, 0.0f };
 	_obj->vertexData[2].position = { 640.0f, 360.0f, 0.0f, 1.0f }; // 右下
 	_obj->vertexData[2].texcoord = { 1.0f, 1.0f };
-
-	// 2枚目の三角形
-	_obj->vertexData[3].position = { 0.0f, 0.0f, 0.0f, 1.0f }; // 左上
-	_obj->vertexData[3].texcoord = { 0.0f, 0.0f };
-	_obj->vertexData[4].position = { 640.0f, 0.0f, 0.0f, 1.0f }; // 右上
-	_obj->vertexData[4].texcoord = { 1.0f, 0.0f };
-	_obj->vertexData[5].position = { 640.0f, 360.0f, 0.0f, 1.0f }; // 右下
-	_obj->vertexData[5].texcoord = { 1.0f, 1.0f };
+	_obj->vertexData[3].position = { 640.0f, 0.0f, 0.0f, 1.0f }; // 右上
+	_obj->vertexData[3].texcoord = { 1.0f, 0.0f };
 
 	_obj->vertexData[0].normal = { 0.0f,0.0f,-1.0f };
 	_obj->vertexData[1].normal = { 0.0f,0.0f,-1.0f };
 	_obj->vertexData[2].normal = { 0.0f,0.0f,-1.0f };
 	_obj->vertexData[3].normal = { 0.0f,0.0f,-1.0f };
-	_obj->vertexData[4].normal = { 0.0f,0.0f,-1.0f };
-	_obj->vertexData[5].normal = { 0.0f,0.0f,-1.0f };
 
 	_obj->materialResource = CreateBufferResource(_device, sizeof(Material));
 

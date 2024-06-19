@@ -4,6 +4,7 @@ cbuffer gMaterial : register(b0)
 {
     float4 materialColor;
     int enableLighting;
+    float4x4 unTransform;
 };
 
 cbuffer gTexVisibility : register(b1)
@@ -32,11 +33,17 @@ PixelShaderOutput main(VertexShaderOutput _input)
     //output.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
     float4 textureColor;
     
+    
+    //画像の有無
     if (isVisible == 1.0f)
-        textureColor = materialColor * gTexture.Sample(gSampler, _input.texcoord);
+    {
+        float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
+        textureColor = materialColor * gTexture.Sample(gSampler, transformedUV.xy);
+    }
     else
         textureColor = materialColor;
     
+    //ライティング
     float cos;
     float NdotL = dot(normalize(_input.normal), -lightDirection);
     if (isHalf != 0)
