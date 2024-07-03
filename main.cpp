@@ -25,6 +25,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "externals/DirectXTex/d3dx12.h"
 
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
@@ -96,6 +98,11 @@ struct TransformationMatrix
 	Matrix4x4 World;
 };
 
+struct ModelData
+{
+	std::vector<VertexData> vertices;
+};
+
 struct  Object
 {
 	Material* materialData;
@@ -129,6 +136,9 @@ struct Texture
 };
 
 std::vector<Texture> textures;
+
+
+ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename);
 
 /// <summary>
 /// 読み込んだテクスチャを取り出す
@@ -911,6 +921,50 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	directionalLightData->isHalf = true;
 
 #pragma endregion
+
+
+#pragma region OBjの読み込み
+
+	//モデル読み込み
+	ModelData modelData = LoadObjFile("resources/obj", "axis.obj");
+	//頂点リソースを作る
+	ID3D12Resource* vertexResourcePlane = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
+	//頂点バッファビューを作成する
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewPlane{};
+	vertexBufferViewPlane.BufferLocation = vertexResourcePlane->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う
+	vertexBufferViewPlane.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());//使用するリソースのサイズは頂点のサイズ
+	vertexBufferViewPlane.StrideInBytes = sizeof(VertexData);//1頂点あたりのサイズ
+
+	//頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	vertexResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&vertexData)); //書き込むためのアドレスを取得
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());//頂点データをリソースにコピー
+
+	ID3D12Resource* materialResorcePlane = CreateBufferResource(device, sizeof(Material));
+	Material* materialDataPlane;
+	materialResorcePlane->Map(0, nullptr, reinterpret_cast<void**>(&materialDataPlane));
+	materialDataPlane->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialDataPlane->enabledLighthig = false;
+	materialDataPlane->uvTransform = MakeIdentity4x4();
+
+	// Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
+	ID3D12Resource* WvpMatrixResourcePlane = CreateBufferResource(device, sizeof(TransformationMatrix));
+	// データを書き込む
+	TransformationMatrix* WvpMatrixDataPlane = nullptr;
+	// 書き込むためのアドレスを取得
+	WvpMatrixResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&WvpMatrixDataPlane));
+	// 単位行列を書きこんでおく
+	WvpMatrixDataPlane->World = MakeIdentity4x4();
+
+
+
+	ID3D12Resource* texVisiblityPlane = CreateBufferResource(device, sizeof(float));
+	float* visiblePlane = nullptr;
+	texVisiblityPlane->Map(0, nullptr, reinterpret_cast<void**>(&visiblePlane));
+	*visiblePlane = 1.0f;
+
+#pragma endregion
+
 	ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
 
 	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
@@ -920,6 +974,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2dTexture
 	//DSVHeapの先頭にDSVを作る
 	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+
 
 
 	D3D12_VIEWPORT viewport{};
@@ -1015,8 +1071,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	stTransform unTransformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
+	stTransform transformPlane{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
-	int currentTexture = 0;
+	int currentTexture = 1;
 	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
 
 	///
@@ -1049,6 +1106,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Begin("Window");
 			if (ImGui::CollapsingHeader("object"))
 			{
+				if (ImGui::TreeNode("Camera"))
+				{
+					ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
+					ImGui::TreePop();
+				}
 				if (ImGui::TreeNode("Sphere"))
 				{
 					ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
@@ -1060,6 +1124,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::TreePop();
 				}
 
+				if (ImGui::TreeNode("Plane"))
+				{
+					ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
+					ImGui::DragFloat3("scale", &transformPlane.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &transformPlane.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &transformPlane.translate.x, 0.01f);
+					ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
+					//triangle1->materialData->color = objColor1;
+					ImGui::TreePop();
+				}
 				if (ImGui::TreeNode("Sprite"))
 				{
 					ImGui::ColorEdit3("color", &objColor1.x);
@@ -1137,11 +1211,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			worldViewProjectionMatrix =  Multiply(worldMatrix,  Multiply(viewMatSprite, projectionMatrix));
 			*WvpMatrixDataSprite = worldViewProjectionMatrix;*/
 			*WvpMatrixDataSprite = CalculateSpriteWVPMat(spriteTrans);
+			*WvpMatrixDataPlane = CalculateObjectWVPMat(transformPlane, viewProjectionMatrix);
 
 			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(unTransformSprite.scale);
 			uvTransformMatrix = uvTransformMatrix * MakeRotateZMatrix(unTransformSprite.rotate.z);
 			uvTransformMatrix = uvTransformMatrix * MakeTranslateMatrix(unTransformSprite.translate);
 			materialDataSprite->uvTransform = uvTransformMatrix;
+
+
 
 			/*
 			transformSphere.rotate.y += 0.01f;
@@ -1227,16 +1304,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			commandList->DrawInstanced(6, 1, 0, 0);*/
 
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+			/*commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 			commandList->IASetIndexBuffer(&indexBufferViewSprite);
 
 			commandList->SetGraphicsRootConstantBufferView(0, materialResorceSprite->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourceSprite->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(1));
 			commandList->SetGraphicsRootConstantBufferView(3, texVisiblitySprite->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());*/
 
-			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+			//commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
+
+			commandList->SetGraphicsRootConstantBufferView(0, materialResorcePlane->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourcePlane->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(currentTexture));
+			commandList->SetGraphicsRootConstantBufferView(3, texVisiblityPlane->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 			//commandList->IASetVertexBuffers(0, 1, &triangle2->vertexBufferView);             // VBを設定
 			//*triangle2->materialData = objColor2;
@@ -1354,9 +1440,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	IDXGIDebug1* debug;
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
 	{
-		//debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		//debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		//debug->Release();
+		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+		debug->Release();
 	}
 
 	CoUninitialize();
@@ -1642,6 +1728,79 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* _descri
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (_descriptorSize * _index);
 	return handleGPU;
+}
+
+ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename)
+{
+	ModelData modelData;				//構築するmodelData
+	std::vector<Vector4> positions;		//位置
+	std::vector<Vector3> normals;		//法線
+	std::vector<Vector2> texcoords;		//テクスチャ座標
+	std::string line;					//ファイルから読んだ1行を格納するもの
+
+	std::ifstream file(_directoryPath + "/" + _filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line))
+	{
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;
+
+
+		if (identifier == "v") {
+			Vector4 position;
+			s >> position.x >> position.y >> position.z;
+			position.w = 1.0f;
+			positions.push_back(position);
+		}
+		else if (identifier == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcoords.push_back(texcoord);
+		}
+		else if (identifier == "vn") {
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		}
+		else if (identifier == "f") {
+			VertexData triangle[3];
+			//面は三角形限定。その他は未対応
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+				//頂点の要素へのIndexは「位置/uV/法線」で格納されているので、分解してIndexを取得する
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/');// /区切りでインデックスを読んでいく
+					elementIndices[element] = std::stoi(index);
+
+				}
+				//要素へのIndexから、実際の要素の値を取得して、頂点を構築する
+				Vector4 position = positions[elementIndices[0] - 1];
+				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+
+				position.x *= -1.0f;
+				position.z *= -1.0f;
+				normal.x *= -1.0f;
+				normal.z *= -1.0f;
+				texcoord.x = 1.0f - texcoord.x;
+				texcoord.y = 1.0f - texcoord.y;
+				//VertexData vertex = { position, texcoord, normal };
+				//modelData.vertices.push_back(vertex);
+				triangle[faceVertex] = { position,texcoord,normal };
+			}
+			modelData.vertices.push_back(triangle[0]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[2]);
+
+		}
+	}
+	return ModelData(modelData);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(int _textureHandle)
