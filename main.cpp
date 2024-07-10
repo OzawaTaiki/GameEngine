@@ -162,7 +162,6 @@ struct Texture
 std::vector<Texture> textures;
 void DeleteTextures();
 
-
 ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename);
 
 /// <summary>
@@ -589,8 +588,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
 
 
 	//シリアライズしてバイナリする
@@ -696,11 +693,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	pLog("materialResource", materialResource);
 
 #pragma region 平行光源
 	DirectionalLight* directionalLightData = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device, sizeof(DirectionalLight));
 	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	pLog("directionalLightResource", directionalLightResource);
 
 	directionalLightData->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightData->direction = { 0.0f,-1.0f,0.0f };
@@ -713,7 +712,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region OBjの読み込み
 
 	//モデル読み込み
-	ModelData modelData = LoadObjFile("resources/obj", "axis.obj");
+	ModelData modelData = LoadObjFile("resources/obj", "bunny.obj");
 	//頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourcePlane = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
@@ -721,6 +720,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vertexBufferViewPlane.BufferLocation = vertexResourcePlane->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う
 	vertexBufferViewPlane.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());//使用するリソースのサイズは頂点のサイズ
 	vertexBufferViewPlane.StrideInBytes = sizeof(VertexData);//1頂点あたりのサイズ
+	pLog("vertexResourcePlane", vertexResourcePlane);
 
 	//頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
@@ -733,6 +733,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	materialDataPlane->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialDataPlane->enabledLighthig = false;
 	materialDataPlane->uvTransform = MakeIdentity4x4();
+	pLog("materialResorcePlane", materialResorcePlane);
 
 	// Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	Microsoft::WRL::ComPtr<ID3D12Resource> WvpMatrixResourcePlane = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -742,6 +743,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	WvpMatrixResourcePlane->Map(0, nullptr, reinterpret_cast<void**>(&WvpMatrixDataPlane));
 	// 単位行列を書きこんでおく
 	WvpMatrixDataPlane->World = MakeIdentity4x4();
+	pLog("WvpMatrixResourcePlane", WvpMatrixResourcePlane);
 
 
 
@@ -749,12 +751,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	float* visiblePlane = nullptr;
 	texVisiblityPlane->Map(0, nullptr, reinterpret_cast<void**>(&visiblePlane));
 	*visiblePlane = 1.0f;
+	pLog("texVisiblityPlane", texVisiblityPlane);
 
 #pragma endregion
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	pLog("depthStencilResource", depthStencilResource);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	pLog("dsvDescriptorHeap", dsvDescriptorHeap);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//基本的にはresourceに合わせる
@@ -871,7 +876,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
 					ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
-					ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
+					//ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
 					//triangle1->materialData->color = objColor1;
 					ImGui::TreePop();
 				}
@@ -908,9 +913,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 
 			ImGui::End();
-
-
-
 
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -1046,12 +1048,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	materialResource->Unmap(0, nullptr);
-	directionalLightResource->Unmap(0, nullptr);
-	vertexResourcePlane->Unmap(0, nullptr);
-	materialResorcePlane->Unmap(0, nullptr);
-	WvpMatrixResourcePlane->Unmap(0, nullptr);
-	texVisiblityPlane->Unmap(0, nullptr);
 
 	DeleteTextures();
 
