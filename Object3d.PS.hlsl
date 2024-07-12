@@ -55,7 +55,8 @@ PixelShaderOutput main(VertexShaderOutput _input)
     
     if (enableLighting != 0)
     {
-        output.color = materialColor * textureColor * lightColor * cos * intensity;
+        output.color.rgb = materialColor.rgb * textureColor.rgb * lightColor.rgb * cos * intensity;
+        output.color.a = materialColor.a * textureColor.a;
     }
     else
         output.color = materialColor * textureColor;

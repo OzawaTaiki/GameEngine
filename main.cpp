@@ -128,11 +128,14 @@ struct  Object
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
-	float* visible;
-	Microsoft::WRL::ComPtr<ID3D12Resource> texVisiblity;
-	D3D12_VERTEX_BUFFER_VIEW indexBufferView;
+	float* useTexture;
+	uint32_t* indexData;
+	Microsoft::WRL::ComPtr<ID3D12Resource> useTextureResource;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	uint32_t vertexNum;
+	uint32_t indexNum;
+	int textureHandle;
 
 
 	/*~Object() {
@@ -219,7 +222,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">三角形のデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, int _textureHandle = -1);
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = -1);
 
 /// <summary>
 /// スプライトの描画
@@ -227,9 +230,9 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">スプライトのデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, int _textureHandle = -1);
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = 0);
 
-void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = -1);
+void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = 0);
 
 
 struct D3DResourceLeakChecker
@@ -633,7 +636,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	D3D12_BLEND_DESC blendDesc{};
 	//すべての色要素を書き込む
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	/// RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -712,7 +721,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region OBjの読み込み
 
 	//モデル読み込み
-	ModelData modelData = LoadObjFile("resources/obj", "bunny.obj");
+	ModelData modelData = LoadObjFile("resources/obj", "plane.obj");
 	//頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourcePlane = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
@@ -731,7 +740,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Material* materialDataPlane;
 	materialResorcePlane->Map(0, nullptr, reinterpret_cast<void**>(&materialDataPlane));
 	materialDataPlane->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialDataPlane->enabledLighthig = false;
+	materialDataPlane->enabledLighthig = true;
 	materialDataPlane->uvTransform = MakeIdentity4x4();
 	pLog("materialResorcePlane", materialResorcePlane);
 
@@ -754,6 +763,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	pLog("texVisiblityPlane", texVisiblityPlane);
 
 #pragma endregion
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
 	pLog("depthStencilResource", depthStencilResource);
@@ -788,9 +798,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	scissorRect.bottom = kClientHeight;
 
 
-	//int cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	int uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	//int ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 
 
@@ -818,9 +825,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	bool ishalf = true;
 
 	stTransform transformObj{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	stTransform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	stTransform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	int currentTexture = 0;
 	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
+
+	bool enableLightting[2] = { true,true };
+	bool useTexture[2] = { true ,true };
+
+
+	int cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	int uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	int ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+
+	Object* sphere = new Object;
+	MakeSphereData(device, sphere);
+
+
+	Object* sprite = new Object;
+	MakeSpriteData(device, sprite);
 
 	///
 	/// メインループ
@@ -859,44 +885,54 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
 					ImGui::TreePop();
 				}
-				//if (ImGui::TreeNode("Sphere"))
-				//{
-				//	ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
-				//	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-				//	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-				//	ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
-				//	ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
-				//	//triangle1->materialData->color = objColor1;
-				//	ImGui::TreePop();
-				//}
+				if (ImGui::TreeNode("Sphere"))
+				{
+					ImGui::ColorEdit4("color", &objColor1.x);
+					ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+					ImGui::Checkbox("Lighting", &enableLightting[0]);
+					ImGui::Checkbox("useTexture", &useTexture[0]);
+					ImGui::Combo("texture", &sphere->textureHandle, textureOption, IM_ARRAYSIZE(textureOption));
+					sphere->materialData->color = objColor1;
+					sphere->materialData->enabledLighthig = enableLightting[0];
+					*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
+					ImGui::TreePop();
+				}
 
 				if (ImGui::TreeNode("OBJ"))
 				{
-					ImGui::DragFloat4("color", &objColor1.x, 0.01f, 0.0f, 1.0f);
+					ImGui::ColorEdit4("color", &objColor1.x);
 					ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
 					ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
-					//ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
-					//triangle1->materialData->color = objColor1;
+					ImGui::Checkbox("Lighting", &enableLightting[1]);
+					ImGui::Checkbox("useTexture", &useTexture[1]);
+					ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
+					materialDataPlane->color = objColor1;
+					materialDataPlane->enabledLighthig = enableLightting[1];
+					*visiblePlane = useTexture[1] ? 1.0f : 0.0f;
 					ImGui::TreePop();
 				}
-				/*if (ImGui::TreeNode("Sprite"))
+				if (ImGui::TreeNode("Sprite"))
 				{
-					ImGui::ColorEdit3("color", &objColor1.x);
+					ImGui::ColorEdit4("color", &objColor1.x);
 					ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
 					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
-					materialDataSprite->color = objColor1;
+					ImGui::Combo("texture", &sprite->textureHandle, textureOption, IM_ARRAYSIZE(textureOption));
+					sprite->materialData->color = objColor1;
 
 					if (ImGui::TreeNode("uvTransform"))
 					{
-						ImGui::DragFloat2("uvTranslate", &unTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-						ImGui::DragFloat2("uvScale", &unTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-						ImGui::SliderAngle("uvRotate", &unTransformSprite.rotate.z);
+						ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
+						ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
+						ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
+						sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
 						ImGui::TreePop();
 					}
 					ImGui::TreePop();
-				}*/
+				}
 
 				if (ImGui::TreeNode("DirectionalLight"))
 				{
@@ -921,6 +957,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			*WvpMatrixDataPlane = CalculateObjectWVPMat(transformObj, viewProjectionMatrix);
 
+			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
+			*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
 
 			///
 			/// 更新処理ここまで
@@ -938,7 +976,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//バリアを貼る対象のリソース。現在のバックバッファに対して行う
 			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 			//遷移前（現在）のResourceState
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;3
 			//遷移後のResourceState
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			//transitionBarrierを張る
@@ -981,8 +1019,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			// 頂点形式を。PSOに設定しているものと同じだが別途、同じものを設定することが必要らしい。
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
 
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResorcePlane->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourcePlane->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(currentTexture));
@@ -990,7 +1028,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
-
+			DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
+			DrawSphere(commandList, sphere, directionalLightResource, sphere->textureHandle);
 
 			///
 			/// 描画ここまで
@@ -1048,7 +1087,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-
+	delete sphere;
+	delete sprite;
 	DeleteTextures();
 
 #ifdef _DEBUG
@@ -1497,14 +1537,15 @@ void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Objec
 	// 1頂点あたりのサイズ
 	_obj->vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	_obj->materialData = new Material;
-	_obj->materialData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 
 	///色の変更
 	_obj->materialResource = CreateBufferResource(_device, sizeof(Vector4) * 3);
 	_obj->materialData = nullptr;
 	_obj->materialResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->materialData));
+	_obj->materialData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	_obj->materialData->enabledLighthig = true;
+	_obj->materialData->uvTransform = MakeIdentity4x4();
 
 	//wvp用のリソースを作る。Matrix4x4 1つ分のサイズをサイズを用意する
 	_obj->wvpResource = CreateBufferResource(_device, sizeof(TransformationMatrix));
@@ -1515,10 +1556,10 @@ void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Objec
 	//単位行列を書き込んでおく
 	_obj->transformMat->World = MakeIdentity4x4();
 
-	_obj->texVisiblity = CreateBufferResource(_device, sizeof(float));
-	_obj->visible = nullptr;
-	_obj->texVisiblity->Map(0, nullptr, reinterpret_cast<void**>(&_obj->visible));
-	*_obj->visible = 1.0f;
+	_obj->useTextureResource = CreateBufferResource(_device, sizeof(float));
+	_obj->useTexture = nullptr;
+	_obj->useTextureResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->useTexture));
+	*_obj->useTexture = 1.0f;
 
 	/// Resourceにデータを書き込む
 	// 頂点バッファーフォーマットが定義されて
@@ -1545,6 +1586,7 @@ void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Objec
 	_obj->vertexData[2].normal.z = _obj->vertexData[2].position.z;
 
 	_obj->vertexNum = 3;
+	_obj->textureHandle = -1;
 
 }
 
@@ -1575,17 +1617,17 @@ void MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->transformMat->World = MakeIdentity4x4();
 
 
-	_obj->texVisiblity = CreateBufferResource(_device, sizeof(float));
-	_obj->visible = nullptr;
-	_obj->texVisiblity->Map(0, nullptr, reinterpret_cast<void**>(&_obj->visible));
-	*_obj->visible = 1.0f;
+	_obj->useTextureResource = CreateBufferResource(_device, sizeof(float));
+	_obj->useTexture = nullptr;
+	_obj->useTextureResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->useTexture));
+	*_obj->useTexture = 0.0f;
 
 	///色の変更
 	_obj->materialResource = CreateBufferResource(_device, sizeof(Material) * sphereVertexNum);
-	_obj->materialData = nullptr;
 	_obj->materialResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->materialData));
 	_obj->materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	_obj->materialData->enabledLighthig = true;
+	_obj->materialData->uvTransform = MakeIdentity4x4();
 
 	_obj->vertexData = nullptr;
 	_obj->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->vertexData));
@@ -1663,8 +1705,11 @@ void MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 		};
 	}
 	_obj->vertexNum = sphereVertexNum;
+	_obj->textureHandle = 0;
 
 }
+
+
 
 void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object* _obj)
 {
@@ -1677,6 +1722,7 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
 	// 1頂点あたりのサイズ
 	_obj->vertexBufferView.StrideInBytes = sizeof(VertexData);
+
 
 	_obj->vertexData = nullptr;
 	_obj->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->vertexData));
@@ -1696,18 +1742,34 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->vertexData[2].normal = { 0.0f,0.0f,-1.0f };
 	_obj->vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
+	_obj->indexResource = CreateBufferResource(_device, sizeof(uint32_t) * 6);
+	_obj->indexBufferView.BufferLocation = _obj->indexResource->GetGPUVirtualAddress();
+	_obj->indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
+	_obj->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+	_obj->indexData = nullptr;
+	_obj->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->indexData));
+
+	_obj->indexData[0] = 0;
+	_obj->indexData[1] = 1;
+	_obj->indexData[2] = 2;
+	_obj->indexData[3] = 1;
+	_obj->indexData[4] = 3;
+	_obj->indexData[5] = 2;
+
 	_obj->materialResource = CreateBufferResource(_device, sizeof(Material));
 
 	_obj->materialData = new Material;
 	_obj->materialResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->materialData));
 	_obj->materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	_obj->materialData->enabledLighthig = true;
+	_obj->materialData->enabledLighthig = false;
+	_obj->materialData->uvTransform = MakeIdentity4x4();
 
 
-	_obj->texVisiblity = CreateBufferResource(_device, sizeof(float));
-	_obj->visible = nullptr;
-	_obj->texVisiblity->Map(0, nullptr, reinterpret_cast<void**>(&_obj->visible));
-	*_obj->visible = 1.0f;
+	_obj->useTextureResource = CreateBufferResource(_device, sizeof(float));
+	_obj->useTexture = nullptr;
+	_obj->useTextureResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->useTexture));
+	*_obj->useTexture = 1.0f;
 
 	// Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	_obj->wvpResource = CreateBufferResource(_device, sizeof(TransformationMatrix));
@@ -1718,6 +1780,8 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	// 単位行列を書きこんでおく
 	_obj->transformMat->World = MakeIdentity4x4();
 	_obj->transformMat->WVP = MakeIdentity4x4();
+
+	_obj->textureHandle = 0;
 }
 
 TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
@@ -1740,34 +1804,42 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 	return TransformationMatrix(transMat);
 }
 
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, int _textureHandle)
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
 	_commandList->SetGraphicsRootConstantBufferView(0, _obj->materialResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(1, _obj->wvpResource->GetGPUVirtualAddress());
 	if (_textureHandle == -1)
+	{
+		*_obj->useTexture = 0.0f;
 		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(0));
+	}
 	else
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_textureHandle));
-	_commandList->SetGraphicsRootConstantBufferView(3, _obj->texVisiblity->GetGPUVirtualAddress());
+	{
+		*_obj->useTexture = 1.0f;
+		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj->textureHandle));
+	}
+	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_textureHandle));
+	_commandList->SetGraphicsRootConstantBufferView(3, _obj->useTextureResource->GetGPUVirtualAddress());
+	_commandList->SetGraphicsRootConstantBufferView(4, _light->GetGPUVirtualAddress());
 
 	_commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, int _textureHandle)
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
+	_commandList->IASetIndexBuffer(&_obj->indexBufferView);
 
 	_commandList->SetGraphicsRootConstantBufferView(0, _obj->materialResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(1, _obj->wvpResource->GetGPUVirtualAddress());
-	if (_textureHandle == -1)
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(0));
-	else
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_textureHandle));
-	_commandList->SetGraphicsRootConstantBufferView(3, _obj->texVisiblity->GetGPUVirtualAddress());
 
-	_commandList->DrawInstanced(6, 1, 0, 0);
+	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj->textureHandle));
+	_commandList->SetGraphicsRootConstantBufferView(3, _obj->useTextureResource->GetGPUVirtualAddress());
+	_commandList->SetGraphicsRootConstantBufferView(4, _light->GetGPUVirtualAddress());
+
+	_commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
@@ -1776,11 +1848,8 @@ void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 
 	_commandList->SetGraphicsRootConstantBufferView(0, _obj->materialResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(1, _obj->wvpResource->GetGPUVirtualAddress());
-	if (_textureHandle == -1)
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(0));
-	else
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_textureHandle));
-	_commandList->SetGraphicsRootConstantBufferView(3, _obj->texVisiblity->GetGPUVirtualAddress());
+	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj->textureHandle));
+	_commandList->SetGraphicsRootConstantBufferView(3, _obj->useTextureResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(4, _light->GetGPUVirtualAddress());
 
 	_commandList->DrawInstanced(_obj->vertexNum, 1, 0, 0);
