@@ -105,7 +105,7 @@ struct DirectionalLight
 	Vector4 color;		//ライトの色
 	Vector3 direction;	//ライトの向き
 	float intensity;	//輝度
-	int isHalf;
+	uint32_t isHalf;
 };
 
 struct TransformationMatrix
@@ -117,6 +117,8 @@ struct TransformationMatrix
 struct ModelData
 {
 	std::vector<VertexData> vertices;
+	std::string textureHandlePath;
+	uint32_t textureHandle;
 };
 
 struct  Object
@@ -135,22 +137,7 @@ struct  Object
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	uint32_t vertexNum;
 	uint32_t indexNum;
-	int textureHandle;
-
-
-	/*~Object() {
-		wvpResource->Unmap(0, nullptr);
-		vertexResource->Unmap(0, nullptr);
-		materialResource->Unmap(0, nullptr);
-		indexResource->Unmap(0, nullptr);
-		texVisiblity->Unmap(0, nullptr);
-
-		wvpResource->Release();
-		vertexResource->Release();
-		materialResource->Release();
-		indexResource->Release();
-		texVisiblity->Release();
-	};*/
+	uint32_t textureHandle;
 };
 
 struct Texture
@@ -165,14 +152,14 @@ struct Texture
 std::vector<Texture> textures;
 void DeleteTextures();
 
-ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename);
+ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
 
 /// <summary>
 /// 読み込んだテクスチャを取り出す
 /// </summary>
 /// <param name="_textureHandle">テクスチャハンドル</param>
 /// <returns>テクスチャデータ</returns>
-D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(int _textureHandle);
+D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle);
 
 /// <summary>
 /// テクスチャを読み込む
@@ -183,7 +170,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(int _textureHandle);
 /// <param name="_srvDescriptorHeap">ｓｒｖディスクリプタヒープ</param>
 /// <param name="_srvSize">srvのサイズ</param>
 /// <returns>テクスチャの登録番号</returns>
-int LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
+uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
 
 /// <summary>
 /// 三角形のデータ作成
@@ -222,7 +209,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">三角形のデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = -1);
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle = -1);
 
 /// <summary>
 /// スプライトの描画
@@ -230,9 +217,9 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">スプライトのデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = 0);
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle = 0);
 
-void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle = 0);
+void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle = 0);
 
 
 struct D3DResourceLeakChecker
@@ -636,13 +623,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	D3D12_BLEND_DESC blendDesc{};
 	//すべての色要素を書き込む
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	/*blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
 
 	/// RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -721,7 +708,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region OBjの読み込み
 
 	//モデル読み込み
-	ModelData modelData = LoadObjFile("resources/obj", "plane.obj");
+	ModelData modelData = LoadObjFile("resources/obj", "fence.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	//頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourcePlane = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
@@ -829,16 +816,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	stTransform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
-	int currentTexture = 0;
+	uint32_t currentTexture = 0;
 	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
 
 	bool enableLightting[2] = { true,true };
 	bool useTexture[2] = { true ,true };
 
 
-	int cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	int uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	int ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 
 	Object* sphere = new Object;
@@ -893,7 +881,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
 					ImGui::Checkbox("Lighting", &enableLightting[0]);
 					ImGui::Checkbox("useTexture", &useTexture[0]);
-					ImGui::Combo("texture", &sphere->textureHandle, textureOption, IM_ARRAYSIZE(textureOption));
+					int currentTex = static_cast<int>(sphere->textureHandle);
+					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						sphere->textureHandle = static_cast<uint32_t> (currentTex);
+					}
 					sphere->materialData->color = objColor1;
 					sphere->materialData->enabledLighthig = enableLightting[0];
 					*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
@@ -908,7 +900,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
 					ImGui::Checkbox("Lighting", &enableLightting[1]);
 					ImGui::Checkbox("useTexture", &useTexture[1]);
-					ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption));
+					int currentTex = static_cast<int>(currentTexture);
+					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						currentTexture = static_cast<uint32_t> (currentTex);
+					}
 					materialDataPlane->color = objColor1;
 					materialDataPlane->enabledLighthig = enableLightting[1];
 					*visiblePlane = useTexture[1] ? 1.0f : 0.0f;
@@ -920,7 +916,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
 					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
-					ImGui::Combo("texture", &sprite->textureHandle, textureOption, IM_ARRAYSIZE(textureOption));
+					int currentTex = static_cast<int>(sprite->textureHandle);
+					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						sprite->textureHandle = static_cast<uint32_t> (currentTex);
+					}
 					sprite->materialData->color = objColor1;
 
 					if (ImGui::TreeNode("uvTransform"))
@@ -976,7 +976,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//バリアを貼る対象のリソース。現在のバックバッファに対して行う
 			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 			//遷移前（現在）のResourceState
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;3
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			//遷移後のResourceState
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			//transitionBarrierを張る
@@ -1023,13 +1023,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewPlane);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResorcePlane->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(1, WvpMatrixResourcePlane->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(currentTexture));
+			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(modelData.textureHandle));
 			commandList->SetGraphicsRootConstantBufferView(3, texVisiblityPlane->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
-			DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
-			DrawSphere(commandList, sphere, directionalLightResource, sphere->textureHandle);
+			//DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
+			//DrawSphere(commandList, sphere, directionalLightResource, sphere->textureHandle);
 
 			///
 			/// 描画ここまで
@@ -1404,7 +1404,7 @@ void DeleteTextures()
 	textures.clear();
 }
 
-ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename)
+ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
 {
 	ModelData modelData;				//構築するmodelData
 	std::vector<Vector4> positions;		//位置
@@ -1420,7 +1420,6 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 		std::string identifier;
 		std::istringstream s(line);
 		s >> identifier;
-
 
 		if (identifier == "v") {
 			Vector4 position;
@@ -1458,20 +1457,40 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
 
-				position.x *= -1.0f;
+				//position.x *= -1.0f;
 				position.z *= -1.0f;
-				normal.x *= -1.0f;
+				//normal.x *= -1.0f;
 				normal.z *= -1.0f;
-				texcoord.x = 1.0f - texcoord.x;
+				//texcoord.x = 1.0f - texcoord.x;
 				texcoord.y = 1.0f - texcoord.y;
 				//VertexData vertex = { position, texcoord, normal };
 				//modelData.vertices.push_back(vertex);
 				triangle[faceVertex] = { position,texcoord,normal };
 			}
-			modelData.vertices.push_back(triangle[0]);
-			modelData.vertices.push_back(triangle[1]);
 			modelData.vertices.push_back(triangle[2]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[0]);
+		}
+		else if (identifier == "mtllib")
+		{
+			std::string mtlFilePath;
+			s >> mtlFilePath;
+			std::ifstream mtlFile(_directoryPath + "/" + mtlFilePath);
+			assert(mtlFile.is_open());
+			while (std::getline(mtlFile, line))
+			{
+				std::istringstream mtls(line);
+				mtls >> identifier;
 
+				if (identifier == "map_Kd")
+				{
+					std::string texturePath;
+					mtls >> texturePath;
+
+					modelData.textureHandlePath = _directoryPath + '/' + texturePath;
+					modelData.textureHandle = LoadTexture(modelData.textureHandlePath, _device, _commandList, _srvDescriptorHeap, _srvSize);
+				}
+			}
 		}
 	}
 	file.close();
@@ -1479,13 +1498,13 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 	return ModelData(modelData);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(int _textureHandle)
+D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle)
 {
 	assert(textures.size() > _textureHandle);
 	return textures[_textureHandle].srvHandlerGPU;
 }
 
-int LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
+uint32_t LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
 {
 
 	auto it = std::find_if(textures.begin(), textures.end(), [&](const auto& texture) {
@@ -1494,7 +1513,7 @@ int LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr<ID3D
 
 	if (it != textures.end())
 	{
-		return static_cast<int>(std::distance(textures.begin(), it));
+		return static_cast<uint32_t>(std::distance(textures.begin(), it));
 	}
 
 	textures.push_back(Texture());
@@ -1519,7 +1538,7 @@ int LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr<ID3D
 	textures[index].srvHandlerGPU = GetGPUDescriptorHandle(_srvDescriptorHeap, _srvSize, (uint32_t)index + 1);
 	_device->CreateShaderResourceView(textures[index].resource.Get(), &srvDesc, textures[index].srvHandlerCPU);
 
-	return (int)index;
+	return (uint32_t)index;
 }
 
 void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object* _obj)
@@ -1804,7 +1823,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 	return TransformationMatrix(transMat);
 }
 
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
@@ -1827,7 +1846,7 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 	_commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 	_commandList->IASetIndexBuffer(&_obj->indexBufferView);
@@ -1842,7 +1861,7 @@ void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 	_commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
-void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, int _textureHandle)
+void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, const Microsoft::WRL::ComPtr<ID3D12Resource>& _light, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
