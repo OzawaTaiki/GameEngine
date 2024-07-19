@@ -128,3 +128,9 @@ Vector3 operator-(const Vector3& _v)
 {
 	return Vector3(-_v.x, -_v.y, -_v.z);
 }
+
+Vector3& operator+=(Vector3& _v1, const Vector3& _v2)
+{
+	_v1 = _v1 + _v2;
+	return _v1;
+}
