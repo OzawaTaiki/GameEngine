@@ -150,6 +150,11 @@ struct ParticleForGPU
 	Matrix4x4 World;
 	Vector4 color;
 };
+struct AccelerationField
+{
+	Vector3 acceleration;
+	AABB area;
+};
 
 struct ModelData
 {
@@ -912,9 +917,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	std::list <Particle> particles;
-	/*particles.push_back(MakeNewParticle(randomEngine));
-	particles.push_back(MakeNewParticle(randomEngine));
-	particles.push_back(MakeNewParticle(randomEngine));*/
+	bool useBillboard = false;
 
 	Emitter emitter{};
 	emitter.count = 3;
@@ -926,8 +929,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		.translate = {0.0f,0.0f,0.0f}
 	};
 
-	bool useBillboard = false;
-
+	AccelerationField accelerationField;
+	accelerationField.acceleration = { 15.0f,0.0f,0.0f };
+	accelerationField.area.min = { -1.0f ,-1.0f ,-1.0f };
+	accelerationField.area.max = { 1.0f , 1.0f , 1.0f };
+	bool enableAccelerationField = false;
 
 	uint32_t currentTexture = 0;
 	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
@@ -1070,6 +1076,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				particles.push_back(MakeNewParticle(randomEngine));*/
 			}
 			ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+			ImGui::Checkbox("enableField", &enableAccelerationField);
 			if (ImGui::Combo("BlendMode", &currentBlendMode, blendModeOption, IM_ARRAYSIZE(blendModeOption)))
 			{
 				SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDesc);
@@ -1085,7 +1092,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 
-			uint32_t numInstance = 0;
 			emitter.frequencyTime += kDeltaTime;
 			if (emitter.frequency <= emitter.frequencyTime)
 			{
@@ -1093,6 +1099,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				emitter.frequencyTime -= emitter.frequency;
 			}
 
+			uint32_t numInstance = 0;
 			for (auto particleIterator = particles.begin(); particleIterator != particles.end();)
 			{
 				if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
@@ -1102,6 +1109,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				if (numInstance < kNumMaxInstance)
 				{
 					float  alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+
+					if (enableAccelerationField && IsCollision(accelerationField.area, (*particleIterator).transform.translate))
+					{
+						(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
+					}
 
 					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
 					(*particleIterator).currentTime += kDeltaTime;
