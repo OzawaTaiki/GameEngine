@@ -270,7 +270,7 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 
 void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model, const std::string& _directoryPath, const std::string& _filename);
 
-void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model);
+void InitializeData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model);
 
 /// <summary>
 /// スプライトのTransformationMatrixの計算
@@ -287,7 +287,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">三角形のデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle = 0);
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
 
 /// <summary>
 /// スプライトの描画
@@ -295,9 +295,11 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">スプライトのデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle = 0);
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
 
 void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
+
+void DrawObj(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, ModelData* _model, uint32_t _textureHandle = 0);
 
 Particle MakeNewParticle(std::mt19937& _randomEngine, const Emitter& _emitter);
 
@@ -766,6 +768,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
+	D3D12_INPUT_ELEMENT_DESC unUVInputElementDescs[2] = {};
+	unUVInputElementDescs[0].SemanticName = "POSITION";
+	unUVInputElementDescs[0].SemanticIndex = 0;
+	unUVInputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	unUVInputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	unUVInputElementDescs[1].SemanticName = "NORMAL";
+	unUVInputElementDescs[1].SemanticIndex = 0;
+	unUVInputElementDescs[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	unUVInputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	D3D12_INPUT_LAYOUT_DESC unVUInputLayoutDesc{};
+	unVUInputLayoutDesc.pInputElementDescs = unUVInputElementDescs;
+	unVUInputLayoutDesc.NumElements = _countof(unUVInputElementDescs);
+
 	/// BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
 	//すべての色要素を書き込む
@@ -992,36 +1009,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 
-	ModelData* modelData = new ModelData;
-	MakeModelData(device, modelData, "resources/obj", "plane.obj");
-
-	const uint32_t kNumMaxInstance = 100;
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = CreateBufferResource(device, sizeof(ParticleForGPU) * kNumMaxInstance);
-
-	ParticleForGPU* instancingData = nullptr;
-	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < kNumMaxInstance; index++)
-	{
-		instancingData->World = MakeIdentity4x4();
-		instancingData->WVP = MakeIdentity4x4();
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
-	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	instancingSrvDesc.Buffer.FirstElement = 0;
-	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = kNumMaxInstance;
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandlerCPU = GetCPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandlerGPU = GetGPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, 2);
-	device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandlerCPU);
-
-
-	///******************************************
-
 	///カメラ
 	CameraForGPU* cameraForGPU = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
@@ -1033,7 +1020,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	stTransform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,-10.0f} };
 
-	Vector4 objColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool ishalf = true;
 
 	stTransform transformObj{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
@@ -1041,27 +1027,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	stTransform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
-	std::list <Particle> particles;
-	bool useBillboard = false;
 
-	Emitter emitter{};
-	emitter.count = 3;
-	emitter.frequency = 0.5f;
-	emitter.frequencyTime = 0.0f;
-	emitter.transform = {
-		.scale = {1.0f,1.0f,1.0f},
-		.rotate = {0.0f,0.0f,0.0f},
-		.translate = {0.0f,0.0f,0.0f}
-	};
-
-	AccelerationField accelerationField;
-	accelerationField.acceleration = { 15.0f,0.0f,0.0f };
-	accelerationField.area.min = { -1.0f ,-1.0f ,-1.0f };
-	accelerationField.area.max = { 1.0f , 1.0f , 1.0f };
-	bool enableAccelerationField = false;
-
-
-	uint32_t currentTexture = 0;
+	int currentTexture = 0;
 	const char* textureOption[] = { "uvChecker","cube","monsterBall" };
 
 	int currentBlendMode = static_cast<int> (BlendMode::kBlendModeNormal);
@@ -1074,22 +1041,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
-	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+	ModelData* plane = new ModelData;
+	*plane = LoadObjFile("resources/obj", "plane.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+	stTransform planeTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 
 	Object* sphere = new Object;
 	MakeSphereData(device, sphere);
 
-
 	Object* sprite = new Object;
 	MakeSpriteData(device, sprite);
 
-	ModelData* terrianModel = new ModelData;
-	*terrianModel = LoadObjFile("resources/obj", "terrain.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
-	stTransform terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	ModelData* teapot = new ModelData;
+	*teapot = LoadObjFile("resources/obj", "teapot.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	stTransform teapotTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
+
+	ModelData* bunny = new ModelData;
+	*bunny = LoadObjFile("resources/obj", "bunny.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	stTransform bunnyTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
+	int scene = 0;
+	const char* sceneName[] = { "obj & sprite","sphere","obj & obj" };
 
 
 	///
@@ -1120,112 +1097,139 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//ImGui::ShowDemoWindow();
 
 			ImGui::Begin("Window");
-			//if (ImGui::CollapsingHeader("object"))
-			//{
-			if (ImGui::TreeNode("Camera"))
+			ImGui::Combo("scene", &scene, sceneName, IM_ARRAYSIZE(sceneName));
+
+			ImGui::BeginTabBar("camera");
+			if (ImGui::BeginTabItem("Camera"))
 			{
 				ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
 				ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
 				ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
-				ImGui::TreePop();
+				ImGui::EndTabItem();
 			}
-			if (ImGui::TreeNode("Sphere"))
+			ImGui::EndTabBar();
+			ImGui::Spacing();
+			ImGui::BeginTabBar("obj");
+
+			switch (scene)
 			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::SliderFloat("shininess", &sphere->materialData->shininess, 1.0f, 50.0f);
-				ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[0]);
-				ImGui::Checkbox("useTexture", &useTexture[0]);
-				int currentTex = static_cast<int>(sphere->textureHandle);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+			case 0:
+
+				if (ImGui::BeginTabItem("plane"))
 				{
-					sphere->textureHandle = static_cast<uint32_t> (currentTex);
+					ImGui::ColorEdit4("color", &plane->materialData->color.x);
+					ImGui::DragFloat3("scale", &planeTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &planeTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &planeTransform.translate.x, 0.01f);
+					//ImGui::Checkbox("Lighting", &enableLightting[0]);
+					ImGui::Checkbox("useTexture", &useTexture[0]);
+					currentTexture = static_cast<int>(plane->textureHandle);
+					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						plane->textureHandle = static_cast<uint32_t> (currentTexture);
+					}
+					plane->materialData->enabledLighthig = enableLightting[0];
+					*plane->useTexture = useTexture[0] ? 1.0f : 0.0f;
+					ImGui::EndTabItem();
 				}
-				sphere->materialData->color = objColor1;
-				sphere->materialData->enabledLighthig = enableLightting[0];
-				*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("OBJ"))
-			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[1]);
-				ImGui::Checkbox("useTexture", &useTexture[1]);
-				int currentTex = static_cast<int>(currentTexture);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+				if (ImGui::BeginTabItem("Sprite"))
 				{
-					currentTexture = static_cast<uint32_t> (currentTex);
+					ImGui::ColorEdit4("color", &sprite->materialData->color.x);
+					ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
+					currentTexture = static_cast<int>(sprite->textureHandle);
+					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						sprite->textureHandle = static_cast<uint32_t> (currentTexture);
+					}
+					ImGui::Spacing();
+					if (ImGui::CollapsingHeader("uvTransform"))
+					{
+						ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
+						ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
+						ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
+						sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
+					}
+					ImGui::EndTabItem();
 				}
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Sprite"))
-			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
-				int currentTex = static_cast<int>(sprite->textureHandle);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+				break;
+
+			case 1:
+				if (ImGui::BeginTabItem("Sphere"))
 				{
-					sprite->textureHandle = static_cast<uint32_t> (currentTex);
+					ImGui::ColorEdit4("color", &sphere->materialData->color.x);
+					ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+					ImGui::Checkbox("Lighting", &enableLightting[0]);
+					ImGui::Checkbox("useTexture", &useTexture[0]);
+					currentTexture = static_cast<int>(sphere->textureHandle);
+					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					{
+						sphere->textureHandle = static_cast<uint32_t> (currentTexture);
+					}
+					sphere->materialData->enabledLighthig = enableLightting[0];
+					*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
+					ImGui::EndTabItem();
 				}
-				sprite->materialData->color = objColor1;
-
-				if (ImGui::TreeNode("uvTransform"))
+				if (ImGui::BeginTabItem("DirectionalLight"))
 				{
-					ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
-					ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
-					ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
-					sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
-					ImGui::TreePop();
+					ImGui::ColorEdit3("color", &directionalLightData->color.x);
+					ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
+					ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
+					ImGui::Checkbox("enable Half Lambert", &ishalf);
+
+					directionalLightData->isHalf = ishalf;
+					directionalLightData->direction = Normalize(directionalLightData->direction);
+					ImGui::EndTabItem();
 				}
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Terrain"))
-			{
-				ImGui::ColorEdit4("color", &terrianModel->materialData->color.x);
-				ImGui::SliderFloat("shininess", &terrianModel->materialData->shininess, 1.0f, 50.0f);
-				ImGui::DragFloat3("scale", &terrainTrans.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &terrainTrans.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &terrainTrans.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[2]);
-				ImGui::Checkbox("useTexture", &useTexture[2]);
-				terrianModel->materialData->enabledLighthig = enableLightting[2];
-				*terrianModel->useTexture = useTexture[1] ? 1.0f : 0.0f;
-				ImGui::TreePop();
+
+				break;
+			case 2:
+				if (ImGui::BeginTabItem("teapot"))
+				{
+					ImGui::ColorEdit4("color", &teapot->materialData->color.x);
+					ImGui::DragFloat3("scale", &teapotTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &teapotTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &teapotTransform.translate.x, 0.01f);
+					ImGui::Checkbox("Lighting", &enableLightting[0]);
+					ImGui::Checkbox("useTexture", &useTexture[0]);
+					teapot->materialData->enabledLighthig = enableLightting[1];
+					*teapot->useTexture = useTexture[0] ? 1.0f : 0.0f;
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("bunny"))
+				{
+					ImGui::ColorEdit4("color", &bunny->materialData->color.x);
+					ImGui::DragFloat3("scale", &bunnyTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("rotate", &bunnyTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("translate", &bunnyTransform.translate.x, 0.01f);
+					ImGui::Checkbox("Lighting", &enableLightting[1]);
+					ImGui::Checkbox("useTexture", &useTexture[1]);
+					bunny->materialData->enabledLighthig = enableLightting[1];
+					*bunny->useTexture = useTexture[1] ? 1.0f : 0.0f;
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("DirectionalLight"))
+				{
+					ImGui::ColorEdit3("color", &directionalLightData->color.x);
+					ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
+					ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
+					ImGui::Checkbox("enable Half Lambert", &ishalf);
+
+					directionalLightData->isHalf = ishalf;
+					directionalLightData->direction = Normalize(directionalLightData->direction);
+					ImGui::EndTabItem();
+				}
+
+				break;
+			default:
+				break;
 			}
 
 
-			if (ImGui::TreeNode("DirectionalLight"))
-			{
-				ImGui::ColorEdit3("color", &directionalLightData->color.x);
-				ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
-				ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
-				ImGui::Checkbox("isHalf", &ishalf);
-
-				directionalLightData->isHalf = ishalf;
-				directionalLightData->direction = Normalize(directionalLightData->direction);
-				ImGui::TreePop();
-			}
-
-			//}
-			if (ImGui::Button("Add Particles"))
-			{
-				particles.splice(particles.end(), Emit(emitter, randomEngine));
-			}
-			ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
-			ImGui::Checkbox("enableField", &enableAccelerationField);
-			if (ImGui::Combo("BlendMode", &currentBlendMode, blendModeOption, IM_ARRAYSIZE(blendModeOption)))
-			{
-				SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDescForInstancing);
-				device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
-			}
-			ImGui::Checkbox("useBillboard", &useBillboard);
+			ImGui::EndTabBar();
 			ImGui::End();
 
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
@@ -1235,50 +1239,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			cameraForGPU->worldPosition = cameraTransform.translate;
 
-			//pointLightData->position = Transform(pointLightPosition, viewProjectionMatrix);
-
-
-			emitter.frequencyTime += kDeltaTime;
-			if (emitter.frequency <= emitter.frequencyTime)
-			{
-				particles.splice(particles.end(), Emit(emitter, randomEngine));
-				emitter.frequencyTime -= emitter.frequency;
-			}
-
-			uint32_t numInstance = 0;
-			for (auto particleIterator = particles.begin(); particleIterator != particles.end();)
-			{
-				if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
-					particleIterator = particles.erase(particleIterator);
-					continue;
-				}
-				if (numInstance < kNumMaxInstance)
-				{
-					float  alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-
-					if (enableAccelerationField && IsCollision(accelerationField.area, (*particleIterator).transform.translate))
-					{
-						(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
-					}
-
-					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-					(*particleIterator).currentTime += kDeltaTime;
-					instancingData[numInstance].WVP = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).WVP;
-					instancingData[numInstance].World = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).World;
-					(*particleIterator).color.w = alpha;
-					instancingData[numInstance].color = (*particleIterator).color;
-					numInstance++;
-				}
-
-				particleIterator++;
-			}
-
-			//*WvpMatrixDataPlane = CalculateObjectWVPMat(transformObj, viewProjectionMatrix);
-
-			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
 
 			*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
-			*terrianModel->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
+			*plane->transformMat = CalculateObjectWVPMat(planeTransform, viewProjectionMatrix);
+			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
+			*teapot->transformMat = CalculateObjectWVPMat(teapotTransform, viewProjectionMatrix);
+			*bunny->transformMat = CalculateObjectWVPMat(bunnyTransform, viewProjectionMatrix);
+
 
 			///
 			/// 更新処理ここまで
@@ -1328,13 +1295,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			/// 描画ここから 
 			/// 
 
-			//TODO:draw関数を作りたい
-			//(x-min)/(max-min);
-
 
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
 
 			commandList->SetGraphicsRootSignature(rootSignature.Get());
 			commandList->SetPipelineState(graphicsPipelineState.Get());                 // PSOを設定
@@ -1342,20 +1304,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(5, cameraResource->GetGPUVirtualAddress());
 
-			//DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
-			DrawSphere(commandList, sphere, sphere->textureHandle);
+
+			switch (scene)
+			{
+			case 0:
+				DrawObj(commandList, plane, plane->textureHandle);
+				DrawSprite(commandList, sprite, sprite->textureHandle);
+
+				break;
+			case 1:
+				DrawSphere(commandList, sphere, sphere->textureHandle);
+				break;
+			case 2:
+				DrawObj(commandList, bunny, bunny->textureHandle);
+				DrawObj(commandList, teapot, teapot->textureHandle);
+				break;
+			default:
+				break;
+			}
 
 
-
-			//commandList->SetGraphicsRootSignature(rootSignatureForInstancing.Get());
-			//commandList->SetPipelineState(graphicsPipelineStateForInstancing.Get());                 // PSOを設定
-
-			commandList->IASetVertexBuffers(0, 1, &terrianModel->vertexBufferView);
-			commandList->SetGraphicsRootConstantBufferView(0, terrianModel->materialResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(1, terrianModel->wvpResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(terrianModel->textureHandle));
-			commandList->SetGraphicsRootConstantBufferView(3, terrianModel->useTextureResource->GetGPUVirtualAddress());
-			commandList->DrawInstanced(UINT(terrianModel->vertices.size()), 1, 0, 0);
 
 			///
 			/// 描画ここまで
@@ -1415,8 +1383,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	delete sphere;
 	delete sprite;
-	delete modelData;
-	delete terrianModel;
+	delete plane;
 	DeleteTextures();
 
 #ifdef _DEBUG
@@ -1804,7 +1771,8 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 	}
 	file.close();
 
-	InitializeMeshData(_device, &modelData);
+	InitializeData(_device, &modelData);
+	modelData.vertexNum = static_cast<uint32_t> (modelData.vertices.size());
 
 	return ModelData(modelData);
 }
@@ -2188,10 +2156,10 @@ void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _mo
 {
 	//モデル読み込み
 	*_model = LoadObjFile(_directoryPath, _filename);
-	InitializeMeshData(_device, _model);
+	InitializeData(_device, _model);
 }
 
-void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model)
+void InitializeData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model)
 {
 	//頂点リソースを作る
 	_model->vertexResource = CreateBufferResource(_device, sizeof(VertexData) * _model->vertices.size());
@@ -2246,7 +2214,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 	return TransformationMatrix(transMat);
 }
 
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle)
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
@@ -2268,7 +2236,7 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 	_commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle)
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 	_commandList->IASetIndexBuffer(&_obj->indexBufferView);
@@ -2292,6 +2260,18 @@ void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 	_commandList->SetGraphicsRootConstantBufferView(3, _obj->useTextureResource->GetGPUVirtualAddress());
 
 	_commandList->DrawInstanced(_obj->vertexNum, 1, 0, 0);
+}
+
+void DrawObj(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, ModelData* _model, uint32_t _textureHandle)
+{
+	_commandList->IASetVertexBuffers(0, 1, &_model->vertexBufferView);
+
+	_commandList->SetGraphicsRootConstantBufferView(0, _model->materialResource->GetGPUVirtualAddress());
+	_commandList->SetGraphicsRootConstantBufferView(1, _model->wvpResource->GetGPUVirtualAddress());
+	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_model->textureHandle));
+	_commandList->SetGraphicsRootConstantBufferView(3, _model->useTextureResource->GetGPUVirtualAddress());
+
+	_commandList->DrawInstanced(_model->vertexNum, 1, 0, 0);
 }
 
 Particle MakeNewParticle(std::mt19937& _randomEngine, const Emitter& _emitter)
