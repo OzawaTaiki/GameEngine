@@ -110,6 +110,7 @@ struct Material
 	int32_t enabledLighthig;
 	float padding[3];
 	Matrix4x4 uvTransform;
+	float shininess;
 };
 
 struct DirectionalLight
@@ -120,10 +121,23 @@ struct DirectionalLight
 	uint32_t isHalf;
 };
 
+struct PointLight
+{
+	Vector4 color;
+	Vector3 position;
+	float intensity;
+};
+
+struct CameraForGPU
+{
+	Vector3 worldPosition;
+};
+
 struct TransformationMatrix
 {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
+	Matrix4x4 worldInverseTranspose;
 };
 
 struct Particle
@@ -150,11 +164,14 @@ struct ParticleForGPU
 	Matrix4x4 World;
 	Vector4 color;
 };
+
 struct AccelerationField
 {
 	Vector3 acceleration;
 	AABB area;
 };
+
+
 
 struct ModelData
 {
@@ -176,8 +193,6 @@ struct ModelData
 	uint32_t vertexNum;
 	uint32_t indexNum;
 	uint32_t textureHandle;
-
-
 };
 
 struct  Object
@@ -255,6 +270,8 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 
 void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model, const std::string& _directoryPath, const std::string& _filename);
 
+void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model);
+
 /// <summary>
 /// スプライトのTransformationMatrixの計算
 /// </summary>
@@ -270,7 +287,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">三角形のデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle = 0);
 
 /// <summary>
 /// スプライトの描画
@@ -278,7 +295,7 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">スプライトのデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle = 0);
 
 void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle = 0);
 
@@ -322,8 +339,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 
-	///COMの初期化
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	///COMの初期化	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	/// ウィンドウクラスを登録する
 	WNDCLASS wc{};
@@ -587,58 +603,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
 
-	/// RootSignatrueを生成する
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	//descriptorRange
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = 0;//０から始まる
-	descriptorRange[0].NumDescriptors = 1;//数は１つ
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
-
-
-	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
-	descriptorRangeForInstancing[0].BaseShaderRegister = 0;//0から始まる
-	descriptorRangeForInstancing[0].NumDescriptors = 1;//数は1つ
-	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	// RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
-
-	//rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	//rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-	//rootParameters[1].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
-
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;// CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
-
-
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
-
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;                           // レジスタ番号1を使う
-
-
-	//rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	//rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	//rootParameters[4].Descriptor.ShaderRegister = 2;                           // レジスタ番号1を使う
-
-	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
-
-
 
 
 
@@ -652,9 +616,64 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
 	staticSamplers[0].ShaderRegister = 0;
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-	descriptionRootSignature.pStaticSamplers = staticSamplers;
 
+	//descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+	//descriptionRootSignature.pStaticSamplers = staticSamplers;
+
+
+	/// RootSignatrueを生成する
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	//descriptorRange
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+	descriptorRange[0].NumDescriptors = 1;//数は１つ
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
+	// RootParameter作成
+	D3D12_ROOT_PARAMETER rootParameters[6] = {};
+
+	//マテリアル
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+	//テクスチャの有無
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].Descriptor.ShaderRegister = 1;
+
+	//directinalLight
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 2;
+
+	//カメラ
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].Descriptor.ShaderRegister = 3;
+
+	////pointLight
+	//rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//rootParameters[6].Descriptor.ShaderRegister = 4;
+
+	descriptionRootSignature.pParameters = rootParameters;
+	descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
+
+	descriptionRootSignature.pStaticSamplers = staticSamplers;
+	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	//シリアライズしてバイナリする
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
@@ -669,6 +688,61 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature = nullptr;
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
+
+
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignatureForInstancing{};
+	descriptionRootSignatureForInstancing.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
+	descriptorRangeForInstancing[0].BaseShaderRegister = 0;//0から始まる
+	descriptorRangeForInstancing[0].NumDescriptors = 1;//数は1つ
+	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// RootParameter作成
+	D3D12_ROOT_PARAMETER rootParametersForInstancing[4] = {};
+	rootParametersForInstancing[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParametersForInstancing[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+	rootParametersForInstancing[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+
+	rootParametersForInstancing[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;// CBVを使う
+	rootParametersForInstancing[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
+	rootParametersForInstancing[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;
+	rootParametersForInstancing[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
+
+
+	rootParametersForInstancing[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+	rootParametersForInstancing[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+	rootParametersForInstancing[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+	rootParametersForInstancing[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+	rootParametersForInstancing[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParametersForInstancing[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+	rootParametersForInstancing[3].Descriptor.ShaderRegister = 1;                           // レジスタ番号1を使う
+
+
+	descriptionRootSignatureForInstancing.pParameters = rootParametersForInstancing;
+	descriptionRootSignatureForInstancing.NumParameters = _countof(rootParametersForInstancing);         // 配列の長さ
+
+	descriptionRootSignatureForInstancing.pStaticSamplers = staticSamplers;
+	descriptionRootSignatureForInstancing.NumStaticSamplers = _countof(staticSamplers);
+
+
+
+	//シリアライズしてバイナリする
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlobForInstancing = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlobForInstancing = nullptr;
+	hr = D3D12SerializeRootSignature(&descriptionRootSignatureForInstancing, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlobForInstancing, &errorBlobForInstancing);
+	if (FAILED(hr))
+	{
+		Log(reinterpret_cast<char*>(signatureBlobForInstancing->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリをもとに生成
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignatureForInstancing = nullptr;
+	hr = device->CreateRootSignature(0, signatureBlobForInstancing->GetBufferPointer(), signatureBlobForInstancing->GetBufferSize(), IID_PPV_ARGS(&rootSignatureForInstancing));
+	assert(SUCCEEDED(hr));
+
 
 
 	/// InputLayoutの設定を行う
@@ -699,7 +773,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -712,12 +786,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	/// shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ComplieShader(L"Particle.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ComplieShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = ComplieShader(L"Particle.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = ComplieShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
+	/// shaderをコンパイルする
+	Microsoft::WRL::ComPtr<IDxcBlob> particleVSBlob = ComplieShader(L"Particle.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(vertexShaderBlob != nullptr);
+
+	Microsoft::WRL::ComPtr<IDxcBlob> particlePSBlob = ComplieShader(L"Particle.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(pixelShaderBlob != nullptr);
 
 
 	//DepthStencilStateの設定
@@ -725,10 +805,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//Depthの機能を有効にする
 	depthStencilDesc.DepthEnable = true;
 	//書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	//比較関数はLessEqeul つまり近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
+
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDescForInstancing{};
+	//Depthの機能を有効にする
+	depthStencilDescForInstancing.DepthEnable = true;
+	//書き込みします
+	depthStencilDescForInstancing.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//比較関数はLessEqeul つまり近ければ描画される
+	depthStencilDescForInstancing.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	/// PSOを生成する
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -753,13 +842,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 
+	/// PSOを生成する
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescForInstancing{};
+	graphicsPipelineStateDescForInstancing.pRootSignature = rootSignatureForInstancing.Get();                                                 // RootSignature
+	graphicsPipelineStateDescForInstancing.InputLayout = inputLayoutDesc;                                                        // InputLayout
+	graphicsPipelineStateDescForInstancing.VS = { particleVSBlob->GetBufferPointer(), particleVSBlob->GetBufferSize() };	        // VertexShader
+	graphicsPipelineStateDescForInstancing.PS = { particlePSBlob->GetBufferPointer(), particlePSBlob->GetBufferSize() };         // PixelShader
+	//graphicsPipelineStateDescForInstancing.BlendState = blendDesc;                                                               // BlendState
+	SetBlendMode(BlendMode::kBlendModeNormal, graphicsPipelineStateDescForInstancing);
+	graphicsPipelineStateDescForInstancing.RasterizerState = rasterizerDesc;                                                     // RasterizerState
+	// 追加の DRTV の情報
+	graphicsPipelineStateDescForInstancing.NumRenderTargets = 1;
+	graphicsPipelineStateDescForInstancing.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDescForInstancing.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	graphicsPipelineStateDescForInstancing.DepthStencilState = depthStencilDescForInstancing;
+	graphicsPipelineStateDescForInstancing.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	// どのように画面に色を打ち込むかの設定 (気にしなくて良い)
+	graphicsPipelineStateDescForInstancing.SampleDesc.Count = 1;
+	graphicsPipelineStateDescForInstancing.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	// 実際に生成
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateForInstancing = nullptr;
+	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
+	assert(SUCCEEDED(hr));
+
 	///色の変更
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(VertexData) * 6);
 	Vector4* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	("materialResource", materialResource);
 
 #pragma region 平行光源
 	DirectionalLight* directionalLightData = nullptr;
@@ -771,6 +883,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	directionalLightData->intensity = 1.0f;
 	directionalLightData->isHalf = true;
 
+#pragma endregion
+
+#pragma region 点光源
+	/*PointLight* pointLightData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>pointLightResource = CreateBufferResource(device, sizeof(PointLight));
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+
+	pointLightData->color = { 1.0f,1.0f,1.0f,1.0f };
+	pointLightData->position = { 0.0f,-1.0f,0.0f };
+	pointLightData->intensity = 1.0f;*/
 #pragma endregion
 
 
@@ -872,7 +994,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ModelData* modelData = new ModelData;
 	MakeModelData(device, modelData, "resources/obj", "plane.obj");
-	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 	const uint32_t kNumMaxInstance = 100;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = CreateBufferResource(device, sizeof(ParticleForGPU) * kNumMaxInstance);
@@ -901,6 +1022,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	///******************************************
 
+	///カメラ
+	CameraForGPU* cameraForGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU));
 
 	///
 	/// 変数宣言
@@ -935,20 +1060,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	accelerationField.area.max = { 1.0f , 1.0f , 1.0f };
 	bool enableAccelerationField = false;
 
+
 	uint32_t currentTexture = 0;
-	const char* textureOption[] = { "cube","uvChecker","monsterBall" };
+	const char* textureOption[] = { "uvChecker","cube","monsterBall" };
 
 	int currentBlendMode = static_cast<int> (BlendMode::kBlendModeNormal);
 	const char* blendModeOption[] = { "normal","add","sub","multi","screen" };
 
-	bool enableLightting[2] = { true,true };
-	bool useTexture[2] = { true ,true };
+	bool enableLightting[3] = { true,true ,true };
+	bool useTexture[3] = { true ,true,true };
 
 
-	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
 
 	Object* sphere = new Object;
 	MakeSphereData(device, sphere);
@@ -956,6 +1085,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Object* sprite = new Object;
 	MakeSpriteData(device, sprite);
+
+	ModelData* terrianModel = new ModelData;
+	*terrianModel = LoadObjFile("resources/obj", "terrain.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+	stTransform terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
 
 	///
 	/// メインループ
@@ -985,102 +1120,110 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//ImGui::ShowDemoWindow();
 
 			ImGui::Begin("Window");
-			if (ImGui::CollapsingHeader("object"))
+			//if (ImGui::CollapsingHeader("object"))
+			//{
+			if (ImGui::TreeNode("Camera"))
 			{
-				if (ImGui::TreeNode("Camera"))
-				{
-					ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
-					ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
-					ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
-					ImGui::TreePop();
-				}
-				if (ImGui::TreeNode("Sphere"))
-				{
-					ImGui::ColorEdit4("color", &objColor1.x);
-					ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-					ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-					ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
-					ImGui::Checkbox("Lighting", &enableLightting[0]);
-					ImGui::Checkbox("useTexture", &useTexture[0]);
-					int currentTex = static_cast<int>(sphere->textureHandle);
-					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-					{
-						sphere->textureHandle = static_cast<uint32_t> (currentTex);
-					}
-					sphere->materialData->color = objColor1;
-					sphere->materialData->enabledLighthig = enableLightting[0];
-					*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
-					ImGui::TreePop();
-				}
-
-				if (ImGui::TreeNode("OBJ"))
-				{
-					ImGui::ColorEdit4("color", &objColor1.x);
-					ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
-					ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
-					ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
-					ImGui::Checkbox("Lighting", &enableLightting[1]);
-					ImGui::Checkbox("useTexture", &useTexture[1]);
-					int currentTex = static_cast<int>(currentTexture);
-					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-					{
-						currentTexture = static_cast<uint32_t> (currentTex);
-					}
-					//materialDataPlane->color = objColor1;
-					//materialDataPlane->enabledLighthig = enableLightting[1];
-					//*visiblePlane = useTexture[1] ? 1.0f : 0.0f;
-					ImGui::TreePop();
-				}
-				if (ImGui::TreeNode("Sprite"))
-				{
-					ImGui::ColorEdit4("color", &objColor1.x);
-					ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
-					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
-					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
-					int currentTex = static_cast<int>(sprite->textureHandle);
-					if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-					{
-						sprite->textureHandle = static_cast<uint32_t> (currentTex);
-					}
-					sprite->materialData->color = objColor1;
-
-					if (ImGui::TreeNode("uvTransform"))
-					{
-						ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
-						ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
-						ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
-						sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
-						ImGui::TreePop();
-					}
-					ImGui::TreePop();
-				}
-
-				if (ImGui::TreeNode("DirectionalLight"))
-				{
-					ImGui::DragFloat4("color", &directionalLightData->color.x, 0.01f, 0.0f, 1.0f);
-					ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
-					ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
-					ImGui::Checkbox("isHalf", &ishalf);
-
-					directionalLightData->isHalf = ishalf;
-					directionalLightData->direction = Normalize(directionalLightData->direction);
-					ImGui::TreePop();
-				}
+				ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
+				ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
+				ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
+				ImGui::TreePop();
 			}
+			if (ImGui::TreeNode("Sphere"))
+			{
+				ImGui::ColorEdit4("color", &objColor1.x);
+				ImGui::SliderFloat("shininess", &sphere->materialData->shininess, 1.0f, 50.0f);
+				ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+				ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+				ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+				ImGui::Checkbox("Lighting", &enableLightting[0]);
+				ImGui::Checkbox("useTexture", &useTexture[0]);
+				int currentTex = static_cast<int>(sphere->textureHandle);
+				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+				{
+					sphere->textureHandle = static_cast<uint32_t> (currentTex);
+				}
+				sphere->materialData->color = objColor1;
+				sphere->materialData->enabledLighthig = enableLightting[0];
+				*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("OBJ"))
+			{
+				ImGui::ColorEdit4("color", &objColor1.x);
+				ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
+				ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
+				ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
+				ImGui::Checkbox("Lighting", &enableLightting[1]);
+				ImGui::Checkbox("useTexture", &useTexture[1]);
+				int currentTex = static_cast<int>(currentTexture);
+				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+				{
+					currentTexture = static_cast<uint32_t> (currentTex);
+				}
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Sprite"))
+			{
+				ImGui::ColorEdit4("color", &objColor1.x);
+				ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
+				ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
+				ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
+				int currentTex = static_cast<int>(sprite->textureHandle);
+				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+				{
+					sprite->textureHandle = static_cast<uint32_t> (currentTex);
+				}
+				sprite->materialData->color = objColor1;
+
+				if (ImGui::TreeNode("uvTransform"))
+				{
+					ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
+					ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
+					ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
+					sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Terrain"))
+			{
+				ImGui::ColorEdit4("color", &terrianModel->materialData->color.x);
+				ImGui::SliderFloat("shininess", &terrianModel->materialData->shininess, 1.0f, 50.0f);
+				ImGui::DragFloat3("scale", &terrainTrans.scale.x, 0.01f);
+				ImGui::DragFloat3("rotate", &terrainTrans.rotate.x, 0.01f);
+				ImGui::DragFloat3("translate", &terrainTrans.translate.x, 0.01f);
+				ImGui::Checkbox("Lighting", &enableLightting[2]);
+				ImGui::Checkbox("useTexture", &useTexture[2]);
+				terrianModel->materialData->enabledLighthig = enableLightting[2];
+				*terrianModel->useTexture = useTexture[1] ? 1.0f : 0.0f;
+				ImGui::TreePop();
+			}
+
+
+			if (ImGui::TreeNode("DirectionalLight"))
+			{
+				ImGui::ColorEdit3("color", &directionalLightData->color.x);
+				ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
+				ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
+				ImGui::Checkbox("isHalf", &ishalf);
+
+				directionalLightData->isHalf = ishalf;
+				directionalLightData->direction = Normalize(directionalLightData->direction);
+				ImGui::TreePop();
+			}
+
+			//}
 			if (ImGui::Button("Add Particles"))
 			{
 				particles.splice(particles.end(), Emit(emitter, randomEngine));
-
-				/*particles.push_back(MakeNewParticle(randomEngine));
-				particles.push_back(MakeNewParticle(randomEngine));
-				particles.push_back(MakeNewParticle(randomEngine));*/
 			}
 			ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
 			ImGui::Checkbox("enableField", &enableAccelerationField);
 			if (ImGui::Combo("BlendMode", &currentBlendMode, blendModeOption, IM_ARRAYSIZE(blendModeOption)))
 			{
-				SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDesc);
-				device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+				SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDescForInstancing);
+				device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
 			}
 			ImGui::Checkbox("useBillboard", &useBillboard);
 			ImGui::End();
@@ -1090,6 +1233,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 			Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
 
+			cameraForGPU->worldPosition = cameraTransform.translate;
+
+			//pointLightData->position = Transform(pointLightPosition, viewProjectionMatrix);
 
 
 			emitter.frequencyTime += kDeltaTime;
@@ -1130,7 +1276,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//*WvpMatrixDataPlane = CalculateObjectWVPMat(transformObj, viewProjectionMatrix);
 
 			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
+
 			*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
+			*terrianModel->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
 
 			///
 			/// 更新処理ここまで
@@ -1184,24 +1332,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//(x-min)/(max-min);
 
 
-			// RootSignatureを設定。PSOに設定しているものと同じ必要がある
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+
 			commandList->SetGraphicsRootSignature(rootSignature.Get());
 			commandList->SetPipelineState(graphicsPipelineState.Get());                 // PSOを設定
 
-			// 頂点形式を。PSOに設定しているものと同じだが別途、同じものを設定することが必要らしい。
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-			//commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
-
-			commandList->IASetVertexBuffers(0, 1, &modelData->vertexBufferView);
-			commandList->SetGraphicsRootConstantBufferView(0, modelData->materialResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandlerGPU);
-			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(modelData->textureHandle));
-			commandList->SetGraphicsRootConstantBufferView(3, modelData->useTextureResource->GetGPUVirtualAddress());
-			commandList->DrawInstanced(UINT(modelData->vertices.size()), numInstance, 0, 0);
+			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(5, cameraResource->GetGPUVirtualAddress());
 
 			//DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
-			//DrawSphere(commandList, sphere, directionalLightResource, sphere->textureHandle);
+			DrawSphere(commandList, sphere, sphere->textureHandle);
+
+
+
+			//commandList->SetGraphicsRootSignature(rootSignatureForInstancing.Get());
+			//commandList->SetPipelineState(graphicsPipelineStateForInstancing.Get());                 // PSOを設定
+
+			commandList->IASetVertexBuffers(0, 1, &terrianModel->vertexBufferView);
+			commandList->SetGraphicsRootConstantBufferView(0, terrianModel->materialResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(1, terrianModel->wvpResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(terrianModel->textureHandle));
+			commandList->SetGraphicsRootConstantBufferView(3, terrianModel->useTextureResource->GetGPUVirtualAddress());
+			commandList->DrawInstanced(UINT(terrianModel->vertices.size()), 1, 0, 0);
 
 			///
 			/// 描画ここまで
@@ -1262,6 +1416,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	delete sphere;
 	delete sprite;
 	delete modelData;
+	delete terrianModel;
 	DeleteTextures();
 
 #ifdef _DEBUG
@@ -1269,16 +1424,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #endif // _DEBUG
 	CloseWindow(hwnd);
 
-
-	///ReportLiveObjects
-	//リソースリークチェック
-	//IDXGIDebug1* debug;
-	//if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
-	//{
-	//	//debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-	//	//debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-	//	debug->Release();
-	//}
 
 
 
@@ -1626,14 +1771,9 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
 
-				//position.x *= -1.0f;
 				position.z *= -1.0f;
-				//normal.x *= -1.0f;
 				normal.z *= -1.0f;
-				//texcoord.x = 1.0f - texcoord.x;
 				texcoord.y = 1.0f - texcoord.y;
-				//VertexData vertex = { position, texcoord, normal };
-				//modelData.vertices.push_back(vertex);
 				triangle[faceVertex] = { position,texcoord,normal };
 			}
 			modelData.vertices.push_back(triangle[2]);
@@ -1663,6 +1803,8 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 		}
 	}
 	file.close();
+
+	InitializeMeshData(_device, &modelData);
 
 	return ModelData(modelData);
 }
@@ -1805,6 +1947,7 @@ void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Objec
 	_obj->materialData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	_obj->materialData->enabledLighthig = true;
 	_obj->materialData->uvTransform = MakeIdentity4x4();
+	_obj->materialData->shininess = 40.0f;
 
 	//wvp用のリソースを作る。Matrix4x4 1つ分のサイズをサイズを用意する
 	_obj->wvpResource = CreateBufferResource(_device, sizeof(TransformationMatrix));
@@ -1879,7 +2022,7 @@ void MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->useTextureResource = CreateBufferResource(_device, sizeof(float));
 	_obj->useTexture = nullptr;
 	_obj->useTextureResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->useTexture));
-	*_obj->useTexture = 0.0f;
+	*_obj->useTexture = 1.0f;
 
 	///色の変更
 	_obj->materialResource = CreateBufferResource(_device, sizeof(Material) * sphereVertexNum);
@@ -1887,6 +2030,7 @@ void MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	_obj->materialData->enabledLighthig = true;
 	_obj->materialData->uvTransform = MakeIdentity4x4();
+	_obj->materialData->shininess = 40.0f;
 
 	_obj->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&_obj->vertexData));
 
@@ -1967,8 +2111,6 @@ void MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 
 }
 
-
-
 void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object* _obj)
 {
 	//sprite用の頂点リソ－スデータを作成
@@ -2021,6 +2163,7 @@ void MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object*
 	_obj->materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	_obj->materialData->enabledLighthig = false;
 	_obj->materialData->uvTransform = MakeIdentity4x4();
+	_obj->materialData->shininess = 40.0f;
 
 
 	_obj->useTextureResource = CreateBufferResource(_device, sizeof(float));
@@ -2045,6 +2188,11 @@ void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _mo
 {
 	//モデル読み込み
 	*_model = LoadObjFile(_directoryPath, _filename);
+	InitializeMeshData(_device, _model);
+}
+
+void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _model)
+{
 	//頂点リソースを作る
 	_model->vertexResource = CreateBufferResource(_device, sizeof(VertexData) * _model->vertices.size());
 	//頂点バッファビューを作成する
@@ -2061,6 +2209,7 @@ void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _mo
 	_model->materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	_model->materialData->enabledLighthig = true;
 	_model->materialData->uvTransform = MakeIdentity4x4();
+	_model->materialData->shininess = 40.0f;
 
 	// Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	_model->wvpResource = CreateBufferResource(_device, sizeof(TransformationMatrix));
@@ -2074,6 +2223,7 @@ void MakeModelData(Microsoft::WRL::ComPtr<ID3D12Device>& _device, ModelData* _mo
 	_model->useTextureResource->Map(0, nullptr, reinterpret_cast<void**>(&_model->useTexture));
 	*_model->useTexture = 1.0f;
 }
+
 
 TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
 {
@@ -2092,10 +2242,11 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 	TransformationMatrix transMat;
 	transMat.World = MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
 	transMat.WVP = transMat.World * _VPmat;
+	transMat.worldInverseTranspose = Transpose(Inverse(transMat.World));
 	return TransformationMatrix(transMat);
 }
 
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle)
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
@@ -2117,7 +2268,7 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 	_commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle)
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, Microsoft::WRL::ComPtr<ID3D12Resource> _light, uint32_t _textureHandle)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 	_commandList->IASetIndexBuffer(&_obj->indexBufferView);
