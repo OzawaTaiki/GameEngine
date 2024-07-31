@@ -172,7 +172,6 @@ struct AccelerationField
 };
 
 
-
 struct ModelData
 {
 	std::vector<VertexData> vertices;
@@ -214,37 +213,39 @@ struct  Object
 	uint32_t textureHandle;
 };
 
+
 struct Texture
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandlerCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandlerGPU;
 	std::string name;
 };
-
 std::vector<Texture> textures;
 void DeleteTextures();
+
+// <summary>	
+/// 読み込んだテクスチャを取り出す	
+/// </summary>	
+/// <param name="_textureHandle">テクスチャハンドル</param>	
+/// <returns>テクスチャデータ</returns>	
+D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle);
+/// <summary>	
+/// テクスチャを読み込む	
+/// </summary>	
+/// <param name="_filePath">ファイルパス</param>	
+/// <param name="_device">デバイス</param>	
+/// <param name="_commandList">コマンドリスト</param>	
+/// <param name="_srvDescriptorHeap">ｓｒｖディスクリプタヒープ</param>	
+/// <param name="_srvSize">srvのサイズ</param>	
+/// <returns>テクスチャの登録番号</returns>	
+uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
+
 
 ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
 ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename);
 
-/// <summary>
-/// 読み込んだテクスチャを取り出す
-/// </summary>
-/// <param name="_textureHandle">テクスチャハンドル</param>
-/// <returns>テクスチャデータ</returns>
-D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle);
-
-/// <summary>
-/// テクスチャを読み込む
-/// </summary>
-/// <param name="_filePath">ファイルパス</param>
-/// <param name="_device">デバイス</param>
-/// <param name="_commandList">コマンドリスト</param>
-/// <param name="_srvDescriptorHeap">ｓｒｖディスクリプタヒープ</param>
-/// <param name="_srvSize">srvのサイズ</param>
-/// <returns>テクスチャの登録番号</returns>
-uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize);
 
 /// <summary>
 /// 三角形のデータ作成
@@ -286,7 +287,7 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">三角形のデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle = 0);
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj);
 
 /// <summary>
 /// スプライトの描画
@@ -294,9 +295,11 @@ void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comm
 /// <param name="_commandList">コマンドリスト</param>
 /// <param name="_obj">スプライトのデータ作成したObject変数</param>
 /// <param name="_textureHandle">テクスチャハンドル</param>
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle = 0);
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj);
 
-void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle = 0);
+void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj);
+
+void DrawObj(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, ModelData _model);
 
 void DrawObj(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, ModelData _model);
 
@@ -474,8 +477,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 		//警告時に泊まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-		//解放
-		infoQueue->Release();
 
 		//抑制するメッセージのID
 		D3D12_MESSAGE_ID denyIds[] = {
@@ -1021,6 +1022,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//("texVisiblityPlane", texVisiblityPlane);
 
 #pragma endregion
+//
+//#pragma region テクスチャ読み込み
+//
+//	DirectX::ScratchImage mipImages = LoadTexture("resources/images/uvChecker.png");
+//	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+//	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = CreateTextureResource(device, metadata);
+//	Microsoft::WRL::ComPtr<ID3D12Resource> intermediaResorce = UploadTextureData(textureResource.Get(), mipImages, device, commandList);
+//
+//
+//	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+//	srvDesc.Format = metadata.format;
+//	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+//	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+//	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE srvHandlerCPU = GetCPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, static_cast<uint32_t>(4));
+//	D3D12_GPU_DESCRIPTOR_HANDLE srvHandlerGPU = GetGPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, static_cast<uint32_t>(4));
+//	device->CreateShaderResourceView(textureResource.Get(), &srvDesc, srvHandlerCPU);
+//
+//#pragma endregion
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
@@ -1095,14 +1116,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	int currentTexture = 0;
-	const char* textureOption[] = { "uvChecker","cube","monsterBall" };
+	const char* textureOption[] = { "uvChecker"/*,"cube","monsterBall" */ };
 
 	int currentBlendMode = static_cast<int> (BlendMode::kBlendModeNormal);
 	const char* blendModeOption[] = { "normal","add","sub","multi","screen" };
 
 	bool enableLightting[3] = { true,true ,true };
 	bool useTexture[3] = { true ,true,true };
-
 
 	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
@@ -1126,7 +1146,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	ModelData bunny;
-	//bunny = LoadObjFile("resources/obj", "bunny.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	bunny = LoadObjFile("resources/obj", "bunny.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	stTransform bunnyTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	ModelData suzanne;
@@ -1301,9 +1321,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("rotate", &suzanneTransform.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &suzanneTransform.translate.x, 0.01f);
 					ImGui::Checkbox("Lighting", &enableLightting[0]);
-					ImGui::Checkbox("useTexture", &useTexture[0]);
 					suzanne.materialData->enabledLighthig = enableLightting[0];
-					*suzanne.useTexture = useTexture[0] ? 1.0f : 0.0f;
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("DirectionalLight"))
@@ -1338,7 +1356,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			*plane.transformMat = CalculateObjectWVPMat(planeTransform, viewProjectionMatrix);
 			*sphere.transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
 			*teapot.transformMat = CalculateObjectWVPMat(teapotTransform, viewProjectionMatrix);
-			//*bunny.transformMat = CalculateObjectWVPMat(bunnyTransform, viewProjectionMatrix);
+			*bunny.transformMat = CalculateObjectWVPMat(bunnyTransform, viewProjectionMatrix);
 			*suzanne.transformMat = CalculateObjectWVPMat(suzanneTransform, viewProjectionMatrix);
 
 
@@ -1436,6 +1454,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				break;
 			}
 
+
+
 			///
 			/// 描画ここまで
 			/// 
@@ -1492,11 +1512,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+
 	DeleteTextures();
 
-#ifdef _DEBUG
-	debugController->Release();
-#endif // _DEBUG
+
 	CloseWindow(hwnd);
 
 	CoUninitialize();
@@ -1756,8 +1775,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::C
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-	ID3D12Resource* intermediateResource = CreateBufferResource(device.Get(), intermediateSize).Get();
-	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(device.Get(), intermediateSize);
+	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+
 	//Tetureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -1770,6 +1792,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::C
 	return intermediateResource;
 }
 
+
+
 D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = _descriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -1778,7 +1802,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
-
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (_descriptorSize * _index);
@@ -1788,6 +1811,45 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<
 void DeleteTextures()
 {
 	textures.clear();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle)
+{
+	assert(textures.size() > _textureHandle);
+	return textures[_textureHandle].srvHandlerGPU;
+}
+
+uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
+{
+	auto it = std::find_if(textures.begin(), textures.end(), [&](const auto& texture) {
+		return texture.name == _filePath;
+						   });
+
+	if (it != textures.end())
+	{
+		return static_cast<uint32_t>(std::distance(textures.begin(), it));
+	}
+
+	textures.push_back(Texture());
+	size_t index = textures.size() - 1;
+	textures[index].name = _filePath;
+
+	DirectX::ScratchImage mipImages = LoadTexture(_filePath);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textures[index].resource = CreateTextureResource(_device, metadata);
+	textures[index].intermediateResource = UploadTextureData(textures[index].resource, mipImages, _device, _commandList);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ	
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	textures[index].srvHandlerCPU = GetCPUDescriptorHandle(_srvDescriptorHeap, _srvSize, (uint32_t)index + 3);
+	textures[index].srvHandlerGPU = GetGPUDescriptorHandle(_srvDescriptorHeap, _srvSize, (uint32_t)index + 3);
+
+	_device->CreateShaderResourceView(textures[index].resource.Get(), &srvDesc, textures[index].srvHandlerCPU);
+	return (uint32_t)index;
 }
 
 ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _filename, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
@@ -1954,11 +2016,8 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
 
-				//position.x *= -1.0f;
 				position.z *= -1.0f;
-				//normal.x *= -1.0f;
 				normal.z *= -1.0f;
-				//texcoord.x = 1.0f - texcoord.x;
 				texcoord.y = 1.0f - texcoord.y;
 				//VertexData vertex = { position, texcoord, normal };
 				//modelData.vertices.push_back(vertex);
@@ -1974,43 +2033,6 @@ ModelData LoadObjFile(const std::string& _directoryPath, const std::string& _fil
 	return ModelData(modelData);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle)
-{
-	assert(textures.size() > _textureHandle);
-	return textures[_textureHandle].srvHandlerGPU;
-}
-
-uint32_t LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize) {
-	auto it = std::find_if(textures.begin(), textures.end(), [&](const auto& texture) {
-		return texture.name == _filePath;
-						   });
-
-	if (it != textures.end()) {
-		return static_cast<uint32_t>(std::distance(textures.begin(), it));
-	}
-
-	textures.emplace_back();
-	size_t index = textures.size() - 1;
-	textures[index].name = _filePath;
-
-	DirectX::ScratchImage mipImages = LoadTexture(_filePath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textures[index].resource = CreateTextureResource(_device, metadata);
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = UploadTextureData(textures[index].resource, mipImages, _device, _commandList);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	textures[index].srvHandlerCPU = GetCPUDescriptorHandle(_srvDescriptorHeap, _srvSize, static_cast<uint32_t>(index) + 3);
-	textures[index].srvHandlerGPU = GetGPUDescriptorHandle(_srvDescriptorHeap, _srvSize, static_cast<uint32_t>(index) + 3);
-	_device->CreateShaderResourceView(textures[index].resource.Get(), &srvDesc, textures[index].srvHandlerCPU);
-
-	return static_cast<uint32_t>(index);
-}
 
 void MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Object* _obj)
 {
@@ -2251,7 +2273,7 @@ Object MakeSpriteData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device)
 
 	obj.materialResource = CreateBufferResource(_device, sizeof(Material));
 
-	obj.materialData = new Material;
+	obj.materialData = nullptr;
 	obj.materialResource->Map(0, nullptr, reinterpret_cast<void**>(&obj.materialData));
 	obj.materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	obj.materialData->enabledLighthig = false;
@@ -2341,29 +2363,19 @@ TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const 
 	return TransformationMatrix(transMat);
 }
 
-void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle)
+void DrawTriangle(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj.vertexBufferView);
 
 	_commandList->SetGraphicsRootConstantBufferView(0, _obj.materialResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(1, _obj.wvpResource->GetGPUVirtualAddress());
-	if (_textureHandle == -1)
-	{
-		*_obj.useTexture = 0.0f;
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(0));
-	}
-	else
-	{
-		*_obj.useTexture = 1.0f;
-		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj.textureHandle));
-	}
-	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_textureHandle));
+	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj.textureHandle));
 	_commandList->SetGraphicsRootConstantBufferView(3, _obj.useTextureResource->GetGPUVirtualAddress());
 
 	_commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle)
+void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj.vertexBufferView);
 	_commandList->IASetIndexBuffer(&_obj.indexBufferView);
@@ -2377,7 +2389,7 @@ void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 	_commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
-void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj, uint32_t _textureHandle)
+void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object _obj)
 {
 	_commandList->IASetVertexBuffers(0, 1, &_obj.vertexBufferView);
 
@@ -2391,25 +2403,26 @@ void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 
 void DrawObj(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, ModelData _model)
 {
+	_commandList->IASetVertexBuffers(0, 1, &_model.vertexBufferView);
+
 	if (_model.textureHandle != -1)
 	{
-		_commandList->IASetVertexBuffers(0, 1, &_model.vertexBufferView);
 
 		_commandList->SetGraphicsRootConstantBufferView(0, _model.materialResource->GetGPUVirtualAddress());
 		_commandList->SetGraphicsRootConstantBufferView(1, _model.wvpResource->GetGPUVirtualAddress());
 		_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_model.textureHandle));
 		_commandList->SetGraphicsRootConstantBufferView(3, _model.useTextureResource->GetGPUVirtualAddress());
 	}
-
 	else
 	{
-		_commandList->IASetVertexBuffers(0, 1, &_model.vertexBufferView);
-
 		_commandList->SetGraphicsRootConstantBufferView(0, _model.materialResource->GetGPUVirtualAddress());
 		_commandList->SetGraphicsRootConstantBufferView(1, _model.wvpResource->GetGPUVirtualAddress());
+		_commandList->DrawInstanced(_model.vertexNum, 1, 0, 0);
 	}
+
 	_commandList->DrawInstanced(_model.vertexNum, 1, 0, 0);
 }
+
 
 Particle MakeNewParticle(std::mt19937& _randomEngine, const Emitter& _emitter)
 {
@@ -2495,7 +2508,6 @@ void SetBlendMode(BlendMode _blendMode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& _gra
 TransformationMatrix CalculateParticleWVPMat(const stTransform& _transform, const Matrix4x4& _cameraMatrix, const Matrix4x4& _VPmat, bool useBillborad)
 {
 	TransformationMatrix transMat;
-
 
 	Matrix4x4 billboardatrix;
 	if (useBillborad)
