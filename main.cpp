@@ -1115,8 +1115,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 
-	int currentTexture = 0;
-	const char* textureOption[] = { "uvChecker"/*,"cube","monsterBall" */ };
 
 	int currentBlendMode = static_cast<int> (BlendMode::kBlendModeNormal);
 	const char* blendModeOption[] = { "normal","add","sub","multi","screen" };
@@ -1157,6 +1155,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	const char* sceneName[] = { "obj & sprite","sphere","obj & obj","suzanne" };
 
 
+	int currentTexture = 0;
+
+	std::vector<const char*> textureOption;
+
+	for (size_t i = 0; i < textures.size(); i++)
+	{
+		textureOption.push_back(textures[i].name.c_str());
+	}
+
+
 	///
 	/// メインループ
 	/// 
@@ -1180,7 +1188,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			///
 			/// 更新処理ここから
 			/// 
-
 
 			//ImGui::ShowDemoWindow();
 
@@ -1212,7 +1219,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					//ImGui::Checkbox("Lighting", &enableLightting[0]);
 					ImGui::Checkbox("useTexture", &useTexture[0]);
 					currentTexture = static_cast<int>(plane.textureHandle);
-					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					if (ImGui::Combo("texture", &currentTexture, textureOption.data(), static_cast<int>(textureOption.size())))
 					{
 						plane.textureHandle = static_cast<uint32_t> (currentTexture);
 					}
@@ -1227,7 +1234,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
 					ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
 					currentTexture = static_cast<int>(sprite.textureHandle);
-					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					if (ImGui::Combo("texture", &currentTexture, textureOption.data(), static_cast<int>(textureOption.size())))
 					{
 						sprite.textureHandle = static_cast<uint32_t> (currentTexture);
 					}
@@ -1253,7 +1260,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					ImGui::Checkbox("Lighting", &enableLightting[0]);
 					ImGui::Checkbox("useTexture", &useTexture[0]);
 					currentTexture = static_cast<int>(sphere.textureHandle);
-					if (ImGui::Combo("texture", &currentTexture, textureOption, IM_ARRAYSIZE(textureOption)))
+					if (ImGui::Combo("texture", &currentTexture, textureOption.data(), static_cast<int>(textureOption.size())))
 					{
 						sphere.textureHandle = static_cast<uint32_t> (currentTexture);
 					}
@@ -1821,8 +1828,19 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle(uint32_t _textureHandle)
 
 uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _srvDescriptorHeap, uint32_t _srvSize)
 {
+	std::string textureName;
+	size_t pos = _filePath.find_last_of('/');
+
+	// 「/」が見つからなかった場合（パスに「/」が含まれていない場合）
+	if (pos == std::string::npos) {
+		textureName = _filePath;
+	}
+
+	// 最後の「/」の次の位置から末尾までの部分
+	textureName = _filePath.substr(pos + 1);
+
 	auto it = std::find_if(textures.begin(), textures.end(), [&](const auto& texture) {
-		return texture.name == _filePath;
+		return texture.name == textureName;
 						   });
 
 	if (it != textures.end())
@@ -1832,7 +1850,7 @@ uint32_t LoadTexture(const std::string& _filePath, const Microsoft::WRL::ComPtr<
 
 	textures.push_back(Texture());
 	size_t index = textures.size() - 1;
-	textures[index].name = _filePath;
+	textures[index].name = textureName;
 
 	DirectX::ScratchImage mipImages = LoadTexture(_filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
