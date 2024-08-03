@@ -10,9 +10,9 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
+#pragma comment(lib,"dxcompiler.lib")
 
 #include <dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
 
 #include "myLib/MyLib.h"
 
@@ -27,7 +27,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include <vector>
 #include <fstream>
 #include <sstream>
-
 #include <random>
 #include <numbers>
 
@@ -37,20 +36,6 @@ LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lpara
 void Log(const std::string& message);
 std::wstring ConvertString(const std::string& _str);
 std::string ConvertString(const std::wstring& _str);
-
-template <class T>
-void pLog(const std::string& _objname, Microsoft::WRL::ComPtr<T> _p)
-{
-	char buffer[256];
-	sprintf_s(buffer, "address: %p : %s \n", _p.Get(), _objname.c_str());
-	OutputDebugStringA(buffer);
-}
-void pLog(const std::string& _objname, ID3D12Resource* _p)
-{
-	char buffer[256];
-	sprintf_s(buffer, "address: %p : %s \n", &_p, _objname.c_str());
-	OutputDebugStringA(buffer);
-}
 
 
 // クライアント領域のサイズ
@@ -1343,7 +1328,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			cameraForGPU->worldPosition = cameraTransform.translate;
 
-			 
+
 			*sprite.transform.transformMat = CalculateSpriteWVPMat(spriteTrans);
 			*plane.transform.transformMat = CalculateObjectWVPMat(planeTransform, viewProjectionMatrix);
 			*sphere.transform.transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
