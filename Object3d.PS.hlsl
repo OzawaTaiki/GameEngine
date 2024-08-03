@@ -6,15 +6,11 @@ cbuffer gMaterial : register(b0)
     int enableLighting;
     float4x4 unTransform;
     float shininess;
-};
-
-cbuffer gTexVisibility : register(b1)
-{
-    float isVisible;
+    float useTexture;
 };
 
 //平行光源
-cbuffer gDirectionalLight : register(b2)
+cbuffer gDirectionalLight : register(b1)
 {
     float4 DL_color; //ライトの色
     float3 DL_direction; //ライトの向き
@@ -22,7 +18,7 @@ cbuffer gDirectionalLight : register(b2)
     int DL_isHalf;
 }
 
-cbuffer Camera : register(b3)
+cbuffer Camera : register(b2)
 {
     float3 worldPosition;
 }
@@ -50,7 +46,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     float4 textureColor;
         
     //画像の有無
-    if (isVisible == 1.0f)
+    if (useTexture > 0.0f)
     {
         float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
         textureColor = materialColor * gTexture.Sample(gSampler, transformedUV.xy);

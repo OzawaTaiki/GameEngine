@@ -5,14 +5,10 @@ cbuffer gMaterial : register(b0)
     float4 materialColor;
     int enableLighting;
     float4x4 unTransform;
+    float useTExture;
 };
 
-cbuffer gTexVisibility : register(b1)
-{
-    float isVisible;
-};
-
-cbuffer gDirectionalLight : register(b2)
+cbuffer gDirectionalLight : register(b1)
 {
     float4 lightColor; //ライトの色
     float3 lightDirection; //ライトの向き
@@ -33,7 +29,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     float4 textureColor;
     
     //画像の有無
-    if (isVisible == 1.0f)
+    if (useTExture > 0.0f)
     {
         float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
         textureColor = gTexture.Sample(gSampler, transformedUV.xy);
