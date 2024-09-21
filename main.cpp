@@ -4,8 +4,8 @@
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <cassert>
 #include <dxgidebug.h>
+#include <cassert>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -15,6 +15,7 @@
 #pragma comment(lib,"dxcompiler.lib")
 
 #include "myLib/MyLib.h"
+#include "Debug.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -33,10 +34,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
-
-void Log(const std::string& message);
-std::wstring ConvertString(const std::string& _str);
-std::string ConvertString(const std::wstring& _str);
+//
+//void Log(const std::string& message);
+//std::wstring ConvertString(const std::string& _str);
+//std::string ConvertString(const std::wstring& _str);
 
 template <class T>
 void pLog(const std::string& _objname, Microsoft::WRL::ComPtr<T> _p)
@@ -474,7 +475,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//警告時に泊まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 		//解放
-		infoQueue->Release();
+		//infoQueue->Release();
 
 		//抑制するメッセージのID
 		D3D12_MESSAGE_ID denyIds[] = {
@@ -688,63 +689,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature = nullptr;
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
-
-
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignatureForInstancing{};
-	descriptionRootSignatureForInstancing.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
-	descriptorRangeForInstancing[0].BaseShaderRegister = 0;//0から始まる
-	descriptorRangeForInstancing[0].NumDescriptors = 1;//数は1つ
-	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	// RootParameter作成
-	D3D12_ROOT_PARAMETER rootParametersForInstancing[4] = {};
-	rootParametersForInstancing[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParametersForInstancing[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParametersForInstancing[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
-
-	rootParametersForInstancing[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;// CBVを使う
-	rootParametersForInstancing[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-	rootParametersForInstancing[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;
-	rootParametersForInstancing[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
-
-
-	rootParametersForInstancing[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-	rootParametersForInstancing[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-	rootParametersForInstancing[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-	rootParametersForInstancing[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
-
-	rootParametersForInstancing[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParametersForInstancing[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParametersForInstancing[3].Descriptor.ShaderRegister = 1;                           // レジスタ番号1を使う
-
-
-	descriptionRootSignatureForInstancing.pParameters = rootParametersForInstancing;
-	descriptionRootSignatureForInstancing.NumParameters = _countof(rootParametersForInstancing);         // 配列の長さ
-
-	descriptionRootSignatureForInstancing.pStaticSamplers = staticSamplers;
-	descriptionRootSignatureForInstancing.NumStaticSamplers = _countof(staticSamplers);
-
-
-
-	//シリアライズしてバイナリする
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlobForInstancing = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlobForInstancing = nullptr;
-	hr = D3D12SerializeRootSignature(&descriptionRootSignatureForInstancing, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlobForInstancing, &errorBlobForInstancing);
-	if (FAILED(hr))
-	{
-		Log(reinterpret_cast<char*>(signatureBlobForInstancing->GetBufferPointer()));
-		assert(false);
-	}
-	//バイナリをもとに生成
-	Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignatureForInstancing = nullptr;
-	hr = device->CreateRootSignature(0, signatureBlobForInstancing->GetBufferPointer(), signatureBlobForInstancing->GetBufferSize(), IID_PPV_ARGS(&rootSignatureForInstancing));
-	assert(SUCCEEDED(hr));
-
-
-
 	/// InputLayoutの設定を行う
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
@@ -792,12 +736,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = ComplieShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
-	/// shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> particleVSBlob = ComplieShader(L"Particle.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
-	assert(vertexShaderBlob != nullptr);
-
-	Microsoft::WRL::ComPtr<IDxcBlob> particlePSBlob = ComplieShader(L"Particle.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
-	assert(pixelShaderBlob != nullptr);
 
 
 	//DepthStencilStateの設定
@@ -809,15 +747,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//比較関数はLessEqeul つまり近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-
-	//DepthStencilStateの設定
-	D3D12_DEPTH_STENCIL_DESC depthStencilDescForInstancing{};
-	//Depthの機能を有効にする
-	depthStencilDescForInstancing.DepthEnable = true;
-	//書き込みします
-	depthStencilDescForInstancing.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	//比較関数はLessEqeul つまり近ければ描画される
-	depthStencilDescForInstancing.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	/// PSOを生成する
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -841,6 +770,77 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
+
+#pragma region instancing
+
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignatureForInstancing{};
+	descriptionRootSignatureForInstancing.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
+	descriptorRangeForInstancing[0].BaseShaderRegister = 0;//0から始まる
+	descriptorRangeForInstancing[0].NumDescriptors = 1;//数は1つ
+	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// RootParameter作成
+	D3D12_ROOT_PARAMETER rootParametersForInstancing[4] = {};
+	rootParametersForInstancing[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParametersForInstancing[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+	rootParametersForInstancing[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+
+	rootParametersForInstancing[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;// CBVを使う
+	rootParametersForInstancing[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
+	rootParametersForInstancing[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;
+	rootParametersForInstancing[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
+
+
+	rootParametersForInstancing[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+	rootParametersForInstancing[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+	rootParametersForInstancing[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+	rootParametersForInstancing[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+	rootParametersForInstancing[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+	rootParametersForInstancing[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+	rootParametersForInstancing[3].Descriptor.ShaderRegister = 1;                           // レジスタ番号1を使う
+
+
+	descriptionRootSignatureForInstancing.pParameters = rootParametersForInstancing;
+	descriptionRootSignatureForInstancing.NumParameters = _countof(rootParametersForInstancing);         // 配列の長さ
+
+	descriptionRootSignatureForInstancing.pStaticSamplers = staticSamplers;
+	descriptionRootSignatureForInstancing.NumStaticSamplers = _countof(staticSamplers);
+
+	//シリアライズしてバイナリする
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlobForInstancing = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlobForInstancing = nullptr;
+	hr = D3D12SerializeRootSignature(&descriptionRootSignatureForInstancing, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlobForInstancing, &errorBlobForInstancing);
+	if (FAILED(hr))
+	{
+		Log(reinterpret_cast<char*>(signatureBlobForInstancing->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリをもとに生成
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignatureForInstancing = nullptr;
+	hr = device->CreateRootSignature(0, signatureBlobForInstancing->GetBufferPointer(), signatureBlobForInstancing->GetBufferSize(), IID_PPV_ARGS(&rootSignatureForInstancing));
+	assert(SUCCEEDED(hr));
+
+
+	/// shaderをコンパイルする
+	Microsoft::WRL::ComPtr<IDxcBlob> particleVSBlob = ComplieShader(L"Particle.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(vertexShaderBlob != nullptr);
+
+	Microsoft::WRL::ComPtr<IDxcBlob> particlePSBlob = ComplieShader(L"Particle.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(pixelShaderBlob != nullptr);
+
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDescForInstancing{};
+	//Depthの機能を有効にする
+	depthStencilDescForInstancing.DepthEnable = true;
+	//書き込みします
+	depthStencilDescForInstancing.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//比較関数はLessEqeul つまり近ければ描画される
+	depthStencilDescForInstancing.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
 
 	/// PSOを生成する
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescForInstancing{};
@@ -866,12 +866,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
 	assert(SUCCEEDED(hr));
 
-	///色の変更
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-	Vector4* materialData = nullptr;
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
+#pragma endregion
 
 #pragma region 平行光源
 	DirectionalLight* directionalLightData = nullptr;
@@ -1453,40 +1448,40 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	// 標準のメッセージ処理を行う
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
-
-void Log(const std::string& message)
-{
-	OutputDebugStringA(message.c_str());
-}
-
-
-std::wstring ConvertString(const std::string& str) {
-	if (str.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-std::string ConvertString(const std::wstring& str) {
-	if (str.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
-}
+//
+//void Log(const std::string& message)
+//{
+//	OutputDebugStringA(message.c_str());
+//}
+//
+//
+//std::wstring ConvertString(const std::string& str) {
+//	if (str.empty()) {
+//		return std::wstring();
+//	}
+//
+//	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
+//	if (sizeNeeded == 0) {
+//		return std::wstring();
+//	}
+//	std::wstring result(sizeNeeded, 0);
+//	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
+//	return result;
+//}
+//
+//std::string ConvertString(const std::wstring& str) {
+//	if (str.empty()) {
+//		return std::string();
+//	}
+//
+//	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
+//	if (sizeNeeded == 0) {
+//		return std::string();
+//	}
+//	std::string result(sizeNeeded, 0);
+//	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
+//	return result;
+//}
 
 Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(const std::wstring& _filePath, const wchar_t* _profile, Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils, Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler, Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler)
 {

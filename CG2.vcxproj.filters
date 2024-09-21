@@ -60,6 +60,15 @@
     <ClCompile Include="myLib\VectorFunction.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="WinApp.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DXCommon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.VS.hlsl" />
@@ -118,6 +127,15 @@
     <ClInclude Include="Matrix3x3.h">
       <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
+    <ClInclude Include="WinApp.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="DXCommon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -128,5 +146,6 @@
     <None Include="Object3d.hlsli" />
     <None Include="Particle.VS.hlsl" />
     <None Include="Particle.hlsli" />
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
