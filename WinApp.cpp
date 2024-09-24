@@ -45,7 +45,7 @@ void WinApp::CreateGameWindow(const wchar_t* _title, UINT _style, uint32_t _widt
 
 	RegisterClass(&wndClass_);
 
-	RECT wrc = { 0,0,_width,_height };
+	RECT wrc = { 0,0,(LONG)_width,(LONG)_height };
 
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
