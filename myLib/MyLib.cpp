@@ -656,6 +656,18 @@ Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint
 	return result;
 }
 
+Vector4 ComputeColor(uint32_t _color)
+{
+	Vector4 color;
+
+	color.x = ((_color >> 24) & 0xff) / 255.0f;
+	color.y = ((_color >> 16) & 0xff) / 255.0f;
+	color.z = ((_color >>  8) & 0xff) / 255.0f;
+	color.w = (_color & 0xff) / 255.0f;
+
+	return color;
+}
+
 void AABB::Update()
 {
 	this->min.x = (std::min)(this->min.x, this->max.x);

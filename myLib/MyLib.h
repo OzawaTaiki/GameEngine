@@ -4,7 +4,7 @@
 #include "Vector4.h"
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
-#include "Transform.h"
+#include "Transformation.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -216,3 +216,5 @@ void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min
 Vector3 CalculatePointBezier(const Bezier& _bezier, float _t);
 
 Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, float _t);
+
+Vector4 ComputeColor(uint32_t _color);

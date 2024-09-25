@@ -107,9 +107,9 @@ struct Material
 {
 	Vector4 color;
 	int32_t enabledLighthig;
-	float padding[3];
-	Matrix4x4 uvTransform;
 	float shininess;
+	float padding[2];
+	Matrix4x4 uvTransform;
 };
 
 struct DirectionalLight
@@ -159,7 +159,7 @@ struct TransformationMatrix
 
 struct Particle
 {
-	stTransform transform;
+	Transformation transform;
 	Vector3 velocity;
 	Vector4 color;
 	float lifeTime;
@@ -168,7 +168,7 @@ struct Particle
 
 struct Emitter
 {
-	stTransform transform;  //
+	Transformation transform;  //
 	uint32_t count;			//発生数
 	float frequency;		//発生頻度
 	float frequencyTime;	//頻度用時刻
@@ -308,9 +308,9 @@ void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Mod
 /// </summary>
 /// <param name="_transform">トランスフォームデータ</param>
 /// <returns>WVPt および WorldMat</returns>
-TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform);
+TransformationMatrix CalculateSpriteWVPMat(const Transformation& _transform);
 
-TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const Matrix4x4& _VPmat);
+TransformationMatrix CalculateObjectWVPMat(const Transformation& _transform, const Matrix4x4& _VPmat);
 
 /// <summary>
 /// 三角形の描画
@@ -346,7 +346,7 @@ enum class BlendMode
 
 void SetBlendMode(BlendMode _blendMode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& _graphicsPipelineStateDesc);
 
-TransformationMatrix CalculateParticleWVPMat(const stTransform& _transform, const Matrix4x4& _cameraMatrix, const Matrix4x4& _VPmat, bool useBillborad);
+TransformationMatrix CalculateParticleWVPMat(const Transformation& _transform, const Matrix4x4& _cameraMatrix, const Matrix4x4& _VPmat, bool useBillborad);
 
 struct D3DResourceLeakChecker
 {
@@ -1081,15 +1081,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	/// 変数宣言
 	///
 
-	stTransform cameraTransform{ {1.0f,1.0f,1.0f},{0.260f,0.0f,0.0f} ,{0.0f,3.0f,-10.0f} };
+	Transformation cameraTransform{ {1.0f,1.0f,1.0f},{0.260f,0.0f,0.0f} ,{0.0f,3.0f,-10.0f} };
 
 	Vector4 objColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	stTransform transformObj{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-	stTransform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-	stTransform PLTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,2.0f,0.0f} };
-	stTransform spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-	stTransform spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transformation transformObj{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transformation transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transformation PLTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,2.0f,0.0f} };
+	Transformation spriteTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transformation spriteUVTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	std::list <Particle> particles;
 	bool useBillboard = false;
@@ -1147,7 +1147,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	terrianModel = std::unique_ptr<ModelData>(LoadObjFileWithAssimp("resources/obj", "terrain.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV));
 	terrianModel->textureHandle = LoadTexture(terrianModel->textureHandlePath, device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
-	stTransform terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	Transformation terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 
 	///
@@ -2474,7 +2474,7 @@ void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Mod
 }
 
 
-TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
+TransformationMatrix CalculateSpriteWVPMat(const Transformation& _transform)
 {
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
@@ -2486,7 +2486,7 @@ TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
 	return TransformationMatrix(transMat);
 }
 
-TransformationMatrix CalculateObjectWVPMat(const stTransform& _transform, const Matrix4x4& _VPmat)
+TransformationMatrix CalculateObjectWVPMat(const Transformation& _transform, const Matrix4x4& _VPmat)
 {
 	TransformationMatrix transMat;
 	transMat.World = MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);
@@ -2624,7 +2624,7 @@ void SetBlendMode(BlendMode _blendMode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& _gra
 
 }
 
-TransformationMatrix CalculateParticleWVPMat(const stTransform& _transform, const Matrix4x4& _cameraMatrix, const Matrix4x4& _VPmat, bool useBillborad)
+TransformationMatrix CalculateParticleWVPMat(const Transformation& _transform, const Matrix4x4& _cameraMatrix, const Matrix4x4& _VPmat, bool useBillborad)
 {
 	TransformationMatrix transMat;
 
