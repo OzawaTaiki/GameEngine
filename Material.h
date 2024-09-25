@@ -13,7 +13,7 @@
 
 class Material
 {
-	struct CBufferDate
+	struct MaterialCBuffer
 	{
 		Vector4 color;
 		uint32_t enableLighting;
@@ -61,7 +61,7 @@ private:
 	// 定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> cBuffer_;
 	// Map用変数
-	CBufferDate* constMap_ = nullptr;
+	MaterialCBuffer* constMap_ = nullptr;
 	// テクスチャハンドル
 	uint32_t textureHandle_;
 	// コピー禁止
