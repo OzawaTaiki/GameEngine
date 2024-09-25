@@ -4,8 +4,8 @@ cbuffer gMaterial : register(b0)
 {
     float4 materialColor;
     int enableLighting;
-    float4x4 unTransform;
     float shininess;
+    float4x4 unTransform;
 };
 
 cbuffer gTexVisibility : register(b1)

@@ -78,6 +78,9 @@
     <ClCompile Include="Debug.cpp">
       <Filter>Lib\ソース</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">
@@ -97,7 +100,7 @@
     <ClInclude Include="myLib\Matrix4x4.h">
       <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
-    <ClInclude Include="myLib\Transform.h">
+    <ClInclude Include="myLib\Transformation.h">
       <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
     <ClInclude Include="myLib\Vector3.h">
