@@ -155,33 +155,33 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, float3 _toEye, float4 _t
 {
     if (SL_intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
-        
-    
-    float3 direction = normalize(_input.worldPosition - SL_position);
-    float3 HalfVector = normalize(-direction + _toEye);
-    float specularPow = pow(saturate(dot(normalize(_input.normal), HalfVector)), shininess);
-
-    float NdotL = dot(normalize(_input.normal), -direction);
-    float cos = saturate(NdotL);
-    if (SL_isHalf != 0)
+    else
     {
-        cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-    }
+        float3 direction = normalize(_input.worldPosition - SL_position);
+        float3 HalfVector = normalize(-direction + _toEye);
+        float specularPow = pow(saturate(dot(normalize(_input.normal), HalfVector)), shininess);
+
+        float NdotL = dot(normalize(_input.normal), -direction);
+        float cos = saturate(NdotL);
+        if (SL_isHalf != 0)
+        {
+            cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+        }
         
-    float distance = length(SL_position - _input.worldPosition);
-    float factor = pow(saturate(-distance / SL_ditance + 1.0f), SL_decay);
+        float distance = length(SL_position - _input.worldPosition);
+        float factor = pow(saturate(-distance / SL_ditance + 1.0f), SL_decay);
         
-    float cosAngle = dot(direction,normalize (SL_direction));
-    float falloffFactor = 1.0f;
-    if (cosAngle < SL_cosFalloutStart)
-    {
-        falloffFactor = saturate((cosAngle - SL_cosAngle) / (SL_cosFalloutStart - SL_cosAngle));
-    }
+        float cosAngle = dot(direction, normalize(SL_direction));
+        float falloffFactor = 1.0f;
+        if (cosAngle < SL_cosFalloutStart)
+        {
+            falloffFactor = saturate((cosAngle - SL_cosAngle) / (SL_cosFalloutStart - SL_cosAngle));
+        }
 
     
-    float3 diffuse = materialColor.rgb * _textureColor.rgb * SL_color.rgb * cos * SL_intensity * factor*falloffFactor;
-    float3 specular = SL_color.rgb * SL_intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
+        float3 diffuse = materialColor.rgb * _textureColor.rgb * SL_color.rgb * cos * SL_intensity * factor * falloffFactor;
+        float3 specular = SL_color.rgb * SL_intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
     
-    return diffuse + specular;
-
+        return diffuse + specular;
+    }
 }
