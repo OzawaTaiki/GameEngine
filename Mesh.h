@@ -15,17 +15,18 @@ class Material;
 
 class Mesh
 {
+public:
 	struct VertexData
 	{
 		Vector4 position;
-		Vector2 uv;
+		Vector2 texcoord;
 		Vector3 normal;
 	};
 
-public:
 	Mesh() = default;
 	~Mesh() = default;
 
+	void AddVertex(const VertexData& _vertex);
 
 	Material* GetMaterial() const { return material_; }
 	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() const { return vertexBufferView_; }

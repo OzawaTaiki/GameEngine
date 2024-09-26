@@ -42,6 +42,6 @@ private:
 	ViewProjectioncBuffer* constMap_;
 
 	ViewProjection(const ViewProjection&) = delete;
-	ViewProjection operator(const ViewProjection&) = delete;
+	ViewProjection operator=(const ViewProjection&) = delete;
 
 };
