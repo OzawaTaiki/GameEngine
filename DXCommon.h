@@ -16,6 +16,9 @@ public:
 
 	void Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _backBufferHeight);
 
+	ID3D12Device* GetDevice() { return device_.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
+
 private:
 
 	void CreateDevice();

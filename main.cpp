@@ -36,6 +36,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include <random>
 #include <numbers>
 
+#include "Input.h"
+#include "WinApp.h"
+
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
 //
@@ -372,46 +375,49 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	///COMの初期化	CoInitializeEx(0, COINIT_MULTITHREADED);
 
-	/// ウィンドウクラスを登録する
-	WNDCLASS wc{};
-	// ウィンドウプロシージャ
-	wc.lpfnWndProc = WindowProc;
-	// ウィンドウクラス名(なんでもいい)
-	wc.lpszClassName = L"CGWindowClass";
-	// インスタンスハンドル
-	wc.hInstance = GetModuleHandle(nullptr);
-	// カーソル
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	///// ウィンドウクラスを登録する
+	//WNDCLASS wc{};
+	//// ウィンドウプロシージャ
+	//wc.lpfnWndProc = WindowProc;
+	//// ウィンドウクラス名(なんでもいい)
+	//wc.lpszClassName = L"CGWindowClass";
+	//// インスタンスハンドル
+	//wc.hInstance = GetModuleHandle(nullptr);
+	//// カーソル
+	//wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
-	// ウィンドウクラスを登録する
-	RegisterClass(&wc);
+	//// ウィンドウクラスを登録する
+	//RegisterClass(&wc);
 
-	/// ウィンドウサイズを決める
+	///// ウィンドウサイズを決める
 
-	// ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc = { 0,0,kClientWidth,kClientHeight };
+	//// ウィンドウサイズを表す構造体にクライアント領域を入れる
+	//RECT wrc = { 0,0,kClientWidth,kClientHeight };
 
-	//クライアント領域をもとに実際のサイズをwrcを変更してもらう
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
+	////クライアント領域をもとに実際のサイズをwrcを変更してもらう
+	//AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-	/// ウィンドウを生成して表示
-	// ウィンドウの生成
-	HWND hwnd = CreateWindow(
-		wc.lpszClassName,		// 利用するクラス名
-		L"CG2",					// タイトルバーの文字
-		WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
-		CW_USEDEFAULT,			// 表示X座標(WindowsにOS任せる)
-		CW_USEDEFAULT,			// 表示Y座標(WindowsOSに任せる)
-		wrc.right - wrc.left,	// ウィンドウ横幅
-		wrc.bottom - wrc.top,	// ウィンドウ立幅
-		nullptr,				// 親ウィンドウハンドル
-		nullptr,				// メニューハンドル
-		wc.hInstance,			// インスタンスハンドル
-		nullptr);				// オプション
+	///// ウィンドウを生成して表示
+	//// ウィンドウの生成
+	//HWND hwnd = CreateWindow(
+	//	wc.lpszClassName,		// 利用するクラス名
+	//	L"CG2",					// タイトルバーの文字
+	//	WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
+	//	CW_USEDEFAULT,			// 表示X座標(WindowsにOS任せる)
+	//	CW_USEDEFAULT,			// 表示Y座標(WindowsOSに任せる)
+	//	wrc.right - wrc.left,	// ウィンドウ横幅
+	//	wrc.bottom - wrc.top,	// ウィンドウ立幅
+	//	nullptr,				// 親ウィンドウハンドル
+	//	nullptr,				// メニューハンドル
+	//	wc.hInstance,			// インスタンスハンドル
+	//	nullptr);				// オプション
 
-	//ウィンドウを表示する
-	ShowWindow(hwnd, SW_SHOW);
+	////ウィンドウを表示する
+	//ShowWindow(hwnd, SW_SHOW);
 
+	WinApp* winapp =  WinApp::GetInstance();
+	winapp->CreateGameWindow();
+	HWND hwnd = winapp->GetHwnd();
 	///デバッグレイヤー
 #ifdef _DEBUG
 
@@ -1149,6 +1155,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Transformation terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
+	Input* input = Input::GetInstanse();
+	input->Initilize();
 
 	///
 	/// メインループ
@@ -1174,6 +1182,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			/// 更新処理ここから
 			/// 
 
+			input->Update();
 
 			//ImGui::ShowDemoWindow();
 
