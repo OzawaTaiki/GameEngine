@@ -21,6 +21,8 @@ public:
 
 	HWND GetHwnd() { return hwnd_; }
 
+	HINSTANCE GetHInstance() { return wndClass_.hInstance; };
+
 private:
 	// ウィンドウクラス
 	WNDCLASS wndClass_{};
