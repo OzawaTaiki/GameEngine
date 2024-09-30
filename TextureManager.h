@@ -1,6 +1,6 @@
 #pragma once
 
-class
+class TextureManager
 {
 public:
 
