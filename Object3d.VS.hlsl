@@ -20,7 +20,7 @@ VertexShaderOutput main(VertexShaderInput _input)
     output.position = mul(_input.position, WVP);
     output.texcoord = _input.texcoord;
     output.normal = normalize(mul(_input.normal, (float3x3) worldInverseTranspose));
-    output.worldPosition = mul(_input.position, WVP).xyz;
+    output.worldPosition = mul(_input.position, World).xyz;
     return output;
 }
 
