@@ -38,6 +38,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include "Input.h"
 #include "WinApp.h"
+#include "TextureManager.h"
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
@@ -586,7 +587,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//imguiを使うためSRV用のが必要
 	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなのでShaderVisivleはtrue
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 
 
@@ -1027,6 +1028,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	scissorRect.bottom = kClientHeight;
 
 
+	TextureManager* tm = TextureManager::GetInstance();
+	tm->Initilize(device.Get());
 
 
 	///imguiの初期化
@@ -1038,9 +1041,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		device.Get(),
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
-		srvDescriptorHeap.Get(),
-		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+		tm->GetDescriptorHeap(),
+		tm->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
+		tm->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart()
 	);
 
 
@@ -1071,8 +1074,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	instancingSrvDesc.Buffer.NumElements = kNumMaxInstance;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandlerCPU = GetCPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandlerGPU = GetGPUDescriptorHandle(srvDescriptorHeap, desriptorSizeSRV, 2);
+	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandlerCPU = GetCPUDescriptorHandle(tm->GetDescriptorHeap(), desriptorSizeSRV, 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandlerGPU = GetGPUDescriptorHandle(tm->GetDescriptorHeap(), desriptorSizeSRV, 2);
 	device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandlerCPU);
 
 
@@ -1127,12 +1130,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	bool useTexture[3] = { true ,true,true };
 
 
-	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
-	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t uvGH = TextureManager::Load("Images/uvChecker.png", commandList.Get());
+	uint32_t cubeGH = TextureManager::Load("Images/cube.jpg", commandList.Get());
+	uint32_t ballGH = TextureManager::Load("Images/monsterBall.png", commandList.Get());
+	//uint32_t fenceGH = TextureManager::Load("uvChecker.png", commandList.Get());
+	//uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	//uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	//uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	//uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+
+	//modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, tm->GetDescriptorHeap(), desriptorSizeSRV);
 
 
 	std::unique_ptr <Object> sphere;
@@ -1147,16 +1155,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::unique_ptr<ModelData> plane;
 	plane = std::unique_ptr<ModelData>(LoadObjFileWithAssimp("resources/obj/plane_for_glTF", "plane.gltf", device));
-	plane->textureHandle = LoadTexture(plane->textureHandlePath, device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	//plane->textureHandle = LoadTexture(plane->textureHandlePath, device, commandList, tm->GetDescriptorHeap_(), desriptorSizeSRV);
+	plane->textureHandle = TextureManager::Load("obj/plane_for_glTF/uvChecker.png",commandList.Get());
 
 	std::unique_ptr <ModelData>  terrianModel;
-	terrianModel = std::unique_ptr<ModelData>(LoadObjFileWithAssimp("resources/obj", "terrain.obj", device, commandList, srvDescriptorHeap, desriptorSizeSRV));
-	terrianModel->textureHandle = LoadTexture(terrianModel->textureHandlePath, device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	terrianModel = std::unique_ptr<ModelData>(LoadObjFileWithAssimp("resources/obj", "terrain.obj", device, commandList, tm->GetDescriptorHeap(), desriptorSizeSRV));
+	//terrianModel->textureHandle = LoadTexture(terrianModel->textureHandlePath, device, commandList, tm->GetDescriptorHeap_(), desriptorSizeSRV);
+	terrianModel->textureHandle = TextureManager::Load("obj/grass.png", commandList.Get());
 
 	Transformation terrainTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
 	Input* input = Input::GetInstanse();
 	input->Initilize();
+
+	
 
 	///
 	/// メインループ
@@ -1421,7 +1433,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//描画先のRTVを設定する
 			//指定した色で画面算体をクリアする
 
-			Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap.Get() };
+			Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { tm->GetDescriptorHeap() };
 			commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 			//描画先とRTVとDSVの設定を行う
@@ -1443,7 +1455,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			/// 描画ここから 
 			/// 
 
-			//TODO:draw関数を作りたい
+			// draw関数を作りたい
 			//(x-min)/(max-min);
 
 
@@ -1479,7 +1491,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			commandList->IASetVertexBuffers(0, 1, &terrianModel->vertexBufferView);
 			commandList->SetGraphicsRootConstantBufferView(0, terrianModel->materialResource->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(1, terrianModel->wvpResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(terrianModel->textureHandle));
+			commandList->SetGraphicsRootDescriptorTable(2, tm->GetTextureHandle(terrianModel->textureHandle));
 			commandList->SetGraphicsRootConstantBufferView(3, terrianModel->useTextureResource->GetGPUVirtualAddress());
 			commandList->DrawInstanced(UINT(terrianModel->vertices.size()), 1, 0, 0);
 
@@ -2542,11 +2554,13 @@ void DrawSprite(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _comman
 
 void DrawSphere(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& _commandList, Object* _obj, uint32_t _textureHandle)
 {
+	TextureManager* tm = TextureManager::GetInstance();
+
 	_commandList->IASetVertexBuffers(0, 1, &_obj->vertexBufferView);
 
 	_commandList->SetGraphicsRootConstantBufferView(0, _obj->materialResource->GetGPUVirtualAddress());
 	_commandList->SetGraphicsRootConstantBufferView(1, _obj->wvpResource->GetGPUVirtualAddress());
-	_commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(_obj->textureHandle));
+	_commandList->SetGraphicsRootDescriptorTable(2, tm->GetTextureHandle(_obj->textureHandle));
 	_commandList->SetGraphicsRootConstantBufferView(3, _obj->useTextureResource->GetGPUVirtualAddress());
 
 	_commandList->DrawInstanced(_obj->vertexNum, 1, 0, 0);
