@@ -2103,8 +2103,8 @@ Node ReadNode(aiNode* _node)
 	aiMatrix4x4 aiLocalMatrix = _node->mTransformation;
 	aiLocalMatrix.Transpose();
 
-	for (size_t i = 0; i < 4; ++i) {
-		for (size_t j = 0; j < 4; ++j) {
+	for (uint32_t i = 0; i < 4; ++i) {
+		for (uint32_t j = 0; j < 4; ++j) {
 			result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
 		}
 	}
