@@ -20,7 +20,7 @@ public:
 						  uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_);
 
 	HWND GetHwnd() { return hwnd_; }
-
+	HINSTANCE GetHInstance() { return wndClass_.hInstance; }
 private:
 	// ウィンドウクラス
 	WNDCLASS wndClass_{};
