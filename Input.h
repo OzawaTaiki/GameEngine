@@ -10,13 +10,15 @@
 #include <wrl.h>
 #include <array>
 
+#include "WinApp.h"
+
 class Input
 {
 public:
 
 	static Input* GetInstanse();
 
-	void Initilize();
+	void Initilize(WinApp* _winApp);
 	void Update();
 
 	bool IsTriger(uint8_t _key);
@@ -30,5 +32,6 @@ private:
 	std::array<BYTE, 256> keys_ = {};
 	std::array<BYTE, 256> preKeys_ = {};
 
+	WinApp* winApp_ = nullptr;
 
 };

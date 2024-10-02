@@ -59,11 +59,6 @@ void pLog(const std::string& _objname, ID3D12Resource* _p)
 	OutputDebugStringA(buffer);
 }
 
-
-// クライアント領域のサイズ
-const int32_t kClientWidth = 1280;
-const int32_t kClientHeight = 720;
-
 const float kDeltaTime = 1.0f / 60.0f;
 
 
@@ -415,9 +410,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ShowWindow(hwnd, SW_SHOW);
 
 	WinApp* winApp = WinApp::GetInstance();
-	winApp->CreateGameWindow();
+	winApp->Initilize();
 
-	HWND hwnd = winApp->GetHwnd();
 
 	///デバッグレイヤー
 #ifdef _DEBUG
@@ -561,15 +555,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//スワップチェーンを生成する
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	swapChainDesc.Width = kClientWidth;                             //画面の幅。ウィンドウクラスのクライアント領域を同じものにしておく
-	swapChainDesc.Height = kClientHeight;                           //画面の高さ。ウィンドウクラスのクライアント領域を同じものにしておく
+	swapChainDesc.Width = WinApp::kWindowWidth_;                             //画面の幅。ウィンドウクラスのクライアント領域を同じものにしておく
+	swapChainDesc.Height = WinApp::kWindowHeight_;                           //画面の高さ。ウィンドウクラスのクライアント領域を同じものにしておく
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;              //色の形式
 	swapChainDesc.SampleDesc.Count = 1;                             //マルチサンプルしない
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;    //描画ターゲットとして利用すbる
 	swapChainDesc.BufferCount = 2;                                  //ダブルバッファ
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;       //モニタにうつしたら中身を破棄
 	//コマンドキュー，ウィンドウハンドル，設定を渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 
@@ -997,7 +991,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -1012,8 +1006,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	D3D12_VIEWPORT viewport{};
 	// ビューポート領域のサイズを一緒にして画面全体を表示
-	viewport.Width = kClientWidth;
-	viewport.Height = kClientHeight;
+	viewport.Width = WinApp::kWindowWidth_;
+	viewport.Height = WinApp::kWindowHeight_;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -1023,19 +1017,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// シザー矩形
 	// scissorRect.left – ビューポートと同じ幅と高さに設定されることが多い
 	scissorRect.left = 0;
-	scissorRect.right = kClientWidth;
+	scissorRect.right = WinApp::kWindowWidth_;
 	scissorRect.top = 0;
-	scissorRect.bottom = kClientHeight;
+	scissorRect.bottom = WinApp::kWindowHeight_;
 
 
 	Input* input = Input::GetInstanse();
-	input->Initilize();
+	input->Initilize(winApp);
 
 	///imguiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(winApp->GetHwnd());
 	ImGui_ImplDX12_Init(
 		device.Get(),
 		swapChainDesc.BufferCount,
@@ -1161,380 +1155,375 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	///
 	/// メインループ
 	/// 
-	MSG msg{};
 	// ウィンドウのｘボタンが押されるまでループ
-	while (msg.message != WM_QUIT)
+	while (1)
 	{
 		// Windowにメッセージが来ていたら最優先で処理させる
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if (winApp->ProcessMessage())
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			break;
 		}
-		else
+
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+
+		///
+		/// 更新処理ここから
+		/// 
+
+		input->Update();
+
+
+
+		//ImGui::ShowDemoWindow();
+
+		ImGui::Begin("Window");
+		//if (ImGui::CollapsingHeader("object"))
+		//{
+		if (ImGui::TreeNode("Camera"))
 		{
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-
-
-			///
-			/// 更新処理ここから
-			/// 
-
-			input->Update();
-
-			
-
-			//ImGui::ShowDemoWindow();
-
-			ImGui::Begin("Window");
-			//if (ImGui::CollapsingHeader("object"))
-			//{
-			if (ImGui::TreeNode("Camera"))
-			{
-				ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Sphere"))
-			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::SliderFloat("shininess", &sphere->materialData->shininess, 1.0f, 50.0f);
-				ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[0]);
-				ImGui::Checkbox("useTexture", &useTexture[0]);
-				int currentTex = static_cast<int>(sphere->textureHandle);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-				{
-					sphere->textureHandle = static_cast<uint32_t> (currentTex);
-				}
-				sphere->materialData->color = objColor1;
-				sphere->materialData->enabledLighthig = enableLightting[0];
-				*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
-				ImGui::TreePop();
-			}
-
-
-			if (ImGui::TreeNode("OBJ"))
-			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[1]);
-				ImGui::Checkbox("useTexture", &useTexture[1]);
-				int currentTex = static_cast<int>(currentTexture);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-				{
-					currentTexture = static_cast<uint32_t> (currentTex);
-				}
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Sprite"))
-			{
-				ImGui::ColorEdit4("color", &objColor1.x);
-				ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
-				int currentTex = static_cast<int>(sprite->textureHandle);
-				if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
-				{
-					sprite->textureHandle = static_cast<uint32_t> (currentTex);
-				}
-				sprite->materialData->color = objColor1;
-
-				if (ImGui::TreeNode("uvTransform"))
-				{
-					ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
-					ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
-					ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
-					sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
-					ImGui::TreePop();
-				}
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Terrain"))
-			{
-				ImGui::ColorEdit4("color", &terrianModel->materialData->color.x);
-				ImGui::SliderFloat("shininess", &terrianModel->materialData->shininess, 1.0f, 50.0f);
-				ImGui::DragFloat3("scale", &terrainTrans.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &terrainTrans.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &terrainTrans.translate.x, 0.01f);
-				ImGui::Checkbox("Lighting", &enableLightting[2]);
-				ImGui::Checkbox("useTexture", &useTexture[2]);
-				terrianModel->materialData->enabledLighthig = enableLightting[2];
-				*terrianModel->useTexture = useTexture[1] ? 1.0f : 0.0f;
-				ImGui::TreePop();
-			}
-
-
-			if (ImGui::TreeNode("DirectionalLight"))
-			{
-				ImGui::ColorEdit3("color", &directionalLightData->color.x);
-				ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
-				ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
-				bool isHalf = directionalLightData->isHalf != 0;
-				ImGui::Checkbox("isHalf", &isHalf);
-				directionalLightData->isHalf = static_cast<uint32_t>(isHalf);
-
-				directionalLightData->direction = Normalize(directionalLightData->direction);
-				ImGui::TreePop();
-			}
-
-			if (ImGui::TreeNode("PointLight"))
-			{
-				ImGui::ColorEdit3("color", &pointLightData->color.x);
-				if (ImGui::DragFloat3("position", &pointLightData->position.x, 0.01f))
-				{
-					PLTransform.translate = pointLightData->position;
-				}
-				ImGui::DragFloat("intensity", &pointLightData->intensity, 0.01f);
-				ImGui::DragFloat("decay", &pointLightData->decay, 0.01f);
-				ImGui::DragFloat("radius", &pointLightData->radius, 0.01f);
-				bool isHalf = pointLightData->isHalf != 0;
-				ImGui::Checkbox("isHalf", &isHalf);
-				pointLightData->isHalf = static_cast<uint32_t>(isHalf);
-
-				ImGui::TreePop();
-			}
-
-			if (ImGui::TreeNode("spotLight"))
-			{
-				ImGui::ColorEdit3("color", &spotLightData->color.x);
-				if (ImGui::DragFloat3("position", &spotLightData->position.x, 0.01f))
-				{
-					//PLTransform.translate = spotLightData->position;
-				}
-				ImGui::DragFloat("distance", &spotLightData->distance, 0.01f);
-				ImGui::DragFloat3("direction", &spotLightData->direction.x, 0.01f);
-				ImGui::DragFloat("intensity", &spotLightData->intensity, 0.01f);
-				ImGui::DragFloat("decay", &spotLightData->decay, 0.01f);
-				ImGui::SliderAngle("cosAngle", &spotLightData->cosAngle, 0.01f, 180.0f);
-				ImGui::SliderAngle("falloutStart", &spotLightData->falloutStartAngle, 0.01f,180.0f);
-				bool isHalf = spotLightData->isHalf != 0;
-				ImGui::Checkbox("isHalf", &isHalf);
-				spotLightData->isHalf = static_cast<uint32_t>(isHalf);
-				spotLightData->direction = Normalize(spotLightData->direction);
-
-				ImGui::TreePop();
-			}
-			//}
-			/*if (ImGui::Button("Add Particles"))
-			{
-				particles.splice(particles.end(), Emit(emitter, randomEngine));
-			}
-			ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
-			ImGui::Checkbox("enableField", &enableAccelerationField);
-			if (ImGui::Combo("BlendMode", &currentBlendMode, blendModeOption, IM_ARRAYSIZE(blendModeOption)))
-			{
-				SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDescForInstancing);
-				device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
-			}
-			ImGui::Checkbox("useBillboard", &useBillboard);*/
-			ImGui::End();
-
-			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
-			Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
-
-			cameraForGPU->worldPosition = cameraTransform.translate;
-
-			//pointLightData->position = Transform(pointLightPosition, viewProjectionMatrix);
-
-
-			emitter.frequencyTime += kDeltaTime;
-			if (emitter.frequency <= emitter.frequencyTime)
-			{
-				particles.splice(particles.end(), Emit(emitter, randomEngine));
-				emitter.frequencyTime -= emitter.frequency;
-			}
-
-			uint32_t numInstance = 0;
-			for (auto particleIterator = particles.begin(); particleIterator != particles.end();)
-			{
-				if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
-					particleIterator = particles.erase(particleIterator);
-					continue;
-				}
-				if (numInstance < kNumMaxInstance)
-				{
-					float  alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-
-					if (enableAccelerationField && IsCollision(accelerationField.area, (*particleIterator).transform.translate))
-					{
-						(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
-					}
-
-					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-					(*particleIterator).currentTime += kDeltaTime;
-					instancingData[numInstance].WVP = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).WVP;
-					instancingData[numInstance].World = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).World;
-					(*particleIterator).color.w = alpha;
-					instancingData[numInstance].color = (*particleIterator).color;
-					numInstance++;
-				}
-
-				particleIterator++;
-			}
-			
-			//*WvpMatrixDataPlane = CalculateObjectWVPMat(transformObj, viewProjectionMatrix);
-
-
-			transform.rotate.y += 0.001f;
-			*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
-			*pointLight->transformMat = CalculateObjectWVPMat(PLTransform, viewProjectionMatrix);
-
-			*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
-			*terrianModel->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
-			//*plane->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
-			Matrix4x4 wMat = MakeAffineMatrix(terrainTrans.scale, terrainTrans.rotate, terrainTrans.translate);
-			plane->transformMat->WVP = plane->rootNode.localMatrix * wMat * viewProjectionMatrix;
-			plane->transformMat->World = plane->rootNode.localMatrix * wMat ;
-			plane->transformMat->worldInverseTranspose= Transpose(Inverse(plane->transformMat->World));
-
-			///
-			/// 更新処理ここまで
-			///
-
-			//これから書き込むバックバッファのインデックスを取得
-			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-			//trasitionBarrierを貼るコード
-			D3D12_RESOURCE_BARRIER barrier{};
-			//今回のバリアはtransition
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			//Noneにしておく
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			//バリアを貼る対象のリソース。現在のバックバッファに対して行う
-			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
-			//遷移前（現在）のResourceState
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-			//遷移後のResourceState
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			//transitionBarrierを張る
-			commandList->ResourceBarrier(1, &barrier);
-
-
-			//描画先のRTVを設定する
-			//指定した色で画面算体をクリアする
-
-			Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap.Get() };
-			commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
-			//描画先とRTVとDSVの設定を行う
-			//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, desriptorSizeDSV, 0);
-			commandList->OMSetRenderTargets(1, &rtVHandles[backBufferIndex], false, &dsvHandle);
-
-			float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-			commandList->ClearRenderTargetView(rtVHandles[backBufferIndex], clearColor, 0, nullptr);
-
-			//指定した深度で画面をクリアする
-			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-			commandList->RSSetViewports(1, &viewport);                            // Viewportを設定
-			commandList->RSSetScissorRects(1, &scissorRect);                      // Scissorを設定
-
-
-			///
-			/// 描画ここから 
-			/// 
-
-			//TODO:draw関数を作りたい
-			//(x-min)/(max-min);
-
-
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
-
-			commandList->SetGraphicsRootSignature(rootSignature.Get());
-			commandList->SetPipelineState(graphicsPipelineState.Get());                 // PSOを設定
-
-			commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(5, cameraResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
-
-			//DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
-			DrawSphere(commandList, sphere.get(), sphere->textureHandle);
-			DrawSphere(commandList, pointLight.get(), sphere->textureHandle);
-
-
-
-			//commandList->SetGraphicsRootSignature(rootSignatureForInstancing.Get());
-			//commandList->SetPipelineState(graphicsPipelineStateForInstancing.Get());                 // PSOを設定
-
-
-			//commandList->IASetVertexBuffers(0, 1, &plane->vertexBufferView);
-			//commandList->SetGraphicsRootConstantBufferView(0, plane->materialResource->GetGPUVirtualAddress());
-			//commandList->SetGraphicsRootConstantBufferView(1, plane->wvpResource->GetGPUVirtualAddress());
-			//commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(plane->textureHandle));
-			//commandList->SetGraphicsRootConstantBufferView(3, plane->useTextureResource->GetGPUVirtualAddress());
-			//commandList->DrawInstanced(UINT(plane->vertices.size()), 1, 0, 0);
-
-			commandList->IASetVertexBuffers(0, 1, &terrianModel->vertexBufferView);
-			commandList->SetGraphicsRootConstantBufferView(0, terrianModel->materialResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootConstantBufferView(1, terrianModel->wvpResource->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(terrianModel->textureHandle));
-			commandList->SetGraphicsRootConstantBufferView(3, terrianModel->useTextureResource->GetGPUVirtualAddress());
-			commandList->DrawInstanced(UINT(terrianModel->vertices.size()), 1, 0, 0);
-
-			///
-			/// 描画ここまで
-			/// 
-
-			ImGui::Render();
-
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
-
-			//画面に書く処理はすべて終わり，画面に移すので状態を遷移
-			//今回はRenderTargetからPresentにする
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			//TransitionBarrierを張る
-			commandList->ResourceBarrier(1, &barrier);
-
-			//コマンドリストの内容を確立させる。すべてのコマンドを積んでからcloseすること
-			hr = commandList->Close();
-			assert(SUCCEEDED(hr));
-
-			/// コマンドをキックする
-			//GPUにコマンドリストの実行を行わせる
-			Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList.Get() };
-			commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
-			//GPUとOSに画面の交換を行うように通知する
-			swapChain->Present(1, 0);			//	画面が切り替わる
-
-			/// GPUにSignalを送る
-			//Fenceの値の更新
-			fenceValue++;
-			//GPUがここまでたどり着いたときに，Fenceの値を指定した値に代入するようにSignalを送る
-			commandQueue->Signal(fence.Get(), fenceValue);
-
-			//Fenceの値が指定したSignal値にたどり着いているか確認する
-			//GetCompleteValueの初期値はFence作成時に渡した初期値
-			if (fence->GetCompletedValue() < fenceValue)
-			{
-				//指定したSignalにたどり着いていないので，たどり着くまで待つようにイベントを設定する
-				fence->SetEventOnCompletion(fenceValue, fenceEvent);
-				//イベント待つ
-				WaitForSingleObject(fenceEvent, INFINITE);
-			}
-
-			//次のフレーム用のコマンドリストを準備
-			hr = commandAllocator->Reset();
-			assert(SUCCEEDED(hr));
-			hr = commandList->Reset(commandAllocator.Get(), nullptr);
-			assert(SUCCEEDED(hr));
-
-
+			ImGui::DragFloat3("scale", &cameraTransform.scale.x, 0.01f);
+			ImGui::DragFloat3("rotate", &cameraTransform.rotate.x, 0.01f);
+			ImGui::DragFloat3("translate", &cameraTransform.translate.x, 0.01f);
+			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Sphere"))
+		{
+			ImGui::ColorEdit4("color", &objColor1.x);
+			ImGui::SliderFloat("shininess", &sphere->materialData->shininess, 1.0f, 50.0f);
+			ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+			ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+			ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+			ImGui::Checkbox("Lighting", &enableLightting[0]);
+			ImGui::Checkbox("useTexture", &useTexture[0]);
+			int currentTex = static_cast<int>(sphere->textureHandle);
+			if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+			{
+				sphere->textureHandle = static_cast<uint32_t> (currentTex);
+			}
+			sphere->materialData->color = objColor1;
+			sphere->materialData->enabledLighthig = enableLightting[0];
+			*sphere->useTexture = useTexture[0] ? 1.0f : 0.0f;
+			ImGui::TreePop();
+		}
+
+
+		if (ImGui::TreeNode("OBJ"))
+		{
+			ImGui::ColorEdit4("color", &objColor1.x);
+			ImGui::DragFloat3("scale", &transformObj.scale.x, 0.01f);
+			ImGui::DragFloat3("rotate", &transformObj.rotate.x, 0.01f);
+			ImGui::DragFloat3("translate", &transformObj.translate.x, 0.01f);
+			ImGui::Checkbox("Lighting", &enableLightting[1]);
+			ImGui::Checkbox("useTexture", &useTexture[1]);
+			int currentTex = static_cast<int>(currentTexture);
+			if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+			{
+				currentTexture = static_cast<uint32_t> (currentTex);
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sprite"))
+		{
+			ImGui::ColorEdit4("color", &objColor1.x);
+			ImGui::DragFloat3("scale", &spriteTrans.scale.x, 0.01f);
+			ImGui::DragFloat3("rotate", &spriteTrans.rotate.x, 0.01f);
+			ImGui::DragFloat3("translate", &spriteTrans.translate.x, 1.0f);
+			int currentTex = static_cast<int>(sprite->textureHandle);
+			if (ImGui::Combo("texture", &currentTex, textureOption, IM_ARRAYSIZE(textureOption)))
+			{
+				sprite->textureHandle = static_cast<uint32_t> (currentTex);
+			}
+			sprite->materialData->color = objColor1;
+
+			if (ImGui::TreeNode("uvTransform"))
+			{
+				ImGui::DragFloat2("uvTranslate", &spriteUVTrans.translate.x, 0.01f, -10.0f, 10.0f);
+				ImGui::DragFloat2("uvScale", &spriteUVTrans.scale.x, 0.01f, -10.0f, 10.0f);
+				ImGui::SliderAngle("uvRotate", &spriteUVTrans.rotate.z);
+				sprite->materialData->uvTransform = MakeAffineMatrix(spriteUVTrans.scale, spriteUVTrans.rotate, spriteUVTrans.translate);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Terrain"))
+		{
+			ImGui::ColorEdit4("color", &terrianModel->materialData->color.x);
+			ImGui::SliderFloat("shininess", &terrianModel->materialData->shininess, 1.0f, 50.0f);
+			ImGui::DragFloat3("scale", &terrainTrans.scale.x, 0.01f);
+			ImGui::DragFloat3("rotate", &terrainTrans.rotate.x, 0.01f);
+			ImGui::DragFloat3("translate", &terrainTrans.translate.x, 0.01f);
+			ImGui::Checkbox("Lighting", &enableLightting[2]);
+			ImGui::Checkbox("useTexture", &useTexture[2]);
+			terrianModel->materialData->enabledLighthig = enableLightting[2];
+			*terrianModel->useTexture = useTexture[1] ? 1.0f : 0.0f;
+			ImGui::TreePop();
+		}
+
+
+		if (ImGui::TreeNode("DirectionalLight"))
+		{
+			ImGui::ColorEdit3("color", &directionalLightData->color.x);
+			ImGui::DragFloat3("direction", &directionalLightData->direction.x, 0.01f);
+			ImGui::DragFloat("intensity", &directionalLightData->intensity, 0.01f);
+			bool isHalf = directionalLightData->isHalf != 0;
+			ImGui::Checkbox("isHalf", &isHalf);
+			directionalLightData->isHalf = static_cast<uint32_t>(isHalf);
+
+			directionalLightData->direction = Normalize(directionalLightData->direction);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("PointLight"))
+		{
+			ImGui::ColorEdit3("color", &pointLightData->color.x);
+			if (ImGui::DragFloat3("position", &pointLightData->position.x, 0.01f))
+			{
+				PLTransform.translate = pointLightData->position;
+			}
+			ImGui::DragFloat("intensity", &pointLightData->intensity, 0.01f);
+			ImGui::DragFloat("decay", &pointLightData->decay, 0.01f);
+			ImGui::DragFloat("radius", &pointLightData->radius, 0.01f);
+			bool isHalf = pointLightData->isHalf != 0;
+			ImGui::Checkbox("isHalf", &isHalf);
+			pointLightData->isHalf = static_cast<uint32_t>(isHalf);
+
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("spotLight"))
+		{
+			ImGui::ColorEdit3("color", &spotLightData->color.x);
+			if (ImGui::DragFloat3("position", &spotLightData->position.x, 0.01f))
+			{
+				//PLTransform.translate = spotLightData->position;
+			}
+			ImGui::DragFloat("distance", &spotLightData->distance, 0.01f);
+			ImGui::DragFloat3("direction", &spotLightData->direction.x, 0.01f);
+			ImGui::DragFloat("intensity", &spotLightData->intensity, 0.01f);
+			ImGui::DragFloat("decay", &spotLightData->decay, 0.01f);
+			ImGui::SliderAngle("cosAngle", &spotLightData->cosAngle, 0.01f, 180.0f);
+			ImGui::SliderAngle("falloutStart", &spotLightData->falloutStartAngle, 0.01f, 180.0f);
+			bool isHalf = spotLightData->isHalf != 0;
+			ImGui::Checkbox("isHalf", &isHalf);
+			spotLightData->isHalf = static_cast<uint32_t>(isHalf);
+			spotLightData->direction = Normalize(spotLightData->direction);
+
+			ImGui::TreePop();
+		}
+		//}
+		/*if (ImGui::Button("Add Particles"))
+		{
+			particles.splice(particles.end(), Emit(emitter, randomEngine));
+		}
+		ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+		ImGui::Checkbox("enableField", &enableAccelerationField);
+		if (ImGui::Combo("BlendMode", &currentBlendMode, blendModeOption, IM_ARRAYSIZE(blendModeOption)))
+		{
+			SetBlendMode(static_cast<BlendMode>(currentBlendMode), graphicsPipelineStateDescForInstancing);
+			device->CreateGraphicsPipelineState(&graphicsPipelineStateDescForInstancing, IID_PPV_ARGS(&graphicsPipelineStateForInstancing));
+		}
+		ImGui::Checkbox("useBillboard", &useBillboard);*/
+		ImGui::End();
+
+		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WinApp::kWindowWidth_) / float(WinApp::kWindowHeight_), 0.1f, 100.0f);
+		Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
+
+		cameraForGPU->worldPosition = cameraTransform.translate;
+
+		//pointLightData->position = Transform(pointLightPosition, viewProjectionMatrix);
+
+
+		emitter.frequencyTime += kDeltaTime;
+		if (emitter.frequency <= emitter.frequencyTime)
+		{
+			particles.splice(particles.end(), Emit(emitter, randomEngine));
+			emitter.frequencyTime -= emitter.frequency;
+		}
+
+		uint32_t numInstance = 0;
+		for (auto particleIterator = particles.begin(); particleIterator != particles.end();)
+		{
+			if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
+				particleIterator = particles.erase(particleIterator);
+				continue;
+			}
+			if (numInstance < kNumMaxInstance)
+			{
+				float  alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+
+				if (enableAccelerationField && IsCollision(accelerationField.area, (*particleIterator).transform.translate))
+				{
+					(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
+				}
+
+				(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
+				(*particleIterator).currentTime += kDeltaTime;
+				instancingData[numInstance].WVP = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).WVP;
+				instancingData[numInstance].World = CalculateParticleWVPMat((*particleIterator).transform, cameraMatrix, viewProjectionMatrix, useBillboard).World;
+				(*particleIterator).color.w = alpha;
+				instancingData[numInstance].color = (*particleIterator).color;
+				numInstance++;
+			}
+
+			particleIterator++;
+		}
+
+		//*WvpMatrixDataPlane = CalculateObjectWVPMat(transformObj, viewProjectionMatrix);
+
+
+		transform.rotate.y += 0.001f;
+		*sphere->transformMat = CalculateObjectWVPMat(transform, viewProjectionMatrix);
+		*pointLight->transformMat = CalculateObjectWVPMat(PLTransform, viewProjectionMatrix);
+
+		*sprite->transformMat = CalculateSpriteWVPMat(spriteTrans);
+		*terrianModel->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
+		//*plane->transformMat = CalculateObjectWVPMat(terrainTrans, viewProjectionMatrix);
+		Matrix4x4 wMat = MakeAffineMatrix(terrainTrans.scale, terrainTrans.rotate, terrainTrans.translate);
+		plane->transformMat->WVP = plane->rootNode.localMatrix * wMat * viewProjectionMatrix;
+		plane->transformMat->World = plane->rootNode.localMatrix * wMat;
+		plane->transformMat->worldInverseTranspose = Transpose(Inverse(plane->transformMat->World));
+
+		///
+		/// 更新処理ここまで
+		///
+
+		//これから書き込むバックバッファのインデックスを取得
+		UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+		//trasitionBarrierを貼るコード
+		D3D12_RESOURCE_BARRIER barrier{};
+		//今回のバリアはtransition
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		//Noneにしておく
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		//バリアを貼る対象のリソース。現在のバックバッファに対して行う
+		barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+		//遷移前（現在）のResourceState
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		//遷移後のResourceState
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		//transitionBarrierを張る
+		commandList->ResourceBarrier(1, &barrier);
+
+
+		//描画先のRTVを設定する
+		//指定した色で画面算体をクリアする
+
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+
+		//描画先とRTVとDSVの設定を行う
+		//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, desriptorSizeDSV, 0);
+		commandList->OMSetRenderTargets(1, &rtVHandles[backBufferIndex], false, &dsvHandle);
+
+		float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+		commandList->ClearRenderTargetView(rtVHandles[backBufferIndex], clearColor, 0, nullptr);
+
+		//指定した深度で画面をクリアする
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+		commandList->RSSetViewports(1, &viewport);                            // Viewportを設定
+		commandList->RSSetScissorRects(1, &scissorRect);                      // Scissorを設定
+
+
+		///
+		/// 描画ここから 
+		/// 
+
+		//TODO:draw関数を作りたい
+		//(x-min)/(max-min);
+
+
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+
+		commandList->SetGraphicsRootSignature(rootSignature.Get());
+		commandList->SetPipelineState(graphicsPipelineState.Get());                 // PSOを設定
+
+		commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(5, cameraResource->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
+
+		//DrawSprite(commandList, sprite, directionalLightResource, sprite->textureHandle);
+		DrawSphere(commandList, sphere.get(), sphere->textureHandle);
+		DrawSphere(commandList, pointLight.get(), sphere->textureHandle);
+
+
+
+		//commandList->SetGraphicsRootSignature(rootSignatureForInstancing.Get());
+		//commandList->SetPipelineState(graphicsPipelineStateForInstancing.Get());                 // PSOを設定
+
+
+		//commandList->IASetVertexBuffers(0, 1, &plane->vertexBufferView);
+		//commandList->SetGraphicsRootConstantBufferView(0, plane->materialResource->GetGPUVirtualAddress());
+		//commandList->SetGraphicsRootConstantBufferView(1, plane->wvpResource->GetGPUVirtualAddress());
+		//commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(plane->textureHandle));
+		//commandList->SetGraphicsRootConstantBufferView(3, plane->useTextureResource->GetGPUVirtualAddress());
+		//commandList->DrawInstanced(UINT(plane->vertices.size()), 1, 0, 0);
+
+		commandList->IASetVertexBuffers(0, 1, &terrianModel->vertexBufferView);
+		commandList->SetGraphicsRootConstantBufferView(0, terrianModel->materialResource->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(1, terrianModel->wvpResource->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, GetTextureHandle(terrianModel->textureHandle));
+		commandList->SetGraphicsRootConstantBufferView(3, terrianModel->useTextureResource->GetGPUVirtualAddress());
+		commandList->DrawInstanced(UINT(terrianModel->vertices.size()), 1, 0, 0);
+
+		///
+		/// 描画ここまで
+		/// 
+
+		ImGui::Render();
+
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
+		//画面に書く処理はすべて終わり，画面に移すので状態を遷移
+		//今回はRenderTargetからPresentにする
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+		//TransitionBarrierを張る
+		commandList->ResourceBarrier(1, &barrier);
+
+		//コマンドリストの内容を確立させる。すべてのコマンドを積んでからcloseすること
+		hr = commandList->Close();
+		assert(SUCCEEDED(hr));
+
+		/// コマンドをキックする
+		//GPUにコマンドリストの実行を行わせる
+		Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList.Get() };
+		commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
+		//GPUとOSに画面の交換を行うように通知する
+		swapChain->Present(1, 0);			//	画面が切り替わる
+
+		/// GPUにSignalを送る
+		//Fenceの値の更新
+		fenceValue++;
+		//GPUがここまでたどり着いたときに，Fenceの値を指定した値に代入するようにSignalを送る
+		commandQueue->Signal(fence.Get(), fenceValue);
+
+		//Fenceの値が指定したSignal値にたどり着いているか確認する
+		//GetCompleteValueの初期値はFence作成時に渡した初期値
+		if (fence->GetCompletedValue() < fenceValue)
+		{
+			//指定したSignalにたどり着いていないので，たどり着くまで待つようにイベントを設定する
+			fence->SetEventOnCompletion(fenceValue, fenceEvent);
+			//イベント待つ
+			WaitForSingleObject(fenceEvent, INFINITE);
+		}
+
+		//次のフレーム用のコマンドリストを準備
+		hr = commandAllocator->Reset();
+		assert(SUCCEEDED(hr));
+		hr = commandList->Reset(commandAllocator.Get(), nullptr);
+		assert(SUCCEEDED(hr));
+
 	}
 
 	ImGui_ImplDX12_Shutdown();
@@ -1546,71 +1535,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #ifdef _DEBUG
 	debugController->Release();
 #endif // _DEBUG
-	CloseWindow(hwnd);
 
-
-
-
-	CoUninitialize();
+	winApp->Filalze();
 
 	return 0;
 }
-
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-	{
-		return true;
-	}
-
-	// メッセージに応じてゲーム固有の処理を行う
-	switch (msg)
-	{
-		// ウィンドウが破棄された
-	case WM_DESTROY:
-		// OSに対して，アプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	// 標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-//
-//void Log(const std::string& message)
-//{
-//	OutputDebugStringA(message.c_str());
-//}
-//
-//
-//std::wstring ConvertString(const std::string& str) {
-//	if (str.empty()) {
-//		return std::wstring();
-//	}
-//
-//	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-//	if (sizeNeeded == 0) {
-//		return std::wstring();
-//	}
-//	std::wstring result(sizeNeeded, 0);
-//	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-//	return result;
-//}
-//
-//std::string ConvertString(const std::wstring& str) {
-//	if (str.empty()) {
-//		return std::string();
-//	}
-//
-//	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-//	if (sizeNeeded == 0) {
-//		return std::string();
-//	}
-//	std::string result(sizeNeeded, 0);
-//	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-//	return result;
-//}
 
 Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(const std::wstring& _filePath, const wchar_t* _profile, Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils, Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler, Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler)
 {
@@ -2488,7 +2417,7 @@ void InitializeMeshData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, Mod
 TransformationMatrix CalculateSpriteWVPMat(const stTransform& _transform)
 {
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
-	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kWindowWidth_), float(WinApp::kWindowHeight_), 0.0f, 100.0f);
 
 	TransformationMatrix transMat;
 	transMat.World = MakeAffineMatrix(_transform.scale, _transform.rotate, _transform.translate);

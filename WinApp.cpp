@@ -32,8 +32,11 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::CreateGameWindow(const wchar_t* _title, UINT _style, uint32_t _width, uint32_t _height)
+void WinApp::Initilize(const wchar_t* _title, UINT _style, uint32_t _width, uint32_t _height)
 {
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(hr));
+
 	//ウィンドウプロシージャ
 	wndClass_.lpfnWndProc = WindowProc;
 	// ウィンドウクラス名
@@ -44,6 +47,7 @@ void WinApp::CreateGameWindow(const wchar_t* _title, UINT _style, uint32_t _widt
 	wndClass_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
 	RegisterClass(&wndClass_);
+
 
 	RECT wrc = { 0,0,(LONG)_width,(LONG)_height };
 
@@ -65,4 +69,26 @@ void WinApp::CreateGameWindow(const wchar_t* _title, UINT _style, uint32_t _widt
 
 	ShowWindow(hwnd_, SW_NORMAL);
 
+}
+
+void WinApp::Filalze()
+{
+	CloseWindow(hwnd_);
+	CoUninitialize();
+}
+
+bool WinApp::ProcessMessage()
+{
+	MSG msg{};
+
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT)
+		return true;
+
+	return false;
 }
