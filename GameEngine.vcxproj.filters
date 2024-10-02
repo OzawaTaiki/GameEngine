@@ -25,6 +25,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{a3462a09-49de-4400-9055-57f3853699f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{87e84403-6e3d-4fd3-9c7f-1a4c2cf3086d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="myLib\MyLib.cpp">
@@ -71,9 +74,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.VS.hlsl" />
-    <FxCompile Include="Object3d.PS.hlsl" />
-    <FxCompile Include="Particle.PS.hlsl" />
+    <FxCompile Include="Object3d.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Object3d.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Particle.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
@@ -143,8 +152,14 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli" />
-    <None Include="Particle.VS.hlsl" />
-    <None Include="Particle.hlsli" />
+    <None Include="Object3d.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Particle.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Particle.VS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>
