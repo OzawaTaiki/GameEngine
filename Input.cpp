@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-Input* Input::GetInstanse()
+Input* Input::GetInstance()
 {
     static Input instace;
     return &instace;

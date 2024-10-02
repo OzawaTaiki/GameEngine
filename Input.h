@@ -16,7 +16,7 @@ class Input
 {
 public:
 
-	static Input* GetInstanse();
+	static Input* GetInstance();
 
 	void Initilize(WinApp* _winApp);
 	void Update();
