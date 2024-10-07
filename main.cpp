@@ -1,17 +1,13 @@
-#include <Windows.h>
-#include <string>
-#include <format>
-
 #include "WinApp.h"
 #include "DXCommon.h"
 #include "myLib/MyLib.h"
 #include "Debug.h"
 #include "Input.h"
+#include "TextureManager.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -20,15 +16,16 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+
+#include <string>
+#include <format>
 #include <vector>
 #include <fstream>
 #include <sstream>
-
 #include <random>
 #include <numbers>
-#include "Mesh.h"
 
-//
+
 //void Log(const std::string& message);
 //std::wstring ConvertString(const std::string& _str);
 //std::string ConvertString(const std::wstring& _str);
@@ -323,60 +320,18 @@ TransformationMatrix CalculateParticleWVPMat(const stTransform& _transform, cons
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	D3DResourceLeakChecker leakcheker;
 
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 
-	///COMの初期化	CoInitializeEx(0, COINIT_MULTITHREADED);
-
-	///// ウィンドウクラスを登録する
-	//WNDCLASS wc{};
-	//// ウィンドウプロシージャ
-	//wc.lpfnWndProc = WindowProc;
-	//// ウィンドウクラス名(なんでもいい)
-	//wc.lpszClassName = L"CGWindowClass";
-	//// インスタンスハンドル
-	//wc.hInstance = GetModuleHandle(nullptr);
-	//// カーソル
-	//wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	//// ウィンドウクラスを登録する
-	//RegisterClass(&wc);
-
-	///// ウィンドウサイズを決める
-
-	//// ウィンドウサイズを表す構造体にクライアント領域を入れる
-	//RECT wrc = { 0,0,kClientWidth,kClientHeight };
-
-	////クライアント領域をもとに実際のサイズをwrcを変更してもらう
-	//AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	///// ウィンドウを生成して表示
-	//// ウィンドウの生成
-	//HWND hwnd = CreateWindow(
-	//	wc.lpszClassName,		// 利用するクラス名
-	//	L"CG2",					// タイトルバーの文字
-	//	WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
-	//	CW_USEDEFAULT,			// 表示X座標(WindowsにOS任せる)
-	//	CW_USEDEFAULT,			// 表示Y座標(WindowsOSに任せる)
-	//	wrc.right - wrc.left,	// ウィンドウ横幅
-	//	wrc.bottom - wrc.top,	// ウィンドウ立幅
-	//	nullptr,				// 親ウィンドウハンドル
-	//	nullptr,				// メニューハンドル
-	//	wc.hInstance,			// インスタンスハンドル
-	//	nullptr);				// オプション
-
-	////ウィンドウを表示する
-	//ShowWindow(hwnd, SW_SHOW);
-
-	WinApp* winApp = new WinApp();
+	WinApp* winApp = WinApp::GetInstance();
 	winApp->Initilize();
 
-
-	DXCommon* dxCommon = new DXCommon();
+	DXCommon* dxCommon =  DXCommon::GetInstance();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
+	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->LoadTexture("uvChecker.png");
 
 //	///デバッグレイヤー
 //#ifdef _DEBUG
@@ -1131,7 +1086,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		////これから書き込むバックバッファのインデックスを取得
 		//UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
 		////trasitionBarrierを貼るコード
 		//D3D12_RESOURCE_BARRIER barrier{};
 		////今回のバリアはtransition
@@ -1238,8 +1192,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	winApp->Filalze();
 
-	delete dxCommon;
-	delete winApp;
 
 	return 0;
 }
@@ -1383,22 +1335,6 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const Microsof
 	return descriptorHeap;
 }
 
-DirectX::ScratchImage LoadTexture(const std::string& _filePath)
-{
-	DirectX::ScratchImage image{};
-	std::wstring filePathw = Debug::ConvertString(_filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-	assert(SUCCEEDED(hr));
-
-	//ミップマップの生成
-	DirectX::ScratchImage mipImage{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);
-	assert(SUCCEEDED(hr));
-
-	//ミップマップ付きのデータを返す	
-	return mipImage;
-}
-
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, const DirectX::TexMetadata& _metadata)
 {
 	// metadataを基にResourceの設定
@@ -1436,6 +1372,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WR
 [[nodiscard]]
 Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages, const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList)
 {
+
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
@@ -1800,6 +1737,22 @@ uint32_t LoadTexture(const std::string& _filePath, const  Microsoft::WRL::ComPtr
 	return (uint32_t)index;
 }
 
+DirectX::ScratchImage LoadTexture(const std::string& _filePath)
+{
+	DirectX::ScratchImage image{};
+	std::wstring filePathw = Debug::ConvertString(_filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	assert(SUCCEEDED(hr));
+
+	//ミップマップの生成
+	DirectX::ScratchImage mipImage{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);
+	assert(SUCCEEDED(hr));
+
+	//ミップマップ付きのデータを返す	
+	return mipImage;
+}
+
 std::unique_ptr<Object>  MakeTriangleData(const Microsoft::WRL::ComPtr<ID3D12Device>& _device)
 {
 	std::unique_ptr<Object> obj = std::make_unique<Object>();
@@ -1917,13 +1870,13 @@ std::unique_ptr<Object>  MakeSphereData(const Microsoft::WRL::ComPtr<ID3D12Devic
 	obj->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&obj->vertexData));
 
 	//vertexの計算
-	const float kLatEvery = (float)M_PI / (float)kSubdivision;          // 緯度分割１つ分の角度 θ
-	const float kLonEvery = (float)M_PI * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度 φ
+	const float kLatEvery = std::numbers::pi_v<float> / (float)kSubdivision;          // 緯度分割１つ分の角度 θ
+	const float kLonEvery = std::numbers::pi_v<float> * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度 φ
 
 	//緯度の方向に分割   -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
 	{
-		float lat = -(float)M_PI / 2.0f + kLatEvery * latIndex;         // 現在の緯度
+		float lat = -std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;         // 現在の緯度
 
 		// 経度の方向に分割   0 ~ π
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
