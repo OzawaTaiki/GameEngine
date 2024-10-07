@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
+
 #include <cassert>
 
 #pragma comment(lib,"d3d12.lib")
@@ -16,7 +17,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 
 DXCommon* DXCommon::GetInstance()
 {
@@ -31,6 +32,9 @@ void DXCommon::Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _ba
 	winApp_ = _winApp;
 	backBufferWidth_ = _backBufferWidth;
 	backBufferHeight_ = _backBufferHeight;
+
+	desriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	desriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 
 	CreateDevice();
@@ -309,8 +313,6 @@ void DXCommon::CreateDepthBuffer()
 void DXCommon::CreateDescriptor()
 {
 	//DescriptorSizeを取得しておく
-	const uint32_t desriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	const uint32_t desriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないのでShaderVisibleはfalse
@@ -490,5 +492,19 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(const Microsoft::WR
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (_descriptorSize * _index);
+	return handleGPU;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUSRVDescriptorHandle(uint32_t _index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (desriptorSizeSRV_ * _index);
+	return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUSRVDescriptorHandle(uint32_t _index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (desriptorSizeSRV_ * _index);
 	return handleGPU;
 }

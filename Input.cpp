@@ -33,7 +33,7 @@ void Input::Update()
     std::copy(keys_.begin(), keys_.end(), preKeys_.begin());
 
     keyboard_->Acquire();
-    keyboard_->GetDeviceState(keys_.size(), keys_.data());
+    keyboard_->GetDeviceState(DWORD(keys_.size()), keys_.data());
 }
 
 bool Input::IsTriger(uint8_t _key)
