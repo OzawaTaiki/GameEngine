@@ -23,6 +23,11 @@ void Material::Initialize(const std::string& _texturepath)
 
 }
 
+void Material::LoadFIle()
+{
+
+}
+
 void Material::TransferData()
 {
 	Vector3 trans = { transform_,0.0f };

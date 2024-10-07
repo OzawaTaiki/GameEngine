@@ -2,8 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
-
+#include <memory>
 #include <d3d12.h>
 #include <wrl.h>
 
@@ -13,8 +12,7 @@
 #include "Matrix4x4.h"
 #include "Material.h"
 #include "Mesh.h"
-#include <memory>
-#include <map>
+#include <unordered_map>
 
 class Model
 {
@@ -31,7 +29,8 @@ private:
 
 	std::string name_ = {};
 
-	std::map<std::string, std::unique_ptr<Mesh>>meshes_;
+	std::unique_ptr<Mesh>				mesh_			= nullptr;
+	std::unique_ptr<Material>			material_		= nullptr;
 
 	void TransferData();
 
