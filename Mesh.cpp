@@ -26,7 +26,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
 
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
-        assert(mesh->HasNormals());						//法線がないMeshは今回は非対応
+        assert(mesh->HasNormals());						// 法線がないMeshは今回は非対応
         assert(mesh->HasTextureCoords(0));				// TexcoordがないMeshは今回は非対応
 
 
@@ -53,7 +53,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
                 if (it == vertices_.end()) {					
                     // 値が重複しないとき
                     vertices_.push_back(vertex);
-                    indices_.push_back(static_cast<uint32_t>(vertices_.size()-1));
+                    indices_.push_back(static_cast<uint32_t>(vertices_.size() - 1));
                 }
                 else {
                     size_t index = std::distance(vertices_.begin(), it);

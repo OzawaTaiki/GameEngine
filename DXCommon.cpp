@@ -33,8 +33,6 @@ void DXCommon::Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _ba
 	backBufferWidth_ = _backBufferWidth;
 	backBufferHeight_ = _backBufferHeight;
 
-	desriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	desriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 
 	CreateDevice();
@@ -313,7 +311,8 @@ void DXCommon::CreateDepthBuffer()
 void DXCommon::CreateDescriptor()
 {
 	//DescriptorSizeを取得しておく
-
+	desriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	desriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないのでShaderVisibleはfalse
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);              //viewの情報を格納している場所(Discriptor)の束(配列)
