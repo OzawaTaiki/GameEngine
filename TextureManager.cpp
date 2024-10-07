@@ -25,9 +25,12 @@ void TextureManager::Update()
 
 void TextureManager::LoadTexture(const std::string& _filepath)
 {
+	assert(dxCommon_ != nullptr && "not initialized");
+
 	size_t index = textures_.size();
 
-	DirectX::ScratchImage mipImages = GetMipImage(_filepath);
+	std::string fullpath = defaultDirpath_ + _filepath;
+	DirectX::ScratchImage mipImages = GetMipImage(fullpath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textures_[_filepath].resource =  CreateTextureResource(metadata);
 	textures_[_filepath].intermediateResource = UploadTextureData(textures_[_filepath].resource.Get(), mipImages);

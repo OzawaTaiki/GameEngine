@@ -320,60 +320,18 @@ TransformationMatrix CalculateParticleWVPMat(const stTransform& _transform, cons
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	D3DResourceLeakChecker leakcheker;
 
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 
-	///COMの初期化	CoInitializeEx(0, COINIT_MULTITHREADED);
-
-	///// ウィンドウクラスを登録する
-	//WNDCLASS wc{};
-	//// ウィンドウプロシージャ
-	//wc.lpfnWndProc = WindowProc;
-	//// ウィンドウクラス名(なんでもいい)
-	//wc.lpszClassName = L"CGWindowClass";
-	//// インスタンスハンドル
-	//wc.hInstance = GetModuleHandle(nullptr);
-	//// カーソル
-	//wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	//// ウィンドウクラスを登録する
-	//RegisterClass(&wc);
-
-	///// ウィンドウサイズを決める
-
-	//// ウィンドウサイズを表す構造体にクライアント領域を入れる
-	//RECT wrc = { 0,0,kClientWidth,kClientHeight };
-
-	////クライアント領域をもとに実際のサイズをwrcを変更してもらう
-	//AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	///// ウィンドウを生成して表示
-	//// ウィンドウの生成
-	//HWND hwnd = CreateWindow(
-	//	wc.lpszClassName,		// 利用するクラス名
-	//	L"CG2",					// タイトルバーの文字
-	//	WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
-	//	CW_USEDEFAULT,			// 表示X座標(WindowsにOS任せる)
-	//	CW_USEDEFAULT,			// 表示Y座標(WindowsOSに任せる)
-	//	wrc.right - wrc.left,	// ウィンドウ横幅
-	//	wrc.bottom - wrc.top,	// ウィンドウ立幅
-	//	nullptr,				// 親ウィンドウハンドル
-	//	nullptr,				// メニューハンドル
-	//	wc.hInstance,			// インスタンスハンドル
-	//	nullptr);				// オプション
-
-	////ウィンドウを表示する
-	//ShowWindow(hwnd, SW_SHOW);
-
-	WinApp* winApp = new WinApp();
+	WinApp* winApp = WinApp::GetInstance();
 	winApp->Initilize();
 
-
-	DXCommon* dxCommon = new DXCommon();
+	DXCommon* dxCommon =  DXCommon::GetInstance();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
+	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->LoadTexture("uvChecker.png");
 
 //	///デバッグレイヤー
 //#ifdef _DEBUG
@@ -1128,7 +1086,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		////これから書き込むバックバッファのインデックスを取得
 		//UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
 		////trasitionBarrierを貼るコード
 		//D3D12_RESOURCE_BARRIER barrier{};
 		////今回のバリアはtransition
@@ -1235,8 +1192,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	winApp->Filalze();
 
-	delete dxCommon;
-	delete winApp;
 
 	return 0;
 }

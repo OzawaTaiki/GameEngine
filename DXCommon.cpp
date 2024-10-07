@@ -21,6 +21,7 @@
 
 DXCommon* DXCommon::GetInstance()
 {
+	static D3DResourceLeakChecker leakcheker;
     static DXCommon instance;
     return &instance;
 }
@@ -32,8 +33,6 @@ void DXCommon::Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _ba
 	winApp_ = _winApp;
 	backBufferWidth_ = _backBufferWidth;
 	backBufferHeight_ = _backBufferHeight;
-
-
 
 	CreateDevice();
 	InitializeCommand();
@@ -78,7 +77,7 @@ void DXCommon::PreDraw()
 	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	//描画先とRTVとDSVの設定を行う
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_, desriptorSizeDSV, 0);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV, 0);
 	commandList_->OMSetRenderTargets(1, &RTVHandles_[backBufferIndex], false, &dsvHandle);
 
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
@@ -96,7 +95,6 @@ void DXCommon::PostDraw()
 	HRESULT hr = S_FALSE;
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
 
 	//画面に書く処理はすべて終わり，画面に移すので状態を遷移
 	//今回はRenderTargetからPresentにする
@@ -480,14 +478,14 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateDepthStencilTextureResour
 	return resource;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
+D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = _descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	handleCPU.ptr += (_descriptorSize * _index);
 	return handleCPU;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
+D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index)
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (_descriptorSize * _index);
@@ -506,4 +504,9 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUSRVDescriptorHandle(uint32_t _index)
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (desriptorSizeSRV_ * _index);
 	return handleGPU;
+}
+
+DXCommon::~DXCommon()
+{
+	winApp_ = nullptr;
 }
