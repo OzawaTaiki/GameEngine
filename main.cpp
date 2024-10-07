@@ -26,6 +26,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include <random>
 #include <numbers>
+#include "Mesh.h"
 
 //
 //void Log(const std::string& message);
@@ -76,10 +77,10 @@ struct VertexData
 struct Material
 {
 	Vector4 color;
-	int32_t enabledLighthig;
-	float padding[3];
 	Matrix4x4 uvTransform;
 	float shininess;
+	int32_t enabledLighthig;
+	float padding[2];
 };
 
 struct DirectionalLight
@@ -176,6 +177,7 @@ struct ModelData
 	VertexData* vertexData;
 	Material* materialData;
 	Node rootNode;
+	//こいつはマテリアルに入れていい気がします↓
 	float* useTexture;
 	uint32_t* indexData;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource;
@@ -374,6 +376,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	DXCommon* dxCommon = new DXCommon();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+
 
 //	///デバッグレイヤー
 //#ifdef _DEBUG

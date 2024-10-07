@@ -24,6 +24,9 @@ public:
 	void PostDraw();
 
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
+	ID3D12Device* GetDevice() { return device_.Get(); }
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
 private:
 

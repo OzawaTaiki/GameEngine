@@ -74,7 +74,7 @@ Vector3  Normalize(const Vector3& _v)
 	Vector3 result;
 	float _length = Length(_v);
 	if (_length == 0)
-		return { 0 };
+		return { 0.0f };
 	result.x = _v.x / _length;
 	result.y = _v.y / _length;
 	result.z = _v.z / _length;
