@@ -21,7 +21,7 @@ public:
 
 	void Draw();
 
-	void CreateFromObj(const std::string& _filePath);
+	static Model* CreateFromObj(const std::string& _filePath);
 
 	static const std::string defaultDirpath_;
 
@@ -31,6 +31,9 @@ private:
 
 	std::unique_ptr<Mesh>				mesh_			= nullptr;
 	std::unique_ptr<Material>			material_		= nullptr;
+
+	void LoadMesh(const std::string& _filePath);
+	void LoadMaterial(const std::string& _filePath);
 
 	void TransferData();
 

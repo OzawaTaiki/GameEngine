@@ -28,7 +28,7 @@ void PSOManager::Initialize()
     CreatePSOForModel();
 }
 
-std::optional<ID3D12PipelineState*> PSOManager::GetPSO(const std::string& _key, BlendMode _mode)
+std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(const std::string& _key, BlendMode _mode)
 {
     size_t index = static_cast<size_t>(_mode);
     // 要素があるか確認
@@ -39,7 +39,18 @@ std::optional<ID3D12PipelineState*> PSOManager::GetPSO(const std::string& _key, 
     // なかったらnullを返す
     else
         return std::nullopt;
+}
 
+std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(const std::string& _key)
+{
+    // 要素があるか確認
+    auto it = rootSignatures_.find(_key);
+    // あったらそれを返す
+    if (it != rootSignatures_.end())
+        return rootSignatures_[_key].Get();
+    // なかったらnullを返す
+    else
+        return std::nullopt;
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(

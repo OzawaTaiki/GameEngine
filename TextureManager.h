@@ -21,6 +21,7 @@ public:
     void Update();
 
     void LoadTexture(const std::string& _filepath);
+    void LoadTextureAtMaterial(const std::string& _filepath);
 
 private:
 

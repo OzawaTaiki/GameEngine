@@ -89,13 +89,13 @@ void Mesh::InitializeReources()
     CreateResources();
     Map();
 
-    vertexBufferView.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
+    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+    vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
+    vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
-    indexBufferView.BufferLocation = indexResource_->GetGPUVirtualAddress();
-    indexBufferView.SizeInBytes = static_cast<UINT> (sizeof(uint32_t) * indices_.size());
-    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+    indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+    indexBufferView_.SizeInBytes = static_cast<UINT> (sizeof(uint32_t) * indices_.size());
+    indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 }
 
@@ -107,8 +107,8 @@ void Mesh::CreateResources()
 
 void Mesh::Map()
 {
-    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(vConstMap_));
-    indexResource_->Map(0, nullptr, reinterpret_cast<void**>(iConstMap_));
+    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
+    indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iConstMap_));
 
 
 };

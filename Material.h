@@ -25,6 +25,8 @@ public:
 
     void Initialize(const std::string& _texturepath);
     void LoadTexture();
+
+    ID3D12Resource* GetResource() { return resorces_.Get(); }
 private:
 
     std::string     name_                           = {};

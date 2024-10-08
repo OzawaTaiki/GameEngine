@@ -23,6 +23,8 @@ public:
 
     std::string GetTexturePath() { return textureHandlePath_; }
 
+    D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
+    D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() { return indexBufferView_; }
 private:
     DXCommon* dxCommon = nullptr;
 
@@ -43,12 +45,12 @@ private:
     std::vector<VertexData>                     vertices_               = {};                   // データ格納用
     VertexData*                                 vConstMap_              = nullptr;              // map用
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_        = nullptr;
-    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView        = {};
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_        = {};
 
     std::vector<uint32_t>                       indices_                = {};                   // データ格納用
     uint32_t*                                   iConstMap_              = nullptr;              // map用
     Microsoft::WRL::ComPtr<ID3D12Resource>      indexResource_         = nullptr;
-    D3D12_INDEX_BUFFER_VIEW                     indexBufferView         = {};
+    D3D12_INDEX_BUFFER_VIEW                     indexBufferView_         = {};
 
     void InitializeReources();
     void CreateResources();

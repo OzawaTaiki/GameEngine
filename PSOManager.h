@@ -26,10 +26,10 @@ public:
 
 	static PSOManager* GetInstance();
 
-
     void Initialize();
 
-	std::optional<ID3D12PipelineState*> GetPSO(const std::string& _key, BlendMode _mode = BlendMode::Normal);
+	std::optional<ID3D12PipelineState*> GetPipeLineStateObject(const std::string& _key, BlendMode _mode = BlendMode::Normal);
+	std::optional<ID3D12RootSignature*> GetRootSignature(const std::string& _key);
 
 private:
 

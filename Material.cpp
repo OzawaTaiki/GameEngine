@@ -7,7 +7,7 @@ void Material::Initialize(const std::string& _texturepath)
 	DXCommon* dxCommon = DXCommon::GetInstance();
 
 	resorces_ = dxCommon->CreateBufferResource(sizeof(Transferdata));
-	resorces_->Map(0, nullptr, reinterpret_cast<void**>(constMap_));
+	resorces_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
 
 	transform_ = { 0.0f,0.0f };
 	scale_ = { 1.0f,1.0f };
@@ -25,7 +25,7 @@ void Material::Initialize(const std::string& _texturepath)
 
 void Material::LoadTexture()
 {
-	TextureManager::GetInstance()->LoadTexture(texturePath_);
+	TextureManager::GetInstance()->LoadTextureAtMaterial(texturePath_);
 }
 
 void Material::TransferData()
