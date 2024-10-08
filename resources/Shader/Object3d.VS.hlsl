@@ -1,4 +1,4 @@
-#include "Object3d.hlsli"
+#include "Resources/Shader/Object3d.hlsli"
 
 cbuffer TransformationMatrix : register(b0)
 {

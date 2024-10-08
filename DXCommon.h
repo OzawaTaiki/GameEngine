@@ -6,7 +6,6 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 
-#include <dxcapi.h>
 
 #include <cstdint>
 #include <wrl.h>
@@ -74,9 +73,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 	D3D12_VIEWPORT viewport_{}; 
 	D3D12_RECT scissorRect_{};
 

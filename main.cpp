@@ -24,6 +24,7 @@
 #include <sstream>
 #include <random>
 #include <numbers>
+#include "PSOManager.h"
 
 
 //void Log(const std::string& message);
@@ -32,16 +33,16 @@
 
 const float kDeltaTime = 1.0f / 60.0f;
 
-
-Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(
-	//Complierするshaderファイルへのパス
-	const std::wstring& _filePath,
-	//Compilerに使用するprofile
-	const wchar_t* _profile,
-	//初期化で生成したものを3つ
-	Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils,
-	Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler,
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler);
+//
+//Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(
+//	//Complierするshaderファイルへのパス
+//	const std::wstring& _filePath,
+//	//Compilerに使用するprofile
+//	const wchar_t* _profile,
+//	//初期化で生成したものを3つ
+//	Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils,
+//	Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler,
+//	Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler);
 
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, size_t _sizeInBytes);
 
@@ -333,6 +334,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->LoadTexture("uvChecker.png");
 
+	PSOManager::GetInstance()->Initialize();
+
 //	///デバッグレイヤー
 //#ifdef _DEBUG
 //
@@ -540,8 +543,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 //	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 //	assert(fenceEvent != nullptr);
 //
-//
-//	/// DXCの初期化
+
+
+#pragma region ここからコンパイル
+
 //	// dxcCompilerを初期化
 //	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
 //	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
@@ -554,8 +559,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 //	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 //	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 //	assert(SUCCEEDED(hr));
-//
-//	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+//depthStencilResource
+//	Microsoft::WRL::ComPtr<ID3D12Resource>  = CreateDepthStencilTextureResource(device, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 //
 //	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 //
@@ -1195,66 +1200,66 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	return 0;
 }
-
-Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(const std::wstring& _filePath, const wchar_t* _profile, Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils, Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler, Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler)
-{
-	//hlslファイルを読み込む
-	//これからシェーダーをコンパイルする旨をログに出す
-	Debug::Log(Debug::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", _filePath, _profile)));
-	//hlslファイルを読む
-	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
-	HRESULT hr = _dxcUtils->LoadFile(_filePath.c_str(), nullptr, &shaderSource);
-	//読めなかったら止める
-	assert(SUCCEEDED(hr));
-	//読み込んだ内容を設定する
-	DxcBuffer shaderSourceBuffer;
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-	//Cmpileする
-	LPCWSTR arguments[] = {
-		_filePath.c_str(),      //コンパイル対象のhlslファイル名
-		L"-E",L"main",          //エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T",_profile,         // shaderprofilerの設定
-		L"-Zi",L"^Qembed_debug" // デバッグ用の情報を埋め込む
-		L"-Od",                 // 最適化外しておく
-		L"-Zpr",                // メモリレイアウトは行優先
-	};
-	//実際にshaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
-	hr = _dxcCompiler->Compile(
-		&shaderSourceBuffer,            // 読み込んだファイル
-		arguments,			            // コンパイルオプション
-		_countof(arguments),            // コンパイルオプションの数
-		_includeHandler.Get(),	        // includeが含まれた諸々
-		IID_PPV_ARGS(&shaderResult)     // コンパイル結果
-	);
-
-	assert(SUCCEEDED(hr));
-
-	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
-	{
-		Debug::Log(shaderError->GetStringPointer());
-		assert(false);
-	}
-
-	//コンパイル結果から実行用のバイナリ部分を取得
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	//成功したログを出す
-	Debug::Log(Debug::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", _filePath, _profile)));
-	////もう使わないリソースを解放
-	//shaderSource->Release();
-	//shaderResult->Release();
-	//shaderError->Release();
-
-	//実行用バイナリを返却
-	return shaderBlob;
-}
+//
+//Microsoft::WRL::ComPtr<IDxcBlob> ComplieShader(const std::wstring& _filePath, const wchar_t* _profile, Microsoft::WRL::ComPtr<IDxcUtils>& _dxcUtils, Microsoft::WRL::ComPtr<IDxcCompiler3>& _dxcCompiler, Microsoft::WRL::ComPtr<IDxcIncludeHandler>& _includeHandler)
+//{
+//	//hlslファイルを読み込む
+//	//これからシェーダーをコンパイルする旨をログに出す
+//	Debug::Log(Debug::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", _filePath, _profile)));
+//	//hlslファイルを読む
+//	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+//	HRESULT hr = _dxcUtils->LoadFile(_filePath.c_str(), nullptr, &shaderSource);
+//	//読めなかったら止める
+//	assert(SUCCEEDED(hr));
+//	//読み込んだ内容を設定する
+//	DxcBuffer shaderSourceBuffer;
+//	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+//	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+//	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+//
+//	//Cmpileする
+//	LPCWSTR arguments[] = {
+//		_filePath.c_str(),      //コンパイル対象のhlslファイル名
+//		L"-E",L"main",          //エントリーポイントの指定。基本的にmain以外にはしない
+//		L"-T",_profile,         // shaderprofilerの設定
+//		L"-Zi",L"^Qembed_debug" // デバッグ用の情報を埋め込む
+//		L"-Od",                 // 最適化外しておく
+//		L"-Zpr",                // メモリレイアウトは行優先
+//	};
+//	//実際にshaderをコンパイルする
+//	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
+//	hr = _dxcCompiler->Compile(
+//		&shaderSourceBuffer,            // 読み込んだファイル
+//		arguments,			            // コンパイルオプション
+//		_countof(arguments),            // コンパイルオプションの数
+//		_includeHandler.Get(),	        // includeが含まれた諸々
+//		IID_PPV_ARGS(&shaderResult)     // コンパイル結果
+//	);
+//
+//	assert(SUCCEEDED(hr));
+//
+//	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+//	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+//	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
+//	{
+//		Debug::Log(shaderError->GetStringPointer());
+//		assert(false);
+//	}
+//
+//	//コンパイル結果から実行用のバイナリ部分を取得
+//	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
+//	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+//	assert(SUCCEEDED(hr));
+//	//成功したログを出す
+//	Debug::Log(Debug::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", _filePath, _profile)));
+//	////もう使わないリソースを解放
+//	//shaderSource->Release();
+//	//shaderResult->Release();
+//	//shaderError->Release();
+//
+//	//実行用バイナリを返却
+//	return shaderBlob;
+//}
 
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& _device, size_t _sizeInBytes)
 {

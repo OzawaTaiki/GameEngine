@@ -19,24 +19,18 @@ void Model::Draw()
 {
 }
 
-void Model::CreateFromObj(const std::string& _name, const std::string& _extension)
+void Model::CreateFromObj(const std::string& _filePath)
 {
-    name_ = _name+_extension;
-
+    name_ = _filePath;
     mesh_ = std::make_unique<Mesh>();
     mesh_->Initialize();
-    mesh_->LoadFile(_name + _extension);
+    mesh_->LoadFile(_filePath);
 
     material_ = std::make_unique<Material>();
     material_->Initialize(mesh_->GetTexturePath());
-
+    material_->LoadTexture();
 }
 
 void Model::TransferData()
 {
-}
-
-void Model::LoadFilejWithAssimp(const std::string& _filename)
-{	
-
 }

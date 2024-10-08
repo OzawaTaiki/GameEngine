@@ -16,9 +16,6 @@
     <Filter Include="Lib">
       <UniqueIdentifier>{bb130762-2970-4019-a3d8-157336b101b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Lib\ソース">
-      <UniqueIdentifier>{1ab94441-ab1c-484b-b497-22a5cbb86397}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Lib\ヘッダ">
       <UniqueIdentifier>{d87e9a38-2f70-4b3a-beb7-0aa29da1fb44}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,27 @@
     </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{87e84403-6e3d-4fd3-9c7f-1a4c2cf3086d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextureManager">
+      <UniqueIdentifier>{a9516b81-c6df-4821-a750-c42ba7a00c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXCommon">
+      <UniqueIdentifier>{223c34ef-cbeb-4c78-a280-fe102f9376f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinApp">
+      <UniqueIdentifier>{1ad76de3-20e9-478b-9d6c-f382b6536151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\Vector">
+      <UniqueIdentifier>{587bb673-4ebc-46a6-98f1-5ae7b577ff8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\Matrix">
+      <UniqueIdentifier>{c317957c-f889-4f4a-9b4c-6b597f6d3a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{03deaf92-55e5-476b-b8f8-715dbc506c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{b3146db3-dba3-4b92-ad73-c662ff6ab4b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,40 +75,46 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="myLib\MatrixFunction.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="myLib\VectorFunction.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Debug.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXCommon.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="WinApp.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DResourceLeakChecker.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="myLib\Vector3.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
+      <Filter>TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DResourceLeakChecker.cpp">
+      <Filter>DXCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="DXCommon.cpp">
+      <Filter>DXCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="WinApp.cpp">
+      <Filter>WinApp</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Vector3.cpp">
+      <Filter>Lib\Vector</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\MatrixFunction.cpp">
+      <Filter>Lib\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\VectorFunction.cpp">
+      <Filter>Lib\Vector</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="PSOManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,13 +122,7 @@
     <ClInclude Include="myLib\MyLib.h">
       <Filter>Lib</Filter>
     </ClInclude>
-    <ClInclude Include="myLib\Matrix4x4.h">
-      <Filter>Lib\ヘッダ</Filter>
-    </ClInclude>
     <ClInclude Include="myLib\Transform.h">
-      <Filter>Lib\ヘッダ</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\Vector3.h">
       <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -131,37 +149,7 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>Lib\ヘッダ</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\Vector4.h">
-      <Filter>Lib\ヘッダ</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\MatrixFunction.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\VectorFunction.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix3x3.h">
-      <Filter>Lib\ヘッダ</Filter>
-    </ClInclude>
     <ClInclude Include="Debug.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DXCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="WinApp.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
@@ -171,6 +159,48 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
+      <Filter>TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DResourceLeakChecker.h">
+      <Filter>DXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="DXCommon.h">
+      <Filter>DXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApp.h">
+      <Filter>WinApp</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Lib\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Vector3.h">
+      <Filter>Lib\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Vector4.h">
+      <Filter>Lib\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix3x3.h">
+      <Filter>Lib\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Matrix4x4.h">
+      <Filter>Lib\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MatrixFunction.h">
+      <Filter>Lib\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\VectorFunction.h">
+      <Filter>Lib\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="PSOManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -180,24 +210,24 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\Shader\Object3d.hlsli">
+    <None Include="Resources\Shader\Object3d.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="resources\Shader\Particle.hlsli">
+    <None Include="Resources\Shader\Particle.hlsli">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\Shader\Object3d.PS.hlsl">
+    <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\Shader\Object3d.VS.hlsl">
+    <FxCompile Include="Resources\Shader\Object3d.VS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\Shader\Particle.PS.hlsl">
+    <FxCompile Include="Resources\Shader\Particle.PS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\Shader\Particle.VS.hlsl">
+    <FxCompile Include="Resources\Shader\Particle.VS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

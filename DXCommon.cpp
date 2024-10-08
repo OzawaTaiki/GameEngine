@@ -393,21 +393,21 @@ void DXCommon::CreateScissorRect()
 
 void DXCommon::CreateDXcCompiler()
 {
-	HRESULT hr = S_FALSE;
-
-	/// DXCの初期化
-	// dxcCompilerを初期化
-	dxcUtils_ = nullptr;
-	dxcCompiler_ = nullptr;
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
-	assert(SUCCEEDED(hr));
-
-	//現時点でinclideしないが,includeに対応するための設定を行っておく
-	 includeHandler_ = nullptr;
-	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
-	assert(SUCCEEDED(hr));
+//	HRESULT hr = S_FALSE;
+//
+//	/// DXCの初期化
+//	// dxcCompilerを初期化
+//	dxcUtils_ = nullptr;
+//	dxcCompiler_ = nullptr;
+//	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
+//	assert(SUCCEEDED(hr));
+//	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
+//	assert(SUCCEEDED(hr));
+//
+//	//現時点でinclideしないが,includeに対応するための設定を行っておく
+//	 includeHandler_ = nullptr;
+//	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
+//	assert(SUCCEEDED(hr));
 }
 
 void DXCommon::InitializeImGui()

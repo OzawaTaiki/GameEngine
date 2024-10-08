@@ -12,7 +12,7 @@
 #include "Matrix4x4.h"
 #include "Material.h"
 #include "Mesh.h"
-#include <unordered_map>
+
 
 class Model
 {
@@ -21,7 +21,7 @@ public:
 
 	void Draw();
 
-	void CreateFromObj(const std::string& _name,const std::string& _extension);
+	void CreateFromObj(const std::string& _filePath);
 
 	static const std::string defaultDirpath_;
 
@@ -33,7 +33,5 @@ private:
 	std::unique_ptr<Material>			material_		= nullptr;
 
 	void TransferData();
-
-	void LoadFilejWithAssimp(const std::string& _filename);
 
 };

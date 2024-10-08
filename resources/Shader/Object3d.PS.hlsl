@@ -1,20 +1,19 @@
-#include "Object3d.hlsli" 
+#include "Resources/Shader/Object3d.hlsli"
 
 cbuffer gMaterial : register(b0)
 {
-    float4 materialColor;
     float4x4 unTransform;
     float shininess;
     int enableLighting;
 };
 
-cbuffer gTexVisibility : register(b1)
-{
-    float isVisible;
-};
+//cbuffer gTexVisibility : register(b1)
+//{
+//    float isVisible;
+//};
 
 //平行光源
-cbuffer gDirectionalLight : register(b2)
+cbuffer gDirectionalLight : register(b1)
 {
     float4 DL_color; //ライトの色
     float3 DL_direction; //ライトの向き
@@ -22,13 +21,13 @@ cbuffer gDirectionalLight : register(b2)
     int DL_isHalf;
 }
 
-cbuffer Camera : register(b3)
+cbuffer Camera : register(b2)
 {
     float3 worldPosition;
 }
 
 //点光源
-cbuffer gPointLight : register(b4)
+cbuffer gPointLight : register(b3)
 {
     float4 PL_color;
     float3 PL_position;
@@ -39,7 +38,7 @@ cbuffer gPointLight : register(b4)
 }
 
 //スポットライト
-cbuffer gSpotLight : register(b5)
+cbuffer gSpotLight : register(b4)
 {
     float4 SL_color;
     float3 SL_position;
@@ -51,7 +50,10 @@ cbuffer gSpotLight : register(b5)
     float SL_cosFalloutStart;
     int SL_isHalf;
 }
-
+cbuffer gColor : register(b5)
+{
+    float4 materialColor;
+}
 
 struct PixelShaderOutput
 {
@@ -70,13 +72,13 @@ PixelShaderOutput main(VertexShaderOutput _input)
     float4 textureColor;
         
     //画像の有無
-    if (isVisible == 1.0f)
-    {
+    //if (isVisible == 1.0f)
+    //{
         float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
         textureColor = materialColor * gTexture.Sample(gSampler, transformedUV.xy);
-    }
-    else
-        textureColor = materialColor;
+    //}
+    //else
+    //    textureColor = materialColor;
     
     /*lmbart*/
     float3 toEye = normalize(worldPosition - _input.worldPosition);

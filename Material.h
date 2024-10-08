@@ -24,7 +24,7 @@ public:
     bool            enableLighting_                 = true;                 // ライティングの有無
 
     void Initialize(const std::string& _texturepath);
-    void LoadFIle();
+    void LoadTexture();
 private:
 
     std::string     name_                           = {};

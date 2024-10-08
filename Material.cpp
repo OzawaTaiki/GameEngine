@@ -1,7 +1,7 @@
 #include "Material.h"
 #include "DXCommon.h"
 #include "MatrixFunction.h"
-
+#include "TextureManager.h"
 void Material::Initialize(const std::string& _texturepath)
 {
 	DXCommon* dxCommon = DXCommon::GetInstance();
@@ -23,9 +23,9 @@ void Material::Initialize(const std::string& _texturepath)
 
 }
 
-void Material::LoadFIle()
+void Material::LoadTexture()
 {
-
+	TextureManager::GetInstance()->LoadTexture(texturePath_);
 }
 
 void Material::TransferData()
