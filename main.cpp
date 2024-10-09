@@ -43,7 +43,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
 	TextureManager::GetInstance()->Initialize();
-	TextureManager::GetInstance()->LoadTexture("uvChecker.png");
+	TextureManager::GetInstance()->Load("uvChecker.png");
 
 	PSOManager::GetInstance()->Initialize();
 

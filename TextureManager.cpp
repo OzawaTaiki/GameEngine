@@ -4,7 +4,6 @@
 
 #include <cassert>
 
-const std::string TextureManager::defaultDirpath_ = "Resources/images/";
 
 TextureManager* TextureManager::GetInstance()
 {
@@ -23,41 +22,34 @@ void TextureManager::Update()
 
 }
 
-void TextureManager::LoadTexture(const std::string& _filepath)
+uint32_t TextureManager::Load(const std::string& _filepath, const std::string& defaultDirpath_)
 {
 	assert(dxCommon_ != nullptr && "not initialized");
 
-	size_t index = textures_.size();
-
 	std::string fullpath = defaultDirpath_ + _filepath;
-	DirectX::ScratchImage mipImages = GetMipImage(fullpath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textures_[_filepath].resource =  CreateTextureResource(metadata);
-	textures_[_filepath].intermediateResource = UploadTextureData(textures_[_filepath].resource.Get(), mipImages);
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	textures_[_filepath].srvHandlerCPU =dxCommon_->GetCPUSRVDescriptorHandle((uint32_t)index + 3);
-	textures_[_filepath].srvHandlerGPU =dxCommon_->GetGPUSRVDescriptorHandle((uint32_t)index + 3);
-	dxCommon_->GetDevice()->CreateShaderResourceView(textures_[_filepath].resource.Get(), &srvDesc, textures_[_filepath].srvHandlerCPU);
+	return LoadTexture(fullpath);
 
 }
 
-void TextureManager::LoadTextureAtMaterial(const std::string& _filepath)
+D3D12_GPU_DESCRIPTOR_HANDLE* TextureManager::GetHandle(uint32_t _textureHandle)
 {
-	assert(dxCommon_ != nullptr && "not initialized");
+	// テクスチャハンドルががが
+	assert(textures_.size() <= _textureHandle);
+	return &textures_[_textureHandle].srvHandlerGPU;
+}
 
-	size_t index = textures_.size();
+uint32_t TextureManager::LoadTexture(const std::string& _filepath)
+{
+	auto result = IsTextureLoaded(_filepath);
+	if (result.has_value())
+		return result.value();
 
-	std::string fullpath = _filepath;
-	DirectX::ScratchImage mipImages = GetMipImage(fullpath);
+	uint32_t index = static_cast<uint32_t> (textures_.size());
+	DirectX::ScratchImage mipImages = GetMipImage(_filepath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textures_[_filepath].resource = CreateTextureResource(metadata);
-	textures_[_filepath].intermediateResource = UploadTextureData(textures_[_filepath].resource.Get(), mipImages);
+	textures_[index].resource = CreateTextureResource(metadata);
+	textures_[index].intermediateResource = UploadTextureData(textures_[index].resource.Get(), mipImages);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -65,9 +57,23 @@ void TextureManager::LoadTextureAtMaterial(const std::string& _filepath)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	textures_[_filepath].srvHandlerCPU = dxCommon_->GetCPUSRVDescriptorHandle((uint32_t)index + 3);
-	textures_[_filepath].srvHandlerGPU = dxCommon_->GetGPUSRVDescriptorHandle((uint32_t)index + 3);
-	dxCommon_->GetDevice()->CreateShaderResourceView(textures_[_filepath].resource.Get(), &srvDesc, textures_[_filepath].srvHandlerCPU);
+	textures_[index].srvHandlerCPU = dxCommon_->GetCPUSRVDescriptorHandle((uint32_t)index + 3);
+	textures_[index].srvHandlerGPU = dxCommon_->GetGPUSRVDescriptorHandle((uint32_t)index + 3);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textures_[index].resource.Get(), &srvDesc, textures_[index].srvHandlerCPU);
+
+	//キーの保存
+	keys_[_filepath] = index;
+
+	return static_cast<uint32_t>(index);
+}
+
+std::optional<uint32_t>  TextureManager::IsTextureLoaded(const std::string& _filepath)
+{
+	auto it = keys_.find(_filepath);
+	if (it != keys_.end())
+		return (*it).second;
+
+	return std::nullopt;
 }
 
 DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
