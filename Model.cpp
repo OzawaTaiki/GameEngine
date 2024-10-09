@@ -19,12 +19,14 @@ void Model::Draw()
 {
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
-    commandList->IASetVertexBuffers(0, 1, &mesh_->GetVertexBufferView());
-    commandList->IASetIndexBuffer(&mesh_->GetIndexBufferView());
+    commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
+    commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
 
     commandList->SetGraphicsRootConstantBufferView(0, material_->GetResource()->GetGPUVirtualAddress());
-    // Dライト
+    // トランスフォーム
+    // テクスチャ
     // カメラ（ｖｐ
+    // Dライト
     // Pライト
     // Ｓライト
     // カラー

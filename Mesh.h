@@ -23,8 +23,8 @@ public:
 
     std::string GetTexturePath() { return textureHandlePath_; }
 
-    D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
-    D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() { return indexBufferView_; }
+    D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
+    D3D12_INDEX_BUFFER_VIEW* GetIndexBufferView() { return &indexBufferView_; }
 private:
     DXCommon* dxCommon = nullptr;
 

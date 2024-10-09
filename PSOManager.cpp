@@ -119,7 +119,6 @@ void PSOManager::CreatePSOForModel()
 {
     HRESULT hr = S_FALSE;
 
-
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
@@ -147,44 +146,47 @@ void PSOManager::CreatePSOForModel()
     //RootParameter作成
     D3D12_ROOT_PARAMETER rootParameters[8] = {};
 
-    //マテリアル
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-    rootParameters[0].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+    //カメラ
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[0].Descriptor.ShaderRegister = 0;
 
+    // transform
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
     rootParameters[1].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
 
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+    //マテリアル
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
+    rootParameters[2].Descriptor.ShaderRegister = 1;                           // レジスタ番号0を使う
 
-    //directinalLight
+    // 色
     rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[3].Descriptor.ShaderRegister = 1;
+    rootParameters[3].Descriptor.ShaderRegister = 2;
 
-    //カメラ
-    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[4].Descriptor.ShaderRegister = 2;
+    // テクスチャ
+    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[4].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+    rootParameters[4].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
 
-    //pointLight
+    //directinalLight
     rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[5].Descriptor.ShaderRegister = 3;
 
-    //spotlight
+    //pointLight
     rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[6].Descriptor.ShaderRegister = 4;
 
-    // 色
+    //spotlight
     rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[7].Descriptor.ShaderRegister = 5;
+
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ

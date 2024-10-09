@@ -1,6 +1,12 @@
 #include "Resources/Shader/Object3d.hlsli"
 
-cbuffer gMaterial : register(b0)
+
+cbuffer Camera : register(b0)
+{
+    float3 worldPosition;
+}
+
+cbuffer gMaterial : register(b1)
 {
     float4x4 unTransform;
     float shininess;
@@ -12,8 +18,13 @@ cbuffer gMaterial : register(b0)
 //    float isVisible;
 //};
 
+cbuffer gColor : register(b2)
+{
+    float4 materialColor;
+}
+
 //平行光源
-cbuffer gDirectionalLight : register(b1)
+cbuffer gDirectionalLight : register(b3)
 {
     float4 DL_color; //ライトの色
     float3 DL_direction; //ライトの向き
@@ -21,13 +32,8 @@ cbuffer gDirectionalLight : register(b1)
     int DL_isHalf;
 }
 
-cbuffer Camera : register(b2)
-{
-    float3 worldPosition;
-}
-
 //点光源
-cbuffer gPointLight : register(b3)
+cbuffer gPointLight : register(b4)
 {
     float4 PL_color;
     float3 PL_position;
@@ -38,7 +44,7 @@ cbuffer gPointLight : register(b3)
 }
 
 //スポットライト
-cbuffer gSpotLight : register(b4)
+cbuffer gSpotLight : register(b5)
 {
     float4 SL_color;
     float3 SL_position;
@@ -49,10 +55,6 @@ cbuffer gSpotLight : register(b4)
     float SL_cosAngle;
     float SL_cosFalloutStart;
     int SL_isHalf;
-}
-cbuffer gColor : register(b5)
-{
-    float4 materialColor;
 }
 
 struct PixelShaderOutput
