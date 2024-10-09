@@ -3,6 +3,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+
 #include <d3d12.h>
 #include <memory>
 
@@ -10,7 +11,6 @@
 class LightGroup
 {
 public:
-
     LightGroup() = default;
     ~LightGroup() = default;
 
@@ -18,7 +18,11 @@ public:
     void Update();
     void Draw();
 
-    void TransferData();
+    DirectionalLight* GetDirectoinalLight() { return directoinalLight_.get(); }
+    PointLight* GetPointLight() { return pointLight_.get(); }
+    SpotLight* GetSpotLight() { return spotLight_.get(); }
+
+    void TransferData() const;
 
 private:
 

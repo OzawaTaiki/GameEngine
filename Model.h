@@ -6,6 +6,7 @@
 #include "Matrix4x4.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "LightGroup.h"
 
 #include <vector>
 #include <string>
@@ -20,24 +21,30 @@ class ObjectColor;
 class Model
 {
 public:
-	void Initialize();
+    void Initialize();
 
-	void Draw(WorldTransform* _transform, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
+    void Draw(const WorldTransform&, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
 
-	static Model* CreateFromObj(const std::string& _filePath);
+    static Model* CreateFromObj(const std::string& _filePath);
 
-	static const std::string defaultDirpath_;
+    static const std::string defaultDirpath_;
 
+    void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
+
+
+    ~Model() { delete lightGroup_; }
 private:
 
-	std::string name_ = {};
+    std::string name_ = {};
 
-	std::unique_ptr<Mesh>				mesh_			= nullptr;
-	std::unique_ptr<Material>			material_		= nullptr;
+    std::unique_ptr<Mesh>				mesh_			= nullptr;
+    std::unique_ptr<Material>			material_		= nullptr;
 
-	void LoadMesh(const std::string& _filePath);
-	void LoadMaterial(const std::string& _filePath);
+    LightGroup*					lightGroup_		= nullptr;
 
-	void TransferData();
+    void LoadMesh(const std::string& _filePath);
+    void LoadMaterial(const std::string& _filePath);
+
+    void TransferData();
 
 };

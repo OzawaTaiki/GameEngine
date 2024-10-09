@@ -1,6 +1,7 @@
 #include "LightGroup.h"
 #include "DXCommon.h"
 
+
 void LightGroup::Initialize()
 {
     commandList_ = DXCommon::GetInstance()->GetCommandList();
@@ -22,7 +23,7 @@ void LightGroup::Draw()
 {
 }
 
-void LightGroup::TransferData()
+void LightGroup::TransferData() const
 {
     directoinalLight_->TransferData();
     pointLight_->TransferData();

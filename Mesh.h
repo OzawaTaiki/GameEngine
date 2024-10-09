@@ -21,6 +21,7 @@ public:
 
     void TransferData();
 
+    uint32_t GetIndexNum() { return static_cast<uint32_t>(indices_.size()); }
     std::string GetTexturePath() { return textureHandlePath_; }
 
     D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
@@ -34,8 +35,8 @@ private:
     struct VertexData
     {
         Vector4 position;
-        Vector3 normal;
         Vector2 texcoord;
+        Vector3 normal;
 
         bool operator==(const VertexData& _obj) const {
             return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;

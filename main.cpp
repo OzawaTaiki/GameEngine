@@ -4,28 +4,16 @@
 #include "Debug.h"
 #include "Input.h"
 #include "TextureManager.h"
+#include "WorldTransform.h"
+#include "ModelManager.h"
+#include "Camera.h"
+#include "ObjectColor.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-
-#include <string>
-#include <format>
-#include <vector>
-#include <fstream>
-#include <sstream>
 #include <random>
-#include <numbers>
-#include "PSOManager.h"
-#include "ModelManager.h"
 
 const float kDeltaTime = 1.0f / 60.0f;
 
@@ -53,7 +41,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
 
+	Camera* camera = new Camera;
+	camera->Initialize();
 
+	WorldTransform transform;
+	transform.Initialize();
+	transform.TransferData(camera->GetViewProjection());
+
+	ObjectColor* color = new ObjectColor;
+	color->Initialize();
 
 	///
 	/// メインループ
@@ -78,8 +74,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		input->Update();
 
-
-
+		ImGui::Begin("debug");
+		ImGui::DragFloat3("t", &transform.transform_.x, 0.01f);
+		ImGui::End();
+		transform.TransferData(camera->GetViewProjection());
 		
 		///
 		/// 更新処理ここまで
@@ -90,8 +88,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// 描画ここから 
 		/// 
+		ModelManager::GetInstance()->PreDraw();
 
-
+		model->Draw(transform, camera, 0, color);
 
 		
 
@@ -112,8 +111,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-
 	winApp->Filalze();
+
+	delete camera;
+	delete color;
 
 
 	return 0;

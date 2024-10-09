@@ -17,6 +17,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "PSOManager.h"
 
 
 DXCommon* DXCommon::GetInstance()
@@ -88,6 +89,8 @@ void DXCommon::PreDraw()
 
 	commandList_->RSSetViewports(1, &viewport_);                      // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_);                      // Scissorを設定
+
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void DXCommon::PostDraw()

@@ -59,7 +59,6 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
                     size_t index = std::distance(vertices_.begin(), it);
                     indices_.push_back(static_cast<uint32_t>(index));
                 }
-
             }
         }
     }
@@ -81,7 +80,6 @@ void Mesh::TransferData()
 {
     std::memcpy(vConstMap_, vertices_.data(), sizeof(VertexData) * vertices_.size());
     std::memcpy(iConstMap_, indices_.data(), sizeof(uint32_t) * indices_.size());
-
 }
 
 void Mesh::InitializeReources()

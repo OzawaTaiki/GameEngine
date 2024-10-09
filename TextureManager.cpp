@@ -35,7 +35,7 @@ uint32_t TextureManager::Load(const std::string& _filepath, const std::string& d
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetGPUHandle(uint32_t _textureHandle)
 {
 	// テクスチャハンドルががが
-	assert(textures_.size() <= _textureHandle);
+	assert(textures_.size() >= _textureHandle);
 	return textures_[_textureHandle].srvHandlerGPU;
 }
 
