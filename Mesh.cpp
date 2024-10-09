@@ -94,6 +94,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::string str = std::to_string(duration);
     Debug::Log("Load finish \ntime :" + str + "ms\n");
+    Debug::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size())+"\n");
 }
 
 void Mesh::TransferData()
