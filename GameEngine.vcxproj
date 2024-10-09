@@ -116,6 +116,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="DXCommon.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
@@ -125,6 +126,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LightGroup.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -135,7 +137,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="myLib\Vector3.cpp" />
     <ClCompile Include="myLib\VectorFunction.cpp" />
     <ClCompile Include="ObjectColor.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PSOManager.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="WorldTransform.cpp" />
     <ClCompile Include="WinApp.cpp" />
@@ -144,6 +148,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Camera.h" />
     <ClInclude Include="D3DResourceLeakChecker.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="DXCommon.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -154,6 +159,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="LightGroup.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Matrix3x3.h" />
     <ClInclude Include="Mesh.h" />
@@ -166,7 +172,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="myLib\Vector4.h" />
     <ClInclude Include="myLib\VectorFunction.h" />
     <ClInclude Include="ObjectColor.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="PSOManager.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="WorldTransform.h" />
     <ClInclude Include="Vector2.h" />
