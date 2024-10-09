@@ -137,6 +137,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="myLib\Vector3.cpp" />
     <ClCompile Include="myLib\VectorFunction.cpp" />
     <ClCompile Include="ObjectColor.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PSOManager.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="WorldTransform.cpp" />
@@ -170,6 +171,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="myLib\Vector4.h" />
     <ClInclude Include="myLib\VectorFunction.h" />
     <ClInclude Include="ObjectColor.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="PSOManager.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="WorldTransform.h" />
