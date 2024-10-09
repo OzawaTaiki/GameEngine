@@ -36,12 +36,7 @@ void Model::Draw(WorldTransform* _transform, Camera* _camera, uint32_t _textureH
     commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
     // テクスチャ
     commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
-    // Dライト
-    //commandList->SetGraphicsRootConstantBufferView(5, );
-    // Pライト
-    //commandList->SetGraphicsRootConstantBufferView(6, );
-    // Ｓライト
-    //commandList->SetGraphicsRootConstantBufferView(7, );
+    
 }
 
 Model* Model::CreateFromObj(const std::string& _filePath)
