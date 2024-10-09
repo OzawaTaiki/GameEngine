@@ -22,7 +22,7 @@ public:
     void Update();
 
     uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");
-    D3D12_GPU_DESCRIPTOR_HANDLE* GetHandle(uint32_t _textureHandle);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t _textureHandle);
 
 private:
 

@@ -1,6 +1,10 @@
 #include "Model.h"
 #include "ModelManager.h"
 #include "DXCommon.h"
+#include "TextureManager.h"
+#include "Camera.h"
+#include "WorldTransform.h"
+#include "ObjectColor.h"
 
 #include <cassert>
 
@@ -15,21 +19,34 @@ void Model::Initialize()
 
 }
 
-void Model::Draw()
+void Model::Draw(const WorldTransform& _transform, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
 {
+    if (!lightGroup_)
+    {
+        lightGroup_ = new LightGroup;
+        lightGroup_->Initialize();
+    }
+
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
     commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
     commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
 
-    commandList->SetGraphicsRootConstantBufferView(0, material_->GetResource()->GetGPUVirtualAddress());
-    // トランスフォーム
-    // テクスチャ
     // カメラ（ｖｐ
-    // Dライト
-    // Pライト
-    // Ｓライト
+    commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
+    // トランスフォーム
+    commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
+    // マテリアル
+    commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
     // カラー
+    commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
+    // テクスチャ
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
+    // ライトたち
+    lightGroup_->TransferData();
+
+    commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
+    
 }
 
 Model* Model::CreateFromObj(const std::string& _filePath)

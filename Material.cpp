@@ -6,7 +6,7 @@ void Material::Initialize(const std::string& _texturepath)
 {
 	DXCommon* dxCommon = DXCommon::GetInstance();
 
-	resorces_ = dxCommon->CreateBufferResource(sizeof(Transferdata));
+	resorces_ = dxCommon->CreateBufferResource(sizeof(DataForGPU));
 	resorces_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
 
 	transform_ = { 0.0f,0.0f };
