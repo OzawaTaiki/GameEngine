@@ -7,12 +7,12 @@
 #include <wrl.h>
 
 
-class Transform
+class WorldTransform
 {
 public:
 
-    Transform() = default;
-    ~Transform() = default;
+    WorldTransform() = default;
+    ~WorldTransform() = default;
 
     void Initialize();
 

@@ -3,7 +3,8 @@
 #include "DXCommon.h"
 #include "TextureManager.h"
 #include "Camera.h"
-#include "Transform.h"
+#include "WorldTransform.h"
+#include "ObjectColor.h"
 
 #include <cassert>
 
@@ -18,7 +19,7 @@ void Model::Initialize()
 
 }
 
-void Model::Draw(Transform* _transform, Camera* _camera, uint32_t _textureHandle)
+void Model::Draw(WorldTransform* _transform, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
 {
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
@@ -32,7 +33,7 @@ void Model::Draw(Transform* _transform, Camera* _camera, uint32_t _textureHandle
     // マテリアル
     commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
     // カラー
-    //commandList->SetGraphicsRootConstantBufferView(3, );
+    commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
     // テクスチャ
     commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
     // Dライト
