@@ -13,13 +13,13 @@
 #include "Material.h"
 #include "Mesh.h"
 
-
+class Camera;
 class Model
 {
 public:
 	void Initialize();
 
-	void Draw(uint32_t _textureHandle);
+	void Draw(Camera* _camera,uint32_t _textureHandle);
 
 	static Model* CreateFromObj(const std::string& _filePath);
 

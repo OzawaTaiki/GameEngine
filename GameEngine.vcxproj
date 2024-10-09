@@ -113,6 +113,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DXCommon.cpp" />
@@ -135,9 +136,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="myLib\VectorFunction.cpp" />
     <ClCompile Include="PSOManager.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="D3DResourceLeakChecker.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DXCommon.h" />
@@ -164,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="myLib\VectorFunction.h" />
     <ClInclude Include="PSOManager.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="WinApp.h" />
   </ItemGroup>
