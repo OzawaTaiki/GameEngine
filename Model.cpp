@@ -2,6 +2,8 @@
 #include "ModelManager.h"
 #include "DXCommon.h"
 #include "TextureManager.h"
+#include "Camera.h"
+
 #include <cassert>
 
 #include <assimp/Importer.hpp>
@@ -15,7 +17,7 @@ void Model::Initialize()
 
 }
 
-void Model::Draw(uint32_t _textureHandle)
+void Model::Draw(Camera* _camera, uint32_t _textureHandle)
 {
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
@@ -23,7 +25,7 @@ void Model::Draw(uint32_t _textureHandle)
     commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
 
     // カメラ（ｖｐ
-    //commandList->SetGraphicsRootConstantBufferView(0, );
+    commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
     // トランスフォーム
     //commandList->SetGraphicsRootConstantBufferView(1, );
     // マテリアル
