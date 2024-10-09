@@ -25,7 +25,7 @@ void Material::Initialize(const std::string& _texturepath)
 
 void Material::LoadTexture()
 {
-	TextureManager::GetInstance()->LoadTextureAtMaterial(texturePath_);
+	TextureManager::GetInstance()->Load(texturePath_, "");
 }
 
 void Material::TransferData()

@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include <string>
 #include <map>
+#include <optional>
 
 
 
@@ -20,16 +21,18 @@ public:
     void Initialize();
     void Update();
 
-    void LoadTexture(const std::string& _filepath);
-    void LoadTextureAtMaterial(const std::string& _filepath);
+    uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");
+    D3D12_GPU_DESCRIPTOR_HANDLE* GetHandle(uint32_t _textureHandle);
 
 private:
+
+    uint32_t LoadTexture(const std::string& _filepath);
+    std::optional<uint32_t> IsTextureLoaded(const std::string& _filepath);
+
 
     DirectX::ScratchImage GetMipImage(const std::string& _filepath);
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& _metadata);
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* _texture , const DirectX::ScratchImage& _mipImages);
-
-    static const std::string defaultDirpath_;
 
     DXCommon* dxCommon_ = nullptr;
 
@@ -41,7 +44,8 @@ private:
         D3D12_GPU_DESCRIPTOR_HANDLE srvHandlerGPU;
     };
 
-    std::map<std::string, Texture> textures_ = {};
+    std::unordered_map<std::string, uint32_t> keys_ = {};
+    std::map<uint32_t, Texture> textures_ = {};
 
     TextureManager() = default;
     ~TextureManager() = default;
