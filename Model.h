@@ -40,7 +40,7 @@ private:
     std::unique_ptr<Mesh>				mesh_			= nullptr;
     std::unique_ptr<Material>			material_		= nullptr;
 
-    LightGroup*					lightGroup_		= nullptr;
+    LightGroup*					        lightGroup_		= nullptr;
 
     void LoadMesh(const std::string& _filePath);
     void LoadMaterial(const std::string& _filePath);

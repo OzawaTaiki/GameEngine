@@ -1,12 +1,24 @@
 #include "Mesh.h"
 #include "DXCommon.h"
-
+#include "Debug.h"
 #include <cassert>
 #include <iterator>
-
+#include <chrono>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+namespace std {
+    template <>
+    struct hash<Mesh::VertexData> {
+        size_t operator()(const Mesh::VertexData& v) const {
+            size_t h1 = std::hash<Vector4>{}(v.position);
+            size_t h2 = std::hash<Vector2>{}(v.texcoord);
+            size_t h3 = std::hash<Vector3>{}(v.normal);
+            return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+        }
+    };
+}
 
 void Mesh::Initialize()
 {
@@ -17,12 +29,16 @@ void Mesh::Initialize()
 
 void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directoryPath)
 {
+    auto start= std::chrono::high_resolution_clock::now();
+    Debug::Log("load start\nfilepath:" + _directoryPath + _filepath + "\n");
     name_ = _filepath;
 
     Assimp::Importer importer;
     std::string filepath = _directoryPath + _filepath;
     const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
     assert(scene->HasMeshes());// メッシュがないのは対応しない
+
+    std::unordered_map<VertexData, uint32_t> vertexMap = {};
 
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -48,16 +64,16 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
                 vertex.position.z *= -1.0f;  // Z反転
                 vertex.normal.z *= -1.0f;    // Z反転
 
-                auto it = std::find(vertices_.begin(), vertices_.end(), vertex);
-
-                if (it == vertices_.end()) {					
+                auto it = vertexMap.find(vertex);
+                if (it == vertexMap.end()) {					
                     // 値が重複しないとき
+                    uint32_t index = static_cast<uint32_t>(vertices_.size());
                     vertices_.push_back(vertex);
-                    indices_.push_back(static_cast<uint32_t>(vertices_.size() - 1));
+                    indices_.push_back(index);
+                    vertexMap[vertex] = index;
                 }
                 else {
-                    size_t index = std::distance(vertices_.begin(), it);
-                    indices_.push_back(static_cast<uint32_t>(index));
+                    indices_.push_back(it->second);
                 }
             }
         }
@@ -74,6 +90,10 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
 
     InitializeReources();
     TransferData();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::string str = std::to_string(duration);
+    Debug::Log("Load finish \ntime :" + str + "ms\n");
 }
 
 void Mesh::TransferData()

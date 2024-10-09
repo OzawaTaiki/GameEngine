@@ -105,9 +105,6 @@
     <ClCompile Include="WinApp.cpp">
       <Filter>WinApp</Filter>
     </ClCompile>
-    <ClCompile Include="myLib\Vector3.cpp">
-      <Filter>Lib\Vector</Filter>
-    </ClCompile>
     <ClCompile Include="myLib\MatrixFunction.cpp">
       <Filter>Lib\Matrix</Filter>
     </ClCompile>

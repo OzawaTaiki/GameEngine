@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 struct Vector2
 {
@@ -8,3 +9,14 @@ struct Vector2
 		return x == _v.x && y == _v.y;
 	}
 };
+
+namespace std {
+    template <>
+    struct hash<Vector2> {
+        size_t operator()(const Vector2& v) const {
+            size_t h1 = std::hash<float>{}(v.x);
+            size_t h2 = std::hash<float>{}(v.y);
+            return h1 ^ (h2 << 1);
+        }
+    };
+}

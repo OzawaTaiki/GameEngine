@@ -134,7 +134,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="myLib\MatrixFunction.cpp" />
     <ClCompile Include="myLib\MyLib.cpp" />
-    <ClCompile Include="myLib\Vector3.cpp" />
     <ClCompile Include="myLib\VectorFunction.cpp" />
     <ClCompile Include="ObjectColor.cpp" />
     <ClCompile Include="PointLight.cpp" />

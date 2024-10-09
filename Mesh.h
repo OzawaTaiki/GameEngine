@@ -9,13 +9,13 @@
 #include <wrl.h>
 #include <cstdint>
 #include <string>
+#include <functional>
 
 class DXCommon;
 
 class Mesh
 {
 public:
-
     void Initialize();
     void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/Obj/");
 
@@ -26,11 +26,6 @@ public:
 
     D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
     D3D12_INDEX_BUFFER_VIEW* GetIndexBufferView() { return &indexBufferView_; }
-private:
-    DXCommon* dxCommon = nullptr;
-
-    std::string                                 name_                   = {};
-    std::string                                 textureHandlePath_      = {};
 
     struct VertexData
     {
@@ -42,6 +37,12 @@ private:
             return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;
         }
     };
+private:
+
+    DXCommon* dxCommon = nullptr;
+
+    std::string                                 name_                   = {};
+    std::string                                 textureHandlePath_      = {};
 
     std::vector<VertexData>                     vertices_               = {};                   // データ格納用
     VertexData*                                 vConstMap_              = nullptr;              // map用
@@ -56,6 +57,5 @@ private:
     void InitializeReources();
     void CreateResources();
     void Map();
-
+    
 };
-

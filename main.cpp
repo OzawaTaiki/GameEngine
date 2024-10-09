@@ -31,12 +31,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
 	TextureManager::GetInstance()->Initialize();
-	TextureManager::GetInstance()->Load("uvChecker.png");
+	//TextureManager::GetInstance()->Load("uvChecker.png");
 
 	PSOManager::GetInstance()->Initialize();
 
 	ModelManager::GetInstance()->Initialize();
-	Model* model = Model::CreateFromObj("plane.obj");
+	//Model* model = Model::CreateFromObj("plane.obj");
+	Model* model = Model::CreateFromObj("bunny.obj");
 
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);

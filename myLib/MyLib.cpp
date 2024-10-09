@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "MyLib.h"
 #include <algorithm>
+#include <numbers>
 #include <limits>
 
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
@@ -52,13 +53,13 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
 {
 	const uint32_t kSubdivision = 10;                                   // 分割数
-	const float kLatEvery = (float)M_PI / (float)kSubdivision;          // 緯度分割１つ分の角度
-	const float kLonEvery = (float)M_PI * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
-
+	const float kLatEvery = (float)std::numbers::pi_v<float> / (float)kSubdivision;          // 緯度分割１つ分の角度
+	const float kLonEvery = (float)std::numbers::pi_v<float> * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
+	
 	//緯度の方向に分割   -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
 	{
-		float lat = -(float)M_PI / 2.0f + kLatEvery * latIndex;         // 現在の緯度
+		float lat = -(float)std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;         // 現在の緯度
 
 		// 経度の方向に分割   0 ~ π
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
