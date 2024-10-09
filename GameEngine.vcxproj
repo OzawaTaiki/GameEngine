@@ -161,7 +161,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="myLib\Matrix4x4.h" />
     <ClInclude Include="myLib\MatrixFunction.h" />
     <ClInclude Include="myLib\MyLib.h" />
-    <ClInclude Include="myLib\Transform.h" />
     <ClInclude Include="myLib\Vector3.h" />
     <ClInclude Include="myLib\Vector4.h" />
     <ClInclude Include="myLib\VectorFunction.h" />

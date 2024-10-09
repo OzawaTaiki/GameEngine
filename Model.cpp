@@ -3,6 +3,7 @@
 #include "DXCommon.h"
 #include "TextureManager.h"
 #include "Camera.h"
+#include "Transform.h"
 
 #include <cassert>
 
@@ -17,7 +18,7 @@ void Model::Initialize()
 
 }
 
-void Model::Draw(Camera* _camera, uint32_t _textureHandle)
+void Model::Draw(Transform* _transform, Camera* _camera, uint32_t _textureHandle)
 {
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
@@ -27,7 +28,7 @@ void Model::Draw(Camera* _camera, uint32_t _textureHandle)
     // カメラ（ｖｐ
     commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
     // トランスフォーム
-    //commandList->SetGraphicsRootConstantBufferView(1, );
+    commandList->SetGraphicsRootConstantBufferView(1, _transform->GetResource()->GetGPUVirtualAddress());
     // マテリアル
     commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
     // カラー

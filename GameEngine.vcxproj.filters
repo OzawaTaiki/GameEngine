@@ -16,9 +16,6 @@
     <Filter Include="Lib">
       <UniqueIdentifier>{bb130762-2970-4019-a3d8-157336b101b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Lib\ヘッダ">
-      <UniqueIdentifier>{d87e9a38-2f70-4b3a-beb7-0aa29da1fb44}</UniqueIdentifier>
-    </Filter>
     <Filter Include="imgui">
       <UniqueIdentifier>{a3462a09-49de-4400-9055-57f3853699f0}</UniqueIdentifier>
     </Filter>
@@ -127,9 +124,6 @@
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
       <Filter>Lib</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\Transform.h">
-      <Filter>Lib\ヘッダ</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>

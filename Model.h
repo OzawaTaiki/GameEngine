@@ -14,12 +14,13 @@
 #include "Mesh.h"
 
 class Camera;
+class Transform;
 class Model
 {
 public:
 	void Initialize();
 
-	void Draw(Camera* _camera,uint32_t _textureHandle);
+	void Draw(Transform* _transform, Camera* _camera,uint32_t _textureHandle);
 
 	static Model* CreateFromObj(const std::string& _filePath);
 
