@@ -1,11 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <memory>
-#include <d3d12.h>
-#include <wrl.h>
-
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -13,14 +7,22 @@
 #include "Material.h"
 #include "Mesh.h"
 
+#include <vector>
+#include <string>
+#include <memory>
+#include <d3d12.h>
+#include <wrl.h>
+
 class Camera;
-class Transform;
+class WorldTransform;
+class ObjectColor;
+
 class Model
 {
 public:
 	void Initialize();
 
-	void Draw(Transform* _transform, Camera* _camera,uint32_t _textureHandle);
+	void Draw(WorldTransform* _transform, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
 
 	static Model* CreateFromObj(const std::string& _filePath);
 
