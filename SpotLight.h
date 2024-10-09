@@ -6,12 +6,13 @@
 #include <cstdint>
 #include <wrl.h>
 #include <d3d12.h>
-class PointLight
+
+class SpotLight
 {
 public:
 
-    PointLight() = default;
-    ~PointLight() = default;
+    SpotLight() = default;
+    ~SpotLight() = default;
 
     void Initialize();
     void Update();
@@ -23,31 +24,39 @@ public:
 
     void SetColor(const Vector4& _color) { color_ = _color; }
     void SetPosition(const Vector3& _position) { position_ = _position; }
-    void SetIntensity(float _intensity) { intendity_ = _intensity; }
-    void SetRadius(float _radius) { radius_ = _radius; }
+    void SetDirection(const Vector3& _direction) { position_ = _direction; }
+    void SetIntensity(float _intensity) { intensity_ = _intensity; }
+    void SetDistance(float _distance) { distance_ = _distance; }
     void SetDecay(float _decay) { decay_ = _decay; }
+    void SetCosAngle(float _cos) { cosAngle_ = _cos; }
+    void SetFalloutStartAngle(float _falloutStartAngle) { falloutStartAngle_ = _falloutStartAngle; }
 
     void EnableHalfLambert() { useHalfLambert_ = true; }
     void DisEnableHalfLambert() { useHalfLambert_ = false; }
 private:
 
-    Vector4 color_;
+    Vector4 color_;		
     Vector3 position_;
-    float intendity_;
-    float radius_;
-    float decay_;
-    bool useHalfLambert_;
+    Vector3 direction_;
+    float   intensity_;	
+    float   distance_;	
+    float   decay_;	
+    float   cosAngle_;
+    float   falloutStartAngle_;
+    uint32_t useHalfLambert_;
 
 
     struct ConstantBufferData
     {
         Vector4 color;		//ライトの色
-        Vector3 position_;	//ライトの向き
+        Vector3 position;
         float intensity;	//輝度
-        float radius;	// ライトの影響半径
+        Vector3 direction;
+        float distance;
         float decay;	// 減衰率
+        float cosAngle;
+        float falloutStartAngle;
         uint32_t isHalf;
-        float pad;
     };
 
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;

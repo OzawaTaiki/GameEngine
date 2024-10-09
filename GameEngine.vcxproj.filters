@@ -144,6 +144,9 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Light\Point</Filter>
     </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Light\Spot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="PointLight.h">
       <Filter>Light\Point</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Light\Spot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
