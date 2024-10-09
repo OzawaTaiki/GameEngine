@@ -139,6 +139,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="ObjectColor.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PSOManager.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="WorldTransform.cpp" />
     <ClCompile Include="WinApp.cpp" />
@@ -173,6 +174,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="ObjectColor.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PSOManager.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="WorldTransform.h" />
     <ClInclude Include="Vector2.h" />
