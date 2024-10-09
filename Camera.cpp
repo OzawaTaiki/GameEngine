@@ -10,7 +10,6 @@ void Camera::Initialize()
 
 void Camera::Update()
 {
-    TransferData();
 }
 
 void Camera::Draw()

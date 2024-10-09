@@ -32,7 +32,7 @@ private:
     std::string     name_                           = {};
     std::string     texturePath_                    = {};
 
-    struct Transferdata
+    struct DataForGPU
     {
         Matrix4x4       uvTransform;
         float           shininess;
@@ -41,7 +41,7 @@ private:
     };
 
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_               = nullptr;
-    Transferdata*                                   constMap_               = nullptr;;
+    DataForGPU*                                     constMap_               = nullptr;;
 
     void TransferData();
 
