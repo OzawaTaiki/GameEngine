@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "ModelManager.h"
 #include "DXCommon.h"
-
+#include "TextureManager.h"
 #include <cassert>
 
 #include <assimp/Importer.hpp>
@@ -15,21 +15,29 @@ void Model::Initialize()
 
 }
 
-void Model::Draw()
+void Model::Draw(uint32_t _textureHandle)
 {
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
     commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
     commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
 
-    commandList->SetGraphicsRootConstantBufferView(0, material_->GetResource()->GetGPUVirtualAddress());
-    // トランスフォーム
-    // テクスチャ
     // カメラ（ｖｐ
-    // Dライト
-    // Pライト
-    // Ｓライト
+    //commandList->SetGraphicsRootConstantBufferView(0, );
+    // トランスフォーム
+    //commandList->SetGraphicsRootConstantBufferView(1, );
+    // マテリアル
+    commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
     // カラー
+    //commandList->SetGraphicsRootConstantBufferView(3, );
+    // テクスチャ
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
+    // Dライト
+    //commandList->SetGraphicsRootConstantBufferView(5, );
+    // Pライト
+    //commandList->SetGraphicsRootConstantBufferView(6, );
+    // Ｓライト
+    //commandList->SetGraphicsRootConstantBufferView(7, );
 }
 
 Model* Model::CreateFromObj(const std::string& _filePath)

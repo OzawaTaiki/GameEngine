@@ -19,7 +19,7 @@ class Model
 public:
 	void Initialize();
 
-	void Draw();
+	void Draw(uint32_t _textureHandle);
 
 	static Model* CreateFromObj(const std::string& _filePath);
 
