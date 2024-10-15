@@ -8,17 +8,15 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-namespace std {
-    template <>
-    struct hash<Mesh::VertexData> {
-        size_t operator()(const Mesh::VertexData& v) const {
-            size_t h1 = std::hash<Vector4>{}(v.position);
-            size_t h2 = std::hash<Vector2>{}(v.texcoord);
-            size_t h3 = std::hash<Vector3>{}(v.normal);
-            return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
-        }
-    };
-}
+template <>
+struct std::hash<Mesh::VertexData> {
+    size_t operator()(const Mesh::VertexData& v) const {
+        size_t h1 = std::hash<Vector4>{}(v.position);
+        size_t h2 = std::hash<Vector2>{}(v.texcoord);
+        size_t h3 = std::hash<Vector3>{}(v.normal);
+        return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+    }
+};
 
 void Mesh::Initialize()
 {
@@ -42,7 +40,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
 
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
-        assert(mesh->HasNormals());						// 法線がないMeshは今回は非対応
+        assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
         assert(mesh->HasTextureCoords(0));				// TexcoordがないMeshは今回は非対応
 
 
@@ -65,7 +63,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
                 vertex.normal.z *= -1.0f;    // Z反転
 
                 auto it = vertexMap.find(vertex);
-                if (it == vertexMap.end()) {					
+                if (it == vertexMap.end()) {
                     // 値が重複しないとき
                     uint32_t index = static_cast<uint32_t>(vertices_.size());
                     vertices_.push_back(vertex);

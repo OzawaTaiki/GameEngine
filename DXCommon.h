@@ -6,7 +6,7 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 
-
+#include <chrono>
 #include <cstdint>
 #include <wrl.h>
 
@@ -29,8 +29,6 @@ public:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
-	DXCommon() = default;
-	~DXCommon();
 private:
 
 	void CreateDevice();
@@ -46,7 +44,8 @@ private:
 	void CreateDXcCompiler();
 	void InitializeImGui();
 
-
+	void InitializeFixFPS();
+	void UpdateFixFPS();
 
 
 	WinApp* winApp_ = nullptr;
@@ -73,7 +72,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
-	D3D12_VIEWPORT viewport_{}; 
+	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};
 
 	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandles_[2];
@@ -83,9 +82,10 @@ private:
 	HANDLE fenceEvent_;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
-	uint32_t desriptorSizeDSV_ ;;
+	uint32_t desriptorSizeDSV_;
 	D3D12_RESOURCE_BARRIER barrier_{};
 
+	std::chrono::steady_clock::time_point reference_ = {};
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(int32_t _width, int32_t _height);
@@ -93,7 +93,9 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index);
 
-	//DXCommon(const DXCommon&) = delete;
-	//const DXCommon& operator=(const DXCommon&) = delete;
+	DXCommon() = default;
+	~DXCommon();
+	DXCommon(const DXCommon&) = delete;
+	const DXCommon& operator=(const DXCommon&) = delete;
 
 };

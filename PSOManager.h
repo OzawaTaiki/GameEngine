@@ -15,6 +15,7 @@ public:
 
 	enum class BlendMode
 	{
+		None,
 		Normal,
 		Add,
 		Sub,
@@ -42,6 +43,7 @@ private:
 		const std::wstring& _dirPath = L"Resources/Shader/");
 
 	void CreatePSOForModel();
+	void CreatePSOForSprite();
 
 	D3D12_BLEND_DESC GetBlendDesc(BlendMode _mode);
 

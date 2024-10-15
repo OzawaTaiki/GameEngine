@@ -31,7 +31,7 @@ void Material::LoadTexture()
 void Material::TransferData()
 {
 	Vector3 trans = { transform_,0.0f };
-	Vector3 scale = { scale_,0.0f };
+	Vector3 scale = { scale_,1.0f };
 	Vector3 rotate = { 0.0f,0.0f ,rotation_ };
 	Matrix4x4 affine = MakeAffineMatrix(scale, rotate, trans);
 

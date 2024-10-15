@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector2.h"
 
 #include <d3dx12.h>
 #include <DirectXTex.h>
@@ -23,6 +24,7 @@ public:
 
     uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t _textureHandle);
+    Vector2 GetTextureSize(uint32_t _textureHandle);
 
 private:
 

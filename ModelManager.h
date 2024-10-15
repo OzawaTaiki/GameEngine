@@ -7,6 +7,8 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <optional>
+#include <unordered_map>
+
 class ModelManager
 {
 public:

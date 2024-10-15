@@ -16,14 +16,12 @@ struct Vector3
 	}
 };
 
-namespace std {
-    template <>
-    struct hash<Vector3> {
-        size_t operator()(const Vector3& v) const {
-            size_t h1 = std::hash<float>{}(v.x);
-            size_t h2 = std::hash<float>{}(v.y);
-            size_t h3 = std::hash<float>{}(v.z);
-            return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
-        }
-    };
-}
+template <>
+struct std::hash<Vector3> {
+    size_t operator()(const Vector3& v) const {
+        size_t h1 = std::hash<float>{}(v.x);
+        size_t h2 = std::hash<float>{}(v.y);
+        size_t h3 = std::hash<float>{}(v.z);
+        return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+    }
+};

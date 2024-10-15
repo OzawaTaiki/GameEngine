@@ -39,14 +39,14 @@ void Model::Draw(const WorldTransform& _transform, Camera* _camera, uint32_t _te
     // マテリアル
     commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
     // カラー
-    commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
+    _color->TransferData(3, commandList);
+    //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
     // テクスチャ
     commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
     // ライトたち
     lightGroup_->TransferData();
 
     commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
-    
 }
 
 Model* Model::CreateFromObj(const std::string& _filePath)

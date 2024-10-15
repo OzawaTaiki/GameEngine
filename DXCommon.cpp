@@ -8,6 +8,7 @@
 #include <dxgidebug.h>
 
 #include <cassert>
+#include <thread>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -35,6 +36,7 @@ void DXCommon::Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _ba
 	backBufferWidth_ = _backBufferWidth;
 	backBufferHeight_ = _backBufferHeight;
 
+	InitializeFixFPS();
 	CreateDevice();
 	InitializeCommand();
 	CreateSwapChain();
@@ -132,6 +134,8 @@ void DXCommon::PostDraw()
 		//イベント待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
+
+	UpdateFixFPS();
 
 	//次のフレーム用のコマンドリストを準備
 	hr = commandAllocator_->Reset();
@@ -428,6 +432,33 @@ void DXCommon::InitializeImGui()
 		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
 	);
+}
+
+void DXCommon::InitializeFixFPS()
+{
+	reference_ = std::chrono::steady_clock::now();
+}
+
+void DXCommon::UpdateFixFPS()
+{
+	const std::chrono::microseconds kMinTime(static_cast<uint64_t>(1000000.0f / 60.0f));
+	const std::chrono::microseconds kMinCheckTime(static_cast<uint64_t>(1000000.0f / 65.0f));
+
+	// 現在時間を取得
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	// 前回記録からの経過時間を取得
+	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+
+	// 1/60秒(よりわずかに短い時間)経っていないとき
+	if (elapsed < kMinTime) {
+		//1/60秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			//1マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+	//現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 }
 
 

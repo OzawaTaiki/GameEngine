@@ -72,7 +72,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     PixelShaderOutput output;
     output.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 textureColor;
-        
+
     //画像の有無
     //if (isVisible == 1.0f)
     //{
@@ -81,10 +81,10 @@ PixelShaderOutput main(VertexShaderOutput _input)
     //}
     //else
     //    textureColor = materialColor;
-    
+
     /*lmbart*/
     float3 toEye = normalize(worldPosition - _input.worldPosition);
-    
+
     float3 diffuse = float3(0.0f, 0.0f, 0.0f);
     float3 specular = float3(0.0f, 0.0f, 0.0f);
     if (DL_intensity > 0.0f)
@@ -125,15 +125,15 @@ PixelShaderOutput main(VertexShaderOutput _input)
         {
             PL_cos = pow(PL_NdotL * 0.5f + 0.5f, 2.0f);
         }
-        
+
         float distance = length(PL_position - _input.worldPosition);
         float factor = pow(saturate(-distance / PL_radius + 1.0f), PL_decay);
-        
+
         PLDiffuse = materialColor.rgb * textureColor.rgb * PL_color.rgb * PL_cos * PL_intensity * factor;
         PLSpecular = PL_color.rgb * PL_intensity * PLspecularPow * float3(1.0f, 1.0f, 1.0f) * factor;
 
     }
-    
+
     float3 spotLightcColor = CalculateSpotLighting(_input, toEye, textureColor);
 
     if (enableLighting != 0)
@@ -143,14 +143,14 @@ PixelShaderOutput main(VertexShaderOutput _input)
     }
     else
         output.color = materialColor * textureColor;
-    
+
     if (textureColor.a <= 0.5 ||
         textureColor.a == 0.0 ||
         output.color.a == 0.0)
     {
         discard;
     }
-    
+
     return output;
 }
 
@@ -159,8 +159,8 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, float3 _toEye, float4 _t
 {
     if (SL_intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
-        
-    
+
+
     float3 direction = normalize(_input.worldPosition - SL_position);
     float3 HalfVector = normalize(-direction + _toEye);
     float specularPow = pow(saturate(dot(normalize(_input.normal), HalfVector)), shininess);
@@ -171,10 +171,10 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, float3 _toEye, float4 _t
     {
         cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     }
-        
+
     float distance = length(SL_position - _input.worldPosition);
     float factor = pow(saturate(-distance / SL_ditance + 1.0f), SL_decay);
-        
+
     float cosAngle = dot(direction,normalize (SL_direction));
     float falloffFactor = 1.0f;
     if (cosAngle < SL_cosFalloutStart)
@@ -182,10 +182,10 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, float3 _toEye, float4 _t
         falloffFactor = saturate((cosAngle - SL_cosAngle) / (SL_cosFalloutStart - SL_cosAngle));
     }
 
-    
+
     float3 diffuse = materialColor.rgb * _textureColor.rgb * SL_color.rgb * cos * SL_intensity * factor*falloffFactor;
     float3 specular = SL_color.rgb * SL_intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
-    
+
     return diffuse + specular;
 
 }

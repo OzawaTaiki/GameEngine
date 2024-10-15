@@ -19,9 +19,6 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{a3462a09-49de-4400-9055-57f3853699f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{87e84403-6e3d-4fd3-9c7f-1a4c2cf3086d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextureManager">
       <UniqueIdentifier>{a9516b81-c6df-4821-a750-c42ba7a00c08}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="Light\Spot">
       <UniqueIdentifier>{f70f8d27-c1d5-4efc-9ecc-50bd90eae805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル\Shader">
+      <UniqueIdentifier>{87e84403-6e3d-4fd3-9c7f-1a4c2cf3086d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +143,12 @@
     </ClCompile>
     <ClCompile Include="SpotLight.cpp">
       <Filter>Light\Spot</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteManager.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +254,12 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Light\Spot</Filter>
     </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -256,24 +268,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\Object3d.hlsli">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
     </None>
     <None Include="Resources\Shader\Particle.hlsli">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
+    </None>
+    <None Include="Resources\Shader\Sprite.hlsli">
+      <Filter>リソース ファイル\Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Object3d.VS.hlsl">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Particle.PS.hlsl">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Particle.VS.hlsl">
-      <Filter>Shader</Filter>
+      <Filter>リソース ファイル\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Sprite.PS.hlsl">
+      <Filter>リソース ファイル\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Sprite.VS.hlsl">
+      <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

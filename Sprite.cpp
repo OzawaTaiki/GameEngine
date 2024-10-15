@@ -1,0 +1,119 @@
+#include "Sprite.h"
+
+#include "TextureManager.h"
+#include "SpriteManager.h"
+#include "DXCommon.h"
+#include "WinApp.h"
+#include "MatrixFunction.h"
+
+void Sprite::Initialize()
+{
+    color_ = std::make_unique<ObjectColor>();
+    color_->Initialize();
+    color_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+    matResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
+    matResource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
+
+    constMap_->worldMat = MakeIdentity4x4();
+    constMap_->uvTransMat = MakeIdentity4x4();
+
+    vertexResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData)*6);
+    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
+
+    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
+    vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+
+    vConstMap_[0].texcoord = {0.0f,1.0f };
+    vConstMap_[1].texcoord = {0.0f,0.0f };
+    vConstMap_[2].texcoord = {1.0f,1.0f };
+    vConstMap_[3].texcoord = vConstMap_[1].texcoord;
+    vConstMap_[4].texcoord = {1.0f,0.0f };
+    vConstMap_[5].texcoord = vConstMap_[2].texcoord;
+
+    size_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
+    //size_ = { 1,1 };
+    anchor_ = { 0,0 };
+    CalculateVertex();
+}
+
+void Sprite::Update()
+{
+}
+
+void Sprite::Draw()
+{
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    TransferData(commandList);
+
+    commandList->DrawInstanced(6, 1, 0, 0);
+
+}
+
+Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
+{
+    Sprite* sprite = SpriteManager::GetInstance()->Create();
+    sprite->textureHandle_ = _textureHandle;
+    sprite->anchor_ = _anchor;
+
+    return sprite;
+}
+
+void Sprite::StaticInitialize()
+{
+    SpriteManager::GetInstance()->Initialize();
+}
+
+void Sprite::PreDraw()
+{
+    SpriteManager::GetInstance()->PreDraw();
+}
+
+void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
+{
+    CalculateMatrix();
+    _commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+    _commandList->SetGraphicsRootConstantBufferView(0, matResource_->GetGPUVirtualAddress());
+    color_->TransferData(1, _commandList);
+    _commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
+}
+
+void Sprite::CalculateVertex()
+{
+    Vector2 halfSize = size_ / 2.0f;
+
+    vConstMap_[0].position = {
+        -anchor_.x * halfSize.x,
+        (1.0f - anchor_.y) * halfSize.y,0.0f,0.0f }; // 左下
+
+    vConstMap_[1].position = {
+        -anchor_.x * halfSize.x,
+        -anchor_.y * halfSize.y,0.0f,0.0f }; // 左上
+
+    vConstMap_[2].position = {
+        (1.0f - anchor_.x)* halfSize.x,
+        (1.0f - anchor_.y) * halfSize.y,0.0f,0.0f }; // 右下
+
+    vConstMap_[4].position = {
+        (1.0f - anchor_.x) * halfSize.x,
+        -anchor_.y * halfSize.y,0.0f,0.0f }; // 右上
+
+    vConstMap_[3].position = vConstMap_[1].position;
+    vConstMap_[5].position = vConstMap_[2].position;
+}
+
+void Sprite::CalculateMatrix()
+{
+    Vector3 s = { scale_,1.0f };
+    Vector3 r = { 3.0f,0.0f ,rotate_ };
+    Vector3 t = { translate_,0.0f };
+    constMap_->worldMat = MakeAffineMatrix(s, r, t);
+
+    s = { uvScale_,1.0f };
+    r = { 0.0f,0.0f ,uvRotate_ };
+    t = { uvTranslate_,0.0f };
+    constMap_->uvTransMat = MakeAffineMatrix(s, r, t);
+}

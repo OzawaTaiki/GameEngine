@@ -17,6 +17,8 @@ public:
 
     void SetColor(const Vector4& _color);
 
+
+    void TransferData(UINT _index, ID3D12GraphicsCommandList* _commandList)const;
     ID3D12Resource* GetResource() { return resource_.Get(); }
 
 private:

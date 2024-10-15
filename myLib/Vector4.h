@@ -10,16 +10,15 @@ struct Vector4
 	}
 };
 
-namespace std {
-    template <>
-    struct hash<Vector4> {
-        size_t operator()(const Vector4& v) const {
-            size_t h1 = std::hash<float>{}(v.x);
-            size_t h2 = std::hash<float>{}(v.y);
-            size_t h3 = std::hash<float>{}(v.z);
-            size_t h4 = std::hash<float>{}(v.w);
-            return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1) ^ (h4 << 2);
-        }
-    };
-}
+
+template <>
+struct std::hash<Vector4> {
+    size_t operator()(const Vector4& v) const {
+        size_t h1 = std::hash<float>{}(v.x);
+        size_t h2 = std::hash<float>{}(v.y);
+        size_t h3 = std::hash<float>{}(v.z);
+        size_t h4 = std::hash<float>{}(v.w);
+        return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1) ^ (h4 << 2);
+    }
+};
 

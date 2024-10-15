@@ -39,6 +39,15 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetGPUHandle(uint32_t _textureHandle
 	return textures_[_textureHandle].srvHandlerGPU;
 }
 
+Vector2 TextureManager::GetTextureSize(uint32_t _textureHandle)
+{
+	auto desc = textures_[_textureHandle].resource->GetDesc();
+	Vector2 size;
+	size.x = static_cast<float>(desc.Width);
+	size.y = static_cast<float>(desc.Height);
+	return size;
+}
+
 uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 {
 	auto result = IsTextureLoaded(_filepath);
@@ -88,7 +97,7 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);
 	assert(SUCCEEDED(hr));
 
-	//ミップマップ付きのデータを返す	
+	//ミップマップ付きのデータを返す
 	return mipImage;
 }
 
@@ -100,7 +109,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 	resourceDesc.Height = UINT(_metadata.height); // Textureの高さ
 	resourceDesc.MipLevels = UINT16(_metadata.mipLevels); // mipmapの数
 	resourceDesc.DepthOrArraySize = UINT16(_metadata.arraySize); // 奥行き or 配列Textureの配列数
-	resourceDesc.Format = _metadata.format; // Textureのフォーマット 
+	resourceDesc.Format = _metadata.format; // Textureのフォーマット
 	resourceDesc.SampleDesc.Count = 1; // サンプリングカウント、通常は1
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(_metadata.dimension); // Textureの次元。省略はしているのは2次元
 
