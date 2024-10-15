@@ -451,9 +451,6 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(BlendMode _mode)
 
     switch (_mode)
     {
-    case PSOManager::BlendMode::None:
-        blendDesc.RenderTarget[0].BlendEnable = FALSE;
-        return blendDesc;
     case PSOManager::BlendMode::Normal:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;

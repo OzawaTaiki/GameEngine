@@ -8,21 +8,19 @@
 #include "ModelManager.h"
 #include "Camera.h"
 #include "ObjectColor.h"
+#include "Sprite.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
 #include <random>
-#include "Sprite.h"
 
 const float kDeltaTime = 1.0f / 60.0f;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-
-
 	WinApp* winApp = WinApp::GetInstance();
 	winApp->Initilize();
 
@@ -30,16 +28,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
 	TextureManager::GetInstance()->Initialize();
-	//TextureManager::GetInstance()->Load("uvChecker.png");
+	TextureManager::GetInstance()->Load("uvChecker.png");
+	TextureManager::GetInstance()->Load("uvChecker.png");
+	TextureManager::GetInstance()->Load("uvChecker.png");
 
 	PSOManager::GetInstance()->Initialize();
-	Sprite::StaticInitialize();
+	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();
 	//Model* model = Model::CreateFromObj("plane.obj");
 	//Model* model = Model::CreateFromObj("bunny.obj");
 	Model* model1 = Model::CreateFromObj("plane.obj");
 	Model* model2 = Model::CreateFromObj("bunny.gltf");
-	Model* model3 = Model::CreateFromObj("bunny.gltf");
 
 	Sprite* sprite = Sprite::Create(0);
 	sprite->Initialize();
@@ -59,6 +58,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ObjectColor* color = new ObjectColor;
 	color->Initialize();
+
+	Vector2 anchor = { 0,0 };
 
 	///
 	/// メインループ
@@ -80,10 +81,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// 更新処理ここから
 		///
+		ImGui::Begin("Engine");
 
 		input->Update();
 
-		ImGui::Begin("debug");
 		ImGui::DragFloat3("s1", &transform[0].scale_.x, 0.01f);
 		ImGui::DragFloat3("r1", &transform[0].rotate_.x, 0.01f);
 		ImGui::DragFloat3("t1", &transform[0].transform_.x, 0.01f);
@@ -96,13 +97,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		ImGui::DragFloat2("ss", &sprite->scale_.x, 0.01f);
 		ImGui::DragFloat("sr", &sprite->rotate_, 0.01f);
-		ImGui::DragFloat2("st", &sprite->translate_.x, 0.01f);
-		ImGui::End();
+		ImGui::DragFloat2("st", &sprite->translate_.x,1);
+		ImGui::DragFloat2("anchor", &anchor.x,0.01f);
 		transform[0].rotate_.y += 0.01f;
 		transform[0].TransferData(camera->GetViewProjection());
 		transform[1].TransferData(camera->GetViewProjection());
 		transform[2].TransferData(camera->GetViewProjection());
 
+		sprite->SetAnchor(anchor);
+
+		ImGui::End();
 		///
 		/// 更新処理ここまで
 		///
@@ -116,7 +120,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		model1->Draw(transform[0], camera, 0, color);
 		model2->Draw(transform[1], camera, 0, color);
-		model3->Draw(transform[2], camera, 0, color);
 
 		Sprite::PreDraw();
 		sprite->Draw();

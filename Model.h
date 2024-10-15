@@ -25,6 +25,8 @@ public:
 
     void Draw(const WorldTransform&, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
 
+    void ShowImGui(const std::string& _name);
+
     static Model* CreateFromObj(const std::string& _filePath);
 
     static const std::string defaultDirpath_;

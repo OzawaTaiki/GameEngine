@@ -6,17 +6,23 @@
 #include "WinApp.h"
 #include "MatrixFunction.h"
 
+
+uint32_t Sprite::winWidth_ = 1280;
+uint32_t Sprite::winHeight_ = 720;
+
 void Sprite::Initialize()
 {
-    color_ = std::make_unique<ObjectColor>();
-    color_->Initialize();
-    color_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+    color_ = { 1,1,1,1 };
+    colorObj_ = std::make_unique<ObjectColor>();
+    colorObj_->Initialize();
+    colorObj_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
     matResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
     matResource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
 
     constMap_->worldMat = MakeIdentity4x4();
     constMap_->uvTransMat = MakeIdentity4x4();
+
 
     vertexResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData)*6);
     vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
@@ -34,7 +40,6 @@ void Sprite::Initialize()
     vConstMap_[5].texcoord = vConstMap_[2].texcoord;
 
     size_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
-    //size_ = { 1,1 };
     anchor_ = { 0,0 };
     CalculateVertex();
 }
@@ -47,9 +52,19 @@ void Sprite::Draw()
 {
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     TransferData(commandList);
+    colorObj_->SetColor(color_);
 
     commandList->DrawInstanced(6, 1, 0, 0);
 
+}
+
+void Sprite::Draw(const Vector4& _color)
+{
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    TransferData(commandList);
+    colorObj_->SetColor(_color);
+
+    commandList->DrawInstanced(6, 1, 0, 0);
 }
 
 Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
@@ -61,9 +76,11 @@ Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
     return sprite;
 }
 
-void Sprite::StaticInitialize()
+void Sprite::StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight)
 {
     SpriteManager::GetInstance()->Initialize();
+    winWidth_ = winWidth_;
+    winHeight_ = _windowWHeight;
 }
 
 void Sprite::PreDraw()
@@ -77,29 +94,34 @@ void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
     _commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
     _commandList->SetGraphicsRootConstantBufferView(0, matResource_->GetGPUVirtualAddress());
-    color_->TransferData(1, _commandList);
+    colorObj_->TransferData(1, _commandList);
     _commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
 }
 
 void Sprite::CalculateVertex()
 {
-    Vector2 halfSize = size_ / 2.0f;
+    Vector2 halfSize = size_ ;
 
     vConstMap_[0].position = {
         -anchor_.x * halfSize.x,
-        (1.0f - anchor_.y) * halfSize.y,0.0f,0.0f }; // 左下
+        (1.0f - anchor_.y) * halfSize.y,0.0f,1.0f }; // 左下
 
     vConstMap_[1].position = {
         -anchor_.x * halfSize.x,
-        -anchor_.y * halfSize.y,0.0f,0.0f }; // 左上
+        -anchor_.y * halfSize.y,0.0f,1.0f }; // 左上
 
     vConstMap_[2].position = {
         (1.0f - anchor_.x)* halfSize.x,
-        (1.0f - anchor_.y) * halfSize.y,0.0f,0.0f }; // 右下
+        (1.0f - anchor_.y) * halfSize.y,0.0f,1.0f }; // 右下
 
     vConstMap_[4].position = {
         (1.0f - anchor_.x) * halfSize.x,
-        -anchor_.y * halfSize.y,0.0f,0.0f }; // 右上
+        -anchor_.y * halfSize.y,0.0f,1.0f }; // 右上
+
+    //vConstMap_[0].position.x *= -1;
+    //vConstMap_[1].position.x *= -1;
+    //vConstMap_[2].position.x *= -1;
+    //vConstMap_[4].position.x *= -1;
 
     vConstMap_[3].position = vConstMap_[1].position;
     vConstMap_[5].position = vConstMap_[2].position;
@@ -108,9 +130,15 @@ void Sprite::CalculateVertex()
 void Sprite::CalculateMatrix()
 {
     Vector3 s = { scale_,1.0f };
-    Vector3 r = { 3.0f,0.0f ,rotate_ };
+    Vector3 r = { 0.0f,0.0f ,rotate_ };
     Vector3 t = { translate_,0.0f };
     constMap_->worldMat = MakeAffineMatrix(s, r, t);
+
+    Matrix4x4 vp = Inverse(MakeIdentity4x4()) * MakeOrthographicMatrix(0, 0, winWidth_, winHeight_, -1.0f, 1.0);
+    constMap_->worldMat *= vp;
+    //constMap_->worldMat *= MakePerspectiveFovMatrix(0.45f, 16 / 9, 0.1f, 1.0f);
+    //constMap_->worldMat *= MakeViewportMatrix(0, 0, winWidth_, winHeight_, 0.0f, 1.0);
+
 
     s = { uvScale_,1.0f };
     r = { 0.0f,0.0f ,uvRotate_ };

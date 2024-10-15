@@ -49,6 +49,12 @@ void Model::Draw(const WorldTransform& _transform, Camera* _camera, uint32_t _te
     commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
 }
 
+void Model::ShowImGui(const std::string& _name)
+{
+
+
+}
+
 Model* Model::CreateFromObj(const std::string& _filePath)
 {
     Model* model = ModelManager::GetInstance()->FindSameModel(_filePath);
