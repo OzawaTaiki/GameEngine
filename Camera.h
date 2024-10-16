@@ -17,14 +17,14 @@ public:
     void Update();
     void Draw();
 
-    ID3D12Resource* GetResource() { return resource_.Get(); }
-    Matrix4x4 GetViewProjection() { return matViewProjection_; }
+    ID3D12Resource* GetResource()const { return resource_.Get(); }
+    Matrix4x4 GetViewProjection()const { return matViewProjection_; }
 
     void TransferData();
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
-    Vector3 transform_ = { 0.0f,0.0f ,-20.0f };
+    Vector3 translate_ = { 0.0f,0.0f ,-20.0f };
 
     float fovY_ = 0.45f;
     float aspectRatio_ = 16.0f / 9.0f;

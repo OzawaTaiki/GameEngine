@@ -85,6 +85,9 @@
     <Filter Include="Engine\ObjectSprite\Sprite">
       <UniqueIdentifier>{70f4c928-51d6-458d-ae19-cbd21f81d8fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\LineDrawer">
+      <UniqueIdentifier>{8b221288-47a4-4151-8dd6-7e6ee0778a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="myLib\MyLib.cpp">
@@ -185,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
       <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="LineDrawer.cpp">
+      <Filter>Engine\LineDrawer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +311,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Engine\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="LineDrawer.h">
+      <Filter>Engine\LineDrawer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -319,6 +328,9 @@
       <Filter>リソース ファイル\Shader</Filter>
     </None>
     <None Include="Resources\Shader\Sprite.hlsli">
+      <Filter>リソース ファイル\Shader</Filter>
+    </None>
+    <None Include="Resources\Shader\LineDrawer.hlsli">
       <Filter>リソース ファイル\Shader</Filter>
     </None>
   </ItemGroup>
@@ -339,6 +351,12 @@
       <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Sprite.VS.hlsl">
+      <Filter>リソース ファイル\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\LineDrawer.PS.hlsl">
+      <Filter>リソース ファイル\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\LineDrawer.VS.hlsl">
       <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
   </ItemGroup>
