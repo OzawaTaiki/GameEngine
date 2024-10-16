@@ -10,6 +10,7 @@
 #include "imgui_impl_win32.h"
 
 #include <random>
+#include "GameScene.h"
 
 const float kDeltaTime = 1.0f / 60.0f;
 
@@ -32,7 +33,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
 
-
+	GameScene* gameScene = new GameScene;
+	gameScene->Initialize();
 
 	///
 	/// メインループ
@@ -49,7 +51,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// 更新処理ここから
 		///
 
-
+		gameScene->Update();
 
 		///
 		/// 更新処理ここまで
@@ -60,6 +62,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// 描画ここから
 		///
+
+		gameScene->Draw();
 
 		///
 		/// 描画ここまで
@@ -76,6 +80,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui::DestroyContext();
 
 	winApp->Filalze();
+
+	delete gameScene;
 
 	return 0;
 }
