@@ -43,6 +43,7 @@ private:
 
 	void CreatePSOForModel();
 	void CreatePSOForSprite();
+	void CreatePSOForLineDrawer();
 
 	D3D12_BLEND_DESC GetBlendDesc(BlendMode _mode);
 

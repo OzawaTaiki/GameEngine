@@ -11,6 +11,7 @@
 
 #include <random>
 #include "GameScene.h"
+#include "LineDrawer.h"
 
 const float kDeltaTime = 1.0f / 60.0f;
 
@@ -29,6 +30,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	PSOManager::GetInstance()->Initialize();
 	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();
+
+	LineDrawer* lineDrawer = LineDrawer::GetInstance();
+	lineDrawer->Initialize();
 
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
