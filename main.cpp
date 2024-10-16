@@ -29,88 +29,40 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("uvChecker.png");
-	TextureManager::GetInstance()->Load("uvChecker.png");
-	TextureManager::GetInstance()->Load("uvChecker.png");
 
 	PSOManager::GetInstance()->Initialize();
 	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();
-	//Model* model = Model::CreateFromObj("plane.obj");
-	//Model* model = Model::CreateFromObj("bunny.obj");
-	Model* model1 = Model::CreateFromObj("plane.obj");
-	Model* model2 = Model::CreateFromObj("bunny.gltf");
-
-	Sprite* sprite = Sprite::Create(0);
-	sprite->Initialize();
 
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
 
-	Camera* camera = new Camera;
-	camera->Initialize();
 
-	WorldTransform transform[3];
-	for (int i = 0; i < 3; i++)
-	{
-		transform[i].Initialize();
-		transform[i].TransferData(camera->GetViewProjection());
-	}
-
-	ObjectColor* color = new ObjectColor;
-	color->Initialize();
-
-	Vector2 anchor = { 0,0 };
 
 	///
 	/// メインループ
 	///
 	// ウィンドウのｘボタンが押されるまでループ
-	while (1)
+	while (!winApp->ProcessMessage())
 	{
-		// Windowにメッセージが来ていたら最優先で処理させる
-		if (winApp->ProcessMessage())
-		{
-			break;
-		}
-
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
+		ImGui::Begin("Engine");
+		input->Update();
 
 		///
 		/// 更新処理ここから
 		///
-		ImGui::Begin("Engine");
 
-		input->Update();
 
-		ImGui::DragFloat3("s1", &transform[0].scale_.x, 0.01f);
-		ImGui::DragFloat3("r1", &transform[0].rotate_.x, 0.01f);
-		ImGui::DragFloat3("t1", &transform[0].transform_.x, 0.01f);
-		ImGui::DragFloat3("s2", &transform[1].scale_.x, 0.01f);
-		ImGui::DragFloat3("r3", &transform[1].rotate_.x, 0.01f);
-		ImGui::DragFloat3("t3", &transform[1].transform_.x, 0.01f);
-		ImGui::DragFloat3("s4", &transform[2].scale_.x, 0.01f);
-		ImGui::DragFloat3("r4", &transform[2].rotate_.x, 0.01f);
-		ImGui::DragFloat3("t4", &transform[2].transform_.x, 0.01f);
 
-		ImGui::DragFloat2("ss", &sprite->scale_.x, 0.01f);
-		ImGui::DragFloat("sr", &sprite->rotate_, 0.01f);
-		ImGui::DragFloat2("st", &sprite->translate_.x,1);
-		ImGui::DragFloat2("anchor", &anchor.x,0.01f);
-		transform[0].rotate_.y += 0.01f;
-		transform[0].TransferData(camera->GetViewProjection());
-		transform[1].TransferData(camera->GetViewProjection());
-		transform[2].TransferData(camera->GetViewProjection());
-
-		sprite->SetAnchor(anchor);
-
-		ImGui::End();
 		///
 		/// 更新処理ここまで
 		///
 
+		ImGui::End();
 		dxCommon->PreDraw();
 
 		///
@@ -118,23 +70,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		ModelManager::GetInstance()->PreDraw();
 
-		model1->Draw(transform[0], camera, 0, color);
-		model2->Draw(transform[1], camera, 0, color);
+
 
 		Sprite::PreDraw();
-		sprite->Draw();
 
 		///
 		/// 描画ここまで
 		///
 
 		ImGui::Render();
-
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
-
 		dxCommon->PostDraw();
-
 	}
 
 	ImGui_ImplDX12_Shutdown();
@@ -142,10 +89,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ImGui::DestroyContext();
 
 	winApp->Filalze();
-
-	delete camera;
-	delete color;
-
 
 	return 0;
 }
