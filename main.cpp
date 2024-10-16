@@ -1,13 +1,8 @@
 #include "WinApp.h"
 #include "DXCommon.h"
-#include "myLib/MyLib.h"
-#include "Debug.h"
 #include "Input.h"
 #include "TextureManager.h"
-#include "WorldTransform.h"
 #include "ModelManager.h"
-#include "Camera.h"
-#include "ObjectColor.h"
 #include "Sprite.h"
 
 #include "imgui.h"
@@ -49,8 +44,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::Begin("Engine");
-		input->Update();
 
 		///
 		/// 更新処理ここから
@@ -62,17 +55,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// 更新処理ここまで
 		///
 
-		ImGui::End();
 		dxCommon->PreDraw();
 
 		///
 		/// 描画ここから
 		///
-		ModelManager::GetInstance()->PreDraw();
-
-
-
-		Sprite::PreDraw();
 
 		///
 		/// 描画ここまで

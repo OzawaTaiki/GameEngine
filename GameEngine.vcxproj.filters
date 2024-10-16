@@ -13,52 +13,82 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Lib">
-      <UniqueIdentifier>{bb130762-2970-4019-a3d8-157336b101b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="imgui">
       <UniqueIdentifier>{a3462a09-49de-4400-9055-57f3853699f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="TextureManager">
-      <UniqueIdentifier>{a9516b81-c6df-4821-a750-c42ba7a00c08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DXCommon">
-      <UniqueIdentifier>{223c34ef-cbeb-4c78-a280-fe102f9376f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WinApp">
-      <UniqueIdentifier>{1ad76de3-20e9-478b-9d6c-f382b6536151}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Lib\Vector">
-      <UniqueIdentifier>{587bb673-4ebc-46a6-98f1-5ae7b577ff8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Lib\Matrix">
-      <UniqueIdentifier>{c317957c-f889-4f4a-9b4c-6b597f6d3a57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Input">
-      <UniqueIdentifier>{03deaf92-55e5-476b-b8f8-715dbc506c8a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Model">
-      <UniqueIdentifier>{b3146db3-dba3-4b92-ad73-c662ff6ab4b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Light">
-      <UniqueIdentifier>{66a8d7e9-907b-4d70-89d3-a5edb3c2db52}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Light\Directional">
-      <UniqueIdentifier>{a283ec18-d780-4aaa-b284-d0a3d96bf998}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Light\Point">
-      <UniqueIdentifier>{054a57e7-bf27-4743-9bea-e3af9b482841}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Light\Spot">
-      <UniqueIdentifier>{f70f8d27-c1d5-4efc-9ecc-50bd90eae805}</UniqueIdentifier>
     </Filter>
     <Filter Include="リソース ファイル\Shader">
       <UniqueIdentifier>{87e84403-6e3d-4fd3-9c7f-1a4c2cf3086d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{8cee71ed-efcc-46ad-bbe3-36674ccf7fe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\TextureManager">
+      <UniqueIdentifier>{a9516b81-c6df-4821-a750-c42ba7a00c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Lib">
+      <UniqueIdentifier>{bb130762-2970-4019-a3d8-157336b101b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Lib\Vector">
+      <UniqueIdentifier>{587bb673-4ebc-46a6-98f1-5ae7b577ff8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Lib\Matrix">
+      <UniqueIdentifier>{c317957c-f889-4f4a-9b4c-6b597f6d3a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Input">
+      <UniqueIdentifier>{03deaf92-55e5-476b-b8f8-715dbc506c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXCommon">
+      <UniqueIdentifier>{223c34ef-cbeb-4c78-a280-fe102f9376f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\WinApp">
+      <UniqueIdentifier>{1ad76de3-20e9-478b-9d6c-f382b6536151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjColor">
+      <UniqueIdentifier>{87bb6b2a-c0da-4b2f-99d5-5e7f3fc46f89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Scene">
+      <UniqueIdentifier>{861b4ce9-b8ea-48ca-a611-4b7b154eda4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Camera">
+      <UniqueIdentifier>{387019c8-0f5f-4205-beac-874f1e3a9636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel">
+      <UniqueIdentifier>{61792db0-30a9-4e0e-8f05-63e884045f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Model">
+      <UniqueIdentifier>{b3146db3-dba3-4b92-ad73-c662ff6ab4b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Mesh">
+      <UniqueIdentifier>{cb4bb950-0b7c-4c2c-9d9a-7ab1ed80b11d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Material">
+      <UniqueIdentifier>{836e31bd-a9b7-4bc9-98fa-26ae1c77d195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\WorldTransform">
+      <UniqueIdentifier>{90a305af-2c79-467a-9612-76ced9faa54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Light">
+      <UniqueIdentifier>{66a8d7e9-907b-4d70-89d3-a5edb3c2db52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Light\Directional">
+      <UniqueIdentifier>{a283ec18-d780-4aaa-b284-d0a3d96bf998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Light\Point">
+      <UniqueIdentifier>{054a57e7-bf27-4743-9bea-e3af9b482841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectModel\Light\Spot">
+      <UniqueIdentifier>{f70f8d27-c1d5-4efc-9ecc-50bd90eae805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectSprite">
+      <UniqueIdentifier>{0ee7395e-c5ca-4ff2-9d43-72062217fa77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ObjectSprite\Sprite">
+      <UniqueIdentifier>{70f4c928-51d6-458d-ae19-cbd21f81d8fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="myLib\MyLib.cpp">
-      <Filter>Lib</Filter>
+      <Filter>Engine\Lib</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
@@ -87,73 +117,79 @@
     <ClCompile Include="Debug.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="TextureManager.cpp">
-      <Filter>TextureManager</Filter>
+      <Filter>Engine\TextureManager</Filter>
     </ClCompile>
     <ClCompile Include="D3DResourceLeakChecker.cpp">
-      <Filter>DXCommon</Filter>
+      <Filter>Engine\DXCommon</Filter>
     </ClCompile>
     <ClCompile Include="DXCommon.cpp">
-      <Filter>DXCommon</Filter>
+      <Filter>Engine\DXCommon</Filter>
     </ClCompile>
     <ClCompile Include="WinApp.cpp">
-      <Filter>WinApp</Filter>
+      <Filter>Engine\WinApp</Filter>
     </ClCompile>
     <ClCompile Include="myLib\MatrixFunction.cpp">
-      <Filter>Lib\Matrix</Filter>
+      <Filter>Engine\Lib\Matrix</Filter>
     </ClCompile>
     <ClCompile Include="myLib\VectorFunction.cpp">
-      <Filter>Lib\Vector</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
-      <Filter>Input</Filter>
+      <Filter>Engine\Input</Filter>
     </ClCompile>
     <ClCompile Include="ModelManager.cpp">
-      <Filter>Model</Filter>
+      <Filter>Engine\ObjectModel\Model</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
-      <Filter>Model</Filter>
+      <Filter>Engine\ObjectModel\Model</Filter>
     </ClCompile>
     <ClCompile Include="PSOManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="WorldTransform.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectColor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="LightGroup.cpp">
-      <Filter>Light</Filter>
+      <Filter>Engine\ObjectModel\Light</Filter>
     </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Light\Directional</Filter>
+      <Filter>Engine\ObjectModel\Light\Directional</Filter>
     </ClCompile>
     <ClCompile Include="PointLight.cpp">
-      <Filter>Light\Point</Filter>
+      <Filter>Engine\ObjectModel\Light\Point</Filter>
     </ClCompile>
     <ClCompile Include="SpotLight.cpp">
-      <Filter>Light\Spot</Filter>
+      <Filter>Engine\ObjectModel\Light\Spot</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectColor.cpp">
+      <Filter>Engine\ObjColor</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Engine\ObjectModel\Material</Filter>
     </ClCompile>
     <ClCompile Include="Sprite.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Engine\ObjectSprite\Sprite</Filter>
     </ClCompile>
     <ClCompile Include="SpriteManager.cpp">
+      <Filter>Engine\ObjectSprite\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Engine\ObjectModel\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldTransform.cpp">
+      <Filter>Engine\ObjectModel\WorldTransform</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Engine\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
-      <Filter>Lib</Filter>
+      <Filter>Engine\Lib</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -182,83 +218,92 @@
     <ClInclude Include="Debug.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="TextureManager.h">
-      <Filter>TextureManager</Filter>
+      <Filter>Engine\TextureManager</Filter>
     </ClInclude>
     <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>DXCommon</Filter>
+      <Filter>Engine\DXCommon</Filter>
     </ClInclude>
     <ClInclude Include="DXCommon.h">
-      <Filter>DXCommon</Filter>
+      <Filter>Engine\DXCommon</Filter>
     </ClInclude>
     <ClInclude Include="WinApp.h">
-      <Filter>WinApp</Filter>
+      <Filter>Engine\WinApp</Filter>
     </ClInclude>
     <ClInclude Include="Vector2.h">
-      <Filter>Lib\Vector</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClInclude>
     <ClInclude Include="myLib\Vector3.h">
-      <Filter>Lib\Vector</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClInclude>
     <ClInclude Include="myLib\Vector4.h">
-      <Filter>Lib\Vector</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClInclude>
     <ClInclude Include="Matrix3x3.h">
-      <Filter>Lib\Matrix</Filter>
+      <Filter>Engine\Lib\Matrix</Filter>
     </ClInclude>
     <ClInclude Include="myLib\Matrix4x4.h">
-      <Filter>Lib\Matrix</Filter>
+      <Filter>Engine\Lib\Matrix</Filter>
     </ClInclude>
     <ClInclude Include="myLib\MatrixFunction.h">
-      <Filter>Lib\Matrix</Filter>
+      <Filter>Engine\Lib\Matrix</Filter>
     </ClInclude>
     <ClInclude Include="myLib\VectorFunction.h">
-      <Filter>Lib\Vector</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
-      <Filter>Input</Filter>
+      <Filter>Engine\Input</Filter>
     </ClInclude>
     <ClInclude Include="ModelManager.h">
-      <Filter>Model</Filter>
+      <Filter>Engine\ObjectModel\Model</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
-      <Filter>Model</Filter>
+      <Filter>Engine\ObjectModel\Model</Filter>
     </ClInclude>
     <ClInclude Include="PSOManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldTransform.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectColor.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="LightGroup.h">
-      <Filter>Light</Filter>
+      <Filter>Engine\ObjectModel\Light</Filter>
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
-      <Filter>Light\Directional</Filter>
+      <Filter>Engine\ObjectModel\Light\Directional</Filter>
     </ClInclude>
     <ClInclude Include="PointLight.h">
-      <Filter>Light\Point</Filter>
+      <Filter>Engine\ObjectModel\Light\Point</Filter>
     </ClInclude>
     <ClInclude Include="SpotLight.h">
-      <Filter>Light\Spot</Filter>
+      <Filter>Engine\ObjectModel\Light\Spot</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectColor.h">
+      <Filter>Engine\ObjColor</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Engine\ObjectModel\Material</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Engine\ObjectSprite\Sprite</Filter>
     </ClInclude>
     <ClInclude Include="SpriteManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Engine\ObjectSprite\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\ObjectModel\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldTransform.h">
+      <Filter>Engine\ObjectModel\WorldTransform</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Engine\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
