@@ -118,10 +118,6 @@ void Sprite::CalculateVertex()
         (1.0f - anchor_.x) * halfSize.x,
         -anchor_.y * halfSize.y,0.0f,1.0f }; // 右上
 
-    //vConstMap_[0].position.x *= -1;
-    //vConstMap_[1].position.x *= -1;
-    //vConstMap_[2].position.x *= -1;
-    //vConstMap_[4].position.x *= -1;
 
     vConstMap_[3].position = vConstMap_[1].position;
     vConstMap_[5].position = vConstMap_[2].position;
@@ -134,10 +130,8 @@ void Sprite::CalculateMatrix()
     Vector3 t = { translate_,0.0f };
     constMap_->worldMat = MakeAffineMatrix(s, r, t);
 
-    Matrix4x4 vp = Inverse(MakeIdentity4x4()) * MakeOrthographicMatrix(0, 0, winWidth_, winHeight_, -1.0f, 1.0);
+    Matrix4x4 vp = Inverse(MakeIdentity4x4()) * MakeOrthographicMatrix(0, 0, static_cast<float> (winWidth_), static_cast<float>(winHeight_), -1.0f, 1.0);
     constMap_->worldMat *= vp;
-    //constMap_->worldMat *= MakePerspectiveFovMatrix(0.45f, 16 / 9, 0.1f, 1.0f);
-    //constMap_->worldMat *= MakeViewportMatrix(0, 0, winWidth_, winHeight_, 0.0f, 1.0);
 
 
     s = { uvScale_,1.0f };

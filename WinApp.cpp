@@ -3,6 +3,8 @@
 #include "externals/imgui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+#pragma comment (lib,"winmm.lib")
+
 const wchar_t WinApp::kWindowClassName[] = L"WindowClass";
 
 WinApp* WinApp::GetInstance()
@@ -69,6 +71,7 @@ void WinApp::Initilize(const wchar_t* _title, UINT _style, uint32_t _width, uint
 
 	ShowWindow(hwnd_, SW_NORMAL);
 
+	timeBeginPeriod(1);
 }
 
 void WinApp::Filalze()
