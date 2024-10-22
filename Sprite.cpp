@@ -6,7 +6,6 @@
 #include "WinApp.h"
 #include "MatrixFunction.h"
 
-
 uint32_t Sprite::winWidth_ = 1280;
 uint32_t Sprite::winHeight_ = 720;
 
