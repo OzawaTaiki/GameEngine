@@ -23,7 +23,12 @@ void GameScene::Initialize()
     color = new ObjectColor;
     color->Initialize();
 
+    edit_ = std::make_unique<CatmulRomSpline>();
+    edit_->Initialize("Resources/Data/Spline");
+    edit_->SetCameraPtr(camera_.get());
+
 }
+
 void GameScene::Update()
 {
     ImGui::Begin("Engine");
@@ -31,16 +36,10 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-    lineDrawer->RegisterPoint({ 0,0,15 }, {  3,0,15 });
-    lineDrawer->RegisterPoint({ 0,1,15 }, {  1,1,15 });
-    lineDrawer->RegisterPoint({ 0,2,15 }, {  3,2,15 });
-    lineDrawer->RegisterPoint({ 0,3,15 }, {  3,9,15 });
-    lineDrawer->RegisterPoint({ 0,4,15 }, {  3,4,15 });
-    lineDrawer->RegisterPoint({ 0,5,15 }, {  3,5,15 });
-
-    trans.TransferData(camera_->GetViewProjection());
+    edit_->Update();
 
 
+    trans.UpdateData();
     //<-----------------------
     camera_->TransferData();
     ImGui::End();
@@ -51,8 +50,8 @@ void GameScene::Draw()
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
 
-    model->Draw(trans, camera_.get(),0, color);
-
+    //model->Draw(trans, camera_.get(),0, color);
+    edit_->Draw();
 
     //<------------------------
 

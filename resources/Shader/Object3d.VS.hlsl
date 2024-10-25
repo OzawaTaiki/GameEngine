@@ -1,9 +1,9 @@
 #include "Resources/Shader/Object3d.hlsli"
+//#include "Object3d.hlsli"
 
-cbuffer TransformationMatrix : register(b0)
+cbuffer TransformationMatrix : register(b1)
 {
     float4x4 World;
-    float4x4 WVP;
     float4x4 worldInverseTranspose;
 };
 
@@ -17,7 +17,7 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput _input)
 {
     VertexShaderOutput output;
-    output.position = mul(_input.position, WVP);
+    output.position = mul(_input.position, mul(World, mul(matView, matProj)));
     output.texcoord = _input.texcoord;
     output.normal = normalize(mul(_input.normal, (float3x3) worldInverseTranspose));
     output.worldPosition = mul(_input.position, World).xyz;

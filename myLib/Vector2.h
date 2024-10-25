@@ -12,6 +12,8 @@ struct Vector2
 	inline bool operator==(const Vector2& _v) const{
 		return x == _v.x && y == _v.y;
 	}
+
+    float Length() const;
 };
 
 template <>

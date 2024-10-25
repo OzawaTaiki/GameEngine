@@ -307,6 +307,17 @@ void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const M
 	DrawSphere(ball, _viewProjectionMatrix, _viewportMatrix, _ball.color);
 }
 
+
+float LerpShortAngle(float _a, float _b, float _t) {
+	// 角度差を計算
+	float diff = _b - _a;
+	// 差を [-pi, pi] の範囲に調整
+	float rotate = std::remainder(diff, std::numbers::pi_v<float> *2.0f);
+
+	// 最短角度を使って補間
+	return _a + rotate * _t;
+}
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
 	Vector3 normalize = Normalize(_v2);

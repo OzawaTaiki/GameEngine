@@ -34,12 +34,13 @@ void Camera::TransferData()
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
     matViewProjection_ = matView_ * matProjection_;
 
-    *constMap_ = translate_;
+    constMap_->pos = translate_;
+    constMap_->view = matView_;
+    constMap_->proj = matProjection_;
 }
 
 void Camera::Map()
 {
-    resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(Vector3));
+    resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferDate));
     resource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
-    *constMap_ = translate_;
 }

@@ -31,6 +31,7 @@ private:
 
     std::string     name_                           = {};
     std::string     texturePath_                    = {};
+    uint32_t        textureHandle_                  = 0;
 
     struct DataForGPU
     {

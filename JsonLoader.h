@@ -2,7 +2,7 @@
 
 #include "Vector2.h"
 #include "Vector3.h"
-
+#include "Debug.h"
 #include <string>
 #include <vector>
 #include <variant>
@@ -41,6 +41,8 @@ public:
 	void MakeJsonFile();
 
 	void SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride = true);
+	template<class T>
+	void SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data);
 
 	Datum parseDatum(const json& j, const std::string& _groupName);
 	json DatumToJson(const Datum& _datum);
@@ -50,7 +52,7 @@ public:
 	template<class T>
 	inline std::optional<T> GetDatum(const std::string& _groupName, const std::string& _variableName);
 	template<class T>
-	inline std::optional<std::vector <T>> GetDatumArray(const std::string& _groupName, const std::string& _variableName);
+	inline std::optional<std::vector <T>>  GetDatumArray(std::string _groupName, std::string _variableName);
 
 	void PrepareForSave();
 
@@ -62,6 +64,19 @@ private:
 	std::unordered_map < std::string, Data > dataGroup_;
 
 };
+
+
+template<class T>
+inline void JsonLoader::SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data)
+{
+	dataGroup_[_groupname].data[_name].clear();
+
+	Data& groupData = dataGroup_[_groupname];
+
+	for (const auto& value : _data) {
+		groupData.data[_name].emplace_back(value);
+	}
+}
 
 template<class T>
 inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, const std::string& _variableName)
@@ -98,12 +113,13 @@ inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, cons
 				return *value;
 		}
 	}
-	assert(false && "not found variaber");   // 見つからなければ止める
-	return std::nullopt;
+	Debug::Log("not found " + _variableName + "in" + _groupName);
+	//assert(false && "not found variaber");   // 見つからなければ止める
+	return T();
 }
 
 template<class T>
-inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(const std::string& _groupName, const std::string& _variableName)
+inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _groupName, std::string _variableName)
 {
 	//objのデータを取得
 	auto groupIt = dataGroup_.find(_groupName);
@@ -112,7 +128,11 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(const std::strin
 		// 取得したデータの変数を取得
 		auto it = groupIt->second.data.find(_variableName);
 		if (it == groupIt->second.data.end())
-			assert(false && "not found variaber");   // 見つからなければ止める
+		{
+			Debug::Log("not found " + _variableName + "in" + _groupName);
+			return std::vector<T>();
+			//assert(false && "not found variaber");   // 見つからなければ止める
+		}
 
 		std::vector<T> result;
 		for( const Datum& datum : it->second)
@@ -122,6 +142,7 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(const std::strin
 		}
 		return result;
 	}
-	assert(false && "not found variaber");   // 見つからなければ止める
-	return std::nullopt;
+	Debug::Log("not found Group"  + _groupName);
+	//assert(false && "not found variaber");   // 見つからなければ止める
+	return std::vector<T>();
 }

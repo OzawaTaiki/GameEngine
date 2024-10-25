@@ -36,7 +36,7 @@ struct Plane
 {
 	Vector3 normal; // 法線
 	float distance; // 距離
-	float scalar = 2;  // 
+	float scalar = 2;  //
 };
 
 //三角形
@@ -146,6 +146,8 @@ void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, c
 void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vector3& _cPoint2, const Vector3& _cPoint3, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint);
 
 void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
+
+float LerpShortAngle(float _a, float _b, float _t);
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 

@@ -33,13 +33,20 @@ public:
 
 
 private:
+    struct ConstantBufferDate
+    {
+        Matrix4x4 view;
+        Matrix4x4 proj;
+        Vector3 pos;
+    };
+
     Matrix4x4 matWorld_ = {};
     Matrix4x4 matView_ = {};
     Matrix4x4 matProjection_ = {};
     Matrix4x4 matViewProjection_ = {};
 
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
-    Vector3* constMap_=nullptr;
+    ConstantBufferDate* constMap_ = nullptr;
 
     void Map();
 };

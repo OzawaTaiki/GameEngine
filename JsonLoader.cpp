@@ -74,7 +74,6 @@ void JsonLoader::MakeJsonFile() {
 void JsonLoader::SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride)
 {
 	if (dataGroup_[_groupname].data[_name].empty())
-		dataGroup_[_groupname].data[_name].emplace_back();
 
 	if(_isOverride)
 	{

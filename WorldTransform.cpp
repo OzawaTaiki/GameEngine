@@ -12,9 +12,27 @@ void WorldTransform::Initialize()
     transform_ = { 0.0f,0.0f ,0.0f };
 }
 
-void WorldTransform::TransferData(const Matrix4x4& _viewProjectoin)
+void WorldTransform::UpdateData()
 {
-    constMap_->World = MakeAffineMatrix(scale_, rotate_, transform_);
-    constMap_->WVP = constMap_->World * _viewProjectoin;
-    constMap_->worldInverseTranspose = Transpose(Inverse(constMap_->World));
+    matWorld_ = MakeAffineMatrix(scale_, rotate_, transform_);
+    if (parent_)
+    {
+        matWorld_ *= parent_->matWorld_;
+    }
+    TransferData();
+}
+
+Vector3 WorldTransform::GetWorldPosition() const
+{
+    Vector3 wPos;
+    wPos.x = matWorld_.m[3][0];
+    wPos.y = matWorld_.m[3][1];
+    wPos.z = matWorld_.m[3][2];
+    return wPos;
+}
+
+void WorldTransform::TransferData()
+{
+    constMap_->World = matWorld_;
+    constMap_->worldInverseTranspose = Transpose(Inverse(matWorld_));
 }

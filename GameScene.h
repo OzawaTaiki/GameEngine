@@ -8,6 +8,7 @@
 #include "ObjectColor.h"
 
 #include <memory>
+#include "CatmulRomSpline.h"
 
 class GameScene : public Scene
 {
@@ -26,4 +27,6 @@ private:
     ObjectColor* color;
     Model* model;
     WorldTransform trans;
+
+    std::unique_ptr<CatmulRomSpline> edit_;
 };
