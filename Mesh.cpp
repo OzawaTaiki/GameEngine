@@ -84,6 +84,10 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
             textureHandlePath_ = _directoryPath + "/" + textureFilePath.C_Str();
         }
+        else
+        {
+            textureHandlePath_ = "Resources/images/uvChecker.png";
+        }
     }
 
     InitializeReources();

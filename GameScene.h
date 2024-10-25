@@ -26,4 +26,7 @@ private:
     ObjectColor* color;
     Model* model;
     WorldTransform trans;
+
+    Vector3 anchorPos{};
+    Vector3 anchorRot{};
 };
