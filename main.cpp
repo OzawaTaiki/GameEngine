@@ -4,14 +4,14 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "Sprite.h"
+#include "GameScene.h"
+#include "LineDrawer.h"
 
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 
 #include <random>
-#include "GameScene.h"
-#include "LineDrawer.h"
 
 const float kDeltaTime = 1.0f / 60.0f;
 

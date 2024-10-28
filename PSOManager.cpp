@@ -150,13 +150,13 @@ void PSOManager::CreatePSOForModel()
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     rootParameters[0].Descriptor.ShaderRegister = 0;
 
     // transform
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-    rootParameters[1].Descriptor.ShaderRegister = 0;                           // レジスタ番号0を使う
+    rootParameters[1].Descriptor.ShaderRegister = 1;                           // レジスタ番号0を使う
 
     //マテリアル
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
@@ -251,15 +251,6 @@ void PSOManager::CreatePSOForModel()
 
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
-    //すべての色要素を書き込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -498,8 +489,8 @@ void PSOManager::CreatePSOForLineDrawer()
     depthStencilDesc.DepthEnable = true;
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-    depthStencilDesc.StencilReadMask = D3D12_DEFAULT_SAMPLE_MASK;
-    depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_SAMPLE_MASK;
+    depthStencilDesc.StencilReadMask = 0xffu;
+    depthStencilDesc.StencilWriteMask = 0xffu;
 
 
     /// InputLayoutの設定を行う

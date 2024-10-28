@@ -1,10 +1,6 @@
 #include "Resources/Shader/Object3d.hlsli"
+//#include "Object3d.hlsli"
 
-
-cbuffer Camera : register(b0)
-{
-    float3 worldPosition;
-}
 
 cbuffer gMaterial : register(b1)
 {

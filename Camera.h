@@ -20,6 +20,14 @@ public:
     ID3D12Resource* GetResource()const { return resource_.Get(); }
     Matrix4x4 GetViewProjection()const { return matViewProjection_; }
 
+    /// <summary>
+    /// メンバ変数から行列を計算，転送
+    /// </summary>
+    void UpdateMatrix();
+
+    /// <summary>
+    /// セットした行列を転送
+    /// </summary>
     void TransferData();
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
@@ -32,14 +40,21 @@ public:
     float farClip_ = 1000.0f;
 
 
-private:
-    Matrix4x4 matWorld_ = {};
     Matrix4x4 matView_ = {};
     Matrix4x4 matProjection_ = {};
+private:
+    struct ConstantBufferDate
+    {
+        Matrix4x4 view;
+        Matrix4x4 proj;
+        Vector3 pos;
+    };
+
+    Matrix4x4 matWorld_ = {};
     Matrix4x4 matViewProjection_ = {};
 
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
-    Vector3* constMap_=nullptr;
+    ConstantBufferDate* constMap_ = nullptr;
 
     void Map();
 };

@@ -2,12 +2,17 @@
 
 struct ParticleForGPU
 {
-    float4x4 WVP;
-    float4x4 World;
+    float4x4 matWorld;
     float4 color;
 };
 
 StructuredBuffer<ParticleForGPU> gParticle : register(t0);
+
+cbuffer gViewProjection : register(b0)
+{
+    float4x4 matView;
+    float4x4 matProj;
+};
 
 struct VertexShaderInput
 {
@@ -19,7 +24,7 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput _input, uint instanceID : SV_InstanceID)
 {
     VertexShaderOutput output;
-    output.position = mul(_input.position, gParticle[instanceID].WVP);
+    output.position = mul(_input.position, mul(gParticle[instanceID].matWorld, mul(matView, matProj)));
     output.texcoord = _input.texcoord;
     output.color = gParticle[instanceID].color;
     return output;

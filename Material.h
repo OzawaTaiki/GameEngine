@@ -19,18 +19,20 @@ public:
     Vector2         scale_                          = { 1.0f, 1.0f };       // スケール
     float           rotation_                       = 0.0f;                 // 回転
 
-    float           shiness_                        = 40.0f;                // 
+    float           shiness_                        = 40.0f;                //
 
     bool            enableLighting_                 = true;                 // ライティングの有無
 
     void Initialize(const std::string& _texturepath);
     void LoadTexture();
 
+    uint32_t GetTexturehandle() const { return textureHandle_; }
     ID3D12Resource* GetResource() { return resorces_.Get(); }
 private:
 
     std::string     name_                           = {};
     std::string     texturePath_                    = {};
+    uint32_t        textureHandle_                  = 0;
 
     struct DataForGPU
     {

@@ -5,11 +5,12 @@
 #include "MatrixFunction.h"
 #include <chrono>
 #include <imgui.h>
+
 GameScene::~GameScene()
 {
 
-    delete color;
 }
+
 void GameScene::Initialize()
 {
     input_ = Input::GetInstance();
@@ -20,12 +21,11 @@ void GameScene::Initialize()
     lineDrawer = LineDrawer::GetInstance();
     lineDrawer->SetCameraPtr(camera_.get());
 
-    model = Model::CreateFromObj("cube/cube.obj");
-    trans.Initialize();
-    color = new ObjectColor;
-    color->Initialize();
+    edit_ = std::make_unique<CatmulRomSpline>();
+    edit_->Initialize("Resources/Data/Spline");
 
 }
+
 void GameScene::Update()
 {
     ImGui::Begin("Engine");
@@ -50,22 +50,21 @@ void GameScene::Update()
     trans.matWorld_ *= MRot;
     trans.matWorld_ *= Inverse(Mpos);
 
+    edit_->Update(camera_->GetViewProjection());
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    auto duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-    std::string str_us = std::to_string(duration_us);
-    std::string str_ns = std::to_string(duration_ns);
-    ImGui::Text("%s us", str_us.c_str());
-    ImGui::Text("%s ns", str_ns.c_str());
-
-
-    trans.TransferData(camera_->GetViewProjection());
-
+    if (edit_->IsMove())
+    {
+        camera_->matView_ = edit_->GetCamera()->matView_;
+        camera_->matProjection_= edit_->GetCamera()->matProjection_;
+        camera_->TransferData();
+    }
+    else
+    {
+        camera_->UpdateMatrix();
+    }
 
 
     //<-----------------------
-    camera_->TransferData();
     ImGui::End();
 }
 
@@ -74,8 +73,7 @@ void GameScene::Draw()
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
 
-    model->Draw(trans, camera_.get(),0, color);
-
+    edit_->Draw(camera_.get());
 
     //<------------------------
 

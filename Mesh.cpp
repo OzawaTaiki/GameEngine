@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Mesh.h"
 #include "DXCommon.h"
 #include "Debug.h"
@@ -41,8 +42,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
-        assert(mesh->HasTextureCoords(0));				// TexcoordがないMeshは今回は非対応
-
+        assert(mesh->HasTextureCoords(0));				    // TexcoordがないMeshは今回は非対応
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace& face = mesh->mFaces[faceIndex];
@@ -69,6 +69,13 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
                     vertices_.push_back(vertex);
                     indices_.push_back(index);
                     vertexMap[vertex] = index;
+
+                    min.x = std::min(min.x, vertex.position.x);
+                    min.y = std::min(min.y, vertex.position.y);
+                    min.z = std::min(min.z, vertex.position.z);
+                    max.x = std::max(max.x, vertex.position.x);
+                    max.y = std::max(max.y, vertex.position.y);
+                    max.z = std::max(max.z, vertex.position.z);
                 }
                 else {
                     indices_.push_back(it->second);
@@ -82,6 +89,16 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
         if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
             aiString textureFilePath;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+
+            // /の位置を探す
+            size_t slashPos = _filepath.find('/');
+
+            if (slashPos != std::string::npos)
+            {// 見つかったら
+                std::string dirPath = _filepath.substr(0, slashPos);
+                textureFilePath = dirPath+'/' + textureFilePath.C_Str();
+            }
+
             textureHandlePath_ = _directoryPath + "/" + textureFilePath.C_Str();
         }
         else

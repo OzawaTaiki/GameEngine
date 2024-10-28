@@ -6,7 +6,7 @@
 void Camera::Initialize()
 {
     Map();
-    TransferData();
+    UpdateMatrix();
 }
 
 void Camera::Update()
@@ -27,19 +27,31 @@ void Camera::Draw()
 {
 }
 
-void Camera::TransferData()
+void Camera::UpdateMatrix()
 {
     matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_);
     matView_ = Inverse(matWorld_);
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
     matViewProjection_ = matView_ * matProjection_;
 
-    *constMap_ = translate_;
+    constMap_->pos = translate_;
+    constMap_->view = matView_;
+    constMap_->proj = matProjection_;
+}
+
+void Camera::TransferData()
+{
+    Matrix4x4 iView = Inverse(matView_);
+    //translate_ = { iView.m[3][0],iView.m[3][1],iView.m[3][2] };
+    matViewProjection_ = matView_ * matProjection_;
+
+    constMap_->pos = translate_;
+    constMap_->view = matView_;
+    constMap_->proj = matProjection_;
 }
 
 void Camera::Map()
 {
-    resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(Vector3));
+    resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferDate));
     resource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
-    *constMap_ = translate_;
 }

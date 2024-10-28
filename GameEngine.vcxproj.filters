@@ -192,6 +192,18 @@
     <ClCompile Include="LineDrawer.cpp">
       <Filter>Engine\LineDrawer</Filter>
     </ClCompile>
+    <ClCompile Include="JsonLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="CatmulRomSpline.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Vector3.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Vector2.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\MyLib.h">
@@ -314,6 +326,9 @@
     <ClInclude Include="LineDrawer.h">
       <Filter>Engine\LineDrawer</Filter>
     </ClInclude>
+    <ClInclude Include="JsonLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -333,6 +348,10 @@
     <None Include="Resources\Shader\LineDrawer.hlsli">
       <Filter>リソース ファイル\Shader</Filter>
     </None>
+    <None Include="CatmulRomSpline.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </None>
+    <None Include="Resources\Data\Spline.json" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">

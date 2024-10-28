@@ -54,8 +54,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>      indexResource_         = nullptr;
     D3D12_INDEX_BUFFER_VIEW                     indexBufferView_         = {};
 
+    Vector3 min;
+    Vector3 max;
+
     void InitializeReources();
     void CreateResources();
     void Map();
-    
+
 };
