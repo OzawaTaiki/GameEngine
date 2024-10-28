@@ -24,8 +24,6 @@ private:
     Input* input_ = nullptr;
     LineDrawer* lineDrawer = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
-    ObjectColor* color;
-    Model* model;
     WorldTransform trans;
 
     std::unique_ptr<CatmulRomSpline> edit_;

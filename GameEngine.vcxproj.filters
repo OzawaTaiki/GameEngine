@@ -351,6 +351,7 @@
     <None Include="CatmulRomSpline.h">
       <Filter>ヘッダー ファイル</Filter>
     </None>
+    <None Include="Resources\Data\Spline.json" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">

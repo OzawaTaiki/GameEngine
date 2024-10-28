@@ -19,7 +19,7 @@ void Model::Initialize()
 
 }
 
-void Model::Draw(const WorldTransform& _transform, Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
+void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
 {
     if (!lightGroup_)
     {
@@ -43,6 +43,36 @@ void Model::Draw(const WorldTransform& _transform, Camera* _camera, uint32_t _te
     //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
     // テクスチャ
     commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
+    // ライトたち
+    lightGroup_->TransferData();
+
+    commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
+}
+
+void Model::Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color)
+{
+    if (!lightGroup_)
+    {
+        lightGroup_ = new LightGroup;
+        lightGroup_->Initialize();
+    }
+
+    ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
+    commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
+
+    // カメラ（ｖｐ
+    commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
+    // トランスフォーム
+    commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
+    // マテリアル
+    commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
+    // カラー
+    _color->TransferData(3, commandList);
+    //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
+    // テクスチャ
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(material_->GetTexturehandle()));
     // ライトたち
     lightGroup_->TransferData();
 

@@ -6,7 +6,6 @@
 GameScene::~GameScene()
 {
 
-    delete color;
 }
 void GameScene::Initialize()
 {
@@ -18,14 +17,8 @@ void GameScene::Initialize()
     lineDrawer = LineDrawer::GetInstance();
     lineDrawer->SetCameraPtr(camera_.get());
 
-    model = Model::CreateFromObj("bunny.gltf");
-    trans.Initialize();
-    color = new ObjectColor;
-    color->Initialize();
-
     edit_ = std::make_unique<CatmulRomSpline>();
     edit_->Initialize("Resources/Data/Spline");
-    edit_->SetCameraPtr(camera_.get());
 
 }
 
@@ -36,12 +29,22 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-    edit_->Update();
+    edit_->Update(camera_->GetViewProjection());
 
 
-    trans.UpdateData();
+    if (input_->IsKeyPressed(DIK_0))
+    {
+        camera_->matView_ = edit_->GetCamera()->matView_;
+        camera_->matProjection_= edit_->GetCamera()->matProjection_;
+        camera_->TransferData();
+    }
+    else
+    {
+        camera_->UpdateMatrix();
+
+    }
+
     //<-----------------------
-    camera_->TransferData();
     ImGui::End();
 }
 
@@ -50,8 +53,7 @@ void GameScene::Draw()
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
 
-    //model->Draw(trans, camera_.get(),0, color);
-    edit_->Draw();
+    edit_->Draw(camera_.get());
 
     //<------------------------
 

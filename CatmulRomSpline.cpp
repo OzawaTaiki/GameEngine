@@ -6,6 +6,7 @@
 #include "MyLib.h"
 #include "imgui.h"
 #include "LineDrawer.h"
+#include "Input.h"
 #include <optional>
 
 CatmulRomSpline::CatmulRomSpline()
@@ -45,8 +46,12 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
     jsonLoader_->LoadJson(filepath_, true);
 
     posModel_ = Model::CreateFromObj("sphere/sphere.obj");
-    rotModel_ = Model::CreateFromObj("cube/cube.obj");
-    rotModelTexture_= TextureManager::GetInstance()->Load("axisCube.png");
+    rotModel_ = Model::CreateFromObj("axis/axis.gltf");
+
+    //rotModelTexture_ = TextureManager::GetInstance()->Load("axisCube.png");
+
+    camera_ = std::make_unique<Camera>();
+    camera_->Initialize();
 
     colorWhite_ = new ObjectColor;
     colorRed_ = new ObjectColor;
@@ -54,8 +59,8 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
     colorWhite_->Initialize();
     colorWhite_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-    colorRed_ ->Initialize();
-    colorRed_->SetColor( {1.0f, 0.0f, 0.0f, 1.0f });
+    colorRed_->Initialize();
+    colorRed_->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 
     // 念のためクリア
     areaLength_.clear();
@@ -81,7 +86,6 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
     }
 
     // データがあるときはそれらでスプラインを計算
-    //if (!finalPosCtrlPoints_.empty() && !finalRotCtrlPoints_.empty())
     else
     {
         CalculateCatmulRomSpline();
@@ -93,12 +97,19 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
         AddRotCtrlPoint();
     }
 
+    isDrawCtrlPoint_ = true;
+    isDrawPosCtrlPoint_ = true;
+    isDrawRotCtrlPoint_ = true;
 
+    deltaTime_ = 1.0f / 60.0f;
+    speed_ = 1.0f;
+
+    hitRadius_ =20.0f;
 
     return;
 }
 
-void CatmulRomSpline::Update()
+void CatmulRomSpline::Update(const Matrix4x4& _vp)
 {
     isChangeCtrlPoint_ = false;
     ImGui();
@@ -106,8 +117,14 @@ void CatmulRomSpline::Update()
     if (isChangeCtrlPoint_)
         CalculateCatmulRomSpline();
 
-    // if(isMove_)
-    // byT
+    if (Input::GetInstance()->IsMouseTriggered(0))
+    {
+        SelectPoint(_vp);
+    }
+
+
+    if (isMove_)
+        CalculatePositinByPosOnLine();
 
     for (const auto& wt : editPosCtrlPoints_) {
         wt->worldTransform.UpdateData();
@@ -117,9 +134,11 @@ void CatmulRomSpline::Update()
         wt->worldTransform.UpdateData();
     }
     RegisterDrawPoint();
+
+    camera_->UpdateMatrix();
 }
 
-void CatmulRomSpline::Draw()
+void CatmulRomSpline::Draw(const Camera* _camera)
 {
     if (isDrawCtrlPoint_)
     {
@@ -129,9 +148,9 @@ void CatmulRomSpline::Draw()
             {
                 if (selectPosIterator_ != editPosCtrlPoints_.end() &&
                     ctrlPoint.get() == (*selectPosIterator_).get())
-                    posModel_->Draw(ctrlPoint->worldTransform, cameraPtr_, posModelTexture_, colorRed_);
+                    posModel_->Draw(ctrlPoint->worldTransform, _camera, posModelTexture_, colorRed_);
                 else
-                    posModel_->Draw(ctrlPoint->worldTransform, cameraPtr_, posModelTexture_, colorWhite_);
+                    posModel_->Draw(ctrlPoint->worldTransform, _camera, posModelTexture_, colorWhite_);
             }
         }
     }
@@ -140,10 +159,10 @@ void CatmulRomSpline::Draw()
         for (const auto& ctrlPoint : editRotCtrlPoints_)
         {
             if (selectRotIterator_ != editRotCtrlPoints_.end() &&
-                ctrlPoint.get() == (*selectPosIterator_).get())
-                rotModel_->Draw(ctrlPoint->worldTransform, cameraPtr_, rotModelTexture_, colorRed_);
+                ctrlPoint.get() == (*selectRotIterator_).get())
+                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorRed_);
             else
-                rotModel_->Draw(ctrlPoint->worldTransform, cameraPtr_, rotModelTexture_, colorWhite_);
+                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
         }
     }
 }
@@ -182,8 +201,11 @@ void CatmulRomSpline::ConvertToEditableData()
         editPosCtrlPoints_.back()->worldTransform.UpdateData();
     }
 
-    GenerateDrawPoints();
-    CalculateLengths();
+    if (editPosCtrlPoints_.size() >= 4)
+    {
+        GenerateDrawPoints();
+        CalculateLengths();
+    }
 
 
     if (finalRotCtrlPoints_.empty())
@@ -318,6 +340,7 @@ Vector3 CatmulRomSpline::CalculateCatmulRomAreaLine(size_t _index0, size_t _inde
 
 void CatmulRomSpline::GenerateDrawPoints()
 {
+
     uint32_t division = lineSegmentCount_ * static_cast<uint32_t>(editPosCtrlPoints_.size() - 1);
     float t = 0;
     lineDrawPoint_.push_back(CalculateCatmulRomPoint(t));
@@ -374,6 +397,7 @@ void CatmulRomSpline::AddPosCtrlPoint()
         (*it)->worldTransform.Initialize();
         (*it)->worldTransform.transform_ = addPosCtrlPoint_;
         (*it)->worldTransform.scale_ = { 0.3f };
+        (*it)->worldTransform.UpdateData();
         (*it)->number = (*selectPosIterator_)->number + 1;
 
         // 以降の番号をインクリメント
@@ -446,6 +470,12 @@ void CatmulRomSpline::InsertPosCtrlPoint()
     auto insertIt = std::find_if(editPosCtrlPoints_.begin(), editPosCtrlPoints_.end(),
                                  [&](const std::unique_ptr<ControlPoint>& cp)
                                  {return cp->number == insertNumber_; });
+    if (insertIt == editPosCtrlPoints_.end())
+    {
+        insertIt = std::prev(editPosCtrlPoints_.end());
+        insertNumber_ = (*insertIt)->number;
+    }
+
     uint32_t selecNum = (*selectPosIterator_)->number;
 
     if (selecNum > insertNumber_)
@@ -464,6 +494,24 @@ void CatmulRomSpline::InsertPosCtrlPoint()
                 break;
         }
     }
+    else
+    {
+        // insert後ろ(insertのnextの前)に入れる
+        editPosCtrlPoints_.splice(std::next(insertIt), editPosCtrlPoints_, selectPosIterator_);
+
+        // selectにinsertNumを入れる
+        (*selectPosIterator_)->number = insertNumber_;
+
+        // insertからselectNumまで要素番号をデクリメント
+        for (auto it = insertIt; it != editPosCtrlPoints_.end(); --it)
+        {
+            (*it)->number--;
+            if ((*it)->number == selecNum)
+                break;
+        }
+
+
+    }
 }
 
 void CatmulRomSpline::InsertRotCtrlPoint()
@@ -480,6 +528,12 @@ void CatmulRomSpline::InsertRotCtrlPoint()
     auto insertIt = std::find_if(editRotCtrlPoints_.begin(), editRotCtrlPoints_.end(),
                                  [&](const std::unique_ptr<ControlPoint>& cp)
                                  {return cp->number == insertNumber_; });
+    if (insertIt == editRotCtrlPoints_.end())
+    {
+        insertIt = std::prev(editRotCtrlPoints_.end());
+        insertNumber_ = (*insertIt)->number;
+    }
+
     uint32_t selecNum = (*selectRotIterator_)->number;
 
     if (selecNum > insertNumber_)
@@ -497,6 +551,24 @@ void CatmulRomSpline::InsertRotCtrlPoint()
             if ((*it)->number == selecNum)
                 break;
         }
+    }
+    else
+    {
+        // insert後ろ(insertのnextの前)に入れる
+        editRotCtrlPoints_.splice(std::next(insertIt), editRotCtrlPoints_, selectRotIterator_);
+
+        // selectにinsertNumを入れる
+        (*selectRotIterator_)->number = insertNumber_;
+
+        // insertからselectNumまで要素番号をデクリメント
+        for (auto it = insertIt; it != editRotCtrlPoints_.end(); --it)
+        {
+            (*it)->number--;
+            if ((*it)->number == selecNum)
+                break;
+        }
+
+
     }
 }
 
@@ -574,16 +646,18 @@ void CatmulRomSpline::CalculatePositinByPosOnLine()
     float posT = GetPositionParameterForDistance(posOnLine_);
 
     Vector3 positionByT_ = CalculateCatmulRomPoint(posT);
-    cameraPtr_->translate_ = positionByT_;
+    camera_->translate_ = positionByT_;
 
     ///*回転*///
     float t = GetRotateParameterForDistance(posOnLine_);
 
-    cameraPtr_->rotate_ = (Rotate(t));
+    camera_->rotate_ = (Rotate(t));
 }
 
 Vector3 CatmulRomSpline::Rotate(float _t)
 {
+    ConvertToFinalDataOfRotCtrl();
+
     size_t divistion = finalRotCtrlPoints_.size() - 1;
     size_t index = static_cast<size_t>(std::floor(_t * divistion));
     index = std::clamp(index, size_t(0), finalRotCtrlPoints_.size() - 1);
@@ -606,6 +680,61 @@ Vector3 CatmulRomSpline::Rotate(float _t)
 
 
     return result;
+}
+
+void CatmulRomSpline::SelectPoint(const Matrix4x4& _vp)
+{
+    Vector2 mPos = Input::GetInstance()->GetMousePosition();
+
+    Matrix4x4 viewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth_, WinApp::kWindowHeight_, 0, 1);
+    Matrix4x4 matVPVp = _vp * viewport;
+
+    if (!selectRot_) {
+        for (auto it = editPosCtrlPoints_.begin(); it != editPosCtrlPoints_.end(); ++it) {
+            // スクリーン座標へ変換
+            Vector3 pointPosition = Transform((*it)->worldTransform.GetWorldPosition(), matVPVp);
+            Vector2 pointPositionOfscreen(pointPosition.x, pointPosition.y);
+
+            // 範囲内にあったらイテレータを保存
+            float distance = (mPos - pointPositionOfscreen).Length();
+            if (distance <= hitRadius_) {
+                // 同じものを選んでいたらキャンセル
+                // そうじゃなければ選択
+                if (selectPosIterator_ != editPosCtrlPoints_.end() && it == selectPosIterator_) {
+                    selectPosIterator_ = editPosCtrlPoints_.end();
+                    insertNumber_ = static_cast<uint16_t>(editPosCtrlPoints_.size());
+                }
+                else {
+                    selectPosIterator_ = it;
+                    selectRotIterator_ = editRotCtrlPoints_.end();
+                    addPosCtrlPoint_ = (*it)->worldTransform.GetWorldPosition();
+                    insertNumber_ = static_cast<uint16_t>(it->get()->number);
+                }
+            }
+        }
+    }
+    else {
+        for (auto it = editRotCtrlPoints_.begin(); it != editRotCtrlPoints_.end(); ++it) {
+            Vector3 pointPosition = Transform((*it)->worldTransform.GetWorldPosition(), matVPVp);
+            Vector2 pointPositionOfscreen(pointPosition.x, pointPosition.y);
+
+            // 範囲内にあったらイテレータを保存
+            float distance = (mPos - pointPositionOfscreen).Length();
+            if (distance <= hitRadius_) {
+                if (selectRotIterator_ != editRotCtrlPoints_.end() && it == selectRotIterator_) {
+                    selectRotIterator_ = editRotCtrlPoints_.end();
+                    insertNumber_ = static_cast<uint16_t>(editRotCtrlPoints_.size());
+                }
+                else {
+                    selectRotIterator_ = it;
+                    selectPosIterator_ = editPosCtrlPoints_.end();
+                    addRotCtrlPoint_ = (*it)->posOnLine;
+                    insertNumber_ = static_cast<uint16_t>(it->get()->number);
+                }
+            }
+        }
+    }
+
 }
 
 void CatmulRomSpline::RegisterDrawPoint()
@@ -633,6 +762,8 @@ void CatmulRomSpline::ImGui()
     if (ImGui::Checkbox("Move", &isMove_)) {
         isDrawCtrlPoint_ = !isMove_;
     }
+    ImGui::DragFloat("selectRadius", &hitRadius_, 0.1f);
+
     ImGui::BeginTabBar("point");
     if (ImGui::BeginTabItem("positoin"))
     {
@@ -669,6 +800,7 @@ void CatmulRomSpline::ImGui()
         ImGui::EndTabItem();
     }
     ImGui::EndTabBar();
+
     if (selectPosIterator_ != editPosCtrlPoints_.end()) {
         if (ImGui::DragFloat3("positoin", &(selectPosIterator_->get()->worldTransform.transform_.x), 0.01f))
         {
@@ -688,7 +820,7 @@ void CatmulRomSpline::ImGui()
         insertNumber_ = static_cast<uint32_t>(tempNum);
     }
     if (selectRotIterator_ != editRotCtrlPoints_.end()) {
-        if (ImGui::DragFloat("positoin", &(selectRotIterator_->get()->posOnLine), 0.01f)) {
+        if (ImGui::SliderFloat("positoin", &(selectRotIterator_->get()->posOnLine), 0.01f, totalLength_ - 0.01f)) {
             isChangeCtrlPoint_ = true;
         }
         if (ImGui::DragFloat3("rotate", &selectRotIterator_->get()->worldTransform.rotate_.x, 0.01f)) {

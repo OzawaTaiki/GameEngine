@@ -8,8 +8,8 @@
 
 #include <chrono>
 #include <cstdint>
-#include <wrl.h>
 
+#include <wrl.h>
 class WinApp;
 
 class DXCommon

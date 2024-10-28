@@ -37,11 +37,12 @@ public:
 	CatmulRomSpline();
 	~CatmulRomSpline();
 
-	void SetCameraPtr(Camera* _ptr) { cameraPtr_ = _ptr; }
+
+	Camera* GetCamera()const { return camera_.get(); }
 
 	void Initialize(const std::string& _filePath);
-	void Update();
-	void Draw();
+	void Update(const Matrix4x4& _vp);
+	void Draw(const Camera* _camera);
 
 private:
 	/// <summary>
@@ -170,10 +171,11 @@ private:
 	/// </summary>
 	Vector3 Rotate(float _t);
 
+	void SelectPoint(const Matrix4x4& _vp);
 
 	void RegisterDrawPoint();
 
-	Camera*									cameraPtr_						= nullptr;		// カメラのポインタ
+	std::unique_ptr <Camera>				camera_							= nullptr;		// カメラ
 	JsonLoader*								jsonLoader_						= nullptr;		// jsonLoaderのポインタ
 	Model*									posModel_						= nullptr;		// 座標制御点モデル
 	uint32_t								posModelTexture_				= 0;
@@ -212,7 +214,6 @@ private:
 	bool									drawMoveObj_					= false;		// 移動objの描画フラグ
 	bool									selectRot_						= false;		// 回転制御点を選択しているか
 	bool									isChangeCtrlPoint_				= false;		// 編集したか否か
-
 
 	void ImGui();
 
