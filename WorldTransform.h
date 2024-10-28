@@ -42,7 +42,6 @@ public:
 
 private:
     void TransferData();
-    Matrix4x4 matWorld_ = {};
 
 
     struct DataForGPU
