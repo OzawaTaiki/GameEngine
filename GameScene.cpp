@@ -7,6 +7,7 @@ GameScene::~GameScene()
 {
 
 }
+
 void GameScene::Initialize()
 {
     input_ = Input::GetInstance();
@@ -31,8 +32,7 @@ void GameScene::Update()
 
     edit_->Update(camera_->GetViewProjection());
 
-
-    if (input_->IsKeyPressed(DIK_0))
+    if (edit_->IsMove())
     {
         camera_->matView_ = edit_->GetCamera()->matView_;
         camera_->matProjection_= edit_->GetCamera()->matProjection_;
@@ -41,7 +41,6 @@ void GameScene::Update()
     else
     {
         camera_->UpdateMatrix();
-
     }
 
     //<-----------------------

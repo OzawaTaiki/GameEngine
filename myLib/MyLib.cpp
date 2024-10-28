@@ -55,7 +55,7 @@ void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, c
 	const uint32_t kSubdivision = 10;                                   // 分割数
 	const float kLatEvery = (float)std::numbers::pi_v<float> / (float)kSubdivision;          // 緯度分割１つ分の角度
 	const float kLonEvery = (float)std::numbers::pi_v<float> * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
-	
+
 	//緯度の方向に分割   -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
 	{

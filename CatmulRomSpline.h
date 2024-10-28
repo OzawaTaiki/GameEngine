@@ -44,6 +44,8 @@ public:
 	void Update(const Matrix4x4& _vp);
 	void Draw(const Camera* _camera);
 
+	bool IsMove()const { return isMove_; }
+
 private:
 	/// <summary>
 	/// finalRotDataに変換

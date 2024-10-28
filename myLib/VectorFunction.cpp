@@ -98,60 +98,60 @@ Vector3  Transform(const Vector3& _vector, const Matrix4x4& _matrix)
 	result.z /= _w;
 	return result;
 }
-
-Vector3 operator+(const Vector3& _v1, const Vector3& _v2)
-{
-	return Vector3(_v1.x + _v2.x, _v1.y + _v2.y, _v1.z + _v2.z);
-}
-
-Vector3 operator-(const Vector3& _v1, const Vector3& _v2)
-{
-	return Vector3(_v1.x - _v2.x, _v1.y - _v2.y, _v1.z - _v2.z);
-}
-
-Vector3 operator*(const Vector3& _v1, const Vector3& _v2)
-{
-	return Vector3(_v1.x * _v2.x, _v1.y * _v2.y, _v1.z * _v2.z);
-}
-
-Vector3 operator/(const Vector3& _v1, const Vector3& _v2)
-{
-	return Vector3(_v1.x / _v2.x, _v1.y / _v2.y, _v1.z / _v2.z);
-}
-
-Vector3 operator*(const Vector3& _v, float _s)
-{
-	return Vector3(_v.x * _s, _v.y * _s, _v.z * _s);
-}
-
-Vector3 operator/(const Vector3& _v, float _s)
-{
-	return Vector3(_v.x / _s, _v.y / _s, _v.z / _s);
-}
-
-Vector3 operator*(float _s, const Vector3& _v)
-{
-	return Vector3(_v * _s);
-}
-
-Vector3 operator/(float _s, const Vector3& _v)
-{
-	return Vector3(_v / _s);
-}
-
-Vector3 operator-(const Vector3& _v)
-{
-	return Vector3(-_v.x, -_v.y, -_v.z);
-}
-
-Vector3& operator+=(Vector3& _v1, const Vector3& _v2)
-{
-	_v1 = _v1 + _v2;
-	return _v1;
-}
-
-Vector3& operator-=(Vector3& _v1, const Vector3& _v2)
-{
-	_v1 = _v1 - _v2;
-	return _v1;
-}
+//
+//Vector3 operator+(const Vector3& _v1, const Vector3& _v2)
+//{
+//	return Vector3(_v1.x + _v2.x, _v1.y + _v2.y, _v1.z + _v2.z);
+//}
+//
+//Vector3 operator-(const Vector3& _v1, const Vector3& _v2)
+//{
+//	return Vector3(_v1.x - _v2.x, _v1.y - _v2.y, _v1.z - _v2.z);
+//}
+//
+//Vector3 operator*(const Vector3& _v1, const Vector3& _v2)
+//{
+//	return Vector3(_v1.x * _v2.x, _v1.y * _v2.y, _v1.z * _v2.z);
+//}
+//
+//Vector3 operator/(const Vector3& _v1, const Vector3& _v2)
+//{
+//	return Vector3(_v1.x / _v2.x, _v1.y / _v2.y, _v1.z / _v2.z);
+//}
+//
+//Vector3 operator*(const Vector3& _v, float _s)
+//{
+//	return Vector3(_v.x * _s, _v.y * _s, _v.z * _s);
+//}
+//
+//Vector3 operator/(const Vector3& _v, float _s)
+//{
+//	return Vector3(_v.x / _s, _v.y / _s, _v.z / _s);
+//}
+//
+//Vector3 operator*(float _s, const Vector3& _v)
+//{
+//	return Vector3(_v * _s);
+//}
+//
+//Vector3 operator/(float _s, const Vector3& _v)
+//{
+//	return Vector3(_v / _s);
+//}
+//
+//Vector3 operator-(const Vector3& _v)
+//{
+//	return Vector3(-_v.x, -_v.y, -_v.z);
+//}
+//
+//Vector3& operator+=(Vector3& _v1, const Vector3& _v2)
+//{
+//	_v1 = _v1 + _v2;
+//	return _v1;
+//}
+//
+//Vector3& operator-=(Vector3& _v1, const Vector3& _v2)
+//{
+//	_v1 = _v1 - _v2;
+//	return _v1;
+//}
