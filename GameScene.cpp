@@ -30,25 +30,9 @@ void GameScene::Update()
 {
     ImGui::Begin("Engine");
 
-    ImGui::DragFloat3("trans", &trans.transform_.x, 0.01f);
-    ImGui::DragFloat3("rotate", &trans.rotate_.x, 0.01f);
-    ImGui::DragFloat3("anchorPos", &anchorPos.x, 0.01f);
-    ImGui::DragFloat3("anchorRot", &anchorRot.x, 0.01f);
-
     input_->Update();
     //<-----------------------
     camera_->Update();
-    auto start = std::chrono::high_resolution_clock::now();
-
-    trans.matWorld_ = MakeAffineMatrix(trans.scale_, trans.rotate_, trans.transform_);
-
-    Matrix4x4 Mpos = MakeTranslateMatrix(anchorPos - trans.transform_);
-    Matrix4x4 MRot = MakeRotateMatrix(anchorRot);
-
-
-    trans.matWorld_ *= Mpos;
-    trans.matWorld_ *= MRot;
-    trans.matWorld_ *= Inverse(Mpos);
 
     edit_->Update(camera_->GetViewProjection());
 
