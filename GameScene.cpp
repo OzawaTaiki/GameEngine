@@ -18,11 +18,8 @@ void GameScene::Initialize()
     camera_ = std::make_unique<Camera>();
     camera_->Initialize();
 
-    lineDrawer = LineDrawer::GetInstance();
-    lineDrawer->SetCameraPtr(camera_.get());
-
-    edit_ = std::make_unique<CatmulRomSpline>();
-    edit_->Initialize("Resources/Data/Spline");
+    lineDrawer_ = LineDrawer::GetInstance();
+    lineDrawer_->SetCameraPtr(camera_.get());
 
 }
 
@@ -34,20 +31,10 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-    edit_->Update(camera_->GetViewProjection());
-
-    if (edit_->IsMove())
-    {
-        camera_->matView_ = edit_->GetCamera()->matView_;
-        camera_->matProjection_= edit_->GetCamera()->matProjection_;
-        camera_->TransferData();
-    }
-    else
-    {
-        camera_->UpdateMatrix();
-    }
 
 
+
+    camera_->UpdateMatrix();
     //<-----------------------
     ImGui::End();
 }
@@ -57,7 +44,6 @@ void GameScene::Draw()
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
 
-    edit_->Draw(camera_.get());
 
     //<------------------------
 
@@ -70,7 +56,7 @@ void GameScene::Draw()
 
     //<------------------------
 
-    lineDrawer->Draw();
+    lineDrawer_->Draw();
 
 
 }
