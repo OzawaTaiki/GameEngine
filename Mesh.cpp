@@ -101,7 +101,7 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
 
             textureHandlePath_ = _directoryPath + "/" + textureFilePath.C_Str();
         }
-        else
+        else if(textureHandlePath_=="")
         {
             textureHandlePath_ = "Resources/images/uvChecker.png";
         }
