@@ -21,6 +21,11 @@ void GameScene::Initialize()
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->SetCameraPtr(camera_.get());
 
+
+    audio_ = std::make_unique<Audio>();
+    audio_->Initialize();
+
+    handle_ = audio_->SoundLoadWave("./Resources/sounds/Alarm01.wav");
 }
 
 void GameScene::Update()
@@ -31,7 +36,7 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-
+    audio_->SoundPlay(handle_, 1.0f, true, false);
 
 
     camera_->UpdateMatrix();
