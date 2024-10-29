@@ -5,6 +5,7 @@
 #include "LineDrawer.h"
 #include "WorldTransform.h"
 #include "Model.h"
+#include "Audio.h"
 #include "ObjectColor.h"
 
 #include <memory>
@@ -23,5 +24,6 @@ private:
     Input* input_ = nullptr;
     LineDrawer* lineDrawer_ = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
-
+    std::unique_ptr<Audio> audio_;
+    uint32_t handle_;
 };
