@@ -195,14 +195,14 @@
     <ClCompile Include="JsonLoader.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="myLib\Vector3.cpp">
+    <ClCompile Include="Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="myLib\Vector2.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Engine\Lib\Vector</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="myLib\Vector3.cpp">
+      <Filter>Engine\Lib\Vector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

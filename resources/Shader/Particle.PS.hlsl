@@ -1,11 +1,8 @@
 #include "Particle.hlsli"
 
-cbuffer gMaterial : register(b0)
+cbuffer gColor : register(b0)
 {
     float4 materialColor;
-    float4x4 uvTransform;
-    int enableLighting;
-    float isVisible;
 };
 
 struct PixelShaderOutput
@@ -22,12 +19,6 @@ PixelShaderOutput main(VertexShaderOutput _input)
     float4 textureColor;
 
     //画像の有無
-    if (isVisible == 1.0f)
-    {
-        float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), uvTransform);
-        textureColor = gTexture.Sample(gSampler, transformedUV.xy);
-    }
-    else
         textureColor = materialColor;
 
     output.color = materialColor * textureColor * _input.color;

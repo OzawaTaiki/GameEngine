@@ -44,6 +44,7 @@ private:
 	void CreatePSOForModel();
 	void CreatePSOForSprite();
 	void CreatePSOForLineDrawer();
+	void CreatePSOForParticle();
 
 	D3D12_BLEND_DESC GetBlendDesc(BlendMode _mode);
 
