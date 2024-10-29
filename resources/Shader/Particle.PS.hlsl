@@ -1,10 +1,5 @@
 #include "Particle.hlsli"
 
-cbuffer gColor : register(b0)
-{
-    float4 materialColor;
-};
-
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
