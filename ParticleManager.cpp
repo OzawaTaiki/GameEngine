@@ -12,6 +12,8 @@ void ParticleManager::Initialize()
    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Particle");
    assert(rootSignature.has_value());
    rootsignature_ = rootSignature.value();
+ //TODO: SRVの設定
+
 }
 
 void ParticleManager::Update()
