@@ -12,6 +12,7 @@ cbuffer gViewProjection : register(b0)
 {
     float4x4 matView;
     float4x4 matProj;
+    float3 worldPosition;
 };
 
 struct VertexShaderInput
