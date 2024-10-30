@@ -29,7 +29,7 @@ void Mesh::Initialize()
 void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directoryPath)
 {
     auto start= std::chrono::high_resolution_clock::now();
-    Debug::Log("load start\nfilepath:" + _directoryPath + _filepath + "\n");
+    Utils::Log("load start\nfilepath:" + _directoryPath + _filepath + "\n");
     name_ = _filepath;
 
     Assimp::Importer importer;
@@ -112,8 +112,8 @@ void Mesh::LoadFile(const std::string& _filepath,  const std::string& _directory
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::string str = std::to_string(duration);
-    Debug::Log("Load finish \ntime :" + str + "ms\n");
-    Debug::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size())+"\n");
+    Utils::Log("Load finish \ntime :" + str + "ms\n");
+    Utils::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size())+"\n");
 }
 
 void Mesh::TransferData()

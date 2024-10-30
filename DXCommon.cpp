@@ -206,7 +206,7 @@ void DXCommon::CreateDevice()
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
 			//採用したアダプタの情報をログに出力。wstringの方なので注意。
-			Debug::Log(Debug::ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
+			Utils::Log(Utils::ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
 			break;
 		}
 		//ソフトウェアアダプタの場合は見なかったことにする
@@ -232,14 +232,14 @@ void DXCommon::CreateDevice()
 		if (SUCCEEDED(hresult))
 		{
 			//生成で来たのでログの出力を行ってループを抜ける
-			Debug::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
+			Utils::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
 			break;
 		}
 	}
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
 	//初期化完了のログ
-	Debug::Log("Complete create D3D12Device\n");
+	Utils::Log("Complete create D3D12Device\n");
 
 #ifdef _DEBUG
 
@@ -526,19 +526,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHea
 	return handleGPU;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUSRVDescriptorHandle(uint32_t _index)
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (desriptorSizeSRV_ * _index);
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUSRVDescriptorHandle(uint32_t _index)
-{
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (desriptorSizeSRV_ * _index);
-	return handleGPU;
-}
 
 DXCommon::~DXCommon()
 {

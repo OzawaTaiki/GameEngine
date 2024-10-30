@@ -6,6 +6,7 @@
 #include "Sprite.h"
 #include "GameScene.h"
 #include "LineDrawer.h"
+#include "SRVManager.h"
 
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
@@ -24,7 +25,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DXCommon* dxCommon =  DXCommon::GetInstance();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
-	TextureManager::GetInstance()->Initialize();
+	std::unique_ptr<SRVManager> srvManager = std::make_unique<SRVManager>();
+	srvManager->Initialize();
+
+	TextureManager::GetInstance()->Initialize(srvManager.get());
 	TextureManager::GetInstance()->Load("uvChecker.png");
 
 	PSOManager::GetInstance()->Initialize();

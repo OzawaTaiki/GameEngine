@@ -1,7 +1,7 @@
 #include "Debug.h"
 #include <Windows.h>
 
-namespace Debug {
+namespace Utils {
 
 	void Log(const std::string& message)
 	{

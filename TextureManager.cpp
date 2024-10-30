@@ -1,7 +1,7 @@
 #include "TextureManager.h"
 #include "DXCommon.h"
 #include "Debug.h"
-
+#include "SRVManager.h"
 #include <cassert>
 
 
@@ -11,10 +11,12 @@ TextureManager* TextureManager::GetInstance()
     return &instance;
 }
 
-void TextureManager::Initialize()
+void TextureManager::Initialize(SRVManager* _srvManager)
 {
     dxCommon_ = DXCommon::GetInstance();
     assert(dxCommon_);
+
+	srvManager_ = _srvManager;
 }
 
 void TextureManager::Update()
@@ -54,7 +56,7 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 	if (result.has_value())
 		return result.value();
 
-	uint32_t index = static_cast<uint32_t> (textures_.size());
+	uint32_t index = srvManager_->Allocate();
 	DirectX::ScratchImage mipImages = GetMipImage(_filepath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textures_[index].resource = CreateTextureResource(metadata);
@@ -66,8 +68,8 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	textures_[index].srvHandlerCPU = dxCommon_->GetCPUSRVDescriptorHandle((uint32_t)index + 3);
-	textures_[index].srvHandlerGPU = dxCommon_->GetGPUSRVDescriptorHandle((uint32_t)index + 3);
+	textures_[index].srvHandlerCPU = srvManager_->GetCPUSRVDescriptorHandle(index);
+	textures_[index].srvHandlerGPU = srvManager_->GetGPUSRVDescriptorHandle(index);
 	dxCommon_->GetDevice()->CreateShaderResourceView(textures_[index].resource.Get(), &srvDesc, textures_[index].srvHandlerCPU);
 
 	//キーの保存
@@ -88,7 +90,7 @@ std::optional<uint32_t>  TextureManager::IsTextureLoaded(const std::string& _fil
 DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 {
 	DirectX::ScratchImage image{};
-	std::wstring filePathw = Debug::ConvertString(_filepath);
+	std::wstring filePathw = Utils::ConvertString(_filepath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 

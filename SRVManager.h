@@ -1,0 +1,30 @@
+#pragma once
+
+#include <cstdint>
+
+#include <d3d12.h>
+#include <wrl.h>
+
+class DXCommon;
+class SRVManager
+{
+public:
+
+    void Initialize();
+
+    uint32_t Allocate();
+    D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
+
+private:
+    static const uint32_t kMAxIndex_;
+    uint32_t descriptorSize_;
+
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
+
+    uint32_t useIndex_ = 0;
+    DXCommon* dxcommon_ = nullptr;
+
+
+
+};

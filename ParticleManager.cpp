@@ -14,6 +14,8 @@ void ParticleManager::Initialize()
    rootsignature_ = rootSignature.value();
  //TODO: SRVの設定
 
+
+
 }
 
 void ParticleManager::Update()

@@ -65,7 +65,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
 
     //hlslファイルを読み込む
  	//これからシェーダーをコンパイルする旨をログに出す
-    Debug::Log(Debug::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", fullpath, _profile)));
+    Utils::Log(Utils::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", fullpath, _profile)));
  	//hlslファイルを読む
  	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
     HRESULT hr = dxcUtils_->LoadFile(fullpath.c_str(), nullptr, &shaderSource);
@@ -102,7 +102,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
  	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
  	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
  	{
- 		Debug::Log(shaderError->GetStringPointer());
+ 		Utils::Log(shaderError->GetStringPointer());
  		assert(false);
  	}
 
@@ -111,7 +111,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
  	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
  	assert(SUCCEEDED(hr));
  	//成功したログを出す
- 	Debug::Log(Debug::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", fullpath, _profile)));
+ 	Utils::Log(Utils::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", fullpath, _profile)));
 
  	//実行用バイナリを返却
  	return shaderBlob;
@@ -202,7 +202,7 @@ void PSOManager::CreatePSOForModel()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-    	Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+    	Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
     	assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Model"]));
@@ -351,7 +351,7 @@ void PSOManager::CreatePSOForSprite()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Sprite"]));
@@ -475,7 +475,7 @@ void PSOManager::CreatePSOForLineDrawer()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["LineDrawer"]));
@@ -608,7 +608,7 @@ void PSOManager::CreatePSOForParticle()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Particle"]));
