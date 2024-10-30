@@ -79,6 +79,68 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
     commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
 }
 
+void Model::Draw(const WorldTransform& _transform, const Camera* _camera, const Vector4& _color)
+{
+    if (!lightGroup_)
+    {
+        lightGroup_ = new LightGroup;
+        lightGroup_->Initialize();
+    }
+
+    ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
+    commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
+
+    // カメラ（ｖｐ
+    commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
+    // トランスフォーム
+    commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
+    // マテリアル
+    commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
+    // カラー
+    color_->SetColor(_color);
+    color_->TransferData(3, commandList);
+    //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
+    // テクスチャ
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(material_->GetTexturehandle()));
+    // ライトたち
+    lightGroup_->TransferData();
+
+    commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
+}
+
+void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    if (!lightGroup_)
+    {
+        lightGroup_ = new LightGroup;
+        lightGroup_->Initialize();
+    }
+
+    ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->IASetVertexBuffers(0, 1, mesh_->GetVertexBufferView());
+    commandList->IASetIndexBuffer(mesh_->GetIndexBufferView());
+
+    // カメラ（ｖｐ
+    commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
+    // トランスフォーム
+    commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
+    // マテリアル
+    commandList->SetGraphicsRootConstantBufferView(2, material_->GetResource()->GetGPUVirtualAddress());
+    // カラー
+    color_->SetColor(_color);
+    color_->TransferData(3, commandList);
+    //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
+    // テクスチャ
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
+    // ライトたち
+    lightGroup_->TransferData();
+
+    commandList->DrawIndexedInstanced(mesh_->GetIndexNum(), 1, 0, 0, 0);
+}
+
 void Model::ShowImGui(const std::string& _name)
 {
 
@@ -116,6 +178,12 @@ void Model::SetUVTrans(const Vector2& _trans)
     material_->TransferData();
 }
 
+Model::~Model()
+{
+    delete lightGroup_;
+    delete color_;
+}
+
 void Model::LoadMesh(const std::string& _filePath)
 {
     name_ = _filePath;
@@ -126,6 +194,9 @@ void Model::LoadMesh(const std::string& _filePath)
 
 void Model::LoadMaterial(const std::string& _filePath)
 {
+    color_ = new ObjectColor;
+    color_->Initialize();
+
     material_ = std::make_unique<Material>();
     material_->Initialize(mesh_->GetTexturePath());
     material_->LoadTexture();

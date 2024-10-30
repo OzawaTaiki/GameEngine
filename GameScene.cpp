@@ -20,16 +20,18 @@ void GameScene::Initialize()
     lineDrawer = LineDrawer::GetInstance();
     lineDrawer->SetCameraPtr(camera_.get());
 
-    edit_ = std::make_unique<CatmulRomSpline>();
-    edit_->Initialize("Resources/Data/Spline");
-
     tile_ = Model::CreateFromObj("tile/tile.gltf");
     tile_->SetUVScale({ 100,100 });
     trans_.Initialize();
     trans_.UpdateData();
 
-    color_ = std::make_unique<ObjectColor>();
-    color_->Initialize();
+
+    edit_ = std::make_unique<CatmulRomSpline>();
+    edit_->Initialize("Resources/Data/Spline");
+
+    player_ = std::make_unique<Player>();
+    player_->Initialize();
+
 }
 
 void GameScene::Update()
@@ -45,6 +47,7 @@ void GameScene::Update()
 
     edit_->Update(camera_->GetViewProjection());
 
+    player_->Update();
 
     if (edit_->IsMove() && !useDebugCamera_)
     {
@@ -71,8 +74,10 @@ void GameScene::Update()
 void GameScene::Draw()
 {
     ModelManager::GetInstance()->PreDraw();
+    tile_->Draw(trans_, camera_.get());
     //<------------------------
-    tile_->Draw(trans_, camera_.get(), color_.get());
+
+    player_->Draw(camera_.get());
 
     edit_->Draw(camera_.get());
 
