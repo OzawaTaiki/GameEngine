@@ -34,6 +34,7 @@ CatmulRomSpline::~CatmulRomSpline()
     delete jsonLoader_;
     delete colorRed_;
     delete colorWhite_;
+    delete moveObjColor_;
 
     return;
 }
@@ -47,6 +48,14 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
 
     posModel_ = Model::CreateFromObj("sphere/sphere.obj");
     rotModel_ = Model::CreateFromObj("axis/axis.gltf");
+
+    moveObjTrans_.Initialize();
+    moveObjTrans_.scale_ = { 0.2f,0.2f ,0.2f };
+    moveObjTrans_.UpdateData();
+
+    moveObjColor_ = new ObjectColor;
+    moveObjColor_->Initialize();
+    moveObjColor_->SetColor({ 1, 1, 1, 0.6f });
 
     //rotModelTexture_ = TextureManager::GetInstance()->Load("axisCube.png");
 
@@ -135,6 +144,15 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
     RegisterDrawPoint();
 
+    moveObjTrans_.transform_ = camera_->translate_;
+    moveObjTrans_.rotate_ = camera_->rotate_;
+    moveObjTrans_.UpdateData();
+
+    if (isMove_)
+    {
+        Vector3 ofs = TransformNormal(cameraOffset_, MakeRotateMatrix(camera_->rotate_));
+        camera_->translate_ += ofs;
+    }
     camera_->UpdateMatrix();
 }
 
@@ -165,6 +183,8 @@ void CatmulRomSpline::Draw(const Camera* _camera)
                 rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
         }
     }
+    rotModel_->Draw(moveObjTrans_, _camera, moveObjColor_);
+
 }
 
 void CatmulRomSpline::CreateFinalRotData(const std::vector<Vector3>& _rotArr, const std::vector<float>& _posArr)
@@ -799,6 +819,12 @@ void CatmulRomSpline::ImGui()
         }
         ImGui::EndTabItem();
     }
+    if (ImGui::BeginTabItem("MoveCamera"))
+    {
+        ImGui::DragFloat3("offset", &cameraOffset_.x, 0.01f);
+        ImGui::EndTabItem();
+    }
+
     ImGui::EndTabBar();
 
     if (selectPosIterator_ != editPosCtrlPoints_.end()) {

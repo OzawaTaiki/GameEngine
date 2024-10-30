@@ -28,6 +28,7 @@ public:
 
     uint32_t GetTexturehandle() const { return textureHandle_; }
     ID3D12Resource* GetResource() { return resorces_.Get(); }
+    void TransferData();
 private:
 
     std::string     name_                           = {};
@@ -45,6 +46,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_               = nullptr;
     DataForGPU*                                     constMap_               = nullptr;;
 
-    void TransferData();
 
 };

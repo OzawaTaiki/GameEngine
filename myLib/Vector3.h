@@ -31,6 +31,7 @@ struct Vector3
 	Vector3 operator-() const;
 	Vector3& operator+= (const Vector3& _v);
 	Vector3& operator-= (const Vector3& _v);
+	Vector3& operator*= (float _s);
 
 	friend Vector3 operator*(float _s, const Vector3& vec);
 	friend Vector3 operator/(float _s, const Vector3& vec);

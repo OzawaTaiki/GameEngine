@@ -117,6 +117,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="CatmulRomSpline.cpp" />
     <ClCompile Include="D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="DXCommon.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -156,6 +157,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Camera.h" />
     <ClInclude Include="D3DResourceLeakChecker.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="DXCommon.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

@@ -30,6 +30,10 @@ public:
 
     static Model* CreateFromObj(const std::string& _filePath);
 
+    void SetUVRotate(float _rot);
+    void SetUVScale(const Vector2& _scale);
+    void SetUVTrans(const Vector2& _trans);
+
     static const std::string defaultDirpath_;
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }

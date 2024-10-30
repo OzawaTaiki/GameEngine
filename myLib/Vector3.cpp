@@ -84,6 +84,12 @@ Vector3& Vector3::operator-=(const Vector3& _v)
     return *this;
 }
 
+Vector3& Vector3::operator*=(float _s)
+{
+    *this = *this * _s;
+    return *this;
+}
+
 Vector3 operator*(float _s, const Vector3& vec)
 {
     return { vec * _s };
