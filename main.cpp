@@ -871,7 +871,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	ModelData* modelData = new ModelData;
-	MakeModelData(device, modelData, "resources/obj", "plane.obj");
+	MakeModelData(device, modelData, "resources/obj", "plane/plane.obj");
 	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 	const uint32_t kNumMaxInstance = 100;
@@ -959,7 +959,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	///
 	/// メインループ
-	/// 
+	///
 	MSG msg{};
 	// ウィンドウのｘボタンが押されるまでループ
 	while (msg.message != WM_QUIT)
@@ -979,7 +979,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			///
 			/// 更新処理ここから
-			/// 
+			///
 
 
 			//ImGui::ShowDemoWindow();
@@ -1177,8 +1177,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 			///
-			/// 描画ここから 
-			/// 
+			/// 描画ここから
+			///
 
 			//TODO:draw関数を作りたい
 			//(x-min)/(max-min);
@@ -1205,7 +1205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			///
 			/// 描画ここまで
-			/// 
+			///
 
 			ImGui::Render();
 
@@ -1265,7 +1265,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DeleteTextures();
 
 #ifdef _DEBUG
-	debugController->Release();
+	//debugController->Release();
 #endif // _DEBUG
 	CloseWindow(hwnd);
 
@@ -1495,7 +1495,7 @@ DirectX::ScratchImage LoadTexture(const std::string& _filePath)
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);
 	assert(SUCCEEDED(hr));
 
-	//ミップマップ付きのデータを返す	
+	//ミップマップ付きのデータを返す
 	return mipImage;
 }
 
@@ -1507,7 +1507,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WR
 	resourceDesc.Height = UINT(_metadata.height); // Textureの高さ
 	resourceDesc.MipLevels = UINT16(_metadata.mipLevels); // mipmapの数
 	resourceDesc.DepthOrArraySize = UINT16(_metadata.arraySize); // 奥行き or 配列Textureの配列数
-	resourceDesc.Format = _metadata.format; // Textureのフォーマット 
+	resourceDesc.Format = _metadata.format; // Textureのフォーマット
 	resourceDesc.SampleDesc.Count = 1; // サンプリングカウント、通常は1
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(_metadata.dimension); // Textureの次元。省略はしているのは2次元
 
