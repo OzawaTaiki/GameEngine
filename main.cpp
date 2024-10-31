@@ -871,7 +871,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	ModelData* modelData = new ModelData;
-	MakeModelData(device, modelData, "resources/obj", "plane/plane.obj");
+	MakeModelData(device, modelData, "resources/models", "plane/plane.obj");
 	modelData->textureHandle = LoadTexture("./resources/images/circle.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 	const uint32_t kNumMaxInstance = 100;
@@ -948,7 +948,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t fenceGH = LoadTexture("resources/obj/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t fenceGH = LoadTexture("resources/models/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 	Object* sphere = new Object;
 	MakeSphereData(device, sphere);
