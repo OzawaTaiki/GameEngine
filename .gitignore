@@ -100,6 +100,7 @@ StyleCopReport.xml
 *.scc
 
 !Resources/models/*.obj
+!Resources/models/**/*.obj
 
 # Chutzpah Test files
 _Chutzpah*
