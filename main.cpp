@@ -7,14 +7,9 @@
 #include "GameScene.h"
 #include "LineDrawer.h"
 #include "SRVManager.h"
-
-#include "imgui.h"
-#include "imgui_impl_dx12.h"
-#include "imgui_impl_win32.h"
+#include "ImGuiManager.h"
 
 #include <random>
-
-const float kDeltaTime = 1.0f / 60.0f;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -27,6 +22,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::unique_ptr<SRVManager> srvManager = std::make_unique<SRVManager>();
 	srvManager->Initialize();
+
+	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
+	imguiManager->Initialize(srvManager.get());
 
 	TextureManager::GetInstance()->Initialize(srvManager.get());
 	TextureManager::GetInstance()->Load("uvChecker.png");
@@ -44,16 +42,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	GameScene* gameScene = new GameScene;
 	gameScene->Initialize();
 
+
 	///
 	/// メインループ
 	///
 	// ウィンドウのｘボタンが押されるまでループ
 	while (!winApp->ProcessMessage())
 	{
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
+		imguiManager->Begin();
 
 		///
 		/// 更新処理ここから
@@ -76,16 +72,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// 描画ここまで
 		///
-
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
+		imguiManager->End();
+		imguiManager->Draw();
 
 		dxCommon->PostDraw();
 	}
-
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	imguiManager->Finalize();
 
 	winApp->Filalze();
 

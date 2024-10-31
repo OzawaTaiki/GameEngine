@@ -15,10 +15,10 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
-
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
+//
+//#include "externals/imgui/imgui.h"
+//#include "externals/imgui/imgui_impl_dx12.h"
+//#include "externals/imgui/imgui_impl_win32.h"
 
 
 DXCommon* DXCommon::GetInstance()
@@ -418,7 +418,7 @@ void DXCommon::CreateDXcCompiler()
 }
 
 void DXCommon::InitializeImGui()
-{
+{/*
 	///imguiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -431,7 +431,7 @@ void DXCommon::InitializeImGui()
 		srvDescriptorHeap_.Get(),
 		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);
+	);*/
 }
 
 void DXCommon::InitializeFixFPS()

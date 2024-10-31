@@ -25,6 +25,8 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 	ID3D12Device* GetDevice() { return device_.Get(); }
 
+	size_t GetBackBufferSize() const { return swapChainDesc_.BufferCount; }
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
 

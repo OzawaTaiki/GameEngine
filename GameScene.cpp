@@ -30,6 +30,7 @@ void GameScene::Initialize()
 
 void GameScene::Update()
 {
+    ImGui::ShowDemoWindow();
     ImGui::Begin("Engine");
 
     input_->Update();

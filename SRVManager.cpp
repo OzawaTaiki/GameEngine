@@ -2,13 +2,13 @@
 
 #include "DXCommon.h"
 
-const uint32_t SRVManager::kMAxIndex_ = 4096;
+const uint32_t SRVManager::kMaxIndex_ = 1024;
 
 void SRVManager::Initialize()
 {
     dxcommon_ = DXCommon::GetInstance();
 
-    descriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMAxIndex_,true);
+    descriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxIndex_,true);
     descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
