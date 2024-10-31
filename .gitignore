@@ -69,6 +69,9 @@ ScaffoldingReadMe.txt
 # StyleCop
 StyleCopReport.xml
 
+!Resources/*.obj
+
+
 # Files built by Visual Studio
 *_i.c
 *_p.c
@@ -98,7 +101,6 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
-!Resources/*.obj
 
 # Chutzpah Test files
 _Chutzpah*
