@@ -8,6 +8,7 @@
 #include "LineDrawer.h"
 #include "SRVManager.h"
 #include "ImGuiManager.h"
+#include "ParticleManager.h"
 
 #include <random>
 
@@ -22,14 +23,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::unique_ptr<SRVManager> srvManager = std::make_unique<SRVManager>();
 	srvManager->Initialize();
+	PSOManager::GetInstance()->Initialize();
 
 	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
 	imguiManager->Initialize(srvManager.get());
 
+	ParticleManager* particle = ParticleManager::GetInstance();
+	particle->Initialize(srvManager.get());
+
 	TextureManager::GetInstance()->Initialize(srvManager.get());
+	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
 
-	PSOManager::GetInstance()->Initialize();
 	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();
 
@@ -62,7 +67,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 
 		dxCommon->PreDraw();
-
+		srvManager->PreDraw();
 		///
 		/// 描画ここから
 		///

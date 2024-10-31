@@ -17,6 +17,8 @@ void ImGuiManager::Initialize(SRVManager* _ptr)
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 
+
+    srvManager_->Allocate();
     ImGui_ImplDX12_Init(
         dx->GetDevice(),
         static_cast<int>(dx->GetBackBufferSize()),

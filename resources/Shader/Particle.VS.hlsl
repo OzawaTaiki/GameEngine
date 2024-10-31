@@ -1,4 +1,4 @@
-#include "Particle.hlsli"
+#include "Resources/Shader/Particle.hlsli"
 
 struct ParticleForGPU
 {

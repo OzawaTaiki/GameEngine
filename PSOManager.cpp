@@ -28,6 +28,7 @@ void PSOManager::Initialize()
     CreatePSOForModel();
     CreatePSOForSprite();
     CreatePSOForLineDrawer();
+    CreatePSOForParticle();
 }
 
 std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(const std::string& _key, BlendMode _mode)
@@ -569,11 +570,18 @@ void PSOManager::CreatePSOForParticle()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
-    descriptorRange[0].NumDescriptors = 1;//数は１つ
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+    D3D12_DESCRIPTOR_RANGE descriptorRangeTrans[1] = {};
+    descriptorRangeTrans[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRangeTrans[0].NumDescriptors = 1;//数は１つ
+    descriptorRangeTrans[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRangeTrans[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
+
+    D3D12_DESCRIPTOR_RANGE descriptorRangeTexture[1] = {};
+    descriptorRangeTexture[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRangeTexture[0].NumDescriptors = 1;//数は１つ
+    descriptorRangeTexture[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRangeTexture[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
     //RootParameter作成
     D3D12_ROOT_PARAMETER rootParameters[3] = {};
@@ -586,14 +594,14 @@ void PSOManager::CreatePSOForParticle()
     // transform    ParticleForGPU
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeTrans;
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeTrans);
 
     // テクスチャ
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRangeTexture;
+    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeTexture);
 
 
     descriptionRootSignature.pParameters = rootParameters;

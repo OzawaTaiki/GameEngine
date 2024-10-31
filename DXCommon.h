@@ -69,7 +69,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;

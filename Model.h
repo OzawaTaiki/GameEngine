@@ -30,10 +30,12 @@ public:
 
     static Model* CreateFromObj(const std::string& _filePath);
 
+    Mesh* GetMeshPtr() { return mesh_.get(); }
+    Material* GetMaterialPtr() { return material_.get(); }
+
     static const std::string defaultDirpath_;
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
-
 
     ~Model() { delete lightGroup_; }
 private:

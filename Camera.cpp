@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include "MatrixFunction.h"
 #include "DXCommon.h"
-//#include <imgui.h>
+#include <imgui.h>
 
 void Camera::Initialize()
 {
@@ -10,7 +10,7 @@ void Camera::Initialize()
 }
 
 void Camera::Update()
-{/*
+{
     if(ImGui::BeginTabBar("camera"))
     {
         if (ImGui::BeginTabItem("camera"))
@@ -20,7 +20,7 @@ void Camera::Update()
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
-    }*/
+    }
 }
 
 void Camera::Draw()

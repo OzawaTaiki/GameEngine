@@ -12,9 +12,14 @@ public:
 
     void Initialize();
 
+    void PreDraw();
+
     uint32_t Allocate();
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
+
+    void CreateSRVForTextrue2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format, UINT _mipLevel);
+    void CreateSRVForStructureBuffer(uint32_t _index, ID3D12Resource* _resource, UINT _numElement,UINT _structureBufferStride);
 
     ID3D12DescriptorHeap* GetSRVHeap_() { return descriptorHeap_.Get(); }
 
