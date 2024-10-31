@@ -948,7 +948,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	uint32_t cubeGH = LoadTexture("resources/images/cube.jpg", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t uvGH = LoadTexture("resources/images/uvChecker.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 	uint32_t ballGH = LoadTexture("resources/images/monsterBall.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
-	uint32_t fenceGH = LoadTexture("resources/mode/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
+	uint32_t fenceGH = LoadTexture("resources/models/fence.png", device, commandList, srvDescriptorHeap, desriptorSizeSRV);
 
 	Object* sphere = new Object;
 	MakeSphereData(device, sphere);
