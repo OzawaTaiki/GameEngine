@@ -10,7 +10,6 @@
 
 GameScene::~GameScene()
 {
-    delete color;
 }
 
 void GameScene::Initialize()
@@ -23,15 +22,6 @@ void GameScene::Initialize()
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->SetCameraPtr(camera_.get());
 
-
-    audio_ = std::make_unique<Audio>();
-    audio_->Initialize();
-
-    model_ = Model::CreateFromObj("bunny.gltf");
-    trans_.Initialize();
-    trans_.UpdateData();
-    color = new ObjectColor;
-    color->Initialize();
 
     emit_ = new ParticleEmitter;
     emit_->Setting({ 0,0,0 }, { 0,0,0 }, 1, 1, 10, true);

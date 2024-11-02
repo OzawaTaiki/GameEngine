@@ -228,6 +228,12 @@
     <ClCompile Include="Engine\Other\Collider.cpp">
       <Filter>Engine\Other</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Utility\DebugCamera.cpp">
+      <Filter>Engine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\ConfigManager.cpp">
+      <Filter>Engine\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\Object3d.hlsli">
@@ -398,6 +404,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Other\Collider.h">
       <Filter>Engine\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\DebugCamera.h">
+      <Filter>Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\ConfigManager.h">
+      <Filter>Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

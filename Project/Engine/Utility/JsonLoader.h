@@ -2,6 +2,7 @@
 
 #include "Vector2.h"
 #include "Vector3.h"
+#include "Vector4.h"
 #include "Debug.h"
 #include <string>
 #include <vector>
@@ -16,13 +17,14 @@ class JsonLoader {
 private:
 	struct Datum
 	{
-		std::variant<uint32_t, float, Vector2, Vector3> datum;
+		std::variant<uint32_t, float, Vector2, Vector3, Vector4> datum;
 		Datum() = default;
 
 		Datum(uint32_t _uint) { datum = _uint; };
 		Datum(float _f) { datum = _f; };
 		Datum(const Vector2& _vec2) { datum = _vec2; };
 		Datum(const Vector3& _vec3) { datum = _vec3; };
+		Datum(const Vector4& _vec4) { datum = _vec4; };
 
 	};
 	struct Data
@@ -33,15 +35,18 @@ private:
 	// obj名,Data
 
 public:
-	JsonLoader();
+	JsonLoader(bool _autoSave = true);
+	JsonLoader(const std::string& _directory, bool _autoSave = true);
 	~JsonLoader();
 
 	void LoadJson(const std::string& _filepath, bool _isMakeFile = false);
 	void SaveJson();
 	void MakeJsonFile();
 
+	void SaveJson(const std::string& _groupName);
+
 	void SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride = true);
-	template<class T>
+	template<typename T>
 	void SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data);
 
 	Datum parseDatum(const json& j, const std::string& _groupName);
@@ -49,9 +54,9 @@ public:
 
 
 	std::optional<Data> GetData(const std::string& _groupName);
-	template<class T>
+	template<typename T>
 	inline std::optional<T> GetDatum(const std::string& _groupName, const std::string& _variableName);
-	template<class T>
+	template<typename T>
 	inline std::optional<std::vector <T>>  GetDatumArray(std::string _groupName, std::string _variableName);
 
 	void PrepareForSave();
@@ -60,13 +65,14 @@ private:
 	json jsonData_;
 	std::string folderPath_;
 	std::string filePath_;
+	bool autoSave_;
 
 	std::unordered_map < std::string, Data > dataGroup_;
 
 };
 
 
-template<class T>
+template<typename T>
 inline void JsonLoader::SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data)
 {
 	dataGroup_[_groupname].data[_name].clear();
@@ -78,7 +84,7 @@ inline void JsonLoader::SetData(const std::string& _groupname, const std::string
 	}
 }
 
-template<class T>
+template<typename T>
 inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, const std::string& _variableName)
 {
 	//objのデータを取得
@@ -112,13 +118,18 @@ inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, cons
 			if (auto value = std::get_if<Vector3>(&datum.datum))
 				return *value;
 		}
+		else if constexpr (std::is_same_v<T, Vector4>)
+		{
+			if (auto value = std::get_if<Vector4>(&datum.datum))
+				return *value;
+		}
 	}
 	Utils::Log("not found " + _variableName + "in" + _groupName);
 	//assert(false && "not found variaber");   // 見つからなければ止める
 	return T();
 }
 
-template<class T>
+template<typename T>
 inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _groupName, std::string _variableName)
 {
 	//objのデータを取得

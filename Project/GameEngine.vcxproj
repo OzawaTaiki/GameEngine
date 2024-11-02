@@ -151,7 +151,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Sprite\SpriteManager.cpp" />
     <ClCompile Include="Engine\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="Engine\Utility\ConfigManager.cpp" />
     <ClCompile Include="Engine\Utility\Debug.cpp" />
+    <ClCompile Include="Engine\Utility\DebugCamera.cpp" />
     <ClCompile Include="Engine\Utility\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Utility\JsonLoader.cpp" />
     <ClCompile Include="Engine\Utility\LineDrawer.cpp" />
@@ -257,7 +259,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Sprite\SpriteManager.h" />
     <ClInclude Include="Engine\TextureManager\TextureManager.h" />
+    <ClInclude Include="Engine\Utility\ConfigManager.h" />
     <ClInclude Include="Engine\Utility\Debug.h" />
+    <ClInclude Include="Engine\Utility\DebugCamera.h" />
     <ClInclude Include="Engine\Utility\ImGuiManager.h" />
     <ClInclude Include="Engine\Utility\JsonLoader.h" />
     <ClInclude Include="Engine\Utility\LineDrawer.h" />
