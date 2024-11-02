@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Camera.h"
+#include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
 
 #include <d3d12.h>
 #include <wrl.h>
-
+#include <array>
 class LineDrawer
 {
 public:
@@ -18,6 +19,8 @@ public:
     void SetColor(const Vector4& _color) { color_ = _color; }
     void RegisterPoint(const Vector3& _start, const Vector3& _end);
     void Draw();
+
+    void DrawOBB(const Matrix4x4& _affineMat);
 
 private:
     void TransferData();
@@ -45,6 +48,12 @@ private:
     PointData* vConstMap_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_ = {};
+
+    void SetVerties();
+
+    std::array <Vector3, 8> obbVertices_;
+    std::array <uint32_t, 24> obbIndices_;
+    std::array <Vector3, 32> circleVertices_;
 
     LineDrawer() = default;
     ~LineDrawer() = default;

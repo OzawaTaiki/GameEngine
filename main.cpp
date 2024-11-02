@@ -9,7 +9,7 @@
 #include "SRVManager.h"
 #include "ImGuiManager.h"
 #include "ParticleManager.h"
-
+#include "RandomGenerator.h"
 #include <random>
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -30,6 +30,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize(srvManager.get());
+
 
 	TextureManager::GetInstance()->Initialize(srvManager.get());
 	TextureManager::GetInstance()->Load("cube.jpg");
@@ -68,11 +69,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		dxCommon->PreDraw();
 		srvManager->PreDraw();
+
 		///
 		/// 描画ここから
 		///
 
 		gameScene->Draw();
+
 
 		///
 		/// 描画ここまで

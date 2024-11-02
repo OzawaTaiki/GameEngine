@@ -74,8 +74,6 @@ void DXCommon::PreDraw()
 	//描画先のRTVを設定する
 	//指定した色で画面算体をクリアする
 
-	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap_.Get() };
-	//commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
@@ -172,6 +170,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _
 
 	return bufferResource;
 }
+
 
 
 void DXCommon::CreateDevice()

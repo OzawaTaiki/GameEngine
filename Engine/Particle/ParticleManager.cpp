@@ -5,7 +5,9 @@
 #include "TextureManager.h"
 #include "Camera.h"
 #include "MatrixFunction.h"
+#include "ParticleEmitters.h"
 #include <cassert>
+
 const uint32_t ParticleManager::kGroupMaxInstance = 1024;
 
 ParticleManager* ParticleManager::GetInstance()
@@ -23,7 +25,7 @@ void ParticleManager::Initialize(SRVManager* _pSrvManager)
 {
     srvManager_ = _pSrvManager;
 
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle");
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle",PSOManager::BlendMode::Add);
     pipelineState_ = pso.value();
     assert(pso.has_value());
 
@@ -36,18 +38,29 @@ void ParticleManager::Update()
 {
     // billBordはshaderで計算したい
 
+
     for (auto& [name, group] : groups_)
     {
-        for (size_t index = 0; index < group.instanceNum; index++)
+        group.instanceNum = 0;
+        for (auto it=group.particles.begin();it!=group.particles.end();)
         {
-            group.constMap[index].matWorld.m[3][0] += 0.1f;
+            it->Update();
+            if (!it->IsAlive())
+                it = group.particles.erase(it);
+            else
+            {
+                group.constMap[group.instanceNum].matWorld = it->GetWorldMatrix();
+                group.constMap[group.instanceNum].color = it->GetColor();
+                group.instanceNum++;
+                ++it;
+            }
         }
     }
 
-    groups_["sample"].particles.emplace_back();
-    groups_["sample"].constMap[groups_["sample"].instanceNum].matWorld = MakeIdentity4x4();
-    groups_["sample"].constMap[groups_["sample"].instanceNum].color = { 1,1,1,1 };
-    groups_["sample"].instanceNum++;
+    //groups_["sample"].particles.emplace_back();
+    //groups_["sample"].constMap[groups_["sample"].instanceNum].matWorld = MakeIdentity4x4();
+    //groups_["sample"].constMap[groups_["sample"].instanceNum].color = { 1,1,1,1 };
+    //groups_["sample"].instanceNum++;
 
 }
 
@@ -69,11 +82,13 @@ void ParticleManager::Draw(const Camera* _camera)
     }
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, uint32_t _textureHandle)
+void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle)
 {
     if (groups_.contains(_groupName))
         return;
 
+    if (!_emitterPtr)
+        throw std::runtime_error("emitterPtr == nullPtr");
 
     Group& group = groups_[_groupName];
     group.model = Model::CreateFromObj(_modelPath);
@@ -90,11 +105,28 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
 
     group.instanceNum = 0;
 
+    group.emitterPtr = _emitterPtr;
 
-    group.particles.emplace_back();
-    group.constMap[group.instanceNum].matWorld = MakeIdentity4x4();
-    group.constMap[group.instanceNum].color = { 1,1,1,1 };
-    group.instanceNum++;
+}
+
+void ParticleManager::AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles)
+{
+    if (!groups_.contains(_groupName))
+    {
+        std::string err = "not find particleGroup! name:" + '\"' + _groupName + '\"';
+        throw std::runtime_error(err);
+    }
+
+    for(const auto& particle:_particles)
+    {
+        groups_[_groupName].particles.push_back(particle);
+
+        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].matWorld = MakeIdentity4x4();
+        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].matWorld.m[3][0] = groups_[_groupName].instanceNum;
+        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].color = { 1,1,1,1 };
+        //groups_[_groupName].instanceNum++;
+
+    }
 
 }
 

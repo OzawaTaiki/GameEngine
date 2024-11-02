@@ -38,6 +38,7 @@ void LineDrawer::Initialize()
     vertexBufferView_.SizeInBytes = sizeof(PointData) * kMaxNum;
     vertexBufferView_.StrideInBytes = sizeof(PointData);
 
+    SetVerties();
 }
 
 void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end)
@@ -67,8 +68,37 @@ void LineDrawer::Draw()
     index = 0u;
 }
 
+void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
+{
+    for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
+    {
+        uint32_t sIndex = obbIndices_[index - 1];
+        uint32_t eIndex = obbIndices_[index];
+
+        Vector3 spos = Transform(obbVertices_[sIndex], _affineMat);
+        Vector3 epos = Transform(obbVertices_[eIndex], _affineMat);
+
+        RegisterPoint(spos, epos);
+    }
+
+}
+
 void LineDrawer::TransferData()
 {
     constMap_->color = color_;
     constMap_->vp = cameraptr_->GetViewProjection();
+}
+
+void LineDrawer::SetVerties()
+{
+    obbVertices_[0] = {-0.5f, 0.5f ,-0.5f };
+    obbVertices_[1] = {-0.5f,-0.5f ,-0.5f };
+    obbVertices_[2] = { 0.5f,-0.5f ,-0.5f };
+    obbVertices_[3] = { 0.5f, 0.5f ,-0.5f };
+    obbVertices_[4] = {-0.5f, 0.5f , 0.5f };
+    obbVertices_[5] = {-0.5f,-0.5f , 0.5f };
+    obbVertices_[6] = { 0.5f,-0.5f , 0.5f };
+    obbVertices_[7] = { 0.5f, 0.5f , 0.5f };
+
+    obbIndices_ = { 0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7 };
 }

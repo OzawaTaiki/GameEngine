@@ -29,7 +29,6 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
-
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
 private:
 

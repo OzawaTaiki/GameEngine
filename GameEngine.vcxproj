@@ -62,7 +62,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)myLib;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)Engine\Audio;$(projectDir)Engine\Camera;$(projectDir)Engine\DXWin;$(projectDir)Engine\Input;$(projectDir)Engine\Lib;$(projectDir)Engine\Lights;$(projectDir)Engine\Model;$(projectDir)Engine\ObjectColor;$(projectDir)Engine\Other;$(projectDir)Engine\Particle;$(projectDir)Engine\Render;$(projectDir)Engine\Scene;$(projectDir)Engine\Sprite;$(projectDir)Engine\TextureManager;$(projectDir)Engine\Utility</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,83 +115,46 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="D3DResourceLeakChecker.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="DXCommon.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="ImGuiManager.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="JsonLoader.cpp" />
-    <ClCompile Include="LightGroup.cpp" />
-    <ClCompile Include="LineDrawer.cpp" />
+    <ClCompile Include="Engine\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\DXWin\D3DResourceLeakChecker.cpp" />
+    <ClCompile Include="Engine\DXWin\DXCommon.cpp" />
+    <ClCompile Include="Engine\DXWin\WinApp.cpp" />
+    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Lib\MatrixFunction.cpp" />
+    <ClCompile Include="Engine\Lib\MyLib.cpp" />
+    <ClCompile Include="Engine\Lib\Vector2.cpp" />
+    <ClCompile Include="Engine\Lib\Vector3.cpp" />
+    <ClCompile Include="Engine\Lib\VectorFunction.cpp" />
+    <ClCompile Include="Engine\Lights\DirectionalLight.cpp" />
+    <ClCompile Include="Engine\Lights\LightGroup.cpp" />
+    <ClCompile Include="Engine\Lights\PointLight.cpp" />
+    <ClCompile Include="Engine\Lights\SpotLight.cpp" />
+    <ClCompile Include="Engine\Model\Material.cpp" />
+    <ClCompile Include="Engine\Model\Mesh.cpp" />
+    <ClCompile Include="Engine\Model\Model.cpp" />
+    <ClCompile Include="Engine\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Model\WorldTransform.cpp" />
+    <ClCompile Include="Engine\ObjectColor\ObjectColor.cpp" />
+    <ClCompile Include="Engine\Other\CatmulRomSpline.cpp" />
+    <ClCompile Include="Engine\Other\Collider.cpp" />
+    <ClCompile Include="Engine\Other\CollisionManager.cpp" />
+    <ClCompile Include="Engine\Particle\Particle.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleEmitters.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
+    <ClCompile Include="Engine\Render\PSOManager.cpp" />
+    <ClCompile Include="Engine\Render\SRVManager.cpp" />
+    <ClCompile Include="Engine\Scene\GameScene.cpp" />
+    <ClCompile Include="Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Engine\Sprite\Sprite.cpp" />
+    <ClCompile Include="Engine\Sprite\SpriteManager.cpp" />
+    <ClCompile Include="Engine\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="Engine\Utility\Debug.cpp" />
+    <ClCompile Include="Engine\Utility\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Utility\JsonLoader.cpp" />
+    <ClCompile Include="Engine\Utility\LineDrawer.cpp" />
+    <ClCompile Include="Engine\Utility\RandomGenerator.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="myLib\MatrixFunction.cpp" />
-    <ClCompile Include="myLib\MyLib.cpp" />
-    <ClCompile Include="myLib\Vector2.cpp" />
-    <ClCompile Include="myLib\Vector3.cpp" />
-    <ClCompile Include="myLib\VectorFunction.cpp" />
-    <ClCompile Include="ObjectColor.cpp" />
-    <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="ParticleEmitter.cpp" />
-    <ClCompile Include="ParticleManager.cpp" />
-    <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="PSOManager.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="SpotLight.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteManager.cpp" />
-    <ClCompile Include="SRVManager.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="WorldTransform.cpp" />
-    <ClCompile Include="WinApp.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="D3DResourceLeakChecker.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="DXCommon.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="JsonLoader.h" />
-    <ClInclude Include="LightGroup.h" />
-    <ClInclude Include="LineDrawer.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Matrix3x3.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="myLib\Matrix4x4.h" />
-    <ClInclude Include="myLib\MatrixFunction.h" />
-    <ClInclude Include="myLib\MyLib.h" />
-    <ClInclude Include="myLib\Vector3.h" />
-    <ClInclude Include="myLib\Vector4.h" />
-    <ClInclude Include="myLib\VectorFunction.h" />
-    <ClInclude Include="ObjectColor.h" />
-    <ClInclude Include="Particle.h" />
-    <ClInclude Include="ParticleEmitter.h" />
-    <ClInclude Include="ParticleManager.h" />
-    <ClInclude Include="PointLight.h" />
-    <ClInclude Include="PSOManager.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="SpotLight.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteManager.h" />
-    <ClInclude Include="SRVManager.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="WorldTransform.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="WinApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -252,6 +215,51 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\Audio\Audio.h" />
+    <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\DXWin\D3DResourceLeakChecker.h" />
+    <ClInclude Include="Engine\DXWin\DXCommon.h" />
+    <ClInclude Include="Engine\DXWin\WinApp.h" />
+    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Lib\Matrix3x3.h" />
+    <ClInclude Include="Engine\Lib\Matrix4x4.h" />
+    <ClInclude Include="Engine\Lib\MatrixFunction.h" />
+    <ClInclude Include="Engine\Lib\MyLib.h" />
+    <ClInclude Include="Engine\Lib\Vector2.h" />
+    <ClInclude Include="Engine\Lib\Vector3.h" />
+    <ClInclude Include="Engine\Lib\Vector4.h" />
+    <ClInclude Include="Engine\Lib\VectorFunction.h" />
+    <ClInclude Include="Engine\Lights\DirectionalLight.h" />
+    <ClInclude Include="Engine\Lights\LightGroup.h" />
+    <ClInclude Include="Engine\Lights\PointLight.h" />
+    <ClInclude Include="Engine\Lights\SpotLight.h" />
+    <ClInclude Include="Engine\Model\Material.h" />
+    <ClInclude Include="Engine\Model\Mesh.h" />
+    <ClInclude Include="Engine\Model\Model.h" />
+    <ClInclude Include="Engine\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Model\WorldTransform.h" />
+    <ClInclude Include="Engine\ObjectColor\ObjectColor.h" />
+    <ClInclude Include="Engine\Other\CatmulRomSpline.h" />
+    <ClInclude Include="Engine\Other\Collider.h" />
+    <ClInclude Include="Engine\Other\CollisionManager.h" />
+    <ClInclude Include="Engine\Particle\Particle.h" />
+    <ClInclude Include="Engine\Particle\ParticleEmitters.h" />
+    <ClInclude Include="Engine\Particle\ParticleManager.h" />
+    <ClInclude Include="Engine\Render\PSOManager.h" />
+    <ClInclude Include="Engine\Render\SRVManager.h" />
+    <ClInclude Include="Engine\Scene\GameScene.h" />
+    <ClInclude Include="Engine\Scene\Scene.h" />
+    <ClInclude Include="Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Engine\Sprite\Sprite.h" />
+    <ClInclude Include="Engine\Sprite\SpriteManager.h" />
+    <ClInclude Include="Engine\TextureManager\TextureManager.h" />
+    <ClInclude Include="Engine\Utility\Debug.h" />
+    <ClInclude Include="Engine\Utility\ImGuiManager.h" />
+    <ClInclude Include="Engine\Utility\JsonLoader.h" />
+    <ClInclude Include="Engine\Utility\LineDrawer.h" />
+    <ClInclude Include="Engine\Utility\RandomGenerator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

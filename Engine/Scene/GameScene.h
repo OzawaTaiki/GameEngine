@@ -8,6 +8,7 @@
 #include "Audio.h"
 #include "ObjectColor.h"
 #include "ParticleManager.h"
+#include "ParticleEmitters.h"
 
 #include <memory>
 
@@ -31,4 +32,6 @@ private:
     Model* model_;
     WorldTransform trans_;
     ObjectColor* color;
+
+    ParticleEmitter* emit_;
 };

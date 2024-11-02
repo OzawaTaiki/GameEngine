@@ -4,6 +4,7 @@
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 #include "ParticleManager.h"
+#include "TextureManager.h"
 #include <chrono>
 #include <imgui.h>
 
@@ -25,13 +26,19 @@ void GameScene::Initialize()
 
     audio_ = std::make_unique<Audio>();
     audio_->Initialize();
-    ParticleManager::GetInstance()->CreateParticleGroup("sample", "cube/cube.obj",0);
 
     model_ = Model::CreateFromObj("bunny.gltf");
     trans_.Initialize();
     trans_.UpdateData();
     color = new ObjectColor;
     color->Initialize();
+
+    emit_ = new ParticleEmitter;
+    emit_->Setting({ 0,0,0 }, { 0,0,0 }, 1, 1, 10, true);
+    emit_->SetShape_Box({ 2, 2, 2 });
+
+   uint32_t handle= TextureManager::GetInstance()->Load("circle.png");
+   ParticleManager::GetInstance()->CreateParticleGroup("sample", "plane/plane.obj", emit_, handle);
 }
 
 void GameScene::Update()
@@ -43,7 +50,7 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-
+    emit_->Update();
     ParticleManager::GetInstance()->Update();
 
     camera_->UpdateMatrix();
@@ -55,7 +62,7 @@ void GameScene::Draw()
 {
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
-    model_->Draw(trans_, camera_.get(), color);
+    //model_->Draw(trans_, camera_.get(), color);
 
     //<------------------------
 
@@ -67,7 +74,7 @@ void GameScene::Draw()
 
 
     //<------------------------
-
+    emit_->Draw();
     lineDrawer_->Draw();
 
 

@@ -4,6 +4,7 @@
 
 #include <d3d12.h>
 class SRVManager;
+class ParticleEmitter;
 class ParticleManager
 {
 public:
@@ -17,8 +18,9 @@ public:
     void Update();
     void Draw(const Camera* _camera);
 
-    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, uint32_t _textureHandle = UINT32_MAX);
+    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle = UINT32_MAX);
 
+    void AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles);
 private:
 
     static const uint32_t kGroupMaxInstance;
@@ -37,6 +39,7 @@ private:
         uint32_t textureHandle;
         uint32_t srvIndex;
         uint32_t instanceNum;
+        ParticleEmitter* emitterPtr;
     };
 
     void PreDraw();

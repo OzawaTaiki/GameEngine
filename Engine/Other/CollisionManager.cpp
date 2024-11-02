@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "CollisionManager.h"
 #include "Collider.h"
-#include "myMath.h"
+#include "MyLib.h"
 #include "ImGuiManager.h"
 #include <algorithm>
 
@@ -226,7 +226,7 @@ bool CollisionManager::IsCollision(const OBB& _obb, const Sphere& _sphere)
     Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
     Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
 
-    Vector3  centerInOBBLocalSphere = Transformation(_sphere.center, obbWorldMatInv);
+    Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
     AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
     Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
 
@@ -324,7 +324,7 @@ CollisionManager::OBB CollisionManager::ConvertToAABBToOBB(const AABB& _aabb)
 
 void CollisionManager::OBB::CalculateOrientations()
 {
-    Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(this->rotate);
+    Matrix4x4 rotateMatrix = MakeRotateMatrix(this->rotate);
 
 
     this->orientations[0].x = rotateMatrix.m[0][0];
