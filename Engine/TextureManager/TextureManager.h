@@ -10,7 +10,7 @@
 #include <optional>
 
 
-
+class SRVManager;
 class DXCommon;
 class TextureManager
 {
@@ -18,7 +18,7 @@ public:
 
     static TextureManager* GetInstance();
 
-    void Initialize();
+    void Initialize(SRVManager* _srvManager);
     void Update();
 
     uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");
@@ -36,6 +36,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* _texture , const DirectX::ScratchImage& _mipImages);
 
     DXCommon* dxCommon_ = nullptr;
+    SRVManager* srvManager_ = nullptr;
 
     struct Texture
     {
@@ -43,6 +44,7 @@ private:
         Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
         D3D12_CPU_DESCRIPTOR_HANDLE srvHandlerCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE srvHandlerGPU;
+        uint32_t srvIndex;
     };
 
     std::unordered_map<std::string, uint32_t> keys_ = {};

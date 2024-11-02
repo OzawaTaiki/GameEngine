@@ -113,7 +113,7 @@ inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, cons
 				return *value;
 		}
 	}
-	Debug::Log("not found " + _variableName + "in" + _groupName);
+	Utils::Log("not found " + _variableName + "in" + _groupName);
 	//assert(false && "not found variaber");   // 見つからなければ止める
 	return T();
 }
@@ -129,7 +129,7 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _gro
 		auto it = groupIt->second.data.find(_variableName);
 		if (it == groupIt->second.data.end())
 		{
-			Debug::Log("not found " + _variableName + "in" + _groupName);
+			Utils::Log("not found " + _variableName + "in" + _groupName);
 			return std::vector<T>();
 			//assert(false && "not found variaber");   // 見つからなければ止める
 		}
@@ -142,7 +142,7 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _gro
 		}
 		return result;
 	}
-	Debug::Log("not found Group"  + _groupName);
+	Utils::Log("not found Group"  + _groupName);
 	//assert(false && "not found variaber");   // 見つからなければ止める
 	return std::vector<T>();
 }

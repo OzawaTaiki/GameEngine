@@ -15,10 +15,10 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
-
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
+//
+//#include "externals/imgui/imgui.h"
+//#include "externals/imgui/imgui_impl_dx12.h"
+//#include "externals/imgui/imgui_impl_win32.h"
 
 
 DXCommon* DXCommon::GetInstance()
@@ -74,8 +74,6 @@ void DXCommon::PreDraw()
 	//描画先のRTVを設定する
 	//指定した色で画面算体をクリアする
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap_.Get() };
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
@@ -174,6 +172,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _
 }
 
 
+
 void DXCommon::CreateDevice()
 {
 	HRESULT hresult = S_FALSE;
@@ -206,7 +205,7 @@ void DXCommon::CreateDevice()
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
 			//採用したアダプタの情報をログに出力。wstringの方なので注意。
-			Debug::Log(Debug::ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
+			Utils::Log(Utils::ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
 			break;
 		}
 		//ソフトウェアアダプタの場合は見なかったことにする
@@ -232,14 +231,14 @@ void DXCommon::CreateDevice()
 		if (SUCCEEDED(hresult))
 		{
 			//生成で来たのでログの出力を行ってループを抜ける
-			Debug::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
+			Utils::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
 			break;
 		}
 	}
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
 	//初期化完了のログ
-	Debug::Log("Complete create D3D12Device\n");
+	Utils::Log("Complete create D3D12Device\n");
 
 #ifdef _DEBUG
 
@@ -322,9 +321,9 @@ void DXCommon::CreateDescriptor()
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないのでShaderVisibleはfalse
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);              //viewの情報を格納している場所(Discriptor)の束(配列)
 
-	//imguiを使うためSRV用のが必要
-	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなのでShaderVisivleはtrue
-	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	////imguiを使うためSRV用のが必要
+	////SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなのでShaderVisivleはtrue
+	//srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 }
 
@@ -418,7 +417,7 @@ void DXCommon::CreateDXcCompiler()
 }
 
 void DXCommon::InitializeImGui()
-{
+{/*
 	///imguiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -431,7 +430,7 @@ void DXCommon::InitializeImGui()
 		srvDescriptorHeap_.Get(),
 		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);
+	);*/
 }
 
 void DXCommon::InitializeFixFPS()
@@ -526,19 +525,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHea
 	return handleGPU;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUSRVDescriptorHandle(uint32_t _index)
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (desriptorSizeSRV_ * _index);
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUSRVDescriptorHandle(uint32_t _index)
-{
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (desriptorSizeSRV_ * _index);
-	return handleGPU;
-}
 
 DXCommon::~DXCommon()
 {

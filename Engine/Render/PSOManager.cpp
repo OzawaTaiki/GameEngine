@@ -28,6 +28,7 @@ void PSOManager::Initialize()
     CreatePSOForModel();
     CreatePSOForSprite();
     CreatePSOForLineDrawer();
+    CreatePSOForParticle();
 }
 
 std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(const std::string& _key, BlendMode _mode)
@@ -65,7 +66,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
 
     //hlslファイルを読み込む
  	//これからシェーダーをコンパイルする旨をログに出す
-    Debug::Log(Debug::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", fullpath, _profile)));
+    Utils::Log(Utils::ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", fullpath, _profile)));
  	//hlslファイルを読む
  	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
     HRESULT hr = dxcUtils_->LoadFile(fullpath.c_str(), nullptr, &shaderSource);
@@ -102,7 +103,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
  	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
  	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
  	{
- 		Debug::Log(shaderError->GetStringPointer());
+ 		Utils::Log(shaderError->GetStringPointer());
  		assert(false);
  	}
 
@@ -111,7 +112,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
  	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
  	assert(SUCCEEDED(hr));
  	//成功したログを出す
- 	Debug::Log(Debug::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", fullpath, _profile)));
+ 	Utils::Log(Utils::ConvertString(std::format(L"Compile Succesed,path:{},profile:{}\n", fullpath, _profile)));
 
  	//実行用バイナリを返却
  	return shaderBlob;
@@ -202,7 +203,7 @@ void PSOManager::CreatePSOForModel()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-    	Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+    	Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
     	assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Model"]));
@@ -351,7 +352,7 @@ void PSOManager::CreatePSOForSprite()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Sprite"]));
@@ -475,7 +476,7 @@ void PSOManager::CreatePSOForLineDrawer()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["LineDrawer"]));
@@ -569,11 +570,18 @@ void PSOManager::CreatePSOForParticle()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
-    descriptorRange[0].NumDescriptors = 1;//数は１つ
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+    D3D12_DESCRIPTOR_RANGE descriptorRangeTrans[1] = {};
+    descriptorRangeTrans[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRangeTrans[0].NumDescriptors = 1;//数は１つ
+    descriptorRangeTrans[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRangeTrans[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
+
+    D3D12_DESCRIPTOR_RANGE descriptorRangeTexture[1] = {};
+    descriptorRangeTexture[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRangeTexture[0].NumDescriptors = 1;//数は１つ
+    descriptorRangeTexture[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRangeTexture[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
     //RootParameter作成
     D3D12_ROOT_PARAMETER rootParameters[3] = {};
@@ -586,14 +594,14 @@ void PSOManager::CreatePSOForParticle()
     // transform    ParticleForGPU
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeTrans;
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeTrans);
 
     // テクスチャ
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRangeTexture;
+    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeTexture);
 
 
     descriptionRootSignature.pParameters = rootParameters;
@@ -608,7 +616,7 @@ void PSOManager::CreatePSOForParticle()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Particle"]));
@@ -621,7 +629,7 @@ void PSOManager::CreatePSOForParticle()
     //Depthの機能を有効にする
     depthStencilDesc.DepthEnable = true;
     //書き込みします
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     //比較関数はLessEqeul つまり近ければ描画される
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 

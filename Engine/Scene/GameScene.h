@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "Audio.h"
 #include "ObjectColor.h"
+#include "ParticleManager.h"
+#include "ParticleEmitters.h"
 
 #include <memory>
 
@@ -26,4 +28,10 @@ private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<Audio> audio_;
     uint32_t handle_;
+
+    Model* model_;
+    WorldTransform trans_;
+    ObjectColor* color;
+
+    ParticleEmitter* emit_;
 };

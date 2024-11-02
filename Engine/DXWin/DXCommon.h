@@ -25,10 +25,11 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 	ID3D12Device* GetDevice() { return device_.Get(); }
 
+	size_t GetBackBufferSize() const { return swapChainDesc_.BufferCount; }
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
 private:
 
 	void CreateDevice();
@@ -67,7 +68,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
@@ -87,7 +88,6 @@ private:
 
 	std::chrono::steady_clock::time_point reference_ = {};
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(int32_t _width, int32_t _height);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index);

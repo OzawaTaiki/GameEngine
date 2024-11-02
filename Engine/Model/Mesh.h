@@ -17,7 +17,7 @@ class Mesh
 {
 public:
     void Initialize();
-    void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/Obj/");
+    void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/models/");
 
     void TransferData();
 

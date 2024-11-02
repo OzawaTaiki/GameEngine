@@ -6,14 +6,11 @@
 #include "Sprite.h"
 #include "GameScene.h"
 #include "LineDrawer.h"
-
-#include "imgui.h"
-#include "imgui_impl_dx12.h"
-#include "imgui_impl_win32.h"
-
+#include "SRVManager.h"
+#include "ImGuiManager.h"
+#include "ParticleManager.h"
+#include "RandomGenerator.h"
 #include <random>
-
-const float kDeltaTime = 1.0f / 60.0f;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -24,10 +21,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DXCommon* dxCommon =  DXCommon::GetInstance();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
-	TextureManager::GetInstance()->Initialize();
+	std::unique_ptr<SRVManager> srvManager = std::make_unique<SRVManager>();
+	srvManager->Initialize();
+	PSOManager::GetInstance()->Initialize();
+
+	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
+	imguiManager->Initialize(srvManager.get());
+
+	ParticleManager* particle = ParticleManager::GetInstance();
+	particle->Initialize(srvManager.get());
+
+
+	TextureManager::GetInstance()->Initialize(srvManager.get());
+	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
 
-	PSOManager::GetInstance()->Initialize();
 	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();
 
@@ -40,16 +48,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	GameScene* gameScene = new GameScene;
 	gameScene->Initialize();
 
+
 	///
 	/// メインループ
 	///
 	// ウィンドウのｘボタンが押されるまでループ
 	while (!winApp->ProcessMessage())
 	{
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
+		imguiManager->Begin();
 
 		///
 		/// 更新処理ここから
@@ -62,6 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 
 		dxCommon->PreDraw();
+		srvManager->PreDraw();
 
 		///
 		/// 描画ここから
@@ -69,19 +76,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		gameScene->Draw();
 
+
 		///
 		/// 描画ここまで
 		///
-
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
+		imguiManager->End();
+		imguiManager->Draw();
 
 		dxCommon->PostDraw();
 	}
-
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	imguiManager->Finalize();
 
 	winApp->Filalze();
 
