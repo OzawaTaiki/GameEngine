@@ -98,6 +98,24 @@ Model* Model::CreateFromObj(const std::string& _filePath)
     return model;
 }
 
+void Model::SetUVRotate(float _rot)
+{
+    material_->rotation_ = _rot;
+    material_->TransferData();
+}
+
+void Model::SetUVScale(const Vector2& _scale)
+{
+    material_->scale_ = _scale;
+    material_->TransferData();
+}
+
+void Model::SetUVTrans(const Vector2& _trans)
+{
+    material_->transform_ = _trans;
+    material_->TransferData();
+}
+
 void Model::LoadMesh(const std::string& _filePath)
 {
     name_ = _filePath;

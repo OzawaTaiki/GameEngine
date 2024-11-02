@@ -30,6 +30,10 @@ public:
 
     static Model* CreateFromObj(const std::string& _filePath);
 
+    void SetUVRotate(float _rot);
+    void SetUVScale(const Vector2& _scale);
+    void SetUVTrans(const Vector2& _trans);
+
     Mesh* GetMeshPtr() { return mesh_.get(); }
     Material* GetMaterialPtr() { return material_.get(); }
 

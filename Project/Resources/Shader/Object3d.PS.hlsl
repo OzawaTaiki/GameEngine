@@ -140,8 +140,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     else
         output.color = materialColor * textureColor;
 
-    if (textureColor.a <= 0.5 ||
-        textureColor.a == 0.0 ||
+    if (textureColor.a == 0.0 ||
         output.color.a == 0.0)
     {
         discard;

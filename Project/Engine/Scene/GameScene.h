@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "Audio.h"
 #include "ObjectColor.h"
+#include "DebugCamera.h"
 #include "ParticleManager.h"
 #include "ParticleEmitters.h"
 
@@ -26,12 +27,12 @@ private:
     Input* input_ = nullptr;
     LineDrawer* lineDrawer_ = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
-    std::unique_ptr<Audio> audio_;
-    uint32_t handle_;
+    std::unique_ptr<DebugCamera> DebugCamera_ = nullptr;
+    bool useDebugCamera_ = false;
 
-    Model* model_;
+    Model* tile_ = nullptr;
     WorldTransform trans_;
-    ObjectColor* color;
+    std::unique_ptr <ObjectColor> color_;
 
     ParticleEmitter* emit_;
 };
