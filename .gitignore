@@ -10,7 +10,7 @@
 *.userosscache
 *.sln.docstates
 
-![Ee]xternals/
+[Ee]xternals/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -19,10 +19,10 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+[Dd]ebug/*
 [Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
+[Rr]elease/*
+[Rr]eleases/*
 x64/
 x86/
 [Ww][Ii][Nn]32/
@@ -36,7 +36,6 @@ bld/
 [Ll]ogs/
 
 Generated/
-!externals/assimp/lib/
 
 
 # Visual Studio 2015/2017 cache/options directory
@@ -107,6 +106,8 @@ StyleCopReport.xml
 *.tlog
 !Resources/models/*.obj
 !Resources/models/**/*.obj
+!externals/assimp/[Ll]ib/
+
 # Chutzpah Test files
 
 _Chutzpah*
