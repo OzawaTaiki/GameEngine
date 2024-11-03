@@ -660,7 +660,7 @@ void CatmulRomSpline::CalculatePositinByPosOnLine()
     posOnLine_ += speed_ * deltaTime_;
     if (posOnLine_ > totalLength_) {
         return;
-        //positionOnLine_ = 0.0f;
+        posOnLine_ = 0.0f;
     }
 
     float posT = GetPositionParameterForDistance(posOnLine_);

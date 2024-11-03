@@ -5,13 +5,11 @@
 #include "LineDrawer.h"
 #include "WorldTransform.h"
 #include "Model.h"
-#include "Audio.h"
 #include "ObjectColor.h"
 #include "DebugCamera.h"
-#include "ParticleManager.h"
-#include "ParticleEmitters.h"
 
 #include <memory>
+#include "CatmulRomSpline.h"
 
 class GameScene : public Scene
 {
@@ -25,7 +23,7 @@ public:
 
 private:
     Input* input_ = nullptr;
-    LineDrawer* lineDrawer_ = nullptr;
+    LineDrawer* lineDrawer = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<DebugCamera> DebugCamera_ = nullptr;
     bool useDebugCamera_ = false;
@@ -34,5 +32,5 @@ private:
     WorldTransform trans_;
     std::unique_ptr <ObjectColor> color_;
 
-    ParticleEmitter* emit_;
+    std::unique_ptr<CatmulRomSpline> edit_;
 };
