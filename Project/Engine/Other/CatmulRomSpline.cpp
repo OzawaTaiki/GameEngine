@@ -59,8 +59,6 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
 
     //rotModelTexture_ = TextureManager::GetInstance()->Load("axisCube.png");
 
-    camera_ = std::make_unique<Camera>();
-    camera_->Initialize();
 
     colorWhite_ = new ObjectColor;
     colorRed_ = new ObjectColor;
@@ -132,7 +130,7 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
 
 
-    if (isMove_)
+    if (isMove_ && pMoveObj_)
         CalculatePositinByPosOnLine();
 
     for (const auto& wt : editPosCtrlPoints_) {
@@ -144,16 +142,7 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
     RegisterDrawPoint();
 
-    moveObjTrans_.transform_ = camera_->translate_;
-    moveObjTrans_.rotate_ = camera_->rotate_;
-    moveObjTrans_.UpdateData();
 
-    if (isMove_)
-    {
-        Vector3 ofs = TransformNormal(cameraOffset_, MakeRotateMatrix(camera_->rotate_));
-        camera_->translate_ += ofs;
-    }
-    camera_->UpdateMatrix();
 }
 
 void CatmulRomSpline::Draw(const Camera* _camera)
@@ -183,7 +172,9 @@ void CatmulRomSpline::Draw(const Camera* _camera)
                 rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
         }
     }
-    rotModel_->Draw(moveObjTrans_, _camera, moveObjColor_);
+
+    if (drawMoveObj_)
+        rotModel_->Draw(moveObjTrans_, _camera, moveObjColor_);
 
 }
 
@@ -666,12 +657,16 @@ void CatmulRomSpline::CalculatePositinByPosOnLine()
     float posT = GetPositionParameterForDistance(posOnLine_);
 
     Vector3 positionByT_ = CalculateCatmulRomPoint(posT);
-    camera_->translate_ = positionByT_;
+    pMoveObj_->transform_ = positionByT_;
 
     ///*回転*///
     float t = GetRotateParameterForDistance(posOnLine_);
 
-    camera_->rotate_ = (Rotate(t));
+    pMoveObj_->rotate_ = (Rotate(t));
+
+    moveObjTrans_.transform_ = pMoveObj_->transform_;
+    moveObjTrans_.rotate_ = pMoveObj_->rotate_;
+    moveObjTrans_.UpdateData();
 }
 
 Vector3 CatmulRomSpline::Rotate(float _t)
@@ -817,11 +812,6 @@ void CatmulRomSpline::ImGui()
             DeleteRotCtrlPoint();
             isChangeCtrlPoint_ = true;
         }
-        ImGui::EndTabItem();
-    }
-    if (ImGui::BeginTabItem("MoveCamera"))
-    {
-        ImGui::DragFloat3("offset", &cameraOffset_.x, 0.01f);
         ImGui::EndTabItem();
     }
 

@@ -8,7 +8,6 @@
 #include "ObjectColor.h"
 #include "DebugCamera.h"
 #include "Player.h"
-
 #include <memory>
 #include "CatmulRomSpline.h"
 

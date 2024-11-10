@@ -106,6 +106,15 @@
     <Filter Include="Engine\Other">
       <UniqueIdentifier>{15fa33b4-1187-4640-b874-a5deaf870c03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{e5b2d5a5-c8a8-4a21-86e8-3f619b05463b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Player">
+      <UniqueIdentifier>{0f3d0751-297f-4fb2-93f5-a0bc8b0ab0a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Beam">
+      <UniqueIdentifier>{e791f65e-32f6-4fce-a97f-eb042433082e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -233,6 +242,12 @@
     </ClCompile>
     <ClCompile Include="Engine\Utility\ConfigManager.cpp">
       <Filter>Engine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Player.cpp">
+      <Filter>Application\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Beam.cpp">
+      <Filter>Application\Beam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,6 +425,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Utility\ConfigManager.h">
       <Filter>Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Player.h">
+      <Filter>Application\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Beam.h">
+      <Filter>Application\Beam</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

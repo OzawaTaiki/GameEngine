@@ -43,7 +43,7 @@ public:
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
 
-    ~Model() { delete lightGroup_; }
+    ~Model();
 private:
 
     std::string name_ = {};

@@ -2,7 +2,7 @@
 
 #include "Vector3.h"
 #include "Matrix4x4.h"
-
+#include "WorldTransform.h"
 #include <wrl.h>
 #include <d3d12.h>
 
@@ -19,6 +19,8 @@ public:
 
     ID3D12Resource* GetResource()const { return resource_.Get(); }
     Matrix4x4 GetViewProjection()const { return matViewProjection_; }
+
+    void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
     /// <summary>
     /// メンバ変数から行列を計算，転送
@@ -49,7 +51,7 @@ private:
         Matrix4x4 proj;
         Vector3 pos;
     };
-
+    WorldTransform worldTransform_;
     Matrix4x4 matWorld_ = {};
     Matrix4x4 matViewProjection_ = {};
 

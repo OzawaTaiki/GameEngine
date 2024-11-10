@@ -36,6 +36,9 @@ void GameScene::Initialize()
     player_ = std::make_unique<Player>();
     player_->Initialize();
 
+    edit_->SetMoveObjTrans(player_->GetWorldTransform());
+    camera_->SetParent(player_->GetWorldTransform());
+    camera_->translate_ = { 0,1.25f,-0.65f };
 }
 
 void GameScene::Update()
@@ -45,22 +48,16 @@ void GameScene::Update()
     if (input_->IsKeyPressed(DIK_RSHIFT) && input_->IsKeyTriggered(DIK_RETURN))
         useDebugCamera_ = !useDebugCamera_;
 
-    DebugCamera_->Update();
     //<-----------------------
     camera_->Update();
 
     edit_->Update(camera_->GetViewProjection());
 
-    player_->Update();
+    player_->Update(camera_->GetViewProjection());
 
-    if (edit_->IsMove() && !useDebugCamera_)
+    if (useDebugCamera_)
     {
-        camera_->matView_ = edit_->GetCamera()->matView_;
-        camera_->matProjection_ = edit_->GetCamera()->matProjection_;
-        camera_->TransferData();
-    }
-    else if (useDebugCamera_)
-    {
+        DebugCamera_->Update();
         camera_->matView_ = DebugCamera_->matView_;
         camera_->TransferData();
     }
