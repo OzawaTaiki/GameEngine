@@ -255,6 +255,9 @@
     <ClCompile Include="Application\Enemy.cpp">
       <Filter>Application\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Application\EnemyManager.cpp">
+      <Filter>Application\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\Object3d.hlsli">
@@ -439,6 +442,9 @@
       <Filter>Application\Beam</Filter>
     </ClInclude>
     <ClInclude Include="Application\Enemy.h">
+      <Filter>Application\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\EnemyManager.h">
       <Filter>Application\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
