@@ -39,6 +39,9 @@ public:
     Mesh* GetMeshPtr() { return mesh_.get(); }
     Material* GetMaterialPtr() { return material_.get(); }
 
+    Vector3 GetMin() { return mesh_->GetMin(); }
+    Vector3 GetMax() { return mesh_->GetMax(); }
+
     static const std::string defaultDirpath_;
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }

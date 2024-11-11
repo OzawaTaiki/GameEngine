@@ -27,6 +27,9 @@ public:
     D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
     D3D12_INDEX_BUFFER_VIEW* GetIndexBufferView() { return &indexBufferView_; }
 
+    Vector3 GetMin() const { return min; }
+    Vector3 GetMax() const { return max; }
+
     struct VertexData
     {
         Vector4 position;

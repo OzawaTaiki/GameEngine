@@ -4,6 +4,7 @@
 #include <cassert>
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
+#include <numbers>
 LineDrawer* LineDrawer::GetInstance()
 {
     static LineDrawer instance;
@@ -83,6 +84,20 @@ void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
 
 }
 
+void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
+{
+    for (uint32_t index = 1; index < sphereIndices_.size(); index += 2)
+    {
+        uint32_t sIndex = sphereIndices_[index - 1];
+        uint32_t eIndex = sphereIndices_[index];
+
+        Vector3 spos = Transform(sphereVertices_[sIndex], _affineMat);
+        Vector3 epos = Transform(sphereVertices_[eIndex], _affineMat);
+
+        RegisterPoint(spos, epos);
+    }
+}
+
 void LineDrawer::TransferData()
 {
     constMap_->color = color_;
@@ -101,4 +116,40 @@ void LineDrawer::SetVerties()
     obbVertices_[7] = { 0.5f, 0.5f , 0.5f };
 
     obbIndices_ = { 0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7 };
+
+    //sphere頂点の計算
+    const float kLatEvery = std::numbers::pi_v<float> / kDivision;
+    const float kLonEvery = std::numbers::pi_v<float> *2.0f / kDivision;
+
+    for (uint32_t lat = 0; lat < kDivision; ++lat)
+    {
+        for (uint32_t lon = 0; lon < kDivision; ++lon)
+        {
+            float latRad = lat * kLatEvery;
+            float lonRad = lon * kLonEvery;
+
+            float x = std::sin(latRad) * std::cos(lonRad);
+            float y = std::cos(latRad);
+            float z = std::sin(latRad) * std::sin(lonRad);
+
+            sphereVertices_.emplace_back(x, y, z);
+        }
+    }
+    uint32_t div = static_cast<uint32_t> (kDivision);
+    for (uint32_t lat = 0; lat < div - 1; ++lat) {
+        for (uint32_t lon = 0; lon < div; ++lon) {
+            uint32_t current = lat * div + lon;
+            uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
+
+            uint32_t nextLat = (lat + 1) * div + lon;
+            uint32_t nextLonLat = (lat + 1) * div + nextLon;
+
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
+
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back(nextLat);
+        }
+    }
+
 }

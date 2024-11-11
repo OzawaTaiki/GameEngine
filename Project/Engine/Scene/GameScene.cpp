@@ -5,6 +5,7 @@
 #include "MatrixFunction.h"
 #include "ParticleManager.h"
 #include "TextureManager.h"
+#include "CollisionManager.h"
 #include <chrono>
 #include <imgui.h>
 
@@ -36,9 +37,15 @@ void GameScene::Initialize()
     player_ = std::make_unique<Player>();
     player_->Initialize();
 
+    enemy_ = std::make_unique<Enemy>();
+    enemy_->Initialize({ 0,0,10 });
+
     edit_->SetMoveObjTrans(player_->GetWorldTransform());
     camera_->SetParent(player_->GetWorldTransform());
     camera_->translate_ = { 0,1.25f,-0.65f };
+
+
+
 }
 
 void GameScene::Update()
@@ -49,10 +56,12 @@ void GameScene::Update()
         useDebugCamera_ = !useDebugCamera_;
 
     //<-----------------------
+    CollisionManager::GetInstance()->ListReset();
     camera_->Update();
 
     edit_->Update(camera_->GetViewProjection());
 
+    enemy_->Update();
     player_->Update(camera_->GetViewProjection());
 
     if (useDebugCamera_)
@@ -66,7 +75,7 @@ void GameScene::Update()
         camera_->UpdateMatrix();
     }
 
-
+    CollisionManager::GetInstance()->CheckAllCollisions();
 
     //<-----------------------
     ImGui::End();
@@ -79,7 +88,7 @@ void GameScene::Draw()
     //<------------------------
 
     player_->Draw(camera_.get());
-
+    enemy_->Draw(camera_.get());
     edit_->Draw(camera_.get());
 
     //<------------------------

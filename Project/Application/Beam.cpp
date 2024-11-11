@@ -4,6 +4,7 @@
 
 #include "MatrixFunction.h"
 #include "VectorFunction.h"
+#include "CollisionManager.h"
 
 void Beam::Initialize()
 {
@@ -11,6 +12,14 @@ void Beam::Initialize()
 
     model_ = Model::CreateFromObj("beam/beam.obj");
 
+    pSize_ = &worldTransform_.scale_;
+    pRotate_ = &worldTransform_.rotate_;
+    //offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
+
+
+    Collider::SetAtrribute("Player");
+    Collider::SetMask({ "Player" });
+    Collider::SetBoundingBox(Collider::BoundingBox::OBB_3D);
 
 }
 
@@ -22,6 +31,8 @@ void Beam::Update()
         return;
     }
 
+    CollisionManager::GetInstance()->SetCollider(this);
+
     Vector3 target = target_ - worldTransform_.parent_->GetWorldPosition();
     float distance = target_.Length();
     Vector3 direction = target_.Normalize();
@@ -32,6 +43,9 @@ void Beam::Update()
 
 
     worldTransform_.scale_.z = distance;
+    offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
+    offset_.z = (model_->GetMax() + model_->GetMin()).z * worldTransform_.scale_.z / 2.0f;
+    offset_ = target / 2.0f;
 
     worldTransform_.UpdateData();
 
@@ -43,6 +57,13 @@ void Beam::Update()
 void Beam::Draw(const Camera* _camera)
 {
     model_->Draw(worldTransform_, _camera, 0u);
+    if (isDrawBoundingBox_)
+        Collider::Draw();
+}
+
+void Beam::OnCollision()
+{
+
 }
 
 

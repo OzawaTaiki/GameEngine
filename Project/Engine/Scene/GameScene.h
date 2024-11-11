@@ -10,6 +10,7 @@
 #include "Player.h"
 #include <memory>
 #include "CatmulRomSpline.h"
+#include "Enemy.h"
 
 class GameScene : public Scene
 {
@@ -31,6 +32,6 @@ private:
     WorldTransform trans_;
 
     std::unique_ptr<Player>  player_ = nullptr;
-
+    std::unique_ptr<Enemy> enemy_ = nullptr;
     std::unique_ptr<CatmulRomSpline> edit_;
 };
