@@ -22,13 +22,15 @@ void GameScene::Initialize()
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->SetCameraPtr(camera_.get());
 
+    sprite = Sprite::Create(TextureManager::GetInstance()->Load("uvChecker.png"));
+    sprite->Initialize();
 
-    emit_ = new ParticleEmitter;
-    emit_->Setting({ 0,0,0 }, { 0,0,0 }, 1, 1, 10, true);
-    emit_->SetShape_Box({ 2, 2, 2 });
+    //emit_ = new ParticleEmitter;
+    //emit_->Setting({ 0,0,0 }, { 0,0,0 }, 1, 1, 10, true);
+    //emit_->SetShape_Box({ 2, 2, 2 });
 
-   uint32_t handle= TextureManager::GetInstance()->Load("circle.png");
-   ParticleManager::GetInstance()->CreateParticleGroup("sample", "plane/plane.obj", emit_, handle);
+   //uint32_t handle= TextureManager::GetInstance()->Load("circle.png");
+   //ParticleManager::GetInstance()->CreateParticleGroup("sample", "plane/plane.obj", emit_, handle);
 }
 
 void GameScene::Update()
@@ -40,8 +42,7 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-    emit_->Update();
-    ParticleManager::GetInstance()->Update();
+    sprite->Update();
 
     camera_->UpdateMatrix();
     //<-----------------------
@@ -52,19 +53,20 @@ void GameScene::Draw()
 {
     ModelManager::GetInstance()->PreDraw();
     //<------------------------
-    //model_->Draw(trans_, camera_.get(), color);
+
 
     //<------------------------
 
-    ParticleManager::GetInstance()->Draw(camera_.get());
+    //ParticleManager::GetInstance()->Draw(camera_.get());
 
     Sprite::PreDraw();
     //<------------------------
 
+    sprite->Draw();
 
 
     //<------------------------
-    emit_->Draw();
+    //emit_->Draw();
     lineDrawer_->Draw();
 
 

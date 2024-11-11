@@ -31,14 +31,15 @@ public:
     Vector2 uvScale_ = { 1.0f,1.0f };
     float uvRotate_ = 0.0f;
 
-
     static Sprite* Create(uint32_t _textureHandle, const Vector2& _anchor = { 0.5f, 0.5f });
     static void StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight);
     static void PreDraw();
 
     void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle; }
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; CalculateVertex(); }
-    void SetSize(const Vector2& _size) { size_ = _size; CalculateVertex(); }
+
+    void SetSize(const Vector2& _size);
+    void SetLeftTop(const Vector2& _leftTop);
 private:
 
     static uint32_t winWidth_;
@@ -50,7 +51,8 @@ private:
     void CalculateMatrix();
 
     uint32_t textureHandle_ = 0;
-    Vector2 size_ = {100.0f,100.0f };
+
+    Vector2 textureSize_ = { 100.0f,100.0f };
     Vector2 anchor_ = { 0.5f, 0.5f };
     Vector4 color_ = {};
     Matrix4x4 worldMat_ = {};
@@ -78,5 +80,12 @@ private:
     VertexData* vConstMap_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_ = {};
+
+#ifdef _DEBUG
+    Vector2 lefttop_ = { 0.0f,0.0f };
+    Vector2 size_ = { 100.0f,100.0f };
+    void ImGui();
+#endif // _DEBUG
+
 
 };

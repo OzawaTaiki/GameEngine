@@ -38,13 +38,17 @@ void Sprite::Initialize()
     vConstMap_[4].texcoord = {1.0f,0.0f };
     vConstMap_[5].texcoord = vConstMap_[2].texcoord;
 
-    size_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
+    textureSize_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
     anchor_ = { 0,0 };
     CalculateVertex();
 }
 
 void Sprite::Update()
 {
+
+#ifdef _DEBUG
+    ImGui();
+#endif // _DEBUG
 }
 
 void Sprite::Draw()
@@ -87,6 +91,16 @@ void Sprite::PreDraw()
     SpriteManager::GetInstance()->PreDraw();
 }
 
+void Sprite::SetSize(const Vector2& _size)
+{
+    uvScale_ = _size / textureSize_;
+}
+
+void Sprite::SetLeftTop(const Vector2& _leftTop)
+{
+    uvTranslate_ = _leftTop / textureSize_;
+}
+
 void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
 {
     CalculateMatrix();
@@ -99,27 +113,28 @@ void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
 
 void Sprite::CalculateVertex()
 {
-    Vector2 halfSize = size_ ;
+    Vector2 size = textureSize_;
 
     vConstMap_[0].position = {
-        -anchor_.x * halfSize.x,
-        (1.0f - anchor_.y) * halfSize.y,0.0f,1.0f }; // 左下
+        -anchor_.x * size.x ,
+        (1.0f - anchor_.y) * size.y ,0.0f,1.0f }; // 左下
 
     vConstMap_[1].position = {
-        -anchor_.x * halfSize.x,
-        -anchor_.y * halfSize.y,0.0f,1.0f }; // 左上
+        -anchor_.x * size.x,
+        -anchor_.y * size.y,0.0f,1.0f }; // 左上
 
     vConstMap_[2].position = {
-        (1.0f - anchor_.x)* halfSize.x,
-        (1.0f - anchor_.y) * halfSize.y,0.0f,1.0f }; // 右下
+        (1.0f - anchor_.x) * size.x,
+        (1.0f - anchor_.y) * size.y,0.0f,1.0f }; // 右下
 
     vConstMap_[4].position = {
-        (1.0f - anchor_.x) * halfSize.x,
-        -anchor_.y * halfSize.y,0.0f,1.0f }; // 右上
+        (1.0f - anchor_.x) * size.x ,
+        -anchor_.y * size.y ,0.0f,1.0f }; // 右上
 
 
     vConstMap_[3].position = vConstMap_[1].position;
     vConstMap_[5].position = vConstMap_[2].position;
+
 }
 
 void Sprite::CalculateMatrix()
@@ -138,3 +153,31 @@ void Sprite::CalculateMatrix()
     t = { uvTranslate_,0.0f };
     constMap_->uvTransMat = MakeAffineMatrix(s, r, t);
 }
+#ifdef _DEBUG
+#include <imgui.h>
+void Sprite::ImGui()
+{
+    ImGui::Begin("Sprite");
+    ImGui::DragFloat2("Translate", &translate_.x);
+    ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
+    ImGui::DragFloat("Rotate", &rotate_, 0.01f);
+    ImGui::DragFloat2("UVTranslate", &uvTranslate_.x, 0.01f);
+    ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f);
+    ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f);
+    ImGui::ColorEdit4("Color", &color_.x);
+    if(ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f))
+    {
+        CalculateVertex();
+    }
+
+    ImGui::DragFloat2("Size", &size_.x, 0.01f);
+    ImGui::DragFloat2("LeftTop", &lefttop_.x, 0.01f);
+    if (ImGui::Button("Set"))
+    {
+        SetSize(size_);
+        SetLeftTop(lefttop_);
+    }
+
+    ImGui::End();
+}
+#endif // _DEBUG

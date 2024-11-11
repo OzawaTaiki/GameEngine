@@ -10,6 +10,7 @@
 #include "DebugCamera.h"
 #include "ParticleManager.h"
 #include "ParticleEmitters.h"
+#include "Sprite.h"
 
 #include <memory>
 
@@ -35,4 +36,6 @@ private:
     std::unique_ptr <ObjectColor> color_;
 
     ParticleEmitter* emit_;
+
+    Sprite* sprite = nullptr;
 };
