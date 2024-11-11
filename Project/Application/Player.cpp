@@ -25,8 +25,8 @@ void Player::Update(const Matrix4x4& _matVP)
         isBeamActive_ = false;
 
     Aim(_matVP);
-
-    beam_->Update();
+    if(isBeamActive_)
+        beam_->Update();
     worldTransform_.UpdateData();
 }
 

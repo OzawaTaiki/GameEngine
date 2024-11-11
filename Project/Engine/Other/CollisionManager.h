@@ -43,6 +43,7 @@ private:
         Vector3 orientations[3];	//座標軸 正規化・直行必須
         Vector3 size;				//サイズ
         Vector3 rotate;				//回転角
+        Vector3 anchor;				//アンカー
 
     public:
         void CalculateOrientations();
@@ -59,7 +60,7 @@ private:
     bool IsCollision(const OBB& _obb, const Sphere& _sphere);
     bool IsCollision(const Sphere& _sphere, const OBB& _obb);
     bool IsCollision(const AABB& _aabb, const OBB& _obb);
-    bool IsCollision(const OBB& _obb, const AABB& _aabb);  
+    bool IsCollision(const OBB& _obb, const AABB& _aabb);
     bool IsCollision(const OBB& _obb1, const OBB& _obb2);
     void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
 

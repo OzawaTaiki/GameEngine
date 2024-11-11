@@ -21,6 +21,7 @@ public:
     void Draw();
 
     void DrawOBB(const Matrix4x4& _affineMat);
+    void DrawSphere(const Matrix4x4& _affineMat);
 
 private:
     void TransferData();
@@ -54,6 +55,10 @@ private:
     std::array <Vector3, 8> obbVertices_;
     std::array <uint32_t, 24> obbIndices_;
     std::array <Vector3, 32> circleVertices_;
+
+    const float kDivision = 16;
+    std::vector <Vector3> sphereVertices_;
+    std::vector <uint32_t> sphereIndices_;
 
     LineDrawer() = default;
     ~LineDrawer() = default;

@@ -115,6 +115,9 @@
     <Filter Include="Application\Beam">
       <UniqueIdentifier>{e791f65e-32f6-4fce-a97f-eb042433082e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application\Enemy">
+      <UniqueIdentifier>{f3894f60-3f0f-4c40-af65-e5721ee8a759}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -248,6 +251,12 @@
     </ClCompile>
     <ClCompile Include="Application\Beam.cpp">
       <Filter>Application\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy.cpp">
+      <Filter>Application\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\EnemyManager.cpp">
+      <Filter>Application\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -431,6 +440,12 @@
     </ClInclude>
     <ClInclude Include="Application\Beam.h">
       <Filter>Application\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy.h">
+      <Filter>Application\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\EnemyManager.h">
+      <Filter>Application\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
