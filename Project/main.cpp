@@ -33,8 +33,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	TextureManager::GetInstance()->Initialize(srvManager.get());
-	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
+	TextureManager::GetInstance()->Load("cube.jpg");
 
 	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 	ModelManager::GetInstance()->Initialize();

@@ -10,6 +10,8 @@ void Camera::Initialize()
 {
     Map();
     UpdateMatrix();
+
+    worldTransform_.Initialize();
 }
 
 void Camera::Update()
@@ -24,6 +26,12 @@ void Camera::Update()
         }
         ImGui::EndTabBar();
     }
+
+    worldTransform_.transform_ = translate_;
+    worldTransform_.rotate_ = rotate_;
+    worldTransform_.scale_ = scale_;
+    worldTransform_.UpdateData();
+    matView_ = Inverse(worldTransform_.matWorld_);
 
     //Vector3 move;
     //Input::GetInstance()->GetMove(move, 0.1f);
@@ -42,7 +50,7 @@ void Camera::Draw()
 
 void Camera::UpdateMatrix()
 {
-    matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_);
+    matWorld_ = worldTransform_.matWorld_;
     matView_ = Inverse(matWorld_);
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
     matViewProjection_ = matView_ * matProjection_;

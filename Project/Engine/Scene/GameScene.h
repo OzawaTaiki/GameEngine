@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "ObjectColor.h"
 #include "DebugCamera.h"
-
+#include "Player.h"
 #include <memory>
 #include "CatmulRomSpline.h"
 
@@ -27,10 +27,10 @@ private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<DebugCamera> DebugCamera_ = nullptr;
     bool useDebugCamera_ = false;
-
     Model* tile_ = nullptr;
     WorldTransform trans_;
-    std::unique_ptr <ObjectColor> color_;
+
+    std::unique_ptr<Player>  player_ = nullptr;
 
     std::unique_ptr<CatmulRomSpline> edit_;
 };

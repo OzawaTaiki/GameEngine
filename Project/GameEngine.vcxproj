@@ -64,7 +64,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)Engine\Audio;$(projectDir)Engine\Camera;$(projectDir)Engine\DXWin;$(projectDir)Engine\Input;$(projectDir)Engine\Lib;$(projectDir)Engine\Lights;$(projectDir)Engine\Model;$(projectDir)Engine\ObjectColor;$(projectDir)Engine\Other;$(projectDir)Engine\Particle;$(projectDir)Engine\Render;$(projectDir)Engine\Scene;$(projectDir)Engine\Sprite;$(projectDir)Engine\TextureManager;$(projectDir)Engine\Utility</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)Engine\Audio;$(projectDir)Engine\Camera;$(projectDir)Engine\DXWin;$(projectDir)Engine\Input;$(projectDir)Engine\Lib;$(projectDir)Engine\Lights;$(projectDir)Engine\Model;$(projectDir)Engine\ObjectColor;$(projectDir)Engine\Other;$(projectDir)Engine\Particle;$(projectDir)Engine\Render;$(projectDir)Engine\Scene;$(projectDir)Engine\Sprite;$(projectDir)Engine\TextureManager;$(projectDir)Engine\Utility;$(projectdir)Application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,7 +95,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)myLib;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)myLib;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectdir)Application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,6 +117,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Beam.cpp" />
+    <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\DXWin\D3DResourceLeakChecker.cpp" />
@@ -221,6 +223,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Beam.h" />
+    <ClInclude Include="Application\Player.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\DXWin\D3DResourceLeakChecker.h" />

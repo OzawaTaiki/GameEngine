@@ -25,6 +25,8 @@ public:
 
     void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
     void Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color);
+    void Draw(const WorldTransform& _transform, const Camera* _camera, const Vector4& _color = { 1,1,1,1 });
+    void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color = { 1,1,1,1 });
 
     void ShowImGui(const std::string& _name);
 
@@ -41,7 +43,7 @@ public:
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
 
-    ~Model() { delete lightGroup_; }
+    ~Model();
 private:
 
     std::string name_ = {};
@@ -50,6 +52,7 @@ private:
     std::unique_ptr<Material>			material_		= nullptr;
 
     LightGroup*					        lightGroup_		= nullptr;
+    ObjectColor*                        color_          = nullptr;
 
     void LoadMesh(const std::string& _filePath);
     void LoadMaterial(const std::string& _filePath);

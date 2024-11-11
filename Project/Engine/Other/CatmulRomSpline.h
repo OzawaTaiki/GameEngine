@@ -38,7 +38,10 @@ public:
     ~CatmulRomSpline();
 
 
-    Camera* GetCamera()const { return camera_.get(); }
+    /// <summary>
+    /// 移動オブジェクトのポインタをセット
+    /// <summary>
+    void SetMoveObjTrans(WorldTransform* _prt) { pMoveObj_ = _prt;  }
 
     void Initialize(const std::string& _filePath);
     void Update(const Matrix4x4& _vp);
@@ -177,10 +180,9 @@ private:
 
     void RegisterDrawPoint();
 
-    std::unique_ptr <Camera>				camera_							= nullptr;		// カメラ
+    WorldTransform*                         pMoveObj_                       = nullptr;      // 移動オブジェクトのポインタ
     WorldTransform							moveObjTrans_					= {};
     ObjectColor*							moveObjColor_					= nullptr;
-    Vector3                                 cameraOffset_                   = {};
 
     JsonLoader*								jsonLoader_						= nullptr;		// jsonLoaderのポインタ
     Model*									posModel_						= nullptr;		// 座標制御点モデル
