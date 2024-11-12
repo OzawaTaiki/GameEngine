@@ -14,7 +14,7 @@ void Beam::Initialize()
 
     pSize_ = &worldTransform_.scale_;
     pRotate_ = &worldTransform_.rotate_;
-    //offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
+    pWorldTransform_ = &worldTransform_.matWorld_;
 
 
     Collider::SetAtrribute("Player");
@@ -37,15 +37,16 @@ void Beam::Update()
     float distance = target_.Length();
     Vector3 direction = target_.Normalize();
 
+    //direction = TransformNormal(direction, worldTransform_.parent_->matWorld_);
+
+
     worldTransform_.rotate_.y = std::atan2(direction.x, direction.z);
     float horizontalDistance = std::sqrt(direction.x * direction.x + direction.z * direction.z);
     worldTransform_.rotate_.x = -std::atan2(direction.y, horizontalDistance);
 
+    //worldTransform_.rotate_ -= worldTransform_.parent_->rotate_;
 
     worldTransform_.scale_.z = distance;
-    offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
-    offset_.z = (model_->GetMax() + model_->GetMin()).z * worldTransform_.scale_.z / 2.0f;
-    offset_ = target / 2.0f;
 
     worldTransform_.UpdateData();
 
@@ -58,7 +59,7 @@ void Beam::Draw(const Camera* _camera)
 {
     model_->Draw(worldTransform_, _camera, 0u);
     if (isDrawBoundingBox_)
-        Collider::Draw();
+        Collider::Draw(worldTransform_.matWorld_);
 }
 
 void Beam::OnCollision()

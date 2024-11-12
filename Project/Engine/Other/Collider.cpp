@@ -2,9 +2,10 @@
 #include "CollisionManager.h"
 #include "LineDrawer.h"
 #include "MatrixFunction.h"
-void Collider::Draw() const
+
+void Collider::Draw(Matrix4x4 _world) const
 {
-    Matrix4x4 affine = MakeAffineMatrix(GetSize(), GetRotate(), GetWorldPosition() + offset_);
+    Matrix4x4 affine = MakeTranslateMatrix(offset_) * _world;
     switch (boundingBox_)
     {
     case Collider::BoundingBox::Sphere_3D:

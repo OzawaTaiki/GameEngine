@@ -101,7 +101,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                         .rotate = _colliderB->GetRotate()
                     };
                     colB.CalculateOrientations();
-                    if (IsCollision(colA, colB))
+                    if (IsCollision(colB, *_colliderB->pWorldTransform_ ,colA))
                     {
                         _colliderA->OnCollision();
                         _colliderB->OnCollision();
@@ -136,7 +136,6 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     .center = wPosB,
                     .size = _colliderB->GetSize(),
                     .rotate = _colliderB->GetRotate(),
-                    .anchor = _colliderB->GetAnchor()
             };
             switch (_colliderB->GetBoundingBox())
             {
@@ -175,7 +174,6 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                         .center = wPosB,
                         .size = _colliderB->GetSize(),
                         .rotate = _colliderB->GetRotate(),
-                        .anchor = _colliderB->GetAnchor()
                     };
                     colB.CalculateOrientations();
                     if (IsCollision(colA, colB))
@@ -226,40 +224,18 @@ bool CollisionManager::IsCollision(const Sphere& _s, const AABB& _a)
 
 bool CollisionManager::IsCollision(const OBB& _obb, const Sphere& _sphere)
 {
-//    Vector3 anchorPoint = _obb.center + _obb.anchor * _obb.size;
-//
-//#pragma region anchorRotationMat
-//    //Vector3 offset(0.0f, 0.5f, 0.0f);  // [0, 1] 範囲でアンカー位置
-//    //Vector3 anchorPoint = _obb.center + Vector3(_obb.size.x * offset.x, _obb.size.y * offset.y, _obb.size.z * offset.z);
-//
-//    // 2. アンカーを原点に移動する変換行列
-//      Matrix4x4 translateToOrigin = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, -anchorPoint);
-//
-//    // 3. OBBの回転行列（アンカーを基準に回転）
-//    Matrix4x4 rotationMat = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, _obb.rotate, { 0.0f, 0.0f, 0.0f });
-//
-//    // 4. アンカー位置に戻すための逆平行移動行列
-//    Matrix4x4 translateBack = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, anchorPoint);
-//
-//    // 5. 最終的な変換行列（アンカー基準の回転を適用）
-//    Matrix4x4 anchorRotationMat = translateToOrigin * rotationMat * translateBack;
-//
-//    // 6. OBBのローカル座標系での変換
-//    Matrix4x4 obbWorldMat = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, _obb.rotate, _obb.center);
-//    Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
-//
-//    // 7. 球の中心をアンカー基準で回転
-//    Vector3 centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
-//    centerInOBBLocalSphere = Transform(centerInOBBLocalSphere, anchorRotationMat);  // アンカーを基準に回転
-//
-//    LineDrawer::GetInstance()->DrawSphere(MakeAffineMatrix({ 1.f,1.f,1.f }, { 0,0,0 }, centerInOBBLocalSphere));
-//
-//    // 8. OBBのAABBと球の更新（回転後のローカル座標系）
-//    AABB aabbOBBLocal{ .min = -_obb.size, .max = _obb.size };
-//    Sphere sphereOBBLocal{ centerInOBBLocalSphere, _sphere.radius };
-//#pragma endregion
-
     Matrix4x4 obbWorldMat = MakeAffineMatrix(_obb.size, _obb.rotate, _obb.center);
+    Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
+
+    Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
+    AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
+    Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
+
+    return IsCollision(aabbOBBLocal, sphereOBBLocal);
+}
+bool CollisionManager::IsCollision(const OBB& _obb, const Matrix4x4& _world, const Sphere& _sphere)
+{
+    Matrix4x4 obbWorldMat = _world;
     Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
 
     Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);

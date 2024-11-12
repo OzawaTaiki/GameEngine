@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
-
+#include "Matrix4x4.h"
 #include <list>
 #include <unordered_map>
 #include <string>
@@ -43,7 +43,6 @@ private:
         Vector3 orientations[3];	//座標軸 正規化・直行必須
         Vector3 size;				//サイズ
         Vector3 rotate;				//回転角
-        Vector3 anchor;				//アンカー
 
     public:
         void CalculateOrientations();
@@ -58,6 +57,7 @@ private:
     bool IsCollision(const AABB& _a, const Sphere& _s);
     bool IsCollision(const Sphere& _s, const AABB& _a);
     bool IsCollision(const OBB& _obb, const Sphere& _sphere);
+    bool IsCollision(const OBB& _obb, const Matrix4x4& _world, const Sphere& _sphere);
     bool IsCollision(const Sphere& _sphere, const OBB& _obb);
     bool IsCollision(const AABB& _aabb, const OBB& _obb);
     bool IsCollision(const OBB& _obb, const AABB& _aabb);

@@ -19,6 +19,8 @@ void Enemy::Initialize(const Vector3& _pos, const Vector3& _velo, float _lifeTim
     size_ = (model_->GetMin() - model_->GetMax())/ 2.0f;
     pRotate_ = &worldTransform_.rotate_;
     offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
+    pWorldTransform_ = &worldTransform_.matWorld_;
+
 
 }
 
@@ -46,7 +48,7 @@ void Enemy::Draw(const Camera* _camera)
 
     if (IsDrawBoundingBox_)
     {
-        Collider::Draw();
+        Collider::Draw(worldTransform_.matWorld_);
     }
 }
 

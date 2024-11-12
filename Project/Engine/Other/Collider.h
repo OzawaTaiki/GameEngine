@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Matrix4x4.h"
 
 #include <string>
 #include <cstdint>
@@ -18,12 +19,11 @@ public:
     virtual Vector3 GetWorldPosition()const = 0;
     virtual void OnCollision() = 0;
 
-    void Draw() const;
+    void Draw(Matrix4x4 _world) const;
 
     float GetRadius()const { return radius_; }
     Vector3 GetSize()const { return pSize_ ? *pSize_ : size_; }
     Vector3 GetRotate()const { return pRotate_ ? *pRotate_ : rotate_; }
-    Vector3 GetAnchor()const { return anchor_; }
     Vector3 GetOffset()const { return offset_; }
 
     void SetBoundingBox(BoundingBox _set) { boundingBox_ = _set; }
@@ -42,7 +42,7 @@ public:
     uint32_t GetMask() const { return mask_; }
     uint32_t GetAtrribute_() const { return atrribute_; }
 
-
+    const Matrix4x4* pWorldTransform_ = nullptr;
 protected:
     // 衝突判定用変数
     float radius_;  // 球
@@ -51,7 +51,6 @@ protected:
     Vector3 size_ = { 1,1,1 };
     Vector3 rotate_ = {};
     Vector3 offset_ = {};
-    Vector3 anchor_ = { 0.5f,0.5f ,0.5f };
 
     BoundingBox boundingBox_ = BoundingBox::Sphere_3D;
     uint32_t atrribute_ = 0x0;
