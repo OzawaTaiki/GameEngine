@@ -18,12 +18,14 @@ void Camera::Update()
 {
     if(ImGui::BeginTabBar("camera"))
     {
+        ImGui::PushID(this);
         if (ImGui::BeginTabItem("camera"))
         {
             ImGui::DragFloat3("translate", &translate_.x, 0.01f);
             ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
             ImGui::EndTabItem();
         }
+        ImGui::PopID();
         ImGui::EndTabBar();
     }
 

@@ -52,9 +52,13 @@ void GameScene::Initialize()
 void GameScene::Update()
 {
     ImGui::Begin("Engine");
+
     input_->Update();
+
+#ifdef _DEBUG
     if (input_->IsKeyPressed(DIK_RSHIFT) && input_->IsKeyTriggered(DIK_RETURN))
         useDebugCamera_ = !useDebugCamera_;
+#endif // _DEBUG
 
     //<-----------------------
     CollisionManager::GetInstance()->ListReset();
@@ -62,8 +66,16 @@ void GameScene::Update()
     skyDome_->Update();
 
     edit_->Update(camera_->GetViewProjection());
-    EnemyManager::GetInstance()->Update();
     player_->Update(railCamera_->GetViewProjection());
+    if(edit_->IsMove())
+    {
+        EnemyManager::GetInstance()->Update();
+    }
+    else
+    {
+        if (Input::GetInstance()->IsKeyTriggered(DIK_SPACE))
+            edit_->Move();
+    }
 
     if (useDebugCamera_)
     {

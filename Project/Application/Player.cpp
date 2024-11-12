@@ -17,6 +17,11 @@ void Player::Initialize()
 
 void Player::Update(const Matrix4x4& _matVP)
 {
+#ifdef _DEBUG
+    ImGui();
+#endif //  _DEBUG
+
+
     if (Input::GetInstance()->IsKeyTriggered(DIK_SPACE))
     {
         isBeamActive_ = true;
@@ -69,6 +74,7 @@ void Player::ImGui()
     ImGui::BeginTabBar("Player");
     if(ImGui::BeginTabItem("Player"))
     {
+        ImGui::Text("PlayerPosition:%.2f,%.2f,%.2f", worldTransform_.GetWorldPosition().x, worldTransform_.GetWorldPosition().y, worldTransform_.GetWorldPosition().z);
         ImGui::EndTabItem();
     }
     ImGui::EndTabBar();

@@ -239,7 +239,14 @@ bool CollisionManager::IsCollision(const OBB& _obb, const Matrix4x4& _world, con
     Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
 
     Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
-    AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
+    AABB aabbOBBLocal;
+    aabbOBBLocal.min.x = std::min(-_obb.size.x, _obb.size.x);
+    aabbOBBLocal.min.y = std::min(-_obb.size.y, _obb.size.y);
+    aabbOBBLocal.min.z = std::min(-_obb.size.z, _obb.size.z);
+    aabbOBBLocal.max.x = std::max(-_obb.size.x, _obb.size.x);
+    aabbOBBLocal.max.y = std::max(-_obb.size.y, _obb.size.y);
+    aabbOBBLocal.max.z = std::max(-_obb.size.z, _obb.size.z);
+
     Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
 
     return IsCollision(aabbOBBLocal, sphereOBBLocal);

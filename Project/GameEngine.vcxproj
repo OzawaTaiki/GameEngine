@@ -95,7 +95,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)myLib;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectdir)Application</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectdir)Application;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine/Camera;$(ProjectDir)Engine/DXWin;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/Lights;$(ProjectDir)Engine/Lib;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/ObjectColor;$(ProjectDir)Engine/Other;$(ProjectDir)Engine/Particle;$(ProjectDir)Engine/Render;$(ProjectDir)Engine/Scene;$(ProjectDir)Engine/TextureManager;$(ProjectDir)Engine/Sprite;$(ProjectDir)Engine/Utility;$(ProjectDir)Application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
