@@ -121,6 +121,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy.cpp" />
     <ClCompile Include="Application\EnemyManager.cpp" />
     <ClCompile Include="Application\Player.cpp" />
+    <ClCompile Include="Application\RailCamera.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\DXWin\D3DResourceLeakChecker.cpp" />
@@ -229,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy.h" />
     <ClInclude Include="Application\EnemyManager.h" />
     <ClInclude Include="Application\Player.h" />
+    <ClInclude Include="Application\RailCamera.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\DXWin\D3DResourceLeakChecker.h" />

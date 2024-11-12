@@ -252,6 +252,9 @@
     <ClCompile Include="Application\Beam.cpp">
       <Filter>Application\Beam</Filter>
     </ClCompile>
+    <ClCompile Include="Application\RailCamera.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
     <ClCompile Include="Application\Enemy.cpp">
       <Filter>Application\Enemy</Filter>
     </ClCompile>
@@ -446,6 +449,9 @@
     </ClInclude>
     <ClInclude Include="Application\EnemyManager.h">
       <Filter>Application\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\RailCamera.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
