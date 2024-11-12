@@ -3,6 +3,7 @@
 #include "Collider.h"
 #include "MyLib.h"
 #include "ImGuiManager.h"
+#include "LineDrawer.h"
 #include <algorithm>
 
 CollisionManager* CollisionManager::GetInstance()
@@ -49,8 +50,8 @@ uint32_t CollisionManager::GetMask(const std::string& _atrribute)
 
 void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
 {
-    Vector3 wPosA = _colliderA->GetWorldPosition();
-    Vector3 wPosB = _colliderB->GetWorldPosition();
+    Vector3 wPosA = _colliderA->GetWorldPosition() + _colliderA->GetOffset();
+    Vector3 wPosB = _colliderB->GetWorldPosition() + _colliderB->GetOffset();
 
      switch (_colliderA->GetBoundingBox())
     {
@@ -100,7 +101,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                         .rotate = _colliderB->GetRotate()
                     };
                     colB.CalculateOrientations();
-                    if (IsCollision(colA, colB))
+                    if (IsCollision(colB, *_colliderB->pWorldTransform_ ,colA))
                     {
                         _colliderA->OnCollision();
                         _colliderB->OnCollision();
@@ -134,7 +135,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
             OBB colA = {
                     .center = wPosB,
                     .size = _colliderB->GetSize(),
-                    .rotate = _colliderB->GetRotate()
+                    .rotate = _colliderB->GetRotate(),
             };
             switch (_colliderB->GetBoundingBox())
             {
@@ -145,7 +146,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                    .radius = _colliderB->GetRadius()
                     };
 
-                    if (IsCollision(colA, colB))
+                    if (IsCollision(colA, *_colliderB->pWorldTransform_, colB))
                     {
                         _colliderA->OnCollision();
                         _colliderB->OnCollision();
@@ -172,7 +173,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     OBB colB = {
                         .center = wPosB,
                         .size = _colliderB->GetSize(),
-                        .rotate = _colliderB->GetRotate()
+                        .rotate = _colliderB->GetRotate(),
                     };
                     colB.CalculateOrientations();
                     if (IsCollision(colA, colB))
@@ -223,8 +224,19 @@ bool CollisionManager::IsCollision(const Sphere& _s, const AABB& _a)
 
 bool CollisionManager::IsCollision(const OBB& _obb, const Sphere& _sphere)
 {
-    Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
-    Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
+    Matrix4x4 obbWorldMat = MakeAffineMatrix(_obb.size, _obb.rotate, _obb.center);
+    Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
+
+    Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
+    AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
+    Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
+
+    return IsCollision(aabbOBBLocal, sphereOBBLocal);
+}
+bool CollisionManager::IsCollision(const OBB& _obb, const Matrix4x4& _world, const Sphere& _sphere)
+{
+    Matrix4x4 obbWorldMat = _world;
+    Matrix4x4 obbWorldMatInv = Inverse(obbWorldMat);
 
     Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
     AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
@@ -243,7 +255,7 @@ bool CollisionManager::IsCollision(const AABB& _aabb, const OBB& _obb)
 }
 bool CollisionManager::IsCollision(const OBB& _obb, const AABB& _aabb)
 {
-    return IsCollision(_aabb, _obb);;
+    return IsCollision(_aabb, _obb);
 }
 bool CollisionManager::IsCollision(const OBB& _obb1, const OBB& _obb2)
 {

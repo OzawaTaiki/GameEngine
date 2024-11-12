@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
-
+#include "Matrix4x4.h"
 #include <list>
 #include <unordered_map>
 #include <string>
@@ -57,9 +57,10 @@ private:
     bool IsCollision(const AABB& _a, const Sphere& _s);
     bool IsCollision(const Sphere& _s, const AABB& _a);
     bool IsCollision(const OBB& _obb, const Sphere& _sphere);
+    bool IsCollision(const OBB& _obb, const Matrix4x4& _world, const Sphere& _sphere);
     bool IsCollision(const Sphere& _sphere, const OBB& _obb);
     bool IsCollision(const AABB& _aabb, const OBB& _obb);
-    bool IsCollision(const OBB& _obb, const AABB& _aabb);  
+    bool IsCollision(const OBB& _obb, const AABB& _aabb);
     bool IsCollision(const OBB& _obb1, const OBB& _obb2);
     void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
 

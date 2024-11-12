@@ -10,6 +10,7 @@
 #include "Player.h"
 #include <memory>
 #include "CatmulRomSpline.h"
+#include "Enemy.h"
 #include "RailCamera.h"
 
 class GameScene : public Scene

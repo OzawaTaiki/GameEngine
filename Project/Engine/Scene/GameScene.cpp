@@ -5,6 +5,9 @@
 #include "MatrixFunction.h"
 #include "ParticleManager.h"
 #include "TextureManager.h"
+#include "CollisionManager.h"
+#include "EnemyManager.h"
+#include <chrono>
 #include <imgui.h>
 
 GameScene::~GameScene()
@@ -35,12 +38,13 @@ void GameScene::Initialize()
     player_ = std::make_unique<Player>();
     player_->Initialize();
 
+    EnemyManager::GetInstance()->Initialize("Resources/data/enemyPopData.csv");
+
     railCamera_ = std::make_unique<RailCamera>();
     railCamera_->Initialize();
 
     edit_->SetMoveObjTrans(player_->GetWorldTransform());
-    camera_->SetParent(player_->GetWorldTransform());
-    camera_->translate_ = { 0,1.25f,-0.65f };
+    railCamera_->SetParent(player_->GetWorldTransform());
 }
 
 void GameScene::Update()
@@ -51,9 +55,11 @@ void GameScene::Update()
         useDebugCamera_ = !useDebugCamera_;
 
     //<-----------------------
+    CollisionManager::GetInstance()->ListReset();
+    camera_->Update();
 
     edit_->Update(railCamera_->GetViewProjection());
-
+    EnemyManager::GetInstance()->Update();
     player_->Update(railCamera_->GetViewProjection());
 
     if (useDebugCamera_)
@@ -65,10 +71,10 @@ void GameScene::Update()
     {
         railCamera_->Update();
         camera_->matView_ = railCamera_->GetViewMatrix();
-        camera_->UpdateMatrix();
+        camera_->TransferData();
     }
 
-
+    CollisionManager::GetInstance()->CheckAllCollisions();
 
     //<-----------------------
     ImGui::End();
@@ -81,7 +87,7 @@ void GameScene::Draw()
     //<------------------------
 
     player_->Draw(camera_.get());
-
+    EnemyManager::GetInstance()->Draw(camera_.get());
     edit_->Draw(camera_.get());
 
     //<------------------------
