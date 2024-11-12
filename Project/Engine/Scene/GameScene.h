@@ -10,6 +10,7 @@
 #include "Player.h"
 #include <memory>
 #include "CatmulRomSpline.h"
+#include "RailCamera.h"
 
 class GameScene : public Scene
 {
@@ -22,15 +23,15 @@ public:
 
 
 private:
-    Input* input_ = nullptr;
-    LineDrawer* lineDrawer = nullptr;
-    std::unique_ptr<Camera> camera_ = nullptr;
-    std::unique_ptr<DebugCamera> DebugCamera_ = nullptr;
-    bool useDebugCamera_ = false;
-    Model* tile_ = nullptr;
-    WorldTransform trans_;
+    Input*                              input_          = nullptr;
+    LineDrawer*                         lineDrawer      = nullptr;
+    std::unique_ptr<Camera>             camera_         = nullptr;  //描画用カメラ
+    std::unique_ptr<DebugCamera>        DebugCamera_    = nullptr;
+    bool                                useDebugCamera_ = false;
+    Model*                              tile_           = nullptr;
+    WorldTransform                      trans_          = {};
 
-    std::unique_ptr<Player>  player_ = nullptr;
-
-    std::unique_ptr<CatmulRomSpline> edit_;
+    std::unique_ptr<Player>             player_         = nullptr;
+    std::unique_ptr<RailCamera>         railCamera_     = nullptr;
+    std::unique_ptr<CatmulRomSpline>    edit_           = nullptr;
 };

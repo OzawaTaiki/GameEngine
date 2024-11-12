@@ -249,6 +249,9 @@
     <ClCompile Include="Application\Beam.cpp">
       <Filter>Application\Beam</Filter>
     </ClCompile>
+    <ClCompile Include="Application\RailCamera.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\Object3d.hlsli">
@@ -431,6 +434,9 @@
     </ClInclude>
     <ClInclude Include="Application\Beam.h">
       <Filter>Application\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\RailCamera.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

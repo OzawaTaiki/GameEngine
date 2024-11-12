@@ -5,7 +5,6 @@
 #include "MatrixFunction.h"
 #include "ParticleManager.h"
 #include "TextureManager.h"
-#include <chrono>
 #include <imgui.h>
 
 GameScene::~GameScene()
@@ -36,6 +35,9 @@ void GameScene::Initialize()
     player_ = std::make_unique<Player>();
     player_->Initialize();
 
+    railCamera_ = std::make_unique<RailCamera>();
+    railCamera_->Initialize();
+
     edit_->SetMoveObjTrans(player_->GetWorldTransform());
     camera_->SetParent(player_->GetWorldTransform());
     camera_->translate_ = { 0,1.25f,-0.65f };
@@ -49,20 +51,20 @@ void GameScene::Update()
         useDebugCamera_ = !useDebugCamera_;
 
     //<-----------------------
-    camera_->Update();
 
-    edit_->Update(camera_->GetViewProjection());
+    edit_->Update(railCamera_->GetViewProjection());
 
-    player_->Update(camera_->GetViewProjection());
+    player_->Update(railCamera_->GetViewProjection());
 
     if (useDebugCamera_)
     {
         DebugCamera_->Update();
-        camera_->matView_ = DebugCamera_->matView_;
         camera_->TransferData();
     }
     else
     {
+        railCamera_->Update();
+        camera_->matView_ = railCamera_->GetViewMatrix();
         camera_->UpdateMatrix();
     }
 
