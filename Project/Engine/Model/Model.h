@@ -43,7 +43,7 @@ public:
     Vector3 GetMax() { return mesh_->GetMax(); }
 
     static const std::string defaultDirpath_;
-
+    void SetLightingFlag(bool _flag) { material_->enableLighting_ = _flag; material_->TransferData(); }
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
 
     ~Model();

@@ -31,6 +31,8 @@ void GameScene::Initialize()
     trans_.Initialize();
     trans_.UpdateData();
 
+    skyDome_ = std::make_unique<SkyDome>();
+    skyDome_->Initialize();
 
     edit_ = std::make_unique<CatmulRomSpline>();
     edit_->Initialize("Resources/Data/Spline");
@@ -57,6 +59,7 @@ void GameScene::Update()
     //<-----------------------
     CollisionManager::GetInstance()->ListReset();
     camera_->Update();
+    skyDome_->Update();
 
     edit_->Update(railCamera_->GetViewProjection());
     EnemyManager::GetInstance()->Update();
@@ -65,6 +68,7 @@ void GameScene::Update()
     if (useDebugCamera_)
     {
         DebugCamera_->Update();
+        camera_->matView_ = DebugCamera_->matView_;
         camera_->TransferData();
     }
     else
@@ -86,6 +90,7 @@ void GameScene::Draw()
     tile_->Draw(trans_, camera_.get());
     //<------------------------
 
+    skyDome_->Draw(camera_.get());
     player_->Draw(camera_.get());
     EnemyManager::GetInstance()->Draw(camera_.get());
     edit_->Draw(camera_.get());

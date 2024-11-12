@@ -12,6 +12,7 @@
 #include "CatmulRomSpline.h"
 #include "Enemy.h"
 #include "RailCamera.h"
+#include "SkyDome.h"
 
 class GameScene : public Scene
 {
@@ -32,6 +33,7 @@ private:
     Model*                              tile_           = nullptr;
     WorldTransform                      trans_          = {};
 
+    std::unique_ptr<SkyDome>            skyDome_        = nullptr;
     std::unique_ptr<Player>             player_         = nullptr;
     std::unique_ptr<RailCamera>         railCamera_     = nullptr;
     std::unique_ptr<CatmulRomSpline>    edit_           = nullptr;
