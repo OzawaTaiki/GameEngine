@@ -146,7 +146,7 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                    .radius = _colliderB->GetRadius()
                     };
 
-                    if (IsCollision(colA, colB))
+                    if (IsCollision(colA, *_colliderB->pWorldTransform_, colB))
                     {
                         _colliderA->OnCollision();
                         _colliderB->OnCollision();
