@@ -40,9 +40,6 @@ void GameScene::Initialize()
 
     EnemyManager::GetInstance()->Initialize("Resources/data/enemyPopData.csv");
 
-    enemy_ = std::make_unique<Enemy>();
-    //enemy_->Initialize({ 0,0,10 });
-
     railCamera_ = std::make_unique<RailCamera>();
     railCamera_->Initialize();
 
@@ -68,7 +65,6 @@ void GameScene::Update()
     if (useDebugCamera_)
     {
         DebugCamera_->Update();
-        camera_->matView_ = DebugCamera_->matView_;
         camera_->TransferData();
     }
     else

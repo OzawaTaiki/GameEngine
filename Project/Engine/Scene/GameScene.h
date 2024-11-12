@@ -35,5 +35,4 @@ private:
     std::unique_ptr<Player>             player_         = nullptr;
     std::unique_ptr<RailCamera>         railCamera_     = nullptr;
     std::unique_ptr<CatmulRomSpline>    edit_           = nullptr;
-    std::unique_ptr<Enemy> enemy_ = nullptr;
 };
