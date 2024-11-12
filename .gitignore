@@ -37,6 +37,9 @@ bld/
 
 Generated/
 
+!Resources/models/*.obj
+!Resources/models/**/*.obj
+!externals/assimp/[Ll]ib/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -104,9 +107,6 @@ StyleCopReport.xml
 *.scc
 
 *.tlog
-!Resources/models/*.obj
-!Resources/models/**/*.obj
-!externals/assimp/[Ll]ib/
 
 # Chutzpah Test files
 
