@@ -47,9 +47,7 @@ void GameScene::Initialize()
     railCamera_->Initialize();
 
     edit_->SetMoveObjTrans(player_->GetWorldTransform());
-    camera_->SetParent(player_->GetWorldTransform());
-    camera_->translate_ = { 0,1.25f,-0.65f };
-
+    railCamera_->SetParent(player_->GetWorldTransform());
 }
 
 void GameScene::Update()
@@ -70,13 +68,14 @@ void GameScene::Update()
     if (useDebugCamera_)
     {
         DebugCamera_->Update();
+        camera_->matView_ = DebugCamera_->matView_;
         camera_->TransferData();
     }
     else
     {
         railCamera_->Update();
         camera_->matView_ = railCamera_->GetViewMatrix();
-        camera_->UpdateMatrix();
+        camera_->TransferData();
     }
 
     CollisionManager::GetInstance()->CheckAllCollisions();
