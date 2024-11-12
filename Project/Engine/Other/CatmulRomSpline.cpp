@@ -15,6 +15,7 @@ CatmulRomSpline::CatmulRomSpline()
 
 CatmulRomSpline::~CatmulRomSpline()
 {
+#ifdef _DEBUG
     ConvertToFinalDataOfRotCtrl();
     jsonLoader_->PrepareForSave();
     // jsonにsave
@@ -30,6 +31,7 @@ CatmulRomSpline::~CatmulRomSpline()
 
     jsonLoader_->SetData("rotCtrlPoint", "rotate", rot);
     jsonLoader_->SetData("rotCtrlPoint", "posOnLine", pos);
+#endif // _DEBUG
 
     delete jsonLoader_;
     delete colorRed_;
@@ -104,13 +106,21 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
         AddRotCtrlPoint();
     }
 
+#ifdef _DEBUG
     isDrawCtrlPoint_ = true;
     isDrawPosCtrlPoint_ = true;
     isDrawRotCtrlPoint_ = true;
+#else
+    isDrawCtrlPoint_ = false;
+    isDrawPosCtrlPoint_ = false;
+    isDrawRotCtrlPoint_ = false;
+#endif // _DEBUG
+    isMove_ = false;
+
 
     deltaTime_ = 1.0f / 60.0f;
-    speed_ = 1.0f;
 
+    speed_ = 2.0f;
     hitRadius_ =20.0f;
 
     return;
@@ -142,11 +152,14 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
     RegisterDrawPoint();
 
-
 }
 
 void CatmulRomSpline::Draw(const Camera* _camera)
 {
+#ifndef _DEBUG
+    return;
+#endif // DEBUG
+
     if (isDrawCtrlPoint_)
     {
         if (isDrawPosCtrlPoint_)
@@ -160,22 +173,18 @@ void CatmulRomSpline::Draw(const Camera* _camera)
                     posModel_->Draw(ctrlPoint->worldTransform, _camera, posModelTexture_, colorWhite_);
             }
         }
-    }
-    if (isDrawRotCtrlPoint_)
-    {
-        for (const auto& ctrlPoint : editRotCtrlPoints_)
+        if (isDrawRotCtrlPoint_)
         {
-            if (selectRotIterator_ != editRotCtrlPoints_.end() &&
-                ctrlPoint.get() == (*selectRotIterator_).get())
-                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorRed_);
-            else
-                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
+            for (const auto& ctrlPoint : editRotCtrlPoints_)
+            {
+                if (selectRotIterator_ != editRotCtrlPoints_.end() &&
+                    ctrlPoint.get() == (*selectRotIterator_).get())
+                    rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorRed_);
+                else
+                    rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
+            }
         }
     }
-
-    if (drawMoveObj_)
-        rotModel_->Draw(moveObjTrans_, _camera, moveObjColor_);
-
 }
 
 void CatmulRomSpline::CreateFinalRotData(const std::vector<Vector3>& _rotArr, const std::vector<float>& _posArr)
@@ -759,9 +768,13 @@ void CatmulRomSpline::SelectPoint(const Matrix4x4& _vp)
 
 void CatmulRomSpline::RegisterDrawPoint()
 {
+#ifndef _DEBUG
+    return;
+#endif // DEBUG
+
     auto instance = LineDrawer::GetInstance();
 
-    for (size_t index=1;index<lineDrawPoint_.size();index++)
+    for (size_t index = 1; index < lineDrawPoint_.size(); index++)
     {
         instance->RegisterPoint(lineDrawPoint_[index - 1], lineDrawPoint_[index]);
     }
@@ -781,6 +794,7 @@ void CatmulRomSpline::ImGui()
     ImGui::Checkbox("drawMoveObj", &drawMoveObj_);
     if (ImGui::Checkbox("Move", &isMove_)) {
         isDrawCtrlPoint_ = !isMove_;
+        isDrawRotCtrlPoint_ = !isMove_;
     }
     ImGui::DragFloat("selectRadius", &hitRadius_, 0.1f);
 

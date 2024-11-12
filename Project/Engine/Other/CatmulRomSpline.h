@@ -48,6 +48,7 @@ public:
     void Draw(const Camera* _camera);
 
     bool IsMove()const { return isMove_; }
+    void Move() { isMove_ = true; }
 
 private:
     /// <summary>

@@ -45,11 +45,13 @@ void ImGuiManager::End()
 
 void ImGuiManager::Draw()
 {
+#ifdef _DEBUG
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     ID3D12DescriptorHeap* ppheaps[] = { srvManager_->GetSRVHeap_() };
     commandList->SetDescriptorHeaps(_countof(ppheaps), ppheaps);
 
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+#endif // _DEBUG
 
 }
 
