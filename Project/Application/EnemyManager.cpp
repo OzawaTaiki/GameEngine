@@ -15,6 +15,7 @@ void EnemyManager::Initialize(const std::string& _loadPath)
 
     popTimer_ = 0.0f;
     popInterval_ = 0.0f;
+    enemies_.clear();
 }
 
 void EnemyManager::Update()
@@ -50,10 +51,9 @@ void EnemyManager::LoadPopData(const std::string& _loadPath)
         return;
     }
 
-    // Clear buffer
-    popCommand_.clear();
-    // Load file to buffer
-    popCommand_ << ifs.rdbuf();
+    std::stringstream buffer; // 新しいバッファを作成
+    buffer << ifs.rdbuf();    // ファイルの内容をバッファに読み込む
+    popCommand_.swap(buffer);  // popCommand_と新しいバッファを交換
 
     // Close file
     ifs.close();

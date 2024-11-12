@@ -21,7 +21,7 @@ void Enemy::Initialize(const Vector3& _pos, const Vector3& _velo, float _lifeTim
     offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
     pWorldTransform_ = &worldTransform_.matWorld_;
 
-
+    isAlive_ = true;
 }
 
 void Enemy::Update()
@@ -46,10 +46,12 @@ void Enemy::Draw(const Camera* _camera)
     if(isAlive_)
         model_->Draw(worldTransform_, _camera);
 
+#ifdef _DEBUG
     if (IsDrawBoundingBox_)
     {
         Collider::Draw(worldTransform_.matWorld_);
     }
+#endif // _DEBUG
 }
 
 void Enemy::OnCollision()

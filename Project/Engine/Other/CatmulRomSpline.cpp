@@ -768,10 +768,6 @@ void CatmulRomSpline::SelectPoint(const Matrix4x4& _vp)
 
 void CatmulRomSpline::RegisterDrawPoint()
 {
-#ifndef _DEBUG
-    return;
-#endif // DEBUG
-
     auto instance = LineDrawer::GetInstance();
 
     for (size_t index = 1; index < lineDrawPoint_.size(); index++)

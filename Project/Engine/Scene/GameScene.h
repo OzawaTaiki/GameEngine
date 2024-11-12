@@ -25,16 +25,16 @@ public:
 
 
 private:
-    Input*                              input_          = nullptr;
-    LineDrawer*                         lineDrawer      = nullptr;
-    std::unique_ptr<Camera>             camera_         = nullptr;  //描画用カメラ
-    std::unique_ptr<DebugCamera>        DebugCamera_    = nullptr;
+    Input* input_ = nullptr;
+    LineDrawer* lineDrawer = nullptr;
+    std::unique_ptr<Camera>             camera_ = nullptr;  //描画用カメラ
+    std::unique_ptr<DebugCamera>        DebugCamera_ = nullptr;
     bool                                useDebugCamera_ = false;
-    Model*                              tile_           = nullptr;
-    WorldTransform                      trans_          = {};
+    Model* tile_ = nullptr;
+    WorldTransform                      trans_ = {};
 
-    std::unique_ptr<SkyDome>            skyDome_        = nullptr;
-    std::unique_ptr<Player>             player_         = nullptr;
-    std::unique_ptr<RailCamera>         railCamera_     = nullptr;
-    std::unique_ptr<CatmulRomSpline>    edit_           = nullptr;
+    std::unique_ptr<SkyDome>            skyDome_ = nullptr;
+    std::unique_ptr<Player>             player_ = nullptr;
+    std::unique_ptr<RailCamera>         railCamera_ = nullptr;
+    std::unique_ptr<CatmulRomSpline>    edit_ = nullptr;
 };

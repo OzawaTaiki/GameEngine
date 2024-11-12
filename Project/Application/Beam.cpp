@@ -58,8 +58,10 @@ void Beam::Update()
 void Beam::Draw(const Camera* _camera)
 {
     model_->Draw(worldTransform_, _camera, 0u);
+#ifdef _DEBUG
     if (isDrawBoundingBox_)
         Collider::Draw(worldTransform_.matWorld_);
+#endif // _DEBUG
 }
 
 void Beam::OnCollision()

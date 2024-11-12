@@ -7,7 +7,6 @@
 #include "TextureManager.h"
 #include "CollisionManager.h"
 #include "EnemyManager.h"
-#include <chrono>
 #include <imgui.h>
 
 GameScene::~GameScene()
@@ -59,6 +58,9 @@ void GameScene::Update()
     if (input_->IsKeyPressed(DIK_RSHIFT) && input_->IsKeyTriggered(DIK_RETURN))
         useDebugCamera_ = !useDebugCamera_;
 #endif // _DEBUG
+
+    if (Input::GetInstance()->IsKeyTriggered(DIK_R))
+        Initialize();
 
     //<-----------------------
     CollisionManager::GetInstance()->ListReset();
