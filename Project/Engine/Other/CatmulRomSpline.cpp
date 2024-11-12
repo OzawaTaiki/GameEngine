@@ -673,6 +673,11 @@ Vector3 CatmulRomSpline::Rotate(float _t)
 {
     ConvertToFinalDataOfRotCtrl();
 
+    if (finalRotCtrlPoints_.empty())
+    {
+        return { 0,0,0 };
+    }
+
     size_t divistion = finalRotCtrlPoints_.size() - 1;
     size_t index = static_cast<size_t>(std::floor(_t * divistion));
     index = std::clamp(index, size_t(0), finalRotCtrlPoints_.size() - 1);
@@ -799,7 +804,7 @@ void CatmulRomSpline::ImGui()
     }
     if (ImGui::BeginTabItem("rotation"))
     {
-        selectRot_= true;
+        selectRot_ = true;
         ImGui::SliderFloat("AddPosition", &addRotCtrlPoint_, 0.0f, totalLength_ - 0.01f);
 
         if (ImGui::Button("AddControlPoint") /*|| Input::GetInstance()->PushKey(DIK_LALT) && Input::GetInstance()->IsTriggerMouse(0)*/)
@@ -845,11 +850,9 @@ void CatmulRomSpline::ImGui()
         ImGui::Text("number : %d", (int)selectRotIterator_->get()->number);
     }
 
-    if (drawMoveObj_) {
-        if (ImGui::SliderFloat("positionOnLine", &posOnLine_, 0.0f, totalLength_))
-            CalculatePositinByPosOnLine();
-        ImGui::DragFloat("speed", &speed_, 0.1f);
-    }
+    if (ImGui::SliderFloat("positionOnLine", &posOnLine_, 0.0f, totalLength_))
+        CalculatePositinByPosOnLine();
+    ImGui::DragFloat("speed", &speed_, 0.1f);
 
     /*for (float l : areaLength_) {
         ImGui::Text("%f", l);

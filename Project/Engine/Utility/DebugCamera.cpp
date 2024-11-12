@@ -12,7 +12,7 @@ void DebugCamera::Update()
 {
     Vector3 move;
     Input::GetInstance()->GetMove(move,0.1f);
-    translate_.y += move.y;
+        translate_.y += move.y;;
     move.y = 0;
     Vector3 rot;
     Input::GetInstance()->GetRotate(rot);

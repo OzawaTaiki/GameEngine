@@ -61,7 +61,7 @@ void GameScene::Update()
     camera_->Update();
     skyDome_->Update();
 
-    edit_->Update(railCamera_->GetViewProjection());
+    edit_->Update(camera_->GetViewProjection());
     EnemyManager::GetInstance()->Update();
     player_->Update(railCamera_->GetViewProjection());
 
