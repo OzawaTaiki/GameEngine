@@ -117,14 +117,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\AnimationModel\AnimationModel.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\DXWin\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Engine\DXWin\DXCommon.cpp" />
     <ClCompile Include="Engine\DXWin\WinApp.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Joint\Joint.cpp" />
     <ClCompile Include="Engine\Lib\MatrixFunction.cpp" />
     <ClCompile Include="Engine\Lib\MyLib.cpp" />
+    <ClCompile Include="Engine\Lib\Quaternion.cpp" />
     <ClCompile Include="Engine\Lib\Vector2.cpp" />
     <ClCompile Include="Engine\Lib\Vector3.cpp" />
     <ClCompile Include="Engine\Lib\VectorFunction.cpp" />
@@ -135,8 +138,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
+    <ClCompile Include="Engine\Model\ModelAnimation.cpp" />
     <ClCompile Include="Engine\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Model\ObjectModel.cpp" />
     <ClCompile Include="Engine\Model\WorldTransform.cpp" />
+    <ClCompile Include="Engine\Node\Node.cpp" />
     <ClCompile Include="Engine\ObjectColor\ObjectColor.cpp" />
     <ClCompile Include="Engine\Other\CatmulRomSpline.cpp" />
     <ClCompile Include="Engine\Other\Collider.cpp" />
@@ -148,6 +154,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Render\SRVManager.cpp" />
     <ClCompile Include="Engine\Scene\GameScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Engine\Skeleton\Skeleton.cpp" />
+    <ClCompile Include="Engine\SkinCluster\SkinCluster.cpp" />
     <ClCompile Include="Engine\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Sprite\SpriteManager.cpp" />
     <ClCompile Include="Engine\TextureManager\TextureManager.cpp" />
@@ -211,6 +219,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\Shader\SkinningObject3d.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shader\Sprite.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -221,16 +233,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\AnimationModel\AnimationModel.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\DXWin\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\DXWin\DXCommon.h" />
     <ClInclude Include="Engine\DXWin\WinApp.h" />
     <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Joint\Joint.h" />
     <ClInclude Include="Engine\Lib\Matrix3x3.h" />
     <ClInclude Include="Engine\Lib\Matrix4x4.h" />
     <ClInclude Include="Engine\Lib\MatrixFunction.h" />
     <ClInclude Include="Engine\Lib\MyLib.h" />
+    <ClInclude Include="Engine\Lib\Quaternion.h" />
+    <ClInclude Include="Engine\Lib\QuaternionTransform.h" />
     <ClInclude Include="Engine\Lib\Vector2.h" />
     <ClInclude Include="Engine\Lib\Vector3.h" />
     <ClInclude Include="Engine\Lib\Vector4.h" />
@@ -242,8 +258,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Material.h" />
     <ClInclude Include="Engine\Model\Mesh.h" />
     <ClInclude Include="Engine\Model\Model.h" />
+    <ClInclude Include="Engine\Model\ModelAnimation.h" />
     <ClInclude Include="Engine\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Model\ObjectModel.h" />
     <ClInclude Include="Engine\Model\WorldTransform.h" />
+    <ClInclude Include="Engine\Node\Node.h" />
     <ClInclude Include="Engine\ObjectColor\ObjectColor.h" />
     <ClInclude Include="Engine\Other\CatmulRomSpline.h" />
     <ClInclude Include="Engine\Other\Collider.h" />
@@ -256,6 +275,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\GameScene.h" />
     <ClInclude Include="Engine\Scene\Scene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Engine\Skeleton\Skeleton.h" />
+    <ClInclude Include="Engine\SkinCluster\SkinCluster.h" />
     <ClInclude Include="Engine\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Sprite\SpriteManager.h" />
     <ClInclude Include="Engine\TextureManager\TextureManager.h" />

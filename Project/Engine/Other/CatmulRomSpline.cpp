@@ -15,6 +15,7 @@ CatmulRomSpline::CatmulRomSpline()
 
 CatmulRomSpline::~CatmulRomSpline()
 {
+#ifdef _DEBUG
     ConvertToFinalDataOfRotCtrl();
     jsonLoader_->PrepareForSave();
     // jsonにsave
@@ -30,6 +31,7 @@ CatmulRomSpline::~CatmulRomSpline()
 
     jsonLoader_->SetData("rotCtrlPoint", "rotate", rot);
     jsonLoader_->SetData("rotCtrlPoint", "posOnLine", pos);
+#endif // _DEBUG
 
     delete jsonLoader_;
     delete colorRed_;
@@ -59,8 +61,6 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
 
     //rotModelTexture_ = TextureManager::GetInstance()->Load("axisCube.png");
 
-    camera_ = std::make_unique<Camera>();
-    camera_->Initialize();
 
     colorWhite_ = new ObjectColor;
     colorRed_ = new ObjectColor;
@@ -106,14 +106,22 @@ void CatmulRomSpline::Initialize(const std::string& _filePath)
         AddRotCtrlPoint();
     }
 
+#ifdef _DEBUG
     isDrawCtrlPoint_ = true;
     isDrawPosCtrlPoint_ = true;
     isDrawRotCtrlPoint_ = true;
+#else
+    isDrawCtrlPoint_ = false;
+    isDrawPosCtrlPoint_ = false;
+    isDrawRotCtrlPoint_ = false;
+#endif // _DEBUG
+    isMove_ = false;
+
 
     deltaTime_ = 1.0f / 60.0f;
-    speed_ = 1.0f;
 
-    hitRadius_ =20.0f;
+    speed_ = 2.0f;
+    hitRadius_ = 20.0f;
 
     return;
 }
@@ -132,7 +140,7 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
 
 
-    if (isMove_)
+    if (isMove_ && pMoveObj_)
         CalculatePositinByPosOnLine();
 
     for (const auto& wt : editPosCtrlPoints_) {
@@ -144,20 +152,14 @@ void CatmulRomSpline::Update(const Matrix4x4& _vp)
     }
     RegisterDrawPoint();
 
-    moveObjTrans_.transform_ = camera_->translate_;
-    moveObjTrans_.rotate_ = camera_->rotate_;
-    moveObjTrans_.UpdateData();
-
-    if (isMove_)
-    {
-        Vector3 ofs = TransformNormal(cameraOffset_, MakeRotateMatrix(camera_->rotate_));
-        camera_->translate_ += ofs;
-    }
-    camera_->UpdateMatrix();
 }
 
 void CatmulRomSpline::Draw(const Camera* _camera)
 {
+#ifndef _DEBUG
+    return;
+#endif // DEBUG
+
     if (isDrawCtrlPoint_)
     {
         if (isDrawPosCtrlPoint_)
@@ -171,20 +173,18 @@ void CatmulRomSpline::Draw(const Camera* _camera)
                     posModel_->Draw(ctrlPoint->worldTransform, _camera, posModelTexture_, colorWhite_);
             }
         }
-    }
-    if (isDrawRotCtrlPoint_)
-    {
-        for (const auto& ctrlPoint : editRotCtrlPoints_)
+        if (isDrawRotCtrlPoint_)
         {
-            if (selectRotIterator_ != editRotCtrlPoints_.end() &&
-                ctrlPoint.get() == (*selectRotIterator_).get())
-                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorRed_);
-            else
-                rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
+            for (const auto& ctrlPoint : editRotCtrlPoints_)
+            {
+                if (selectRotIterator_ != editRotCtrlPoints_.end() &&
+                    ctrlPoint.get() == (*selectRotIterator_).get())
+                    rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorRed_);
+                else
+                    rotModel_->Draw(ctrlPoint->worldTransform, _camera, colorWhite_);
+            }
         }
     }
-    rotModel_->Draw(moveObjTrans_, _camera, moveObjColor_);
-
 }
 
 void CatmulRomSpline::CreateFinalRotData(const std::vector<Vector3>& _rotArr, const std::vector<float>& _posArr)
@@ -660,23 +660,32 @@ void CatmulRomSpline::CalculatePositinByPosOnLine()
     posOnLine_ += speed_ * deltaTime_;
     if (posOnLine_ > totalLength_) {
         return;
-        //positionOnLine_ = 0.0f;
+        posOnLine_ = 0.0f;
     }
 
     float posT = GetPositionParameterForDistance(posOnLine_);
 
     Vector3 positionByT_ = CalculateCatmulRomPoint(posT);
-    camera_->translate_ = positionByT_;
+    pMoveObj_->transform_ = positionByT_;
 
     ///*回転*///
     float t = GetRotateParameterForDistance(posOnLine_);
 
-    camera_->rotate_ = (Rotate(t));
+    pMoveObj_->rotate_ = (Rotate(t));
+
+    moveObjTrans_.transform_ = pMoveObj_->transform_;
+    moveObjTrans_.rotate_ = pMoveObj_->rotate_;
+    moveObjTrans_.UpdateData();
 }
 
 Vector3 CatmulRomSpline::Rotate(float _t)
 {
     ConvertToFinalDataOfRotCtrl();
+
+    if (finalRotCtrlPoints_.empty())
+    {
+        return { 0,0,0 };
+    }
 
     size_t divistion = finalRotCtrlPoints_.size() - 1;
     size_t index = static_cast<size_t>(std::floor(_t * divistion));
@@ -761,7 +770,7 @@ void CatmulRomSpline::RegisterDrawPoint()
 {
     auto instance = LineDrawer::GetInstance();
 
-    for (size_t index=1;index<lineDrawPoint_.size();index++)
+    for (size_t index = 1; index < lineDrawPoint_.size(); index++)
     {
         instance->RegisterPoint(lineDrawPoint_[index - 1], lineDrawPoint_[index]);
     }
@@ -781,6 +790,7 @@ void CatmulRomSpline::ImGui()
     ImGui::Checkbox("drawMoveObj", &drawMoveObj_);
     if (ImGui::Checkbox("Move", &isMove_)) {
         isDrawCtrlPoint_ = !isMove_;
+        isDrawRotCtrlPoint_ = !isMove_;
     }
     ImGui::DragFloat("selectRadius", &hitRadius_, 0.1f);
 
@@ -804,7 +814,7 @@ void CatmulRomSpline::ImGui()
     }
     if (ImGui::BeginTabItem("rotation"))
     {
-        selectRot_= true;
+        selectRot_ = true;
         ImGui::SliderFloat("AddPosition", &addRotCtrlPoint_, 0.0f, totalLength_ - 0.01f);
 
         if (ImGui::Button("AddControlPoint") /*|| Input::GetInstance()->PushKey(DIK_LALT) && Input::GetInstance()->IsTriggerMouse(0)*/)
@@ -817,11 +827,6 @@ void CatmulRomSpline::ImGui()
             DeleteRotCtrlPoint();
             isChangeCtrlPoint_ = true;
         }
-        ImGui::EndTabItem();
-    }
-    if (ImGui::BeginTabItem("MoveCamera"))
-    {
-        ImGui::DragFloat3("offset", &cameraOffset_.x, 0.01f);
         ImGui::EndTabItem();
     }
 
@@ -855,11 +860,9 @@ void CatmulRomSpline::ImGui()
         ImGui::Text("number : %d", (int)selectRotIterator_->get()->number);
     }
 
-    if (drawMoveObj_) {
-        if (ImGui::SliderFloat("positionOnLine", &posOnLine_, 0.0f, totalLength_))
-            CalculatePositinByPosOnLine();
-        ImGui::DragFloat("speed", &speed_, 0.1f);
-    }
+    if (ImGui::SliderFloat("positionOnLine", &posOnLine_, 0.0f, totalLength_))
+        CalculatePositinByPosOnLine();
+    ImGui::DragFloat("speed", &speed_, 0.1f);
 
     /*for (float l : areaLength_) {
         ImGui::Text("%f", l);

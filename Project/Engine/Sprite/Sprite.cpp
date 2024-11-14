@@ -50,7 +50,6 @@ void Sprite::Update()
     ImGui();
 #endif // _DEBUG
 }
-}
 
 void Sprite::Draw()
 {

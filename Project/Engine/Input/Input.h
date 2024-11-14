@@ -2,6 +2,7 @@
 #include "WinApp.h"
 
 #include "Vector2.h"
+#include "Vector3.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -54,6 +55,8 @@ public:
 	bool IsMouseReleased(uint8_t _buttonNum) const;
 
 	Vector2 GetMousePosition() const;
+    void GetMove(Vector3& _move, float _spped = 1.0f) const;
+    void GetRotate(Vector3& _rot, float _sensi = 0.001f) const;
 
 	bool IsPadTriggered(PadButton _button) const;
     bool IsPadPressed(PadButton _button) const;

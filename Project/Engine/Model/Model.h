@@ -7,7 +7,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "ModelAnimation.h"
-#include "Node.h"
+#include "../Node/Node.h"
 #include "../Skeleton/Skeleton.h"
 #include "../SkinCluster/SkinCluster.h"
 #include "LightGroup.h"

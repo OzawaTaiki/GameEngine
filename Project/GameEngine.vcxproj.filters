@@ -58,6 +58,27 @@
     <Filter Include="Engine\Object\ObjColor">
       <UniqueIdentifier>{87bb6b2a-c0da-4b2f-99d5-5e7f3fc46f89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Object\ObjectSprite">
+      <UniqueIdentifier>{0ee7395e-c5ca-4ff2-9d43-72062217fa77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Object\ObjectSprite\Sprite">
+      <UniqueIdentifier>{70f4c928-51d6-458d-ae19-cbd21f81d8fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXWin\DXCommon">
+      <UniqueIdentifier>{167e44e9-00fc-4aeb-9c28-e3dc3e250f0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utility">
+      <UniqueIdentifier>{df3d2398-268d-4864-83b6-01fce5e71c8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Render">
+      <UniqueIdentifier>{58c8c342-f8f0-4aa4-8975-f5f3e3b7d669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Audio">
+      <UniqueIdentifier>{a25d954f-04f4-4ce2-8105-18ddead0af28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Other">
+      <UniqueIdentifier>{15fa33b4-1187-4640-b874-a5deaf870c03}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Object\ObjectModel">
       <UniqueIdentifier>{61792db0-30a9-4e0e-8f05-63e884045f02}</UniqueIdentifier>
     </Filter>
@@ -85,26 +106,26 @@
     <Filter Include="Engine\Object\ObjectModel\Light\Spot">
       <UniqueIdentifier>{f70f8d27-c1d5-4efc-9ecc-50bd90eae805}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Object\ObjectSprite">
-      <UniqueIdentifier>{0ee7395e-c5ca-4ff2-9d43-72062217fa77}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\Animation">
+      <UniqueIdentifier>{23c5918e-c1af-4bba-a962-e38435418b5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Object\ObjectSprite\Sprite">
-      <UniqueIdentifier>{70f4c928-51d6-458d-ae19-cbd21f81d8fc}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\AnimationModel">
+      <UniqueIdentifier>{40de8a68-3ca3-4661-bd5f-e0eeac04ed27}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\DXWin\DXCommon">
-      <UniqueIdentifier>{167e44e9-00fc-4aeb-9c28-e3dc3e250f0b}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\Joint">
+      <UniqueIdentifier>{d7e22069-16a5-44aa-9f56-f30fa2904fee}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Utility">
-      <UniqueIdentifier>{df3d2398-268d-4864-83b6-01fce5e71c8c}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\Node">
+      <UniqueIdentifier>{9acc1b31-6fca-4311-995c-9f8269d165fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Render">
-      <UniqueIdentifier>{58c8c342-f8f0-4aa4-8975-f5f3e3b7d669}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\Skeleton">
+      <UniqueIdentifier>{c1bc1e33-9185-4e6f-9d19-d278860f6b38}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Audio">
-      <UniqueIdentifier>{a25d954f-04f4-4ce2-8105-18ddead0af28}</UniqueIdentifier>
+    <Filter Include="Engine\Object\ObjectModel\SkinCluster">
+      <UniqueIdentifier>{1b82ba51-86de-430a-82d8-62715e3899db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Other">
-      <UniqueIdentifier>{15fa33b4-1187-4640-b874-a5deaf870c03}</UniqueIdentifier>
+    <Filter Include="Engine\Lib\Quaternion">
+      <UniqueIdentifier>{15691192-ae32-47eb-be50-e00d3d2a9eba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -140,9 +161,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Lib\VectorFunction.cpp">
       <Filter>Engine\Lib\Vector</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Lib\MyLib.cpp">
-      <Filter>Engine\LineDrawer</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Lights\SpotLight.cpp">
       <Filter>Engine\Object\ObjectModel\Light\Spot</Filter>
@@ -234,6 +252,33 @@
     <ClCompile Include="Engine\Utility\ConfigManager.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Lib\MyLib.cpp">
+      <Filter>Engine\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\AnimationModel\AnimationModel.cpp">
+      <Filter>Engine\Object\ObjectModel\AnimationModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Model\ModelAnimation.cpp">
+      <Filter>Engine\Object\ObjectModel\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Joint\Joint.cpp">
+      <Filter>Engine\Object\ObjectModel\Joint</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\SkinCluster\SkinCluster.cpp">
+      <Filter>Engine\Object\ObjectModel\SkinCluster</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Skeleton\Skeleton.cpp">
+      <Filter>Engine\Object\ObjectModel\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Node\Node.cpp">
+      <Filter>Engine\Object\ObjectModel\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Model\ObjectModel.cpp">
+      <Filter>Engine\Object\ObjectModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Lib\Quaternion.cpp">
+      <Filter>Engine\Lib\Quaternion</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\Object3d.hlsli">
@@ -272,6 +317,9 @@
       <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\LineDrawer.VS.hlsl">
+      <Filter>リソース ファイル\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\SkinningObject3d.VS.hlsl">
       <Filter>リソース ファイル\Shader</Filter>
     </FxCompile>
   </ItemGroup>
@@ -314,9 +362,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Lib\VectorFunction.h">
       <Filter>Engine\Lib\Vector</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Lib\MyLib.h">
-      <Filter>Engine\LineDrawer</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Lights\SpotLight.h">
       <Filter>Engine\Object\ObjectModel\Light\Spot</Filter>
@@ -410,6 +455,36 @@
     </ClInclude>
     <ClInclude Include="Engine\Utility\ConfigManager.h">
       <Filter>Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Lib\MyLib.h">
+      <Filter>Engine\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\AnimationModel\AnimationModel.h">
+      <Filter>Engine\Object\ObjectModel\AnimationModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\ModelAnimation.h">
+      <Filter>Engine\Object\ObjectModel\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Joint\Joint.h">
+      <Filter>Engine\Object\ObjectModel\Joint</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SkinCluster\SkinCluster.h">
+      <Filter>Engine\Object\ObjectModel\SkinCluster</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Skeleton\Skeleton.h">
+      <Filter>Engine\Object\ObjectModel\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Node\Node.h">
+      <Filter>Engine\Object\ObjectModel\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\ObjectModel.h">
+      <Filter>Engine\Object\ObjectModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Lib\Quaternion.h">
+      <Filter>Engine\Lib\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Lib\QuaternionTransform.h">
+      <Filter>Engine\Lib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

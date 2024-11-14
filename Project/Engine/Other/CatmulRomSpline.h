@@ -38,13 +38,17 @@ public:
     ~CatmulRomSpline();
 
 
-    Camera* GetCamera()const { return camera_.get(); }
+    /// <summary>
+    /// 移動オブジェクトのポインタをセット
+    /// <summary>
+    void SetMoveObjTrans(WorldTransform* _prt) { pMoveObj_ = _prt; }
 
     void Initialize(const std::string& _filePath);
     void Update(const Matrix4x4& _vp);
     void Draw(const Camera* _camera);
 
     bool IsMove()const { return isMove_; }
+    void Move() { isMove_ = true; }
 
 private:
     /// <summary>
@@ -52,7 +56,7 @@ private:
     /// </summary>
     /// <param name="_rotArr"> 回転成分</param>
     /// <param name="_posArr"> ライン上の位置 </param>
-    void CreateFinalRotData(const std::vector<Vector3>& _rotArr,const std::vector<float>& _posArr);
+    void CreateFinalRotData(const std::vector<Vector3>& _rotArr, const std::vector<float>& _posArr);
 
     /// <summary>
     /// 編集用データへ変換
@@ -177,49 +181,48 @@ private:
 
     void RegisterDrawPoint();
 
-    std::unique_ptr <Camera>				camera_							= nullptr;		// カメラ
-    WorldTransform							moveObjTrans_					= {};
-    ObjectColor*							moveObjColor_					= nullptr;
-    Vector3                                 cameraOffset_                   = {};
+    WorldTransform* pMoveObj_ = nullptr;      // 移動オブジェクトのポインタ
+    WorldTransform							moveObjTrans_ = {};
+    ObjectColor* moveObjColor_ = nullptr;
 
-    JsonLoader*								jsonLoader_						= nullptr;		// jsonLoaderのポインタ
-    Model*									posModel_						= nullptr;		// 座標制御点モデル
-    uint32_t								posModelTexture_				= 0;
-    Model*									rotModel_						= nullptr;		// 回転制御点モデル
-    uint32_t								rotModelTexture_				= 0;
-    ObjectColor*							colorWhite_						= nullptr;
-    ObjectColor*							colorRed_						= nullptr;
-    std::string								filepath_						= {};			// 読み書き用ファイル
+    JsonLoader* jsonLoader_ = nullptr;		// jsonLoaderのポインタ
+    Model* posModel_ = nullptr;		// 座標制御点モデル
+    uint32_t								posModelTexture_ = 0;
+    Model* rotModel_ = nullptr;		// 回転制御点モデル
+    uint32_t								rotModelTexture_ = 0;
+    ObjectColor* colorWhite_ = nullptr;
+    ObjectColor* colorRed_ = nullptr;
+    std::string								filepath_ = {};			// 読み書き用ファイル
 
-    std::vector<float>						areaLength_						= {};			// 区間ごとの距離
-    std::vector<float>						cumulativeLength_				= {};			// 区間ごと累積距離
-    std::vector<Vector3>					lineDrawPoint_					= {};			// ライン描画用配列
+    std::vector<float>						areaLength_ = {};			// 区間ごとの距離
+    std::vector<float>						cumulativeLength_ = {};			// 区間ごと累積距離
+    std::vector<Vector3>					lineDrawPoint_ = {};			// ライン描画用配列
 
-    std::list<std::unique_ptr<ControlPoint>>::iterator	selectPosIterator_	= {};			// 選択中の制御点のイテレータ
-    std::list<std::unique_ptr<ControlPoint>>::iterator	selectRotIterator_	= {};			// 選択中の制御点のイテレータ
-    std::list<std::unique_ptr<ControlPoint>>			editPosCtrlPoints_	= {};			// 確定前の座標制御点
-    std::list<std::unique_ptr<ControlPoint>>			editRotCtrlPoints_	= {};			// 確定前の回転制御点
-    std::vector<Vector3>								finalPosCtrlPoints_	= {};			// 確定した座標制御点
-    std::vector<RotatePoint>							finalRotCtrlPoints_	= {};			// 確定した回転制御点
+    std::list<std::unique_ptr<ControlPoint>>::iterator	selectPosIterator_ = {};			// 選択中の制御点のイテレータ
+    std::list<std::unique_ptr<ControlPoint>>::iterator	selectRotIterator_ = {};			// 選択中の制御点のイテレータ
+    std::list<std::unique_ptr<ControlPoint>>			editPosCtrlPoints_ = {};			// 確定前の座標制御点
+    std::list<std::unique_ptr<ControlPoint>>			editRotCtrlPoints_ = {};			// 確定前の回転制御点
+    std::vector<Vector3>								finalPosCtrlPoints_ = {};			// 確定した座標制御点
+    std::vector<RotatePoint>							finalRotCtrlPoints_ = {};			// 確定した回転制御点
 
-    Vector3									addPosCtrlPoint_				= {};			// 座標制御点 追加座標
-    float									addRotCtrlPoint_				= {};			// 回転制御点 追加位置
+    Vector3									addPosCtrlPoint_ = {};			// 座標制御点 追加座標
+    float									addRotCtrlPoint_ = {};			// 回転制御点 追加位置
 
-    uint32_t								insertNumber_					= 0;			// 挿入インデックス
-    uint32_t								lineSegmentCount_				= 16;			// ラインの分割数
-    float									totalLength_					= 0.0f;			// 合計の長さ
-    float									hitRadius_						= 0.0f;			// マウスとの判定用
-    float									posOnLine_						= 0.0f;			// ライン上の位置
-    float									speed_							= 0.0f;			// 移動スピード
-    float									deltaTime_						= 0.0f;			// デルタタイム
+    uint32_t								insertNumber_ = 0;			// 挿入インデックス
+    uint32_t								lineSegmentCount_ = 16;			// ラインの分割数
+    float									totalLength_ = 0.0f;			// 合計の長さ
+    float									hitRadius_ = 0.0f;			// マウスとの判定用
+    float									posOnLine_ = 0.0f;			// ライン上の位置
+    float									speed_ = 0.0f;			// 移動スピード
+    float									deltaTime_ = 0.0f;			// デルタタイム
 
-    bool									isDrawCtrlPoint_				= false;		// 制御点の描画フラグ
-    bool									isDrawPosCtrlPoint_				= false;		// 制御点の描画フラグ
-    bool									isDrawRotCtrlPoint_				= false;		// 制御点の描画フラグ
-    bool									isMove_							= false;		// 移動フラグ
-    bool									drawMoveObj_					= false;		// 移動objの描画フラグ
-    bool									selectRot_						= false;		// 回転制御点を選択しているか
-    bool									isChangeCtrlPoint_				= false;		// 編集したか否か
+    bool									isDrawCtrlPoint_ = false;		// 制御点の描画フラグ
+    bool									isDrawPosCtrlPoint_ = false;		// 制御点の描画フラグ
+    bool									isDrawRotCtrlPoint_ = false;		// 制御点の描画フラグ
+    bool									isMove_ = false;		// 移動フラグ
+    bool									drawMoveObj_ = false;		// 移動objの描画フラグ
+    bool									selectRot_ = false;		// 回転制御点を選択しているか
+    bool									isChangeCtrlPoint_ = false;		// 編集したか否か
 
     void ImGui();
 

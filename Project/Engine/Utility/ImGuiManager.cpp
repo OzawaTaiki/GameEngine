@@ -16,6 +16,8 @@ void ImGuiManager::Initialize()
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 
+    if (!srvManager_)
+        assert(false);
 
     srvManager_->Allocate();
     ImGui_ImplDX12_Init(

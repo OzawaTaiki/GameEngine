@@ -21,18 +21,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DXCommon* dxCommon =  DXCommon::GetInstance();
 	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
-	std::unique_ptr<SRVManager> srvManager = std::make_unique<SRVManager>();
+	SRVManager* srvManager = SRVManager::GetInstance();
 	srvManager->Initialize();
 	PSOManager::GetInstance()->Initialize();
 
 	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
-	imguiManager->Initialize(srvManager.get());
+	imguiManager->Initialize();
 
 	ParticleManager* particle = ParticleManager::GetInstance();
-	particle->Initialize(srvManager.get());
+	particle->Initialize();
 
 
-	TextureManager::GetInstance()->Initialize(srvManager.get());
+	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
 

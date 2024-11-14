@@ -44,7 +44,7 @@ void Material::TransferData()
 	constMap_->enabledLighthig = enableLighting_;
 }
 
-void Material::MateriallQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
+void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
 {
     _commandList->SetGraphicsRootConstantBufferView(_index, resorces_->GetGPUVirtualAddress());
 }

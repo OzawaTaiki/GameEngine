@@ -45,7 +45,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32
         // トランスフォーム
         commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
         // マテリアル
-        material_[mesh->GetUseMaterialIndex()]->MateriallQueueCommand(commandList, 2);
+        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(commandList, 2);
         // カラー
         _color->QueueCommand(commandList, 3);
         //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
@@ -72,7 +72,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         // トランスフォーム
         commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
         // マテリアル
-        material_[mesh->GetUseMaterialIndex()]->MateriallQueueCommand(commandList, 2);
+        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(commandList, 2);
         // カラー
         _color->QueueCommand(commandList, 3);
         //commandList->SetGraphicsRootConstantBufferView(3, _color->GetResource()->GetGPUVirtualAddress());
@@ -123,7 +123,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
             mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
             skinCluster_.QueueCommand(_commandList);
         }
-        material_[mesh->GetUseMaterialIndex()]->MateriallQueueCommand(_commandList, 2);
+        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -137,7 +137,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     for (auto& mesh : mesh_)
     {
         mesh->QueueCommand(_commandList);
-        material_[mesh->GetUseMaterialIndex()]->MateriallQueueCommand(_commandList, 2);
+        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
