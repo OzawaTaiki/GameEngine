@@ -2,6 +2,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include "Quaternion.h"
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 #define _USE_MATH_DEFINES
@@ -148,6 +149,14 @@ void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vect
 void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 
 float LerpShortAngle(float _a, float _b, float _t);
+
+Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
+
+float Lerp(float _a, float _b, float _t);
+Vector2 Lerp(const Vector2& _v1, const Vector2& _v2, float _t);
+Vector3 Lerp(const Vector3& _v1, const Vector3& _v2, float _t);
+Vector4 Lerp(const Vector4& _v1, const Vector4& _v2, float _t);
+Quaternion Lerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
 
 Vector3 Project(const Vector3& _v1, const Vector3& _v2);
 

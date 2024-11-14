@@ -3,17 +3,25 @@
 #include "Sprite.h"
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
-#include "ParticleManager.h"
-#include "TextureManager.h"
 #include <chrono>
 #include <imgui.h>
 
+std::unique_ptr<BaseScene> GameScene::Create()
+{
+    return std::make_unique<GameScene>();
+}
+
 GameScene::~GameScene()
 {
+    delete color_;
+    delete model_;
+    delete humanModel_;
+    delete emit_;
 }
 
 void GameScene::Initialize()
 {
+
     input_ = Input::GetInstance();
 
     camera_ = std::make_unique<Camera>();
@@ -22,19 +30,20 @@ void GameScene::Initialize()
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->SetCameraPtr(camera_.get());
 
-    sprite = Sprite::Create(TextureManager::GetInstance()->Load("uvChecker.png"));
-    sprite->Initialize();
 
-    //emit_ = new ParticleEmitter;
-    //emit_->Setting({ 0,0,0 }, { 0,0,0 }, 1, 1, 10, true);
-    //emit_->SetShape_Box({ 2, 2, 2 });
+    audio_ = std::make_unique<Audio>();
+    audio_->Initialize();
 
-   //uint32_t handle= TextureManager::GetInstance()->Load("circle.png");
-   //ParticleManager::GetInstance()->CreateParticleGroup("sample", "plane/plane.obj", emit_, handle);
+    model_ = new ObjectModel;
+    model_->Initialize("bunny.gltf");
+    humanModel_ = new AnimationModel;
+    humanModel_->Initialize("human/walk.gltf");
+
 }
 
 void GameScene::Update()
 {
+
     //ImGui::ShowDemoWindow();
     ImGui::Begin("Engine");
 
@@ -42,31 +51,35 @@ void GameScene::Update()
     //<-----------------------
     camera_->Update();
 
-    sprite->Update();
 
-    camera_->UpdateMatrix();
+    model_->Update();
+    humanModel_->Update();
+
+    camera_->TransferData();
     //<-----------------------
     ImGui::End();
 }
 
 void GameScene::Draw()
 {
-    ModelManager::GetInstance()->PreDraw();
+    ModelManager::GetInstance()->PreDrawForObjectModel();
+    //<------------------------
+    model_->Draw(camera_.get(), { 1,1,1,1 });
+
     //<------------------------
 
+    ModelManager::GetInstance()->PreDrawForAnimationModel();
+    //<------------------------
+    humanModel_->Draw(camera_.get(), { 1,1,1,1 });
 
     //<------------------------
-
-    //ParticleManager::GetInstance()->Draw(camera_.get());
 
     Sprite::PreDraw();
     //<------------------------
 
-    sprite->Draw();
 
 
     //<------------------------
-    //emit_->Draw();
     lineDrawer_->Draw();
 
 

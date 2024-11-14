@@ -20,6 +20,7 @@ void Material::Initialize(const std::string& _texturepath)
 	texturePath_ = _texturepath;
 
 	TransferData();
+    LoadTexture();
 
 }
 
@@ -41,4 +42,19 @@ void Material::TransferData()
 	constMap_->uvTransform = affine;
 	constMap_->shininess = shiness_;
 	constMap_->enabledLighthig = enableLighting_;
+}
+
+void Material::MateriallQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
+{
+    _commandList->SetGraphicsRootConstantBufferView(_index, resorces_->GetGPUVirtualAddress());
+}
+
+void Material::TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
+{
+    _commandList->SetGraphicsRootDescriptorTable(_index, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
+}
+
+void Material::TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index, uint32_t _textureHandle) const
+{
+	_commandList->SetGraphicsRootDescriptorTable(_index, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
 }

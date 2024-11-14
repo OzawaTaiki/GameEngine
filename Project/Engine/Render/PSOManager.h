@@ -42,6 +42,7 @@ private:
 		const std::wstring& _dirPath = L"Resources/Shader/");
 
 	void CreatePSOForModel();
+	void CreatePSOForAnimationModel();
 	void CreatePSOForSprite();
 	void CreatePSOForLineDrawer();
 	void CreatePSOForParticle();

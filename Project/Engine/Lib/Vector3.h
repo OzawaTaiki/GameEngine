@@ -1,6 +1,10 @@
 #pragma once
 #include "Vector2.h"
 #include <functional>
+#ifdef _DEBUG
+#include <string>
+#endif // _DEBUG
+
 struct Vector3
 {
 	float x, y, z;
@@ -36,6 +40,9 @@ struct Vector3
 	friend Vector3 operator*(float _s, const Vector3& vec);
 	friend Vector3 operator/(float _s, const Vector3& vec);
 
+#ifdef _DEBUG
+	void ShowData(const std::string& _label, bool _newWindow = true) const;
+#endif // _DEBUG
 };
 
 template <>

@@ -23,6 +23,7 @@ public:
     SpotLight* GetSpotLight() { return spotLight_.get(); }
 
     void TransferData() const;
+    void QueueCommand(ID3D12GraphicsCommandList* _commandList) const;
 
 private:
 

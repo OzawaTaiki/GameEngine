@@ -1,42 +1,57 @@
 #pragma once
-#include "Scene.h"
-#include <cstdint>
+#include "BaseScene.h"
 
-enum class sceneName
-{
-	Title,
-	FromTitle,
-	Game,
-	Result
-};
+#include <iostream>
+#include <cstdint>
+#include <string>
+#include <unordered_map>
+#include <memory>
+
+using SceneFactory = std::unique_ptr<BaseScene>(*)();
 
 class SceneManager
 {
 public:
-	static SceneManager*	GetInstance() { static SceneManager instance; return &instance; }
+    static SceneManager* GetInstance();
 
-	void					Initialize(sceneName _startScene);
-	void					Update();
-	void					Draw();
+    ~SceneManager();
 
+    // シーンの登録
+    // _name : シーンの名前
+    // _scene : シーンの生成関数
+    // 例 : SceneManager::RegisterScene("game", Game::Create);
+    static void RegisterScene(const std::string& _name, SceneFactory _scene);
+
+    // 初期化
+    // _name : 初期化するシーンの名前
+    void Initialize(const std::string& _name);
+    // 更新
+    void Update();
+    // 描画
+    void Draw();
+
+    // シーンの予約
+    // _name : 予約するシーンの名前
+    static void ReserveScene(const std::string& _name);
+
+    // シーンの変更
+    static void ChangeScene();
 
 private:
-	SceneManager() = default;
 
-	void					ReserveScene(sceneName _nextScene);
-	void					ChangeScene();
+    // シーンのリスト
+    std::unordered_map<std::string, SceneFactory>   scenes_ = {};
+    // 現在のシーン
+    std::unique_ptr<BaseScene> currentScene_ = nullptr;
 
-	sceneName						current_				= static_cast<sceneName>(1);
-	sceneName						next_					= static_cast<sceneName>(1);
-	sceneName						previous_				= static_cast<sceneName>(1);
+    // 現在のシーン名
+    std::string currentSceneName_ = {};
+    // 次のシーン名
+    std::string nextSceneName_ = {};
+
+#ifdef _DEBUG
+    void ImGui();
+#endif // _DEBUG
 
 
-	Scene*							currentScenePtr_			=nullptr;
-
-
-	bool							isSceneChange_				= false;
-	bool							isReserve_					= false;
-
-	SceneManager(const SceneManager& _sceneManager) = delete;
-	SceneManager& operator=(const SceneManager& _sceneManager) = delete;
 };

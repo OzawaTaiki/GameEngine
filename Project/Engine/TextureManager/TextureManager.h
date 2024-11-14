@@ -18,7 +18,7 @@ public:
 
     static TextureManager* GetInstance();
 
-    void Initialize(SRVManager* _srvManager);
+    void Initialize();
     void Update();
 
     uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");

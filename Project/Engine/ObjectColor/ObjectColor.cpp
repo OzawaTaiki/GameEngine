@@ -13,7 +13,7 @@ void ObjectColor::SetColor(const Vector4& _color)
     constMap_->color = _color;
 }
 
-void ObjectColor::TransferData(UINT _index, ID3D12GraphicsCommandList* _commandList)const
+void ObjectColor::QueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index)const
 {
     _commandList->SetGraphicsRootConstantBufferView(_index, resource_->GetGPUVirtualAddress());
 }

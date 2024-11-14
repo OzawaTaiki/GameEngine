@@ -20,6 +20,7 @@ public:
     ID3D12Resource* GetResource()const { return resource_.Get(); }
     Matrix4x4 GetViewProjection()const { return matViewProjection_; }
 
+    
     /// <summary>
     /// メンバ変数から行列を計算，転送
     /// </summary>
@@ -29,6 +30,9 @@ public:
     /// セットした行列を転送
     /// </summary>
     void TransferData();
+
+    void QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index)const;
+
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
