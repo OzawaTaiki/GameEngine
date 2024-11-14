@@ -24,11 +24,16 @@ public:
     bool            enableLighting_                 = true;                 // ライティングの有無
 
     void Initialize(const std::string& _texturepath);
-    void LoadTexture();
 
     uint32_t GetTexturehandle() const { return textureHandle_; }
     ID3D12Resource* GetResource() { return resorces_.Get(); }
+
+
     void TransferData();
+    void MateriallQueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index) const;
+    void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const;
+    void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index,uint32_t _textureHandle) const;
+
 private:
 
     std::string     name_                           = {};
@@ -46,5 +51,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_               = nullptr;
     DataForGPU*                                     constMap_               = nullptr;;
 
+    void LoadTexture();
 
 };

@@ -4,10 +4,10 @@
 #include <fstream>
 #include <sstream>
 
-JsonLoader::JsonLoader(bool _autoSave) {
+JsonLoader::JsonLoader() {
     dataGroup_.clear();
     folderPath_ = "Resources/Data";
-    autoSave_ = _autoSave;
+    autoSave_ = true;
 }
 
 JsonLoader::JsonLoader(const std::string& _directory, bool _autoSave) {

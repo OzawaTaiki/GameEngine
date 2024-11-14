@@ -1,41 +1,43 @@
 #pragma once
-#include "Scene.h"
+#include "BaseScene.h"
 #include "Camera.h"
 #include "Input.h"
 #include "LineDrawer.h"
 #include "WorldTransform.h"
-#include "Model.h"
+#include "../AnimationModel/AnimationModel.h"
+#include "ObjectModel.h"
 #include "Audio.h"
 #include "ObjectColor.h"
-#include "DebugCamera.h"
 #include "ParticleManager.h"
 #include "ParticleEmitters.h"
-#include "Sprite.h"
 
 #include <memory>
 
-class GameScene : public Scene
+class GameScene : public BaseScene
 {
 public:
-    ~GameScene();
 
-    void Initialize();
-    void Update();
-    void Draw();
+    // Factory Method
+    static std::unique_ptr<BaseScene> Create();
+
+    ~GameScene() override;
+
+    void Initialize() override;
+    void Update() override;
+    void Draw() override;
 
 
 private:
     Input* input_ = nullptr;
     LineDrawer* lineDrawer_ = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
-    std::unique_ptr<DebugCamera> DebugCamera_ = nullptr;
-    bool useDebugCamera_ = false;
+    std::unique_ptr<Audio> audio_;
+    uint32_t handle_;
 
-    Model* tile_ = nullptr;
+    ObjectModel* model_;
+    AnimationModel* humanModel_;
     WorldTransform trans_;
-    std::unique_ptr <ObjectColor> color_;
+    ObjectColor* color_;
 
     ParticleEmitter* emit_;
-
-    Sprite* sprite = nullptr;
 };

@@ -16,9 +16,9 @@ public:
     void Initialize();
 
     void SetColor(const Vector4& _color);
+    Vector4 GetColor() const { return constMap_->color; }
 
-
-    void TransferData(UINT _index, ID3D12GraphicsCommandList* _commandList)const;
+    void QueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index)const;
     ID3D12Resource* GetResource() { return resource_.Get(); }
 
 private:

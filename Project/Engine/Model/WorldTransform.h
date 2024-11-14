@@ -5,7 +5,7 @@
 
 #include <d3d12.h>
 #include <wrl.h>
-
+#include <initializer_list>
 
 class WorldTransform
 {
@@ -17,10 +17,15 @@ public:
     void Initialize();
 
     void UpdateData();
+    void UpdateData(const std::initializer_list<Matrix4x4>& _mat);
+    void TransferData();
+
+    void QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) const;
 
     ID3D12Resource* GetResource() const { return resource_.Get(); }
 
     Vector3 GetWorldPosition()const;
+
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
@@ -41,7 +46,6 @@ public:
 
 
 private:
-    void TransferData();
 
 
     struct DataForGPU

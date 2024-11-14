@@ -9,7 +9,7 @@
 void Camera::Initialize()
 {
     Map();
-    UpdateMatrix();
+    TransferData();
 }
 
 void Camera::Update()
@@ -40,7 +40,7 @@ void Camera::Draw()
 {
 }
 
-void Camera::UpdateMatrix()
+void Camera::TransferData()
 {
     matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_);
     matView_ = Inverse(matWorld_);
@@ -52,15 +52,9 @@ void Camera::UpdateMatrix()
     constMap_->proj = matProjection_;
 }
 
-void Camera::TransferData()
+void Camera::QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) const
 {
-    Matrix4x4 iView = Inverse(matView_);
-    //translate_ = { iView.m[3][0],iView.m[3][1],iView.m[3][2] };
-    matViewProjection_ = matView_ * matProjection_;
-
-    constMap_->pos = translate_;
-    constMap_->view = matView_;
-    constMap_->proj = matProjection_;
+    _cmdList->SetGraphicsRootConstantBufferView(_index, resource_->GetGPUVirtualAddress());
 }
 
 void Camera::Map()

@@ -14,26 +14,47 @@ void ModelManager::Initialize()
 {
     blendMode_ = PSOManager::BlendMode::Normal;
 
+
     /// PSOを取得
     auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Model", blendMode_);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
-    graphicsPipelineState_ = pso.value();
+    graphicsPipelineState_[0] = pso.value();
 
     /// RootSingnatureを取得
     auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Model");
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
-    rootSignature_= rootSignature.value();
+    rootSignature_[0] = rootSignature.value();
+
+    /// PSOを取得
+    pso = PSOManager::GetInstance()->GetPipeLineStateObject("AnimationModel", blendMode_);
+    // PSOが生成されているか確認
+    assert(pso.has_value() && pso != nullptr);
+    graphicsPipelineState_ [1] = pso.value();
+
+    /// RootSingnatureを取得
+    rootSignature = PSOManager::GetInstance()->GetRootSignature("AnimationModel");
+    // 生成されているか確認
+    assert(rootSignature.has_value() && rootSignature != nullptr);
+    rootSignature_[1] = rootSignature.value();
 
 }
 
-void ModelManager::PreDraw()
+void ModelManager::PreDrawForObjectModel() const
 {
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
-    commandList->SetGraphicsRootSignature(rootSignature_);
-    commandList->SetPipelineState(graphicsPipelineState_);
+    commandList->SetGraphicsRootSignature(rootSignature_[0]);
+    commandList->SetPipelineState(graphicsPipelineState_[0]);
+}
+
+void ModelManager::PreDrawForAnimationModel() const
+{
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->SetGraphicsRootSignature(rootSignature_[1]);
+    commandList->SetPipelineState(graphicsPipelineState_[1]);
 }
 
 Model* ModelManager::FindSameModel(const std::string& _name)

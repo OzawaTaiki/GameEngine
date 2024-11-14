@@ -35,7 +35,7 @@ private:
 	// obj名,Data
 
 public:
-	JsonLoader(bool _autoSave = true);
+	JsonLoader();
 	JsonLoader(const std::string& _directory, bool _autoSave = true);
 	~JsonLoader();
 
