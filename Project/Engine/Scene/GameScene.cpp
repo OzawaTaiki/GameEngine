@@ -19,6 +19,7 @@ GameScene::~GameScene()
     delete emit_;
 }
 
+
 void GameScene::Initialize()
 {
 
