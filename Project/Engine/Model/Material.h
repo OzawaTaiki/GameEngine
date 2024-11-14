@@ -30,7 +30,7 @@ public:
 
 
     void TransferData();
-    void MateriallQueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index) const;
+    void MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index) const;
     void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const;
     void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index,uint32_t _textureHandle) const;
 

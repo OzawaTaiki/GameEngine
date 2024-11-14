@@ -10,7 +10,7 @@ void DebugCamera::Initialize()
 
 void DebugCamera::Update()
 {
-    Vector3 move;/*
+    Vector3 move;
     Input::GetInstance()->GetMove(move,0.1f);
     translate_.y += move.y;
     move.y = 0;
@@ -27,7 +27,7 @@ void DebugCamera::Update()
     translate_.z += rotVelo.z;
 
 
-    matView_ = Inverse(MakeAffineMatrix(scale_, rotation_, translate_));*/
+    matView_ = Inverse(MakeAffineMatrix(scale_, rotation_, translate_));
 
 }
 

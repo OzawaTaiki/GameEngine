@@ -5,11 +5,13 @@ struct Vector2
 {
 	float x, y;
 
-    Vector2 operator-(const Vector2& _v);
-
-    inline Vector2 operator/(float _value) {
-        return { x / _value,y / _value };
-   }
+    
+    Vector2 operator+(const Vector2& _v)const;
+    Vector2 operator-(const Vector2& _v)const;
+    Vector2 operator*(float _value)const;
+    Vector2 operator*(const Vector2& _v)const;
+    Vector2 operator/(float _value)const;
+    Vector2 operator/(const Vector2& _v)const;
 
 	inline bool operator==(const Vector2& _v) const{
 		return x == _v.x && y == _v.y;

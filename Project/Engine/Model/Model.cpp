@@ -12,7 +12,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <Debug.h>
-#include "Input.h"
 
 const std::string Model::defaultDirpath_ = "Resources/models/";
 
