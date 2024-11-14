@@ -8,6 +8,7 @@
 #include <d3d12.h>
 #include <optional>
 #include <unordered_map>
+#include <array>
 
 class ModelManager
 {
@@ -16,7 +17,8 @@ public:
     static ModelManager* GetInstance();
 
     void Initialize();
-    void PreDraw();
+    void PreDrawForObjectModel() const;
+    void PreDrawForAnimationModel() const;
 
     void SetBlendMode(PSOManager::BlendMode _mode) { blendMode_ = _mode; };
 
@@ -25,8 +27,8 @@ private:
 
     std::unordered_map < std::string, std::unique_ptr<Model>> models_ = {};
 
-    ID3D12RootSignature* rootSignature_ = nullptr;
-    ID3D12PipelineState* graphicsPipelineState_ = nullptr;
+    std::array <ID3D12RootSignature*, 2> rootSignature_ = {};
+    std::array <ID3D12PipelineState*, 2> graphicsPipelineState_ = {};
 
     PSOManager::BlendMode blendMode_ = {};
 

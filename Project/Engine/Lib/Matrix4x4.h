@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef _DEBUG
+#include <imgui.h>
+#include <string>
+#endif // _DEBUG
+
+
 struct Matrix4x4
 {
 	float m[4][4];
@@ -30,4 +36,10 @@ struct Matrix4x4
 		result.m[3][3] = _m1.m[3][0] * _m2.m[0][3] + _m1.m[3][1] * _m2.m[1][3] + _m1.m[3][2] * _m2.m[2][3] + _m1.m[3][3] * _m2.m[3][3];
 		*this = result;
 	}
+
+#ifdef _DEBUG
+	void ShowData(const std::string& _label, bool _newWindow = true) const;
+#endif // _DEBUG
+
+
 };

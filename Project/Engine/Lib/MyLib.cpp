@@ -318,6 +318,53 @@ float LerpShortAngle(float _a, float _b, float _t) {
 	return _a + rotate * _t;
 }
 
+Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
+{
+    Quaternion q0 = _q1;
+    float dot = _q1.Dot(_q2);
+    if (dot < 0.0f)
+	{
+		q0 = -_q1;
+        dot = -dot;
+	}
+	if (dot > 1.0f - 1e-6f)
+	{		
+		return Lerp(q0, _q2, _t);
+	}
+    float theta = std::acosf(dot);
+	float scale0, scale1;
+
+    scale0 = std::sinf((1.0f - _t) * theta);
+    scale1 = std::sinf(_t * theta);
+
+    return (q0 * scale0 + _q2 * scale1) / std::sinf(theta);
+}
+
+float Lerp(float _a, float _b, float _t)
+{
+    return _a + (_b - _a) * _t;		
+}
+
+Vector2 Lerp(const Vector2& _v1, const Vector2& _v2, float _t)
+{
+    return Vector2(Lerp(_v1.x, _v2.x, _t), Lerp(_v1.y, _v2.y, _t));
+}
+
+Vector3 Lerp(const Vector3& _v1, const Vector3& _v2, float _t)
+{
+    return Vector3(Lerp(_v1.x, _v2.x, _t), Lerp(_v1.y, _v2.y, _t), Lerp(_v1.z, _v2.z, _t));
+}
+
+Vector4 Lerp(const Vector4& _v1, const Vector4& _v2, float _t)
+{
+    return Vector4(Lerp(_v1.x, _v2.x, _t), Lerp(_v1.y, _v2.y, _t), Lerp(_v1.z, _v2.z, _t), Lerp(_v1.w, _v2.w, _t));
+}
+
+Quaternion Lerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
+{
+	return Quaternion(Lerp(_q1.x, _q2.x, _t), Lerp(_q1.y, _q2.y, _t), Lerp(_q1.z, _q2.z, _t), Lerp(_q1.w, _q2.w, _t));
+}
+
 Vector3 Project(const Vector3& _v1, const Vector3& _v2)
 {
 	Vector3 normalize = Normalize(_v2);

@@ -10,6 +10,7 @@ class SRVManager
 {
 public:
 
+    static SRVManager* GetInstance();
     void Initialize();
 
     void PreDraw();

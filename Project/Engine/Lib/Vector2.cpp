@@ -35,3 +35,9 @@ float Vector2::Length() const
 {
     return std::sqrtf(x * x + y * y);
 }
+
+Vector2 Vector2::Normalize() const
+{
+    float length = Length();
+    return { x / length,y / length };
+}

@@ -28,11 +28,15 @@ void LightGroup::TransferData() const
     directoinalLight_->TransferData();
     pointLight_->TransferData();
     spotLight_->TransferData();
+}
 
+void LightGroup::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
+{
     // Dライト
     commandList_->SetGraphicsRootConstantBufferView(5, directoinalLight_->GetResource()->GetGPUVirtualAddress());
     // Pライト
     commandList_->SetGraphicsRootConstantBufferView(6, pointLight_->GetResource()->GetGPUVirtualAddress());
     // Ｓライト
     commandList_->SetGraphicsRootConstantBufferView(7, spotLight_->GetResource()->GetGPUVirtualAddress());
+
 }
