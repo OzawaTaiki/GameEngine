@@ -2,6 +2,36 @@
 #include "CollisionManager.h"
 #include "LineDrawer.h"
 #include "MatrixFunction.h"
+#include "VectorFunction.h"
+
+void Collider::Update()
+{
+    std::visit([this](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, Sphere>)
+        {
+            Sphere& sphere = arg;
+            sphere.center = Transform(sphere.referencePoint, GetWorldMatrix());
+
+        }
+        else if constexpr (std::is_same_v<T, AABB>)
+        {
+            AABB& aabb = arg;
+            aabb.Calculate(GetWorldMatrix());
+        }
+        else if constexpr (std::is_same_v<T, OBB>)
+        {
+            OBB& obb = arg;
+            obb.Calculate(GetWorldMatrix());
+        }
+        else
+        {
+            assert(false && "Not supported");
+        }
+               }, shape_);
+
+
+}
 
 void Collider::Draw()
 {
@@ -21,13 +51,11 @@ void Collider::Draw()
         else if constexpr (std::is_same_v<T, AABB>)
         {
             AABB& aabb = arg;
-            aabb.Calculate(worldMat);
             lineDrawer->DrawOBB(aabb.vertices);
         }
         else if constexpr (std::is_same_v<T, OBB>)
         {
             OBB& obb = arg;
-            obb.Calculate(worldMat);
             lineDrawer->DrawOBB(obb.vertices);
         }
         else
@@ -35,7 +63,6 @@ void Collider::Draw()
             assert(false && "Not supported");
         }
                }, shape_);
-
 
 }
 

@@ -16,12 +16,15 @@ public:
     void Update();
     void Draw(const Camera* _camera);
 
+    void OnCollision() {};
 
     void SetTarget(const Vector3& _target) { target_ = _target; }
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
+
 private:
 
+    std::unique_ptr<Collider> collider_ = nullptr;
 
     Model* model_ = nullptr;
     WorldTransform worldTransform_;

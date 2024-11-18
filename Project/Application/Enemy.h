@@ -16,6 +16,8 @@ public:
     void Update();
     void Draw(const Camera* _camera);
 
+    bool IsAlive() { return isAlive_; }
+
     void OnCollision();
 
 private:

@@ -39,6 +39,7 @@ public:
         NONE
     };
 
+    void Update();
     void Draw();
 
 
@@ -81,7 +82,6 @@ public:
     uint32_t GetMask()const { return mask_; }
     // 判定マスクを取得する
     uint32_t GetAtrribute_()const { return atrribute_; }
-
 
 private:
 

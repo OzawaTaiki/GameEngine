@@ -26,6 +26,12 @@ uint32_t CollisionManager::GetMask(const std::string& _atrribute)
     return ~GetAtttibute(_atrribute);
 }
 
+void CollisionManager::RegisterCollider(Collider* _collider)
+{
+    _collider->Update();
+    colliders_.push_back(_collider);
+}
+
 void CollisionManager::CheckAllCollision()
 {
     for (auto itA = colliders_.begin(); itA != colliders_.end(); itA++)

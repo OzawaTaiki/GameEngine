@@ -13,12 +13,13 @@ void Enemy::Initialize(const Vector3& _pos, const Vector3& _velo, float _lifeTim
     lifeTime_ = _lifeTime;
 
     collider_ = std::make_unique<Collider>();
-    collider_->SetBoundingBox(Collider::BoundingBox::Sphere_3D);
-    collider_->SetShape(model_->GetMin().x);
+    collider_->SetBoundingBox(Collider::BoundingBox::AABB_3D);
+    collider_->SetShape(model_->GetMin(), model_->GetMax());
     collider_->SetAtrribute("Enemy");
     collider_->SetMask("Enemy");
     collider_->SetGetWorldMatrixFunc([this]() {return worldTransform_.matWorld_; });
     collider_->SetOnCollisionFunc([this]() {OnCollision(); });
+    collider_->SetReferencePoint({ 0,(model_->GetMax().y) / 2.0f,0 });
 
 
     isAlive_ = true;
@@ -37,7 +38,7 @@ void Enemy::Update()
 
     if (isAlive_)
     {
-
+        CollisionManager::GetInstance()->RegisterCollider(collider_.get());
     }
     worldTransform_.UpdateData();
 }

@@ -12,6 +12,13 @@ void Beam::Initialize()
 
     model_ = Model::CreateFromObj("beam/beam.obj");
 
+    collider_= std::make_unique<Collider>();
+    collider_->SetBoundingBox(Collider::BoundingBox::OBB_3D);
+    collider_->SetShape(model_->GetMin(), model_->GetMax());
+    collider_->SetAtrribute("Beam");
+    collider_->SetMask("Beam");
+    collider_->SetGetWorldMatrixFunc([this]() {return worldTransform_.matWorld_; });
+    collider_->SetOnCollisionFunc([this]() {OnCollision(); });
 
 
 
@@ -41,6 +48,8 @@ void Beam::Update()
 
     worldTransform_.scale_.z = distance;
 
+    CollisionManager::GetInstance()->RegisterCollider(collider_.get());
+
     worldTransform_.UpdateData();
 
 #ifdef _DEBUG
@@ -54,7 +63,7 @@ void Beam::Draw(const Camera* _camera)
 #ifdef _DEBUG
     if (isDrawBoundingBox_)
     {
-
+        collider_->Draw();
     }
 #endif // _DEBUG
 }
