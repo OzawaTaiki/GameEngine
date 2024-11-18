@@ -11,12 +11,12 @@ TextureManager* TextureManager::GetInstance()
     return &instance;
 }
 
-void TextureManager::Initialize(SRVManager* _srvManager)
+void TextureManager::Initialize()
 {
     dxCommon_ = DXCommon::GetInstance();
     assert(dxCommon_);
 
-	srvManager_ = _srvManager;
+	srvManager_ = SRVManager::GetInstance();
 }
 
 void TextureManager::Update()

@@ -121,6 +121,9 @@
     <Filter Include="Engine\Collider">
       <UniqueIdentifier>{473b94d1-e406-4dbc-b1c0-c6dd8cdf9ea2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application\Rail">
+      <UniqueIdentifier>{1fcd0b19-518a-4ff3-8533-f1a3bb630229}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -272,6 +275,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Lib\Matrix4x4.cpp">
       <Filter>Engine\Lib\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Rail.cpp">
+      <Filter>Application\Rail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -470,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Collider\Shapes.h">
       <Filter>Engine\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Rail.h">
+      <Filter>Application\Rail</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

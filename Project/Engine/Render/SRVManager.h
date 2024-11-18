@@ -10,6 +10,8 @@ class SRVManager
 {
 public:
 
+    static SRVManager* GetInstance();
+
     void Initialize();
 
     void PreDraw();
@@ -32,6 +34,9 @@ private:
     uint32_t useIndex_ = 0;
     DXCommon* dxcommon_ = nullptr;
 
-
+    SRVManager() = default;
+    ~SRVManager() = default;
+    SRVManager(const SRVManager&) = delete;
+    SRVManager& operator=(const SRVManager&) = delete;
 
 };

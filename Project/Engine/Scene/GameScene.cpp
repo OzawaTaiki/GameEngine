@@ -47,6 +47,10 @@ void GameScene::Initialize()
 
     edit_->SetMoveObjTrans(player_->GetWorldTransform());
     railCamera_->SetParent(player_->GetWorldTransform());
+
+    rail_ = std::make_unique<Rail>();
+    rail_->Initialize();
+    rail_->CalculateRail(edit_.get());
 }
 
 void GameScene::Update()

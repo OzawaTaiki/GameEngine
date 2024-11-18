@@ -13,6 +13,7 @@
 #include "Enemy.h"
 #include "RailCamera.h"
 #include "SkyDome.h"
+#include "Rail.h"
 
 class GameScene : public Scene
 {
@@ -37,4 +38,5 @@ private:
     std::unique_ptr<Player>             player_ = nullptr;
     std::unique_ptr<RailCamera>         railCamera_ = nullptr;
     std::unique_ptr<CatmulRomSpline>    edit_ = nullptr;
+    std::unique_ptr<Rail>               rail_ = nullptr;
 };
