@@ -84,6 +84,20 @@ void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
 
 }
 
+void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices)
+{
+    for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
+    {
+        uint32_t sIndex = obbIndices_[index - 1];
+        uint32_t eIndex = obbIndices_[index];
+
+        Vector3 spos = _vertices[sIndex];
+        Vector3 epos = _vertices[eIndex];
+
+        RegisterPoint(spos, epos);
+    }
+}
+
 void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
 {
     for (uint32_t index = 1; index < sphereIndices_.size(); index += 2)
@@ -106,16 +120,16 @@ void LineDrawer::TransferData()
 
 void LineDrawer::SetVerties()
 {
-    obbVertices_[0] = {-0.5f, 0.5f ,-0.5f };
-    obbVertices_[1] = {-0.5f,-0.5f ,-0.5f };
-    obbVertices_[2] = { 0.5f,-0.5f ,-0.5f };
-    obbVertices_[3] = { 0.5f, 0.5f ,-0.5f };
-    obbVertices_[4] = {-0.5f, 0.5f , 0.5f };
-    obbVertices_[5] = {-0.5f,-0.5f , 0.5f };
-    obbVertices_[6] = { 0.5f,-0.5f , 0.5f };
-    obbVertices_[7] = { 0.5f, 0.5f , 0.5f };
+    obbVertices_[0] = { 0.5f, 0.5f , 0.5f };
+    obbVertices_[1] = { 0.5f, 0.5f ,-0.5f };
+    obbVertices_[2] = { 0.5f,-0.5f , 0.5f };
+    obbVertices_[3] = { 0.5f,-0.5f ,-0.5f };
+    obbVertices_[4] = { -0.5f, 0.5f , 0.5f };
+    obbVertices_[5] = { -0.5f, 0.5f ,-0.5f };
+    obbVertices_[6] = { -0.5f,-0.5f , 0.5f };
+    obbVertices_[7] = { -0.5f,-0.5f ,-0.5f };
 
-    obbIndices_ = { 0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7 };
+    obbIndices_ = { 0,1,0,2,0,4,1,3,1,5,2,6,2,3,3,7,4,5,4,6,5,7,6,7 };
 
     //sphere頂点の計算
     const float kLatEvery = std::numbers::pi_v<float> / kDivision;

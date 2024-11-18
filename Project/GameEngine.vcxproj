@@ -125,10 +125,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SkyDome.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\Collider\Collider.cpp" />
+    <ClCompile Include="Engine\Collider\CollisionManager.cpp" />
+    <ClCompile Include="Engine\Collider\Shapes.cpp" />
     <ClCompile Include="Engine\DXWin\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Engine\DXWin\DXCommon.cpp" />
     <ClCompile Include="Engine\DXWin\WinApp.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Lib\Matrix4x4.cpp" />
     <ClCompile Include="Engine\Lib\MatrixFunction.cpp" />
     <ClCompile Include="Engine\Lib\MyLib.cpp" />
     <ClCompile Include="Engine\Lib\Vector2.cpp" />
@@ -145,8 +149,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\WorldTransform.cpp" />
     <ClCompile Include="Engine\ObjectColor\ObjectColor.cpp" />
     <ClCompile Include="Engine\Other\CatmulRomSpline.cpp" />
-    <ClCompile Include="Engine\Other\Collider.cpp" />
-    <ClCompile Include="Engine\Other\CollisionManager.cpp" />
     <ClCompile Include="Engine\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Particle\ParticleEmitters.cpp" />
     <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
@@ -235,6 +237,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SkyDome.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\Collider\Collider.h" />
+    <ClInclude Include="Engine\Collider\CollisionManager.h" />
+    <ClInclude Include="Engine\Collider\Shapes.h" />
     <ClInclude Include="Engine\DXWin\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\DXWin\DXCommon.h" />
     <ClInclude Include="Engine\DXWin\WinApp.h" />
@@ -258,8 +263,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\WorldTransform.h" />
     <ClInclude Include="Engine\ObjectColor\ObjectColor.h" />
     <ClInclude Include="Engine\Other\CatmulRomSpline.h" />
-    <ClInclude Include="Engine\Other\Collider.h" />
-    <ClInclude Include="Engine\Other\CollisionManager.h" />
     <ClInclude Include="Engine\Particle\Particle.h" />
     <ClInclude Include="Engine\Particle\ParticleEmitters.h" />
     <ClInclude Include="Engine\Particle\ParticleManager.h" />

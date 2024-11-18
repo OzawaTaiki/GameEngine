@@ -4,7 +4,7 @@
 
 #include "MatrixFunction.h"
 #include "VectorFunction.h"
-#include "CollisionManager.h"
+#include "../Collider/CollisionManager.h"
 
 void Beam::Initialize()
 {
@@ -12,14 +12,8 @@ void Beam::Initialize()
 
     model_ = Model::CreateFromObj("beam/beam.obj");
 
-    pSize_ = &worldTransform_.scale_;
-    pRotate_ = &worldTransform_.rotate_;
-    pWorldTransform_ = &worldTransform_.matWorld_;
 
 
-    Collider::SetAtrribute("Player");
-    Collider::SetMask({ "Player" });
-    Collider::SetBoundingBox(Collider::BoundingBox::OBB_3D);
 
 }
 
@@ -31,7 +25,6 @@ void Beam::Update()
         return;
     }
 
-    CollisionManager::GetInstance()->SetCollider(this);
 
     Vector3 target = target_ - worldTransform_.parent_->GetWorldPosition();
     float distance = target_.Length();
@@ -60,14 +53,12 @@ void Beam::Draw(const Camera* _camera)
     model_->Draw(worldTransform_, _camera, 0u);
 #ifdef _DEBUG
     if (isDrawBoundingBox_)
-        Collider::Draw(worldTransform_.matWorld_);
+    {
+
+    }
 #endif // _DEBUG
 }
 
-void Beam::OnCollision()
-{
-
-}
 
 
 #ifdef _DEBUG

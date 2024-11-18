@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Collider.h"
+#include "../Collider/Collider.h"
 #include "WorldTransform.h"
 #include "Model.h"
 #include "Camera.h"
 
-class Enemy : private Collider
+class Enemy
 {
 public:
 
@@ -16,13 +16,13 @@ public:
     void Update();
     void Draw(const Camera* _camera);
 
-    Vector3 GetWorldPosition() const override{ return worldTransform_.GetWorldPosition(); }
     void OnCollision();
 
 private:
 
     WorldTransform worldTransform_ = {};
     Model* model_ = nullptr;
+    std::unique_ptr<Collider> collider_ = nullptr;
 
     Vector3 velocity_ = {};
     float lifeTime_ = 0.0f;

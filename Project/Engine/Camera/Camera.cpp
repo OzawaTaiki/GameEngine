@@ -64,8 +64,6 @@ void Camera::UpdateMatrix()
 
 void Camera::TransferData()
 {
-    Matrix4x4 iView = Inverse(matView_);
-    //translate_ = { iView.m[3][0],iView.m[3][1],iView.m[3][2] };
     matViewProjection_ = matView_ * matProjection_;
 
     constMap_->pos = translate_;
