@@ -21,6 +21,7 @@ public:
     void Draw();
 
     void DrawOBB(const Matrix4x4& _affineMat);
+    void DrawOBB(const std::array<Vector3, 8>& _vertices);
     void DrawSphere(const Matrix4x4& _affineMat);
 
 private:

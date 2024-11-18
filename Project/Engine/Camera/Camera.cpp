@@ -8,10 +8,11 @@
 
 void Camera::Initialize()
 {
+    worldTransform_.Initialize();
+
     Map();
     UpdateMatrix();
 
-    worldTransform_.Initialize();
 }
 
 void Camera::Update()
@@ -52,6 +53,7 @@ void Camera::Draw()
 
 void Camera::UpdateMatrix()
 {
+
     matWorld_ = worldTransform_.matWorld_;
     matView_ = Inverse(matWorld_);
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
@@ -64,8 +66,6 @@ void Camera::UpdateMatrix()
 
 void Camera::TransferData()
 {
-    Matrix4x4 iView = Inverse(matView_);
-    //translate_ = { iView.m[3][0],iView.m[3][1],iView.m[3][2] };
     matViewProjection_ = matView_ * matProjection_;
 
     constMap_->pos = translate_;

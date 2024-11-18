@@ -5,7 +5,8 @@
 #include "MatrixFunction.h"
 #include "ParticleManager.h"
 #include "TextureManager.h"
-#include "CollisionManager.h"
+#include "../Collider/CollisionManager.h"
+
 #include "EnemyManager.h"
 #include <imgui.h>
 
@@ -63,8 +64,8 @@ void GameScene::Update()
         Initialize();
 
     //<-----------------------
-    CollisionManager::GetInstance()->ListReset();
-    camera_->Update();
+    CollisionManager::GetInstance()->ResetColliderList();
+    //camera_->Update();
     skyDome_->Update();
 
     edit_->Update(camera_->GetViewProjection());
@@ -92,7 +93,7 @@ void GameScene::Update()
         camera_->TransferData();
     }
 
-    CollisionManager::GetInstance()->CheckAllCollisions();
+    CollisionManager::GetInstance()->CheckAllCollision();
 
     //<-----------------------
     ImGui::End();

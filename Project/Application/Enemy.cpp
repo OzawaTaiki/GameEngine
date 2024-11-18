@@ -1,5 +1,5 @@
 #include "Enemy.h"
-#include "collisionManager.h"
+#include "../Collider/CollisionManager.h"
 
 void Enemy::Initialize(const Vector3& _pos, const Vector3& _velo, float _lifeTime)
 {
@@ -12,14 +12,15 @@ void Enemy::Initialize(const Vector3& _pos, const Vector3& _velo, float _lifeTim
     velocity_ = _velo;
     lifeTime_ = _lifeTime;
 
-    Collider::SetAtrribute("Enemy");
-    Collider::SetMask({ "Enemy" });
-    Collider::SetBoundingBox(Collider::BoundingBox::Sphere_3D);
+    collider_ = std::make_unique<Collider>();
+    collider_->SetBoundingBox(Collider::BoundingBox::AABB_3D);
+    collider_->SetShape(model_->GetMin(), model_->GetMax());
+    collider_->SetAtrribute("Enemy");
+    collider_->SetMask("Enemy");
+    collider_->SetGetWorldMatrixFunc([this]() {return worldTransform_.matWorld_; });
+    collider_->SetOnCollisionFunc([this]() {OnCollision(); });
+    collider_->SetReferencePoint({ 0,(model_->GetMax().y) / 2.0f,0 });
 
-    size_ = (model_->GetMin() - model_->GetMax())/ 2.0f;
-    pRotate_ = &worldTransform_.rotate_;
-    offset_ = (model_->GetMax() + model_->GetMin()) / 2.0f;
-    pWorldTransform_ = &worldTransform_.matWorld_;
 
     isAlive_ = true;
 }
@@ -35,9 +36,10 @@ void Enemy::Update()
 
     worldTransform_.transform_ += velocity_ * kDeleteTime;
 
-    if(isAlive_)
-        CollisionManager::GetInstance()->SetCollider(this);
-
+    if (isAlive_)
+    {
+        CollisionManager::GetInstance()->RegisterCollider(collider_.get());
+    }
     worldTransform_.UpdateData();
 }
 
@@ -49,7 +51,7 @@ void Enemy::Draw(const Camera* _camera)
 #ifdef _DEBUG
     if (IsDrawBoundingBox_)
     {
-        Collider::Draw(worldTransform_.matWorld_);
+        collider_->Draw();
     }
 #endif // _DEBUG
 }

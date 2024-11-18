@@ -3,9 +3,9 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Camera.h"
-#include "Collider.h"
+#include "../Collider/Collider.h"
 
-class Beam : private Collider
+class Beam 
 {
 public:
 
@@ -16,14 +16,15 @@ public:
     void Update();
     void Draw(const Camera* _camera);
 
-    Vector3 GetWorldPosition() const override { return worldTransform_.GetWorldPosition(); }
-    void OnCollision() override;
+    void OnCollision() {};
 
     void SetTarget(const Vector3& _target) { target_ = _target; }
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
+
 private:
 
+    std::unique_ptr<Collider> collider_ = nullptr;
 
     Model* model_ = nullptr;
     WorldTransform worldTransform_;

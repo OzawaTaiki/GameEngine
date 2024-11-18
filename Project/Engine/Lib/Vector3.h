@@ -6,9 +6,18 @@ struct Vector3
 	float x, y, z;
 
 	inline Vector3() :x(), y(), z() {};
-	inline Vector3(float _x) :x(_x), y(_x), z(_x) {};
+	// 3つの値が同じ場合
+	inline Vector3(float _xyz) :x(_xyz), y(_xyz), z(_xyz) {};
+	// 3つの値が異なる場合
 	inline Vector3(float _f0, float _f1, float _f2) :x(_f0), y(_f1), z(_f2) {};
+	// 配列からの初期化
+	inline Vector3(const float arr[3]) :x(arr[0]), y(arr[1]), z(arr[2]) {};
+	// 2次元ベクトルからの初期化
+	inline Vector3(const Vector2& _v) :x(_v.x), y(_v.y), z(0.0f) {};
+	// 2次元ベクトルと1つの値からの初期化
 	inline Vector3(const Vector2& _v, float _f) :x(_v.x), y(_v.y), z(_f) {};
+	// コピーコンストラクタ
+	inline Vector3(const Vector3& _v) :x(_v.x), y(_v.y), z(_v.z) {};
 
 
 	float Length()const;
@@ -32,6 +41,9 @@ struct Vector3
 	Vector3& operator+= (const Vector3& _v);
 	Vector3& operator-= (const Vector3& _v);
 	Vector3& operator*= (float _s);
+
+	inline operator float* () { return &x; }
+	inline operator const float* () const { return &x; }
 
 	friend Vector3 operator*(float _s, const Vector3& vec);
 	friend Vector3 operator/(float _s, const Vector3& vec);

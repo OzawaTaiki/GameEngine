@@ -119,7 +119,7 @@ Vector2 Input::GetMousePosition() const
 
 void Input::GetMove(Vector3& _move, float _spped) const
 {
-    _move = { 0 };
+    _move = { 0,0,0 };
     if (keys_[DIK_W])
         _move.z += 1.0f;
     if(keys_[DIK_A])

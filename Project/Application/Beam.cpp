@@ -4,7 +4,7 @@
 
 #include "MatrixFunction.h"
 #include "VectorFunction.h"
-#include "CollisionManager.h"
+#include "../Collider/CollisionManager.h"
 
 void Beam::Initialize()
 {
@@ -12,14 +12,15 @@ void Beam::Initialize()
 
     model_ = Model::CreateFromObj("beam/beam.obj");
 
-    pSize_ = &worldTransform_.scale_;
-    pRotate_ = &worldTransform_.rotate_;
-    pWorldTransform_ = &worldTransform_.matWorld_;
+    collider_= std::make_unique<Collider>();
+    collider_->SetBoundingBox(Collider::BoundingBox::OBB_3D);
+    collider_->SetShape(model_->GetMin(), model_->GetMax());
+    collider_->SetAtrribute("Beam");
+    collider_->SetMask("Beam");
+    collider_->SetGetWorldMatrixFunc([this]() {return worldTransform_.matWorld_; });
+    collider_->SetOnCollisionFunc([this]() {OnCollision(); });
 
 
-    Collider::SetAtrribute("Player");
-    Collider::SetMask({ "Player" });
-    Collider::SetBoundingBox(Collider::BoundingBox::OBB_3D);
 
 }
 
@@ -31,7 +32,6 @@ void Beam::Update()
         return;
     }
 
-    CollisionManager::GetInstance()->SetCollider(this);
 
     Vector3 target = target_ - worldTransform_.parent_->GetWorldPosition();
     float distance = target_.Length();
@@ -48,6 +48,8 @@ void Beam::Update()
 
     worldTransform_.scale_.z = distance;
 
+    CollisionManager::GetInstance()->RegisterCollider(collider_.get());
+
     worldTransform_.UpdateData();
 
 #ifdef _DEBUG
@@ -60,14 +62,12 @@ void Beam::Draw(const Camera* _camera)
     model_->Draw(worldTransform_, _camera, 0u);
 #ifdef _DEBUG
     if (isDrawBoundingBox_)
-        Collider::Draw(worldTransform_.matWorld_);
+    {
+        collider_->Draw();
+    }
 #endif // _DEBUG
 }
 
-void Beam::OnCollision()
-{
-
-}
 
 
 #ifdef _DEBUG

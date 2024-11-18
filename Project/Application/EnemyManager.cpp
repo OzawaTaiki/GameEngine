@@ -125,5 +125,12 @@ void EnemyManager::PopEnemy(const Vector3& _pos, const Vector3& _velocity, float
 #include <imgui.h>
 void EnemyManager::ImGui()
 {
+    int index = 0;
+    for (auto& enemy : enemies_)
+    {
+        ImGui::Text("enemy %d: isAlive %s", index, enemy.IsAlive() ? "true" : "false");
+        index++;
+    }
+
 }
 #endif // _DEBUG
