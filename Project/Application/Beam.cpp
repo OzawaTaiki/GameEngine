@@ -1,5 +1,6 @@
 #include "Beam.h"
 #include "Input.h"
+#include "TextureManager.h"
 #include <Windows.h>
 
 #include "MatrixFunction.h"
@@ -59,7 +60,7 @@ void Beam::Update()
 
 void Beam::Draw(const Camera* _camera)
 {
-    model_->Draw(worldTransform_, _camera, 0u);
+    model_->Draw(worldTransform_, _camera);
 #ifdef _DEBUG
     if (isDrawBoundingBox_)
     {

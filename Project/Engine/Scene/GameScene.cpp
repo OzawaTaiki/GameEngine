@@ -14,6 +14,7 @@ GameScene::~GameScene()
 {
 
 }
+
 void GameScene::Initialize()
 {
     input_ = Input::GetInstance();

@@ -28,7 +28,7 @@ private:
 
     Model* model_ = nullptr;
     WorldTransform worldTransform_;
-
+    uint32_t texture_ = 0u;
     Vector3 target_ = {};
 
     bool isDrawBoundingBox_ = true;
