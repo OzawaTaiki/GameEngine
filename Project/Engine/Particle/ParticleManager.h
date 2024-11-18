@@ -14,7 +14,7 @@ public:
     ParticleManager() = default;
     ~ParticleManager();
 
-    void Initialize(SRVManager* _pSrvManager);
+    void Initialize();
     void Update();
     void Draw(const Camera* _camera);
 

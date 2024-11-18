@@ -187,6 +187,20 @@ void CatmulRomSpline::Draw(const Camera* _camera)
     }
 }
 
+void CatmulRomSpline::GetTransAndRot(std::vector<Vector3>& _trans, std::vector<Vector3>& _rot, float _speed)
+{
+    float pos;
+    for (pos = 0; pos < totalLength_; pos += _speed * deltaTime_)
+    {
+        float posT = GetPositionParameterForDistance(pos);
+        _trans.push_back(CalculateCatmulRomPoint(posT));
+
+        float t = GetRotateParameterForDistance(pos);
+        _rot.push_back(Rotate(t));
+    }
+
+}
+
 void CatmulRomSpline::CreateFinalRotData(const std::vector<Vector3>& _rotArr, const std::vector<float>& _posArr)
 {
     // サイズが一緒前提

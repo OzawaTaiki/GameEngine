@@ -21,9 +21,9 @@ ParticleManager::~ParticleManager()
     groups_.clear();
 }
 
-void ParticleManager::Initialize(SRVManager* _pSrvManager)
+void ParticleManager::Initialize()
 {
-    srvManager_ = _pSrvManager;
+    srvManager_ = SRVManager::GetInstance();
 
     auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle",PSOManager::BlendMode::Add);
     pipelineState_ = pso.value();

@@ -50,6 +50,8 @@ public:
     bool IsMove()const { return isMove_; }
     void Move() { isMove_ = true; }
 
+    void GetTransAndRot(std::vector<Vector3>& _trans, std::vector<Vector3>& _rot,float _speed=4.0f);
+
 private:
     /// <summary>
     /// finalRotDataに変換

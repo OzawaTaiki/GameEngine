@@ -6,7 +6,7 @@ class ImGuiManager
 {
 public:
 
-    void Initialize(SRVManager* _ptr);
+    void Initialize();
     void Begin();
     void End();
     void Draw();

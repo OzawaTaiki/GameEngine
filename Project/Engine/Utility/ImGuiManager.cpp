@@ -7,9 +7,9 @@
 #include <imgui_impl_dx12.h>
 
 //extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void ImGuiManager::Initialize(SRVManager* _ptr)
+void ImGuiManager::Initialize()
 {
-    srvManager_ = _ptr;
+    srvManager_ = SRVManager::GetInstance();
     DXCommon* dx = DXCommon::GetInstance();
 
     ImGui::CreateContext();

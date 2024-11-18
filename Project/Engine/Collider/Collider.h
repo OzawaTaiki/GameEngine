@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <functional>
 #include <variant>
+#include <cassert>
 
 /*
     衝突判定のクラス

@@ -4,6 +4,12 @@
 
 const uint32_t SRVManager::kMaxIndex_ = 1024;
 
+SRVManager* SRVManager::GetInstance()
+{
+    static SRVManager instance;
+    return &instance;
+}
+
 void SRVManager::Initialize()
 {
     dxcommon_ = DXCommon::GetInstance();
