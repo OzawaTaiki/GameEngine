@@ -26,6 +26,8 @@ void GameScene::Initialize()
     lineDrawer = LineDrawer::GetInstance();
     lineDrawer->SetCameraPtr(camera_.get());
 
+    Model::CreateFromObj("bunny.gltf");
+
     tile_ = Model::CreateFromObj("tile/tile.gltf");
     tile_->SetUVScale({ 100,100 });
     trans_.Initialize();
@@ -49,8 +51,8 @@ void GameScene::Initialize()
     railCamera_->SetParent(player_->GetWorldTransform());
 
     rail_ = std::make_unique<Rail>();
-    rail_->Initialize();
-    rail_->CalculateRail(edit_.get());
+    rail_->Initialize(edit_.get());
+    rail_->CalculateRail();
 }
 
 void GameScene::Update()
@@ -116,6 +118,7 @@ void GameScene::Draw()
 
     //<------------------------
 
+    rail_->Draw(camera_.get());
 
 
     Sprite::PreDraw();

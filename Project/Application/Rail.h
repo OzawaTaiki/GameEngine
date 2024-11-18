@@ -14,11 +14,11 @@ public:
     Rail() = default;
     ~Rail() = default;
 
-    void Initialize();
+    void Initialize(CatmulRomSpline* _edit);
     void Update();
     void Draw(const Camera* _camera);
 
-    void CalculateRail(CatmulRomSpline* _edit);
+    void CalculateRail();
 
 private:
 
@@ -28,8 +28,8 @@ private:
     Model* model_ = nullptr;
     WorldTransform worldTransform_ = {};
 
-    float scale_ = 1.0f;
-
+    float scale_ = 0.3f;
+    float speed_ = 25.0f;
     struct constantBufferData
     {
         Matrix4x4 matWorld;
@@ -39,9 +39,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
     constantBufferData* constMap_;
     uint32_t textureHandle_;
-    Model* model_;
     uint32_t instanceNum_;
     uint32_t srvIndex_;
+
+    CatmulRomSpline* edit_ = nullptr;
 
     ID3D12PipelineState* pipelineState_;
     ID3D12RootSignature* rootsignature_;

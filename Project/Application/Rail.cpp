@@ -3,15 +3,18 @@
 #include "SRVManager.h"
 #include "DXCommon.h"
 #include "CatmulRomSpline.h"
+#include "TextureManager.h"
 #include "MatrixFunction.h"
 
-void Rail::Initialize()
+#include <numbers>
+
+void Rail::Initialize(CatmulRomSpline* _edit)
 {
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle");
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("instansing");
     pipelineState_ = pso.value();
     assert(pso.has_value());
 
-    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Particle");
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("instansing");
     assert(rootSignature.has_value());
     rootsignature_ = rootSignature.value();
 
@@ -24,19 +27,19 @@ void Rail::Initialize()
     instanceNum_ = 0;
 
     model_ = Model::CreateFromObj("plane/plane.obj");
+    textureHandle_ = TextureManager::GetInstance()->Load("rail.png");
+    edit_ = _edit;
 }
 
 void Rail::Update()
 {
-    for (instanceNum_ = 0; instanceNum_ < trans_.size(); ++instanceNum_)
-    {
-        constMap_[instanceNum_].matWorld = MakeAffineMatrix({ scale_ }, rot_[instanceNum_], trans_[instanceNum_]);
-        constMap_[instanceNum_].color = { 1.0f,1.0f,1.0f,1.0f };
-    }
 }
 
 void Rail::Draw(const Camera* _camera)
 {
+#ifdef _DEBUG
+    ImGui();
+#endif // _DEBUG
 
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
 
@@ -50,16 +53,25 @@ void Rail::Draw(const Camera* _camera)
 
     commandList->SetGraphicsRootConstantBufferView(0, _camera->GetResource()->GetGPUVirtualAddress());
     commandList->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndex_));
-    commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetGPUHandle(particles.textureHandle));
+    commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
 
-    commandList->DrawIndexedInstanced(particles.model->GetMeshPtr()->GetIndexNum(), particles.instanceNum, 0, 0, 0);
-
+    commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), instanceNum_, 0, 0, 0);
 
 }
 
-void Rail::CalculateRail(CatmulRomSpline* _edit)
+void Rail::CalculateRail()
 {
-    _edit->GetTransAndRot(trans_, rot_);
+    trans_.clear();
+    rot_.clear();
+    edit_->GetTransAndRot(trans_, rot_, speed_);
+
+    for (instanceNum_ = 0; instanceNum_ < trans_.size(); ++instanceNum_)
+    {
+        rot_[instanceNum_].x += std::numbers::pi_v<float> / 2.0f;
+        constMap_[instanceNum_].matWorld = MakeAffineMatrix({ scale_ }, rot_[instanceNum_], trans_[instanceNum_]);
+        constMap_[instanceNum_].color = { 1.0f,1.0f,1.0f,1.0f };
+    }
+
 }
 
 
@@ -67,6 +79,13 @@ void Rail::CalculateRail(CatmulRomSpline* _edit)
 #include <imgui.h>
 void Rail::ImGui()
 {
-
+    ImGui::Begin("Rail");
+    ImGui::DragFloat("scale", &scale_, 0.01f, 0.0f, 10.0f);
+    ImGui::DragFloat("speed", &speed_, 0.01f, 0.0f, 100.0f);
+    if(ImGui::Button("Calculate"))
+    {
+        CalculateRail();
+    }
+    ImGui::End();
 }
 #endif // _DEBUG
