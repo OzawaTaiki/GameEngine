@@ -2,6 +2,7 @@
 #include "PSOManager.h"
 #include "DXCommon.h"
 #include <cassert>
+#include <numbers>
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 LineDrawer* LineDrawer::GetInstance()
@@ -83,6 +84,35 @@ void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
 
 }
 
+void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices)
+{
+    for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
+    {
+        uint32_t sIndex = obbIndices_[index - 1];
+        uint32_t eIndex = obbIndices_[index];
+
+        Vector3 spos = _vertices[sIndex];
+        Vector3 epos = _vertices[eIndex];
+
+        RegisterPoint(spos, epos);
+    }
+}
+
+void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
+{
+    for (uint32_t index = 1; index < sphereIndices_.size(); index += 2)
+    {
+        uint32_t sIndex = sphereIndices_[index - 1];
+        uint32_t eIndex = sphereIndices_[index];
+
+        Vector3 spos = Transform(sphereVertices_[sIndex], _affineMat);
+        Vector3 epos = Transform(sphereVertices_[eIndex], _affineMat);
+
+        RegisterPoint(spos, epos);
+    }
+}
+
+
 void LineDrawer::TransferData()
 {
     constMap_->color = color_;
@@ -91,14 +121,50 @@ void LineDrawer::TransferData()
 
 void LineDrawer::SetVerties()
 {
-    obbVertices_[0] = {-0.5f, 0.5f ,-0.5f };
-    obbVertices_[1] = {-0.5f,-0.5f ,-0.5f };
-    obbVertices_[2] = { 0.5f,-0.5f ,-0.5f };
-    obbVertices_[3] = { 0.5f, 0.5f ,-0.5f };
+    obbVertices_[0] = { 0.5f, 0.5f , 0.5f };
+    obbVertices_[1] = { 0.5f, 0.5f ,-0.5f };
+    obbVertices_[2] = { 0.5f,-0.5f , 0.5f };
+    obbVertices_[3] = { 0.5f,-0.5f ,-0.5f };
     obbVertices_[4] = {-0.5f, 0.5f , 0.5f };
-    obbVertices_[5] = {-0.5f,-0.5f , 0.5f };
-    obbVertices_[6] = { 0.5f,-0.5f , 0.5f };
-    obbVertices_[7] = { 0.5f, 0.5f , 0.5f };
+    obbVertices_[5] = {-0.5f, 0.5f ,-0.5f };
+    obbVertices_[6] = {-0.5f,-0.5f , 0.5f };
+    obbVertices_[7] = {-0.5f,-0.5f ,-0.5f };
 
-    obbIndices_ = { 0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7 };
+    obbIndices_ = { 0,1,0,2,0,4,1,3,1,5,2,6,2,3,3,7,4,5,4,6,5,7,6,7 };
+
+
+    //sphere頂点の計算
+    const float kLatEvery = std::numbers::pi_v<float> / kDivision;
+    const float kLonEvery = std::numbers::pi_v<float> *2.0f / kDivision;
+
+    for (uint32_t lat = 0; lat < kDivision; ++lat)
+    {
+        for (uint32_t lon = 0; lon < kDivision; ++lon)
+        {
+            float latRad = lat * kLatEvery;
+            float lonRad = lon * kLonEvery;
+
+            float x = std::sin(latRad) * std::cos(lonRad);
+            float y = std::cos(latRad);
+            float z = std::sin(latRad) * std::sin(lonRad);
+
+            sphereVertices_.emplace_back(x, y, z);
+        }
+    }
+    uint32_t div = static_cast<uint32_t> (kDivision);
+    for (uint32_t lat = 0; lat < div - 1; ++lat) {
+        for (uint32_t lon = 0; lon < div; ++lon) {
+            uint32_t current = lat * div + lon;
+            uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
+
+            uint32_t nextLat = (lat + 1) * div + lon;
+            uint32_t nextLonLat = (lat + 1) * div + nextLon;
+
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
+
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back(nextLat);
+        }
+    }
 }

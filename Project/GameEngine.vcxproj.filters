@@ -127,6 +127,9 @@
     <Filter Include="Engine\Lib\Quaternion">
       <UniqueIdentifier>{15691192-ae32-47eb-be50-e00d3d2a9eba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Collider">
+      <UniqueIdentifier>{fd836233-a8a1-489d-b282-6363c8a13c38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -237,13 +240,7 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Other\CollisionManager.cpp">
-      <Filter>Engine\Other</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Other\CatmulRomSpline.cpp">
-      <Filter>Engine\Other</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Other\Collider.cpp">
       <Filter>Engine\Other</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Utility\DebugCamera.cpp">
@@ -278,6 +275,18 @@
     </ClCompile>
     <ClCompile Include="Engine\Lib\Quaternion.cpp">
       <Filter>Engine\Lib\Quaternion</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collider\Collider.cpp">
+      <Filter>Engine\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collider\CollisionManager.cpp">
+      <Filter>Engine\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collider\Shapes.cpp">
+      <Filter>Engine\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4x4.cpp">
+      <Filter>Engine\Lib\Matrix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -441,13 +450,7 @@
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Other\CollisionManager.h">
-      <Filter>Engine\Other</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Other\CatmulRomSpline.h">
-      <Filter>Engine\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Other\Collider.h">
       <Filter>Engine\Other</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Utility\DebugCamera.h">
@@ -485,6 +488,15 @@
     </ClInclude>
     <ClInclude Include="Engine\Lib\QuaternionTransform.h">
       <Filter>Engine\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collider\Collider.h">
+      <Filter>Engine\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collider\CollisionManager.h">
+      <Filter>Engine\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collider\Shapes.h">
+      <Filter>Engine\Collider</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
