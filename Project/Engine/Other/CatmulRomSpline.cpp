@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "VectorFunction.h"
 #include "MyLib.h"
-#include "imgui.h"
+#include "ImGuiManager.h"
 #include "LineDrawer.h"
 #include "Input.h"
 #include <optional>
@@ -381,7 +381,6 @@ void CatmulRomSpline::CalculateLengths()
     areaLength_.clear();
     areaLength_.push_back(0.0f);
     float division = lineSegmentCount_ * static_cast<float>(editPosCtrlPoints_.size() - 1);
-    float t = 0;
     for (size_t i = 1; i < division; i++)
     {
         areaLength_.back() += (lineDrawPoint_[i] - lineDrawPoint_[i - 1]).Length();
@@ -660,7 +659,6 @@ void CatmulRomSpline::CalculatePositinByPosOnLine()
     posOnLine_ += speed_ * deltaTime_;
     if (posOnLine_ > totalLength_) {
         return;
-        posOnLine_ = 0.0f;
     }
 
     float posT = GetPositionParameterForDistance(posOnLine_);

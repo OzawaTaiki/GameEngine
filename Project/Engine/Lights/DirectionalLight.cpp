@@ -25,6 +25,8 @@ void DirectionalLight::TransferData()
 {
     bool flag = static_cast<bool>(useHalfLambert_);
     *constMap_ = { color_,direction_,intendity_,flag };
+
+
 }
 
 void DirectionalLight::SetDirection(const Vector3& _directoin)

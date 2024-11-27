@@ -94,7 +94,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* _descriptorHeap, uint32_t _descriptorSize, uint32_t _index);
 
 	DXCommon() = default;
-	~DXCommon();
+	~DXCommon() = default;
 	DXCommon(const DXCommon&) = delete;
 	const DXCommon& operator=(const DXCommon&) = delete;
 

@@ -32,6 +32,12 @@ public:
     uint32_t GetUseMaterialIndex() const { return useMaterialIndex_; }
     void SetUseMaterialIndex(uint32_t _index) { useMaterialIndex_ = _index; }
 
+    Vector3 GetMin() const { return min; }
+    Vector3 GetMax() const { return max; }
+
+    void SetMin(const Vector3& _min) { min = _min; }
+    void SetMax(const Vector3& _max) { max = _max; }
+
     struct VertexData
     {
         Vector4 position;

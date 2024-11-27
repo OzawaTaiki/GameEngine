@@ -79,7 +79,13 @@ public:
 
     void SetDeadZone(float _deadZone);
 
-
+    bool IsControllerConnected() {
+        XINPUT_STATE state; ZeroMemory(&state, sizeof(XINPUT_STATE));
+        // コントローラの状態を取得
+        DWORD result = XInputGetState(0, &state);
+        // コントローラが接続されている場合は true を返す
+        return (result == ERROR_SUCCESS);
+    }
 
 private:
 	Microsoft::WRL::ComPtr <IDirectInput8> directInput_ = nullptr;
@@ -89,11 +95,11 @@ private:
 	std::array<BYTE, 256> keys_ = {};
 	std::array<BYTE, 256> preKeys_ = {};
 
-	_XINPUT_STATE xInputState_ = {};
-    _XINPUT_STATE preXInputState_ = {};
 	DIMOUSESTATE mouse_ = {};
 	DIMOUSESTATE preMouse_ = {};
 
+    _XINPUT_STATE xInputState_ = {};
+    _XINPUT_STATE preXInputState_ = {};
     float currentVibrateTime_ = 0.0f;
     float vibrateTimeMax_ = 0.0f;
     float deadZone_ = 0.1f;

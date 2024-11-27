@@ -22,7 +22,6 @@ void WorldTransform::UpdateData()
         matWorld_ *= parent_->matWorld_;
     }
     TransferData();
-
 }
 
 Vector3 WorldTransform::GetWorldPosition() const

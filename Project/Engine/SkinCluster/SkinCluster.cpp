@@ -5,6 +5,8 @@
 #include "SRVManager.h"
 #include "MatrixFunction.h"
 #include <assimp/scene.h>
+#include <algorithm>
+#include <cassert>
 
 void SkinCluster::CreateResources(uint32_t _jointsSize, uint32_t _vertexSize, const std::map<std::string, int32_t>& _jointMap)
 {

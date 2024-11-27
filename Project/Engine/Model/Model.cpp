@@ -80,6 +80,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4);
         // ライトたち
         lightGroup_->TransferData();
+        lightGroup_->QueueCommand(commandList);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -143,6 +144,37 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     }
 }
 
+Vector3 Model::GetMin(size_t _index) const
+{
+    if (_index == -1)
+    {
+        Vector3 min = { 16536,16536,16536 };
+        for (auto& mesh : mesh_)
+        {
+            min = Vector3::Min(min, mesh->GetMin());
+        }
+        return min;
+    }
+
+    else
+        return mesh_[_index]->GetMin();
+}
+Vector3 Model::GetMax(size_t _index) const
+{
+    if (_index == -1)
+    {
+        Vector3 max = { -16536,-16536,-16536 };
+        for (auto& mesh : mesh_)
+        {
+            max = Vector3::Max(max, mesh->GetMax());
+        }
+        return max;
+    }
+    else
+        return mesh_[_index]->GetMax();
+
+}
+
 Matrix4x4 Model::GetAnimationMatrix() const
 {
     if (animation_.empty())
@@ -158,7 +190,7 @@ void Model::LoadFile(const std::string& _filepath)
 
     Assimp::Importer importer;
     std::string filepath = defaultDirpath_ + _filepath;
-    const aiScene* scene = importer.ReadFile(filepath.c_str(),  aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
+    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate| aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
     assert(scene->HasMeshes());// メッシュがないのは対応しない
 
     LoadMesh(scene);
@@ -189,6 +221,8 @@ void Model::LoadMesh(const aiScene* _scene)
         std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
         pMesh->Initialize();
 
+        Vector3 min = { 16536 };
+        Vector3 max = { -16536 };
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
         {
             Mesh::VertexData vertex = {};
@@ -197,7 +231,13 @@ void Model::LoadMesh(const aiScene* _scene)
             vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
 
             pMesh->vertices_.push_back(vertex);
+
+            min = Vector3::Min(min, vertex.position.xyz());
+            max = Vector3::Max(max, vertex.position.xyz());
         }
+
+        pMesh->SetMin(min);
+        pMesh->SetMax(max);
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace& face = mesh->mFaces[faceIndex];
@@ -215,6 +255,8 @@ void Model::LoadMesh(const aiScene* _scene)
 
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);
         pMesh->TransferData();
+
+
         mesh_.push_back(std::move(pMesh));
     }
 }

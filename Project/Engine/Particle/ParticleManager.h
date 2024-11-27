@@ -15,7 +15,7 @@ public:
     ~ParticleManager();
 
     void Initialize();
-    void Update();
+    void Update(const Camera* _camera);
     void Draw(const Camera* _camera);
 
     void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle = UINT32_MAX);

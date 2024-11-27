@@ -127,7 +127,7 @@ JsonLoader::Datum JsonLoader::parseDatum(const json& j, const std::string& _grou
     }
     else if (j.is_array() && j.size() == 2 || j.contains("x") && j.contains("y"))
     {
-        d.datum=Vector2(j[1].get<float>(), j[1].get<float>());
+        d.datum=Vector2(j[0].get<float>(), j[1].get<float>());
     }
     else if (j.is_array() && j.size() == 3 || j.contains("x") && j.contains("y") && j.contains("z"))
     {
@@ -136,6 +136,10 @@ JsonLoader::Datum JsonLoader::parseDatum(const json& j, const std::string& _grou
     else if (j.is_array() && j.size() == 4 || j.contains("x") && j.contains("y") && j.contains("z") && j.contains("w"))
     {
         d.datum = Vector4(j[0].get<float>(), j[1].get<float>(), j[2].get<float>(), j[3].get<float>());
+    }
+    else if (j.is_string())
+    {
+        d.datum = j.get<std::string>();
     }
     else
     {
@@ -170,6 +174,10 @@ json JsonLoader::DatumToJson(const Datum& _datum)
         else if constexpr (std::is_same_v<T, Vector4>)
         {
             j = { arg.x, arg.y,arg.z,arg.w };
+        }
+        else if constexpr (std::is_same_v<T, std::string>)
+        {
+            j = arg;
         }
                }, _datum.datum);
     return j;

@@ -1,4 +1,5 @@
 #include "DebugCamera.h"
+#include "DebugCamera.h"
 #include "Camera.h"
 #include "Input.h"
 #include "VectorFunction.h"

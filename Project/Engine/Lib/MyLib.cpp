@@ -50,58 +50,58 @@ void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewport
 }
 
 
-void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
-{
-	const uint32_t kSubdivision = 10;                                   // 分割数
-	const float kLatEvery = (float)std::numbers::pi_v<float> / (float)kSubdivision;          // 緯度分割１つ分の角度
-	const float kLonEvery = (float)std::numbers::pi_v<float> * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
-
-	//緯度の方向に分割   -π/2 ~ π/2
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
-	{
-		float lat = -(float)std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;         // 現在の緯度
-
-		// 経度の方向に分割   0 ~ π
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
-		{
-			float lon = lonIndex * kLonEvery;                           // 現在の経度
-			// world座標系でのa,b,cを求める
-			Vector3 point[3] = {
-				{
-					std::cosf(lat) * std::cosf(lon),
-					std::sinf(lat),
-					std::cosf(lat) * std::sinf(lon)
-				},
-				{
-					std::cosf(lat + kLatEvery) * std::cosf(lon),
-					std::sinf(lat + kLatEvery),
-					std::cosf(lat + kLatEvery) * std::sinf(lon)
-				},
-				{
-					std::cosf(lat) * std::cosf(lon + kLonEvery),
-					std::sinf(lat),
-					std::cosf(lat) * std::sinf(lon + kLonEvery)
-				}
-			};
-
-			for (int i = 0; i < 3; i++)
-				point[i] = Add(_sphere.center, Multiply(_sphere.radius, point[i]));
-
-			// a,b,cをScreen座標系まで変換
-			Vector3 drawPoint[3];
-			for (int i = 0; i < 3; i++)
-			{
-				Vector3 temp = Transform(point[i], _viewProjectionMatrix);
-				drawPoint[i] = Transform(temp, _viewportMatrix);
-			}
-
-			// ab,acで線を引く
-			//Novice::DrawLine((int)drawPoint[0].x, (int)drawPoint[0].y, (int)drawPoint[1].x, (int)drawPoint[1].y, _color);
-			//Novice::DrawLine((int)drawPoint[0].x, (int)drawPoint[0].y, (int)drawPoint[2].x, (int)drawPoint[2].y, _color);
-
-		}
-	}
-}
+//void DrawSphere(const Sphere& _sphere, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+//{
+//	const uint32_t kSubdivision = 10;                                   // 分割数
+//	const float kLatEvery = (float)std::numbers::pi_v<float> / (float)kSubdivision;          // 緯度分割１つ分の角度
+//	const float kLonEvery = (float)std::numbers::pi_v<float> * 2.0 / (float)kSubdivision;    // 経度分割１つ分の角度
+//
+//	//緯度の方向に分割   -π/2 ~ π/2
+//	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
+//	{
+//		float lat = -(float)std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;         // 現在の緯度
+//
+//		// 経度の方向に分割   0 ~ π
+//		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
+//		{
+//			float lon = lonIndex * kLonEvery;                           // 現在の経度
+//			// world座標系でのa,b,cを求める
+//			Vector3 point[3] = {
+//				{
+//					std::cosf(lat) * std::cosf(lon),
+//					std::sinf(lat),
+//					std::cosf(lat) * std::sinf(lon)
+//				},
+//				{
+//					std::cosf(lat + kLatEvery) * std::cosf(lon),
+//					std::sinf(lat + kLatEvery),
+//					std::cosf(lat + kLatEvery) * std::sinf(lon)
+//				},
+//				{
+//					std::cosf(lat) * std::cosf(lon + kLonEvery),
+//					std::sinf(lat),
+//					std::cosf(lat) * std::sinf(lon + kLonEvery)
+//				}
+//			};
+//
+//			for (int i = 0; i < 3; i++)
+//				point[i] = Add(_sphere.center, Multiply(_sphere.radius, point[i]));
+//
+//			// a,b,cをScreen座標系まで変換
+//			Vector3 drawPoint[3];
+//			for (int i = 0; i < 3; i++)
+//			{
+//				Vector3 temp = Transform(point[i], _viewProjectionMatrix);
+//				drawPoint[i] = Transform(temp, _viewportMatrix);
+//			}
+//
+//			// ab,acで線を引く
+//			//Novice::DrawLine((int)drawPoint[0].x, (int)drawPoint[0].y, (int)drawPoint[1].x, (int)drawPoint[1].y, _color);
+//			//Novice::DrawLine((int)drawPoint[0].x, (int)drawPoint[0].y, (int)drawPoint[2].x, (int)drawPoint[2].y, _color);
+//
+//		}
+//	}
+//}
 
 void Drawline(const Vector3& _origin, const Vector3& _diff, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
 {
@@ -172,63 +172,63 @@ void DrawTriangle(const Triangle& _triangle, const Matrix4x4& _viewProjectionMat
 }
 
 
-void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
-{
-	Vector3 vertices[8];
+//void DrawAABB(const AABB& _aabb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+//{
+//	Vector3 vertices[8];
+//
+//	vertices[0] = { _aabb.min.x,_aabb.min.y ,_aabb.min.z };
+//	vertices[1] = { _aabb.max.x,_aabb.min.y ,_aabb.min.z };
+//	vertices[2] = { _aabb.min.x,_aabb.max.y ,_aabb.min.z };
+//	vertices[3] = { _aabb.max.x,_aabb.max.y ,_aabb.min.z };
+//	vertices[4] = { _aabb.min.x,_aabb.min.y ,_aabb.max.z };
+//	vertices[5] = { _aabb.max.x,_aabb.min.y ,_aabb.max.z };
+//	vertices[6] = { _aabb.min.x,_aabb.max.y ,_aabb.max.z };
+//	vertices[7] = { _aabb.max.x,_aabb.max.y ,_aabb.max.z };
+//
+//	for (Vector3& v : vertices)
+//	{
+//		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
+//	}
+//
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
+//	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+//	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+//	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+//	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+//	//Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+//	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+//	//Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//	//Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//
+//}
 
-	vertices[0] = { _aabb.min.x,_aabb.min.y ,_aabb.min.z };
-	vertices[1] = { _aabb.max.x,_aabb.min.y ,_aabb.min.z };
-	vertices[2] = { _aabb.min.x,_aabb.max.y ,_aabb.min.z };
-	vertices[3] = { _aabb.max.x,_aabb.max.y ,_aabb.min.z };
-	vertices[4] = { _aabb.min.x,_aabb.min.y ,_aabb.max.z };
-	vertices[5] = { _aabb.max.x,_aabb.min.y ,_aabb.max.z };
-	vertices[6] = { _aabb.min.x,_aabb.max.y ,_aabb.max.z };
-	vertices[7] = { _aabb.max.x,_aabb.max.y ,_aabb.max.z };
-
-	for (Vector3& v : vertices)
-	{
-		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
-	}
-
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
-	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
-	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
-	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
-	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
-	//Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
-	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
-	//Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-	//Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-
-}
-
-void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
-{
-	Vector3 vertices[8];
-
-	_obb.CaluculateVertices(vertices);
-
-	for (Vector3& v : vertices)
-	{
-		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
-	}
-
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
-	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
-	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
-	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
-	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
-	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
-	//Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
-	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
-	//Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-	//Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
-}
+//void DrawOBB(const OBB& _obb, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color)
+//{
+//	Vector3 vertices[8];
+//
+//	_obb.CaluculateVertices(vertices);
+//
+//	for (Vector3& v : vertices)
+//	{
+//		v = Transform(Transform(v, _viewProjectionMatrix), _viewportMatrix);
+//	}
+//
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[1].x, (int)vertices[1].y, _color);
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[2].x, (int)vertices[2].y, _color);
+//	//Novice::DrawLine((int)vertices[0].x, (int)vertices[0].y, (int)vertices[4].x, (int)vertices[4].y, _color);
+//	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+//	//Novice::DrawLine((int)vertices[1].x, (int)vertices[1].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+//	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+//	//Novice::DrawLine((int)vertices[2].x, (int)vertices[2].y, (int)vertices[3].x, (int)vertices[3].y, _color);
+//	//Novice::DrawLine((int)vertices[3].x, (int)vertices[3].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[5].x, (int)vertices[5].y, _color);
+//	//Novice::DrawLine((int)vertices[4].x, (int)vertices[4].y, (int)vertices[6].x, (int)vertices[6].y, _color);
+//	//Novice::DrawLine((int)vertices[5].x, (int)vertices[5].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//	//Novice::DrawLine((int)vertices[6].x, (int)vertices[6].y, (int)vertices[7].x, (int)vertices[7].y, _color);
+//}
 
 void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix, uint32_t _color, bool _isDrawPoint)
 {
@@ -249,13 +249,13 @@ void DrawBezier(const Bezier& _bezier, const Matrix4x4& _viewProjectionMatrix, c
 	}
 	if (_isDrawPoint)
 	{
-		Sphere point[3];
-		for (int i = 0; i < 3; i++)
-		{
-			point[i].center = _bezier.point[i];
-			point[i].radius = 0.01f;
-			//DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
-		}
+	//	Sphere point[3];
+	//	for (int i = 0; i < 3; i++)
+	//	{
+	//		point[i].center = _bezier.point[i];
+	//		point[i].radius = 0.01f;
+	//		//DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
+	//	}
 	}
 }
 
@@ -285,26 +285,26 @@ void DrawCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint1, const Vect
 	}
 	if (_isDrawPoint)
 	{
-		Sphere point[4];
-		point[0].center = _cPoint0;
-		point[1].center = _cPoint1;
-		point[2].center = _cPoint2;
-		point[3].center = _cPoint3;
-		for (int i = 0; i < 4; i++)
-		{
-			point[i].radius = 0.01f;
-			//DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
-		}
+		//Sphere point[4];
+		//point[0].center = _cPoint0;
+		//point[1].center = _cPoint1;
+		//point[2].center = _cPoint2;
+		//point[3].center = _cPoint3;
+		//for (int i = 0; i < 4; i++)
+		//{
+		//	point[i].radius = 0.01f;
+		//	//DrawSphere(point[i], _viewProjectionMatrix, _viewportMatrix, BLACK);
+		//}
 	}
 }
 
 void DrawBall(const Ball& _ball, const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
-	Sphere ball{
+	/*Sphere ball{
 		.center = _ball.position,
 		.radius = _ball.radius
 	};
-	DrawSphere(ball, _viewProjectionMatrix, _viewportMatrix, _ball.color);
+	DrawSphere(ball, _viewProjectionMatrix, _viewportMatrix, _ball.color);*/
 }
 
 
@@ -412,21 +412,21 @@ void GetPlaneVertex(const Plane& _plane, Vector3* _vertex)
 		_vertex[i] = _vertex[i] * _plane.scalar + center;
 }
 
-bool IsCollision(const Sphere& _s1, const Sphere& _s2)
-{
-	float distance = Length(Subtract(_s1.center, _s2.center));
-	return distance <= _s1.radius + _s2.radius ? true : false;
-}
-
-bool IsCollision(const Sphere& _s, const Plane& _p)
-{
-	float distance = Dot(_p.normal, _s.center) - _p.distance;
-	distance = distance < 0 ? -distance : distance;
-
-	if (distance <= _s.radius)
-		return true;
-	return false;
-}
+//bool IsCollision(const Sphere& _s1, const Sphere& _s2)
+//{
+//	float distance = Length(Subtract(_s1.center, _s2.center));
+//	return distance <= _s1.radius + _s2.radius ? true : false;
+//}
+//
+//bool IsCollision(const Sphere& _s, const Plane& _p)
+//{
+//	float distance = Dot(_p.normal, _s.center) - _p.distance;
+//	distance = distance < 0 ? -distance : distance;
+//
+//	if (distance <= _s.radius)
+//		return true;
+//	return false;
+//}
 
 bool IsCollision(const Plane& _plane, const Segment& _segment)
 {
@@ -445,207 +445,207 @@ bool IsCollision(const Plane& _plane, const Segment& _segment)
 	return true;
 }
 
-bool IsCollision(const Triangle& _triangle, const Segment& _segment)
-{
-	Plane lPlane = CalculatePlane(_triangle);
+//bool IsCollision(const Triangle& _triangle, const Segment& _segment)
+//{
+//	Plane lPlane = CalculatePlane(_triangle);
+//
+//	float dot = Dot(lPlane.normal, _segment.diff);
+//
+//	if (dot == 0.0f)
+//	{
+//		return false;
+//	}
+//
+//	float t = (lPlane.distance - Dot(_segment.origin, lPlane.normal)) / dot;
+//
+//	if (t < 0.0f || t>1.0f)
+//		return false;
+//
+//	Vector3 point = _segment.origin + _segment.diff * t;
+//
+//	Vector3 v01 = _triangle.vertices[1] - _triangle.vertices[0];
+//	Vector3 v1p = point - _triangle.vertices[1];
+//
+//	Vector3 v12 = _triangle.vertices[2] - _triangle.vertices[1];
+//	Vector3 v2p = point - _triangle.vertices[2];
+//
+//	Vector3 v20 = _triangle.vertices[0] - _triangle.vertices[2];
+//	Vector3 v0p = point - _triangle.vertices[0];
+//
+//	Vector3 cross01 = Cross(v01, v1p);
+//	Vector3 cross12 = Cross(v12, v2p);
+//	Vector3 cross20 = Cross(v20, v0p);
+//
+//	if (Dot(cross01, lPlane.normal) >= 0.0f &&
+//		Dot(cross12, lPlane.normal) >= 0.0f &&
+//		Dot(cross20, lPlane.normal) >= 0.0f)
+//	{
+//		return true;
+//	}
+//	return false;
+//
+//}
 
-	float dot = Dot(lPlane.normal, _segment.diff);
-
-	if (dot == 0.0f)
-	{
-		return false;
-	}
-
-	float t = (lPlane.distance - Dot(_segment.origin, lPlane.normal)) / dot;
-
-	if (t < 0.0f || t>1.0f)
-		return false;
-
-	Vector3 point = _segment.origin + _segment.diff * t;
-
-	Vector3 v01 = _triangle.vertices[1] - _triangle.vertices[0];
-	Vector3 v1p = point - _triangle.vertices[1];
-
-	Vector3 v12 = _triangle.vertices[2] - _triangle.vertices[1];
-	Vector3 v2p = point - _triangle.vertices[2];
-
-	Vector3 v20 = _triangle.vertices[0] - _triangle.vertices[2];
-	Vector3 v0p = point - _triangle.vertices[0];
-
-	Vector3 cross01 = Cross(v01, v1p);
-	Vector3 cross12 = Cross(v12, v2p);
-	Vector3 cross20 = Cross(v20, v0p);
-
-	if (Dot(cross01, lPlane.normal) >= 0.0f &&
-		Dot(cross12, lPlane.normal) >= 0.0f &&
-		Dot(cross20, lPlane.normal) >= 0.0f)
-	{
-		return true;
-	}
-	return false;
-
-}
-
-bool IsCollision(const AABB& _a, const AABB& _b)
-{
-	if ((_a.min.x <= _b.max.x && _a.max.x >= _b.min.x) && // x
-		(_a.min.y <= _b.max.y && _a.max.y >= _b.min.y) && // y
-		(_a.min.z <= _b.max.z && _a.max.z >= _b.min.z)) { // z
-		//衝突
-		return true;
-	}
-
-	return false;
-}
-
-
-bool IsCollision(const AABB& _aabb, const Vector3& _point)
-{
-	Vector3 closestPoint;
-	closestPoint.x = std::clamp(_point.x, _aabb.min.x, _aabb.max.x);
-	closestPoint.y = std::clamp(_point.y, _aabb.min.y, _aabb.max.y);
-	closestPoint.z = std::clamp(_point.z, _aabb.min.z, _aabb.max.z);
-
-	float distance = Length(closestPoint - _point);
-
-	if (distance <= 0)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool IsCollision(const AABB& _a, const Sphere& _s)
-{
-
-	Vector3 closestPoint;
-	closestPoint.x = std::clamp(_s.center.x, _a.min.x, _a.max.x);
-	closestPoint.y = std::clamp(_s.center.y, _a.min.y, _a.max.y);
-	closestPoint.z = std::clamp(_s.center.z, _a.min.z, _a.max.z);
-
-	float distance = Length(closestPoint - _s.center);
-
-	if (distance <= _s.radius)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool IsCollision(const AABB& _aabb, const Segment& _segment)
-{
-	Vector3 tminVec;
-	Vector3 tmaxVec;
-
-	tminVec.y = (_aabb.min.y - _segment.origin.y) / _segment.diff.y;
-	tminVec.x = (_aabb.min.x - _segment.origin.x) / _segment.diff.x;
-	tminVec.z = (_aabb.min.z - _segment.origin.z) / _segment.diff.z;
-
-	tmaxVec.x = (_aabb.max.x - _segment.origin.x) / _segment.diff.x;
-	tmaxVec.y = (_aabb.max.y - _segment.origin.y) / _segment.diff.y;
-	tmaxVec.z = (_aabb.max.z - _segment.origin.z) / _segment.diff.z;
-
-	Vector3 tNear;
-	tNear.x = std::min(tminVec.x, tmaxVec.x);
-	tNear.y = std::min(tminVec.y, tmaxVec.y);
-	tNear.z = std::min(tminVec.z, tmaxVec.z);
-
-	Vector3 tFar;
-	tFar.x = std::max(tminVec.x, tmaxVec.x);
-	tFar.y = std::max(tminVec.y, tmaxVec.y);
-	tFar.z = std::max(tminVec.z, tmaxVec.z);
-
-	float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
-	float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
-
-	if (tmin <= tmax &&
-		tmax >= 0.0f &&
-		tmin <= 1.0f)
-	{
-		//衝突
-		return true;
-	}
-
-	return false;
-}
-
-bool IsCollision(const OBB& _obb, const Sphere& _sphere)
-{
-	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
-	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
-
-	Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
-	AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
-	Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
-
-	return IsCollision(aabbOBBLocal, sphereOBBLocal);
-
-}
-
-bool IsCollision(const OBB& _obb, const Segment& _segment)
-{
-	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
-	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
-	Vector3 localOrigin = Transform(_segment.origin, obbWorldMatInv);
-	Vector3 localEnd = Transform(_segment.origin + _segment.diff, obbWorldMatInv);
-
-	AABB localAABB{
-		{-_obb.size.x, -_obb.size.y, -_obb.size.z},
-		{+_obb.size.x, +_obb.size.y, +_obb.size.z},
-	};
-	Segment localSegment;
-	localSegment.origin = localOrigin;
-	localSegment.diff = localEnd - localOrigin;
-
-	return IsCollision(localAABB, localSegment);
-}
-
-bool IsCollision(const OBB& _obb1, const OBB& _obb2)
-{
-	/// 分離軸候補の計算
-	Vector3 axes[15];
-	axes[0] = _obb1.orientations[0];
-	axes[1] = _obb1.orientations[1];
-	axes[2] = _obb1.orientations[2];
-
-	axes[3] = _obb2.orientations[0];
-	axes[4] = _obb2.orientations[1];
-	axes[5] = _obb2.orientations[2];
-
-	int index = 6;
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			axes[index++] = Cross(_obb1.orientations[i], _obb2.orientations[j]);
-		}
-	}
-
-	for (auto axis : axes)
-	{
-		float minObb1, maxObb1;
-		float minObb2, maxObb2;
-
-		//軸に射影および点の最大と最小を求める
-		CalculateProjectionRange(_obb1, axis, minObb1, maxObb1);
-		CalculateProjectionRange(_obb2, axis, minObb2, maxObb2);
-
-		float l1, l2;
-		l1 = maxObb1 - minObb1;
-		l2 = maxObb2 - minObb2;
-
-		float sumSpan = l1 + l2;
-
-		float longSpan = std::max(maxObb1, maxObb2) - std::min(minObb1, minObb2);
-		if (sumSpan < longSpan)
-		{	//分離している	//すなわち衝突していない
-			return false;
-		}
-	}
-	return true;
-}
+//bool IsCollision(const AABB& _a, const AABB& _b)
+//{
+//	if ((_a.min.x <= _b.max.x && _a.max.x >= _b.min.x) && // x
+//		(_a.min.y <= _b.max.y && _a.max.y >= _b.min.y) && // y
+//		(_a.min.z <= _b.max.z && _a.max.z >= _b.min.z)) { // z
+//		//衝突
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool IsCollision(const AABB& _aabb, const Vector3& _point)
+//{
+//	Vector3 closestPoint;
+//	closestPoint.x = std::clamp(_point.x, _aabb.min.x, _aabb.max.x);
+//	closestPoint.y = std::clamp(_point.y, _aabb.min.y, _aabb.max.y);
+//	closestPoint.z = std::clamp(_point.z, _aabb.min.z, _aabb.max.z);
+//
+//	float distance = Length(closestPoint - _point);
+//
+//	if (distance <= 0)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool IsCollision(const AABB& _a, const Sphere& _s)
+//{
+//
+//	Vector3 closestPoint;
+//	closestPoint.x = std::clamp(_s.center.x, _a.min.x, _a.max.x);
+//	closestPoint.y = std::clamp(_s.center.y, _a.min.y, _a.max.y);
+//	closestPoint.z = std::clamp(_s.center.z, _a.min.z, _a.max.z);
+//
+//	float distance = Length(closestPoint - _s.center);
+//
+//	if (distance <= _s.radius)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool IsCollision(const AABB& _aabb, const Segment& _segment)
+//{
+//	Vector3 tminVec;
+//	Vector3 tmaxVec;
+//
+//	tminVec.y = (_aabb.min.y - _segment.origin.y) / _segment.diff.y;
+//	tminVec.x = (_aabb.min.x - _segment.origin.x) / _segment.diff.x;
+//	tminVec.z = (_aabb.min.z - _segment.origin.z) / _segment.diff.z;
+//
+//	tmaxVec.x = (_aabb.max.x - _segment.origin.x) / _segment.diff.x;
+//	tmaxVec.y = (_aabb.max.y - _segment.origin.y) / _segment.diff.y;
+//	tmaxVec.z = (_aabb.max.z - _segment.origin.z) / _segment.diff.z;
+//
+//	Vector3 tNear;
+//	tNear.x = std::min(tminVec.x, tmaxVec.x);
+//	tNear.y = std::min(tminVec.y, tmaxVec.y);
+//	tNear.z = std::min(tminVec.z, tmaxVec.z);
+//
+//	Vector3 tFar;
+//	tFar.x = std::max(tminVec.x, tmaxVec.x);
+//	tFar.y = std::max(tminVec.y, tmaxVec.y);
+//	tFar.z = std::max(tminVec.z, tmaxVec.z);
+//
+//	float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
+//	float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
+//
+//	if (tmin <= tmax &&
+//		tmax >= 0.0f &&
+//		tmin <= 1.0f)
+//	{
+//		//衝突
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool IsCollision(const OBB& _obb, const Sphere& _sphere)
+//{
+//	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+//	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
+//
+//	Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
+//	AABB aabbOBBLocal{ .min = -_obb.size,.max = _obb.size };
+//	Sphere sphereOBBLocal{ centerInOBBLocalSphere,_sphere.radius };
+//
+//	return IsCollision(aabbOBBLocal, sphereOBBLocal);
+//
+//}
+//
+//bool IsCollision(const OBB& _obb, const Segment& _segment)
+//{
+//	Matrix4x4 obbWolrdMat = MakeAffineMatrix({ 1.0f,1.0f ,1.0f }, _obb.rotate, _obb.center);
+//	Matrix4x4 obbWorldMatInv = Inverse(obbWolrdMat);
+//	Vector3 localOrigin = Transform(_segment.origin, obbWorldMatInv);
+//	Vector3 localEnd = Transform(_segment.origin + _segment.diff, obbWorldMatInv);
+//
+//	AABB localAABB{
+//		{-_obb.size.x, -_obb.size.y, -_obb.size.z},
+//		{+_obb.size.x, +_obb.size.y, +_obb.size.z},
+//	};
+//	Segment localSegment;
+//	localSegment.origin = localOrigin;
+//	localSegment.diff = localEnd - localOrigin;
+//
+//	return IsCollision(localAABB, localSegment);
+//}
+//
+//bool IsCollision(const OBB& _obb1, const OBB& _obb2)
+//{
+//	/// 分離軸候補の計算
+//	Vector3 axes[15];
+//	axes[0] = _obb1.orientations[0];
+//	axes[1] = _obb1.orientations[1];
+//	axes[2] = _obb1.orientations[2];
+//
+//	axes[3] = _obb2.orientations[0];
+//	axes[4] = _obb2.orientations[1];
+//	axes[5] = _obb2.orientations[2];
+//
+//	int index = 6;
+//	for (int i = 0; i < 3; i++)
+//	{
+//		for (int j = 0; j < 3; j++)
+//		{
+//			axes[index++] = Cross(_obb1.orientations[i], _obb2.orientations[j]);
+//		}
+//	}
+//
+//	for (auto axis : axes)
+//	{
+//		float minObb1, maxObb1;
+//		float minObb2, maxObb2;
+//
+//		//軸に射影および点の最大と最小を求める
+//		CalculateProjectionRange(_obb1, axis, minObb1, maxObb1);
+//		CalculateProjectionRange(_obb2, axis, minObb2, maxObb2);
+//
+//		float l1, l2;
+//		l1 = maxObb1 - minObb1;
+//		l2 = maxObb2 - minObb2;
+//
+//		float sumSpan = l1 + l2;
+//
+//		float longSpan = std::max(maxObb1, maxObb2) - std::min(minObb1, minObb2);
+//		if (sumSpan < longSpan)
+//		{	//分離している	//すなわち衝突していない
+//			return false;
+//		}
+//	}
+//	return true;
+//}
 
 Plane CalculatePlane(const Triangle& _triangle)
 {
@@ -665,23 +665,23 @@ Plane CalculatePlane(const Triangle& _triangle)
 	return result;
 }
 
-void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max)
-{
-	Vector3 verties[8];
-	_obb.CaluculateVertices(verties);
-
-	_min = std::numeric_limits<float>::infinity();
-	_max = -(float)std::numeric_limits<float>::infinity();
-
-	for (auto vertex : verties)
-	{
-		float proj = Dot(_axis, vertex);
-		_min = std::min(_min, proj);
-		_max = std::max(_max, proj);
-	}
-
-	return;
-}
+//void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max)
+//{
+//	Vector3 verties[8];
+//	_obb.CaluculateVertices(verties);
+//
+//	_min = std::numeric_limits<float>::infinity();
+//	_max = -(float)std::numeric_limits<float>::infinity();
+//
+//	for (auto vertex : verties)
+//	{
+//		float proj = Dot(_axis, vertex);
+//		_min = std::min(_min, proj);
+//		_max = std::max(_max, proj);
+//	}
+//
+//	return;
+//}
 
 Vector3 CalculatePointBezier(const Bezier& _bezier, float _t)
 {
@@ -715,52 +715,77 @@ Vector3 CalculatePointCatmullRom(const Vector3& _cPoint0, const Vector3& _cPoint
 	return result;
 }
 
-void AABB::Update()
-{
-	this->min.x = (std::min)(this->min.x, this->max.x);
-	this->max.x = (std::max)(this->min.x, this->max.x);
-	this->min.y = (std::min)(this->min.y, this->max.y);
-	this->max.y = (std::max)(this->min.y, this->max.y);
-	this->min.z = (std::min)(this->min.z, this->max.z);
-	this->max.z = (std::max)(this->min.z, this->max.z);
+//void AABB::Update()
+//{
+//	this->min.x = (std::min)(this->min.x, this->max.x);
+//	this->max.x = (std::max)(this->min.x, this->max.x);
+//	this->min.y = (std::min)(this->min.y, this->max.y);
+//	this->max.y = (std::max)(this->min.y, this->max.y);
+//	this->min.z = (std::min)(this->min.z, this->max.z);
+//	this->max.z = (std::max)(this->min.z, this->max.z);
+//}
+//
+//void OBB::CalculateOrientations()
+//{
+//	Matrix4x4 _worldMat = Make_worldMat(this->rotate);
+//
+//
+//	this->orientations[0].x = _worldMat.m[0][0];
+//	this->orientations[0].y = _worldMat.m[0][1];
+//	this->orientations[0].z = _worldMat.m[0][2];
+//
+//	this->orientations[1].x = _worldMat.m[1][0];
+//	this->orientations[1].y = _worldMat.m[1][1];
+//	this->orientations[1].z = _worldMat.m[1][2];
+//
+//	this->orientations[2].x = _worldMat.m[2][0];
+//	this->orientations[2].y = _worldMat.m[2][1];
+//	this->orientations[2].z = _worldMat.m[2][2];
+//
+//	this->orientations[0] = Normalize(this->orientations[0]);
+//	this->orientations[1] = Normalize(this->orientations[1]);
+//	this->orientations[2] = Normalize(this->orientations[2]);
+//}
+//
+//
+//void OBB::CaluculateVertices(Vector3* vertices) const
+//{
+//	Vector3 rotateAxis[3];
+//	rotateAxis[0] = this->orientations[0] * this->size.x;
+//	rotateAxis[1] = this->orientations[1] * this->size.y;
+//	rotateAxis[2] = this->orientations[2] * this->size.z;
+//
+//	vertices[0] = this->center + rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+//	vertices[1] = this->center + rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+//	vertices[2] = this->center + rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+//	vertices[3] = this->center + rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+//	vertices[4] = this->center - rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
+//	vertices[5] = this->center - rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
+//	vertices[6] = this->center - rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
+//	vertices[7] = this->center - rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
+//}
+
+
+float DegreesToRadians(float degrees) { return float(degrees * ((float)M_PI / 180.0)); }
+
+Vector3 DegreesToRadians(Vector3 degrees) {
+	Vector3 resurt;
+
+	resurt.x = float(degrees.x * ((float)M_PI / 180.0));
+	resurt.y = float(degrees.y * ((float)M_PI / 180.0));
+	resurt.z = float(degrees.z * ((float)M_PI / 180.0));
+
+	return resurt;
 }
 
-void OBB::CalculateOrientations()
-{
-	Matrix4x4 rotateMatrix = MakeRotateMatrix(this->rotate);
+float RadiansToDegrees(float radians) { return float(radians * (180.0 / (float)M_PI)); }
 
+Vector3 RadiansToDegrees(Vector3 radians) {
+	Vector3 resurt;
 
-	this->orientations[0].x = rotateMatrix.m[0][0];
-	this->orientations[0].y = rotateMatrix.m[0][1];
-	this->orientations[0].z = rotateMatrix.m[0][2];
+	resurt.x = float(radians.x * (180.0 / (float)M_PI));
+	resurt.y = float(radians.y * (180.0 / (float)M_PI));
+	resurt.z = float(radians.z * (180.0 / (float)M_PI));
 
-	this->orientations[1].x = rotateMatrix.m[1][0];
-	this->orientations[1].y = rotateMatrix.m[1][1];
-	this->orientations[1].z = rotateMatrix.m[1][2];
-
-	this->orientations[2].x = rotateMatrix.m[2][0];
-	this->orientations[2].y = rotateMatrix.m[2][1];
-	this->orientations[2].z = rotateMatrix.m[2][2];
-
-	this->orientations[0] = Normalize(this->orientations[0]);
-	this->orientations[1] = Normalize(this->orientations[1]);
-	this->orientations[2] = Normalize(this->orientations[2]);
+	return resurt;
 }
-
-void OBB::CaluculateVertices(Vector3* vertices) const
-{
-	Vector3 rotateAxis[3];
-	rotateAxis[0] = this->orientations[0] * this->size.x;
-	rotateAxis[1] = this->orientations[1] * this->size.y;
-	rotateAxis[2] = this->orientations[2] * this->size.z;
-
-	vertices[0] = this->center + rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
-	vertices[1] = this->center + rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
-	vertices[2] = this->center + rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
-	vertices[3] = this->center + rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
-	vertices[4] = this->center - rotateAxis[0] + rotateAxis[1] + rotateAxis[2];
-	vertices[5] = this->center - rotateAxis[0] + rotateAxis[1] - rotateAxis[2];
-	vertices[6] = this->center - rotateAxis[0] - rotateAxis[1] + rotateAxis[2];
-	vertices[7] = this->center - rotateAxis[0] - rotateAxis[1] - rotateAxis[2];
-}
-

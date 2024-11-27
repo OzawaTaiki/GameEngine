@@ -830,7 +830,6 @@ void PSOManager::CreatePSOForParticle()
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 
-
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
     inputElementDescs[0].SemanticName = "POSITION";

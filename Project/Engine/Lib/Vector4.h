@@ -11,6 +11,9 @@ struct Vector4
     inline Vector4(float _f0, float _f1, float _f2, float _f3) :x(_f0), y(_f1), z(_f2), w(_f3) {};
     inline Vector4(const Vector3& _v, float _f) :x(_v.x), y(_v.y), z(_v.z), w(_f) {};
 
+    Vector3 xyz()const { return Vector3(x, y, z); }
+
+
 	inline bool operator==(const Vector4& _v)const{
 		return x == _v.x && y == _v.y && z == _v.z && w == _v.w;
 	}

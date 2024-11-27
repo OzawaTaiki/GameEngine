@@ -97,6 +97,12 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 
+    auto metadata = image.GetMetadata();
+	if (metadata.mipLevels <= 1)
+    {
+		return image;
+    }
+
 	//ミップマップの生成
 	DirectX::ScratchImage mipImage{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);

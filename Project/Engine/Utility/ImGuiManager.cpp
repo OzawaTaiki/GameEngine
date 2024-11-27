@@ -1,14 +1,18 @@
 #include "ImGuiManager.h"
+
+#ifdef _DEBUG
 #include "WinApp.h"
 #include "DXCommon.h"
 #include "SRVManager.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
+#endif // _DEBUG
 
-//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void ImGuiManager::Initialize()
 {
+#ifdef _DEBUG
+
     srvManager_ = SRVManager::GetInstance();
     DXCommon* dx = DXCommon::GetInstance();
 
@@ -29,35 +33,44 @@ void ImGuiManager::Initialize()
         srvManager_->GetSRVHeap_()->GetGPUDescriptorHandleForHeapStart()
     );
 
-
-
+#endif // _DEBUG
 }
 
 void ImGuiManager::Begin()
 {
+#ifdef _DEBUG
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    ImGui::Begin("Engine");
+#endif // _DEBUG
 }
 
 void ImGuiManager::End()
 {
+#ifdef _DEBUG
+    ImGui::End();
     ImGui::Render();
+#endif // _DEBUG
 }
 
 void ImGuiManager::Draw()
 {
+#ifdef _DEBUG
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     ID3D12DescriptorHeap* ppheaps[] = { srvManager_->GetSRVHeap_() };
     commandList->SetDescriptorHeaps(_countof(ppheaps), ppheaps);
 
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+#endif // _DEBUG
 
 }
 
 void ImGuiManager::Finalize()
 {
+#ifdef _DEBUG
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+#endif // _DEBUG
 }

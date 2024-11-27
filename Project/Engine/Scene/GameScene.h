@@ -10,6 +10,8 @@
 #include "ObjectColor.h"
 #include "ParticleManager.h"
 #include "ParticleEmitters.h"
+#include "ConfigManager.h"
+#include "DebugCamera.h"
 
 #include <memory>
 
@@ -31,13 +33,10 @@ private:
     Input* input_ = nullptr;
     LineDrawer* lineDrawer_ = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
+    std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
+    bool activeDebugCamera_ = false;
     std::unique_ptr<Audio> audio_;
     uint32_t handle_;
 
-    ObjectModel* model_;
-    AnimationModel* humanModel_;
-    WorldTransform trans_;
-    ObjectColor* color_;
 
-    ParticleEmitter* emit_;
 };

@@ -2,7 +2,8 @@
 #include "MyLib.h"
 #include "../Joint/joint.h"
 #include <assimp/scene.h>
-#include <imgui.h>
+#include "ImGuiManager.h"
+#include <cassert>
 
 void ModelAnimation::Initialize()
 {

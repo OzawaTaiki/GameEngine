@@ -17,7 +17,7 @@ public: // 静的メンバ関数
 	static LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
 
 public: // メンバ関数
-	void Initilize(const wchar_t* _title = L"XGame",
+	void Initilize(const wchar_t* _title = L"2206_MECAREA",
 				   UINT _style = WS_OVERLAPPEDWINDOW,
 				   uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_);
 	void Filalze();

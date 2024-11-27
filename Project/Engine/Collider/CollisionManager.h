@@ -4,6 +4,7 @@
 #include <list>
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 
 class Collider;
@@ -17,7 +18,7 @@ public:
     // コライダーのリストをリセットする
     void ResetColliderList() { colliders_.clear(); }
     // コライダーをリストに登録する
-    void RegisterCollider(Collider* _collider) { colliders_.push_back(_collider); }
+    void RegisterCollider(Collider* _collider);
     // 全てのコライダーの衝突判定を行う
     void CheckAllCollision();
 

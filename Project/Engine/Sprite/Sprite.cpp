@@ -38,8 +38,7 @@ void Sprite::Initialize()
     vConstMap_[4].texcoord = {1.0f,0.0f };
     vConstMap_[5].texcoord = vConstMap_[2].texcoord;
 
-    textureSize_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
-    anchor_ = { 0,0 };
+    defaultTextureSize_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
     CalculateVertex();
 }
 
@@ -82,7 +81,7 @@ Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
 void Sprite::StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight)
 {
     SpriteManager::GetInstance()->Initialize();
-    winWidth_ = winWidth_;
+    winWidth_ = _windowWidth;
     winHeight_ = _windowWHeight;
 }
 
@@ -93,12 +92,17 @@ void Sprite::PreDraw()
 
 void Sprite::SetSize(const Vector2& _size)
 {
-    uvScale_ = _size / textureSize_;
+    scale_ = _size / defaultTextureSize_;
+}
+
+void Sprite::SetUVSize(const Vector2& _size)
+{
+    uvScale_ = _size / defaultTextureSize_;
 }
 
 void Sprite::SetLeftTop(const Vector2& _leftTop)
 {
-    uvTranslate_ = _leftTop / textureSize_;
+    uvTranslate_ = _leftTop / defaultTextureSize_;
 }
 
 void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
@@ -113,7 +117,7 @@ void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
 
 void Sprite::CalculateVertex()
 {
-    Vector2 size = textureSize_;
+    Vector2 size = defaultTextureSize_;
 
     vConstMap_[0].position = {
         -anchor_.x * size.x ,
@@ -174,7 +178,7 @@ void Sprite::ImGui()
     ImGui::DragFloat2("LeftTop", &lefttop_.x, 0.01f);
     if (ImGui::Button("Set"))
     {
-        SetSize(size_);
+        SetUVSize(size_);
         SetLeftTop(lefttop_);
     }
 

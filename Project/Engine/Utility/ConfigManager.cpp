@@ -65,37 +65,33 @@ void ConfigManager::LoadData()
                 if (value.datum.index() == 0)
                 {
                     // uint32_t
-                    uint32_t* ptr = new uint32_t;
-                    *ptr = std::get<uint32_t>(value.datum);
-                    data_[groupName][variableName].variable = ptr;
+                    uint32_t val = std::get<uint32_t>(value.datum);
+                    value_[groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 1)
                 {
-                    // float
-                    float* ptr = new float;
-                    *ptr = std::get<float>(value.datum);
-                    data_[groupName][variableName].variable = ptr;
+                    float val = std::get<float>(value.datum);
+                    value_[groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 2)
                 {
-                    // Vector2
-                    Vector2* ptr = new Vector2;
-                    *ptr = std::get<Vector2>(value.datum);
-                    data_[groupName][variableName].variable = ptr;
+                    Vector2 val = std::get<Vector2>(value.datum);
+                    value_[groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 3)
                 {
-                    // Vector3
-                    Vector3* ptr = new Vector3;
-                    *ptr = std::get<Vector3>(value.datum);
-                    data_[groupName][variableName].variable = ptr;
+                    Vector3 val = std::get<Vector3>(value.datum);
+                    value_[groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 4)
                 {
-                    // Vector4
-                    Vector4* ptr = new Vector4;
-                    *ptr = std::get<Vector4>(value.datum);
-                    data_[groupName][variableName].variable = ptr;
+                    Vector4 val = std::get<Vector4>(value.datum);
+                    value_[groupName][variableName].variable = val;
+                }
+                else if (value.datum.index() == 5)
+                {
+                    std::string val = std::get<std::string>(value.datum);
+                    value_[groupName][variableName].variable = val;
                 }
             }
         }
@@ -104,42 +100,54 @@ void ConfigManager::LoadData()
 
 void ConfigManager::SaveData()
 {
-    for (auto [groupName, variable] : data_)
+    for (auto [groupName, variable] : ptr_)
     {
-        for (auto [variableName, value] : variable)
-        {
-            if (value.variable.index() == 0)
-            {
-                // uint32_t
-                uint32_t* ptr = std::get<uint32_t*>(value.variable);
-                json_->SetData(groupName, variableName, *ptr);
-            }
-            else if (value.variable.index() == 1)
-            {
-                // float
-                float* ptr = std::get<float*>(value.variable);
-                json_->SetData(groupName, variableName, *ptr);
-            }
-            else if (value.variable.index() == 2)
-            {
-                // Vector2
-                Vector2* ptr = std::get<Vector2*>(value.variable);
-                json_->SetData(groupName, variableName, *ptr);
-            }
-            else if (value.variable.index() == 3)
-            {
-                // Vector3
-                Vector3* ptr = std::get<Vector3*>(value.variable);
-                json_->SetData(groupName, variableName, *ptr);
-            }
-            else if (value.variable.index() == 4)
-            {
-                // Vector4
-                Vector4* ptr = std::get<Vector4*>(value.variable);
-                json_->SetData(groupName, variableName, *ptr);
-            }
-        }
-        json_->SaveJson(groupName);
+        SaveData(groupName);
     }
+
+}
+
+void ConfigManager::SaveData(const std::string& _groupName)
+{
+    for (auto [variableName, value] : ptr_[_groupName])
+    {
+        if (value.address.index() == 0)
+        {
+            // uint32_t
+            uint32_t* ptr = std::get<uint32_t*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+        else if (value.address.index() == 1)
+        {
+            // float
+            float* ptr = std::get<float*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+        else if (value.address.index() == 2)
+        {
+            // Vector2
+            Vector2* ptr = std::get<Vector2*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+        else if (value.address.index() == 3)
+        {
+            // Vector3
+            Vector3* ptr = std::get<Vector3*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+        else if (value.address.index() == 4)
+        {
+            // Vector4
+            Vector4* ptr = std::get<Vector4*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+        else if (value.address.index() == 5)
+        {
+            // std::string
+            std::string* ptr = std::get<std::string*>(value.address);
+            json_->SetData(_groupName, variableName, *ptr);
+        }
+    }
+    json_->SaveJson(_groupName);
 
 }

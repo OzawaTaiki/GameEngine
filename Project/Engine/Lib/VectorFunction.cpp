@@ -106,3 +106,17 @@ Vector3 TransformNormal(const Vector3& _v, const Matrix4x4& _m) {
 		_v.x * _m.m[0][2] + _v.y * _m.m[1][2] + _v.z * _m.m[2][2] };
 	return result;
 }
+float Distance(const Vector3& v1, const Vector3& v2) {
+
+	Vector3 diff = Subtract(v1, v2);
+	float leng = Length(diff);
+
+	return leng;
+}
+float DistanceXZ(const Vector3& v1, const Vector3& v2) {
+	Vector3 diff = Subtract(Vector3{ v1.x, 0, v1.z }, Vector3{ v2.x, 0, v2.z });
+
+	float leng = Length(diff);
+
+	return leng;
+};

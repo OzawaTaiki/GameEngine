@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <functional>
 #include <variant>
+#include <cassert>
 
 /*
     衝突判定のクラス
@@ -39,6 +40,7 @@ public:
         NONE
     };
 
+    void Update();
     void Draw();
 
 
@@ -58,7 +60,7 @@ public:
     // ワールド行列を取得する
     Matrix4x4 GetWorldMatrix()const { return fGetWorldMatrix_(); }
     // 衝突時の処理を行う
-    void OnCollision()const { fOnCollision_(); }
+    void OnCollision(const Collider* _other);
 
     // 判定属性を設定する
     // _atrribute->自信の属性
@@ -73,7 +75,7 @@ public:
     // ワールド行列を取得する関数を設定する
     void SetGetWorldMatrixFunc(std::function<Matrix4x4(void)> _f) { fGetWorldMatrix_ = _f; }
     // 衝突時の処理を行う関数を設定する
-    void SetOnCollisionFunc(std::function<void(void)> _f) { fOnCollision_ = _f; }
+    void SetOnCollisionFunc(std::function<void(const Collider*)> _f) { fOnCollision_ = _f; }
 
     void SetReferencePoint(const Vector3& _referencePoint);
 
@@ -82,6 +84,20 @@ public:
     // 判定マスクを取得する
     uint32_t GetAtrribute_()const { return atrribute_; }
 
+    std::string GetName()const { return name_; }
+
+    void NotHit() { preIsHit_ = isHit_; isHit_ = false; }
+
+    // 衝突した瞬間
+    bool IsCollisionEnter()const { return isHit_ && !preIsHit_; }
+
+    // 衝突中
+    bool IsCollisionStay()const { return isHit_; }
+
+    // 衝突から離れた瞬間
+    bool IsCollisionExit()const { return !isHit_ && preIsHit_; }
+
+    void RegsterCollider();
 
 private:
 
@@ -90,13 +106,17 @@ private:
     // 衝突判定のサイズ
     Vector3 size_ = {};
 
+    bool isHit_ = false;
+    bool preIsHit_ = false;
 
     BoundingBox boundingBox_ = BoundingBox::NONE;
     uint32_t atrribute_ = 0x0;
     uint32_t mask_ = 0x1;
 
+    std::string name_ = "";
+
     std::function<Matrix4x4(void)> fGetWorldMatrix_ = nullptr;
-    std::function<void(void)> fOnCollision_ = nullptr;
+    std::function<void(const Collider*)> fOnCollision_ = nullptr;
 };
 
 template<typename T>

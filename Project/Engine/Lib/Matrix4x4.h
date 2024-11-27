@@ -25,7 +25,7 @@ struct Matrix4x4
 	Matrix4x4 operator*(const Matrix4x4& _mat);
 
 	Matrix4x4& operator*=(const Matrix4x4& _mat);
-
+		
 
 #ifdef _DEBUG
 	void ShowData(const std::string& _label, bool _newWindow = true) const;

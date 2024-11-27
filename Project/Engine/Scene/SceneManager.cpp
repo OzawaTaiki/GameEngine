@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-
+#include "Input.h"
 #include <cassert>
 
 SceneManager* SceneManager::GetInstance()
@@ -38,6 +38,7 @@ void SceneManager::Update()
 #ifdef _DEBUG
     ImGui();
 #endif // _DEBUG
+    Input::GetInstance()->Update();
     currentScene_->Update();
 }
 

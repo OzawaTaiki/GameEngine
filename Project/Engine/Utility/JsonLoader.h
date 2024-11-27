@@ -17,7 +17,7 @@ class JsonLoader {
 private:
 	struct Datum
 	{
-		std::variant<uint32_t, float, Vector2, Vector3, Vector4> datum;
+		std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string> datum;
 		Datum() = default;
 
 		Datum(uint32_t _uint) { datum = _uint; };
@@ -25,6 +25,7 @@ private:
 		Datum(const Vector2& _vec2) { datum = _vec2; };
 		Datum(const Vector3& _vec3) { datum = _vec3; };
 		Datum(const Vector4& _vec4) { datum = _vec4; };
+        Datum(const std::string& _str) { datum = _str; };
 
 	};
 	struct Data

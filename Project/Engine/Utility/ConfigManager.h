@@ -22,6 +22,7 @@ public:
 
     void LoadData();
     void SaveData();
+    void SaveData(const std::string& _groupName);
 
     template<typename T>
     void SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr);
@@ -35,10 +36,16 @@ private:
 
     struct Type
     {
-        std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*> variable;
+        std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*> address;
+    };
+    struct Type2
+    {
+        std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string> variable;
     };
 
-    std::unordered_map<std::string, std::unordered_map<std::string, Type>> data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, Type>> ptr_;
+    std::unordered_map<std::string, std::unordered_map<std::string, Type2>> value_;
+
 
     ConfigManager() = default;
     ~ConfigManager() = default;
@@ -49,51 +56,51 @@ private:
 template<typename T>
 inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr)
 {
-    if(data_.contains(_groupName))
+    if(value_.contains(_groupName))
     {
-        if (data_[_groupName].contains(_variableName))
+        if (value_[_groupName].contains(_variableName))
         {
             if constexpr (std::is_same<T, uint32_t>::value)
             {
-                *_variablePtr = *std::get<uint32_t*>(data_[_groupName][_variableName].variable);
-                delete std::get<uint32_t*>(data_[_groupName][_variableName].variable);
-                data_[_groupName][_variableName].variable = _variablePtr;
+                *_variablePtr = std::get<uint32_t>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
             }
             else if constexpr (std::is_same<T, float>::value)
             {
-                *_variablePtr = *std::get<float*>(data_[_groupName][_variableName].variable);
-                delete std::get<float*>(data_[_groupName][_variableName].variable);
-                data_[_groupName][_variableName].variable = _variablePtr;
+                *_variablePtr = std::get<float>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
             }
             else if constexpr (std::is_same<T, Vector2>::value)
             {
-                *_variablePtr = *std::get<Vector2*>(data_[_groupName][_variableName].variable);
-                delete std::get<Vector2*>(data_[_groupName][_variableName].variable);
-                data_[_groupName][_variableName].variable = _variablePtr;
+                *_variablePtr = std::get<Vector2>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
             }
             else if constexpr (std::is_same<T, Vector3>::value)
             {
-                *_variablePtr = *std::get<Vector3*>(data_[_groupName][_variableName].variable);
-                delete std::get<Vector3*>(data_[_groupName][_variableName].variable);
-                data_[_groupName][_variableName].variable = _variablePtr;
+                *_variablePtr = std::get<Vector3>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
             }
             else if constexpr (std::is_same<T, Vector4>::value)
             {
-                *_variablePtr = *std::get<Vector4*>(data_[_groupName][_variableName].variable);
-                delete std::get<Vector4*>(data_[_groupName][_variableName].variable);
-                data_[_groupName][_variableName].variable = _variablePtr;
+                *_variablePtr = std::get<Vector4>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
+            }
+            else if constexpr (std::is_same<T, std::string>::value)
+            {
+                *_variablePtr = std::get<std::string>(value_[_groupName][_variableName].variable);
+                ptr_[_groupName][_variableName].address = _variablePtr;
             }
         }
         else
         {
-            data_[_groupName][_variableName] = Type();
-            data_[_groupName][_variableName].variable = _variablePtr;
+            ptr_[_groupName][_variableName] = Type();
+            ptr_[_groupName][_variableName].address = _variablePtr;
         }
     }
     else
     {
-        data_[_groupName] = std::unordered_map<std::string, Type>();
-        data_[_groupName][_variableName].variable = _variablePtr;
+        ptr_[_groupName] = std::unordered_map<std::string, Type>();
+        ptr_[_groupName][_variableName].address = _variablePtr;
     }
 
 

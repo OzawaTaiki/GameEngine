@@ -34,10 +34,14 @@ void ParticleManager::Initialize()
    rootsignature_ = rootSignature.value();
 }
 
-void ParticleManager::Update()
+void ParticleManager::Update(const Camera* _camera)
 {
     // billBordはshaderで計算したい
 
+    Matrix4x4 billboradMat = Inverse(_camera->matView_);
+    billboradMat.m[3][0] = 0;
+    billboradMat.m[3][1] = 0;
+    billboradMat.m[3][2] = 0;
 
     for (auto& [name, group] : groups_)
     {
@@ -49,19 +53,17 @@ void ParticleManager::Update()
                 it = group.particles.erase(it);
             else
             {
-                group.constMap[group.instanceNum].matWorld = it->GetWorldMatrix();
+                Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
+                mat = mat * billboradMat;
+                //mat = mat * MakeRotateMatrix(it->GetRotation());
+                mat = mat * MakeTranslateMatrix(it->GetPosition());
+                group.constMap[group.instanceNum].matWorld = mat;
                 group.constMap[group.instanceNum].color = it->GetColor();
                 group.instanceNum++;
                 ++it;
             }
         }
     }
-
-    //groups_["sample"].particles.emplace_back();
-    //groups_["sample"].constMap[groups_["sample"].instanceNum].matWorld = MakeIdentity4x4();
-    //groups_["sample"].constMap[groups_["sample"].instanceNum].color = { 1,1,1,1 };
-    //groups_["sample"].instanceNum++;
-
 }
 
 void ParticleManager::Draw(const Camera* _camera)
@@ -71,6 +73,9 @@ void ParticleManager::Draw(const Camera* _camera)
     ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
     for (auto [name, particles] : groups_)
     {
+        if (particles.instanceNum == 0)
+            continue;
+
         commandList->IASetVertexBuffers(0, 1, particles.model->GetMeshPtr()->GetVertexBufferView());
         commandList->IASetIndexBuffer(particles.model->GetMeshPtr()->GetIndexBufferView());
 

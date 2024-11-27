@@ -26,13 +26,21 @@ uint32_t CollisionManager::GetMask(const std::string& _atrribute)
     return ~GetAtttibute(_atrribute);
 }
 
+void CollisionManager::RegisterCollider(Collider* _collider)
+{
+    _collider->Update();
+    colliders_.push_back(_collider);
+}
+
 void CollisionManager::CheckAllCollision()
 {
     for (auto itA = colliders_.begin(); itA != colliders_.end(); itA++)
     {
+        (*itA)->NotHit();
         for (auto itB = std::next(itA); itB != colliders_.end(); itB++)
         {
-            if ((*itA)->GetMask() & (*itB)->GetAtrribute_() ||
+            (*itB)->NotHit();
+            if ((*itA)->GetMask() & (*itB)->GetAtrribute_() &&
                 (*itB)->GetMask() & (*itA)->GetAtrribute_())
             {
                 CheckCollisionPair(*itA, *itB);
@@ -59,8 +67,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
 
                     if (IsCollision(sphereA, sphereB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                 }
                 break;
@@ -71,8 +79,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
 
                     if (IsCollision(sphereA, aabbB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -82,8 +90,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     //obbB.center = Transform(obbB.referencePoint, _colliderB->GetWorldMatrix());
                     if (IsCollision(sphereA, obbB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -105,8 +113,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     Sphere sphereB = _colliderB->GetShape<Sphere>();
                     if (IsCollision(sphereB, aabbA))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -115,8 +123,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     AABB aabbB = _colliderB->GetShape<AABB>();
                     if (IsCollision(aabbA, aabbB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -125,8 +133,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     OBB obbB = _colliderB->GetShape<OBB>();
                     if (IsCollision(aabbA, obbB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -148,8 +156,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     Sphere sphereB = _colliderB->GetShape<Sphere>();
                     if (IsCollision(sphereB, obbA))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -158,8 +166,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     AABB aabbB = _colliderB->GetShape<AABB>();
                     if (IsCollision(aabbB, obbA))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
                 }
@@ -168,8 +176,8 @@ void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colli
                     OBB obbB = _colliderB->GetShape<OBB>();
                     if (IsCollision(obbA, obbB))
                     {
-                        _colliderA->OnCollision();
-                        _colliderB->OnCollision();
+                        _colliderA->OnCollision(_colliderB);
+                        _colliderB->OnCollision(_colliderA);
                     }
                     break;
 
@@ -215,7 +223,17 @@ bool CollisionManager::IsCollision(const Sphere& _sphere, const OBB& _obb)
     Matrix4x4 obbWorldMatInv = Inverse(_obb.worldMat);
 
     Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
-    AABB aabbOBBLocal = { _obb.min,_obb.max };
+    AABB aabbOBBLocal;// = { _obb.min,_obb.max };
+    aabbOBBLocal.min = Transform(_obb.min, obbWorldMatInv);
+    aabbOBBLocal.max = Transform(_obb.max, obbWorldMatInv);
+    for (int i = 0; i < 3; i++)
+    {
+        if (aabbOBBLocal.min[i] > aabbOBBLocal.max[i])
+        {
+            std::swap(aabbOBBLocal.min[i], aabbOBBLocal.max[i]);
+        }
+    }
+
     Sphere sphereOBBLocal;
     sphereOBBLocal.center = centerInOBBLocalSphere;
     sphereOBBLocal.radius = _sphere.radius;

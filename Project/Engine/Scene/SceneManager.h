@@ -54,4 +54,11 @@ private:
 #endif // _DEBUG
 
 
+    SceneManager() = default;
+    // コピー禁止
+    SceneManager(const SceneManager&) = delete;
+    SceneManager& operator=(const SceneManager&) = delete;
+    SceneManager(SceneManager&&) = delete;
+    SceneManager& operator=(SceneManager&&) = delete;
+
 };

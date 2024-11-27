@@ -1,7 +1,37 @@
 #include "Collider.h"
 #include "CollisionManager.h"
-#include "../Utility/LineDrawer.h"
-#include "../Lib/MatrixFunction.h"
+#include "LineDrawer.h"
+#include "MatrixFunction.h"
+#include "VectorFunction.h"
+
+void Collider::Update()
+{
+    std::visit([this](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, Sphere>)
+        {
+            Sphere& sphere = arg;
+            sphere.center = Transform(sphere.referencePoint, GetWorldMatrix());
+
+        }
+        else if constexpr (std::is_same_v<T, AABB>)
+        {
+            AABB& aabb = arg;
+            aabb.Calculate(GetWorldMatrix());
+        }
+        else if constexpr (std::is_same_v<T, OBB>)
+        {
+            OBB& obb = arg;
+            obb.Calculate(GetWorldMatrix());
+        }
+        else
+        {
+            assert(false && "Not supported");
+        }
+               }, shape_);
+
+
+}
 
 void Collider::Draw()
 {
@@ -80,9 +110,19 @@ void Collider::SetShape(const Vector3& _min, const Vector3& _max)
 }
 
 
+void Collider::OnCollision(const Collider* _other)
+{
+    if (fOnCollision_)
+    {
+        isHit_ = true;
+        fOnCollision_(_other);
+    }
+}
+
 void Collider::SetAtrribute(const std::string& _atrribute)
 {
     atrribute_ = CollisionManager::GetInstance()->GetAtttibute(_atrribute);
+    name_ = _atrribute;
 }
 
 void Collider::SetMask(const std::string& _atrribute)
@@ -137,4 +177,9 @@ void Collider::SetReferencePoint(const Vector3& _referencePoint)
     {
         assert(false && "Not supported");
     }
+}
+
+void Collider::RegsterCollider()
+{
+    CollisionManager::GetInstance()->RegisterCollider(this);
 }

@@ -4,6 +4,7 @@
 #include "Matrix4x4.h"
 
 #include <array>
+#include <algorithm>
 
 struct Sphere
 {

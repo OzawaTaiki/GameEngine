@@ -14,7 +14,7 @@ public:
     ~Camera() = default;
 
     void Initialize();
-    void Update();
+    void Update(bool _showImGui = true);
     void Draw();
 
     ID3D12Resource* GetResource()const { return resource_.Get(); }
@@ -25,6 +25,23 @@ public:
     /// セットした行列を転送
     /// </summary>
     void TransferData();
+
+    /// <summary>
+   /// メンバ変数から行列を計算，転送
+   /// </summary>
+    void UpdateMatrix();
+
+    /// <summary>
+    /// カメラを揺らす
+    /// </summary>
+    /// <param name="_time">揺れる時間</param>
+    /// <param name="_RangeMin">揺れる最小値</param>
+    /// <param name="_RangeMax">揺れる最大値</param>
+    void Shake(float _time, const Vector2& _RangeMin, const Vector2& _RangeMax);
+
+    void ShakeParametaerSettingFromImGui();
+
+    Vector3 GetShakeOffset()const { return shakeOffset_; }
 
     void QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index)const;
 
@@ -42,6 +59,17 @@ public:
     Matrix4x4 matView_ = {};
     Matrix4x4 matProjection_ = {};
 private:
+
+    // シェイク用変数たち
+    bool shaking_ = false;
+    float shakeTime_ = 0.0f;
+    float shakeTimer_ = 0.0f;
+    Vector2 shakeRangeMin_ = { 0.0f,0.0f };
+    Vector2 shakeRangeMax_ = { 0.0f,0.0f };
+    Vector3 shakeOffset_ = { 0.0f,0.0f,0.0f };
+
+    void UpdateShake();
+
     struct ConstantBufferDate
     {
         Matrix4x4 view;

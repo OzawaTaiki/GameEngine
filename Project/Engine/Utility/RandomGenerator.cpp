@@ -14,6 +14,8 @@ int RandomGenerator::GetUniformInt(int min, int max) {
 
 float RandomGenerator::GetUniformFloat(float _min, float _max)
 {
+    if (_min > _max)
+        std::swap(_min, _max);
     std::uniform_real_distribution<float> dist(_min, _max);
     return dist(engine);
 }

@@ -15,7 +15,7 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
-//
+
 //#include "externals/imgui/imgui.h"
 //#include "externals/imgui/imgui_impl_dx12.h"
 //#include "externals/imgui/imgui_impl_win32.h"
@@ -186,6 +186,7 @@ void DXCommon::CreateDevice()
 		debugController->EnableDebugLayer();
 		//さらにGPU制御側でもチェックを行うようにする
 		debugController->SetEnableGPUBasedValidation(TRUE);
+
 	}
 
 #endif // _DEBUG
@@ -523,10 +524,4 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHea
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (_descriptorSize * _index);
 	return handleGPU;
-}
-
-
-DXCommon::~DXCommon()
-{
-	winApp_ = nullptr;
 }
