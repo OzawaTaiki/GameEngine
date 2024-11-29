@@ -1,7 +1,8 @@
 #include "Material.h"
-#include "DXCommon.h"
-#include "MatrixFunction.h"
-#include "TextureManager.h"
+#include <Core/DirectX/DXCommon.h>
+#include <Math/MatrixFunction.h>
+#include <TextureManager/TextureManager.h>
+
 void Material::Initialize(const std::string& _texturepath)
 {
 	DXCommon* dxCommon = DXCommon::GetInstance();

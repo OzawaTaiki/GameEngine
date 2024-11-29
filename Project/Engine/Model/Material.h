@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Matrix4x4.h"
+#include <Math/Vector2.h>
+#include <Math/Vector3.h>
+#include <Math/Matrix4x4.h>
 
 #include <cstdint>
 

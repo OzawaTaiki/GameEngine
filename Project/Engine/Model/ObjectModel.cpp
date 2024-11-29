@@ -1,8 +1,8 @@
 #include "ObjectModel.h"
-#include "DXCommon.h"
 #include "ModelManager.h"
-#include "MatrixFunction.h"
-#include "../Collider/CollisionManager.h"
+#include "Math/MatrixFunction.h"
+#include "Core/DirectX/DXCommon.h"
+#include "Collision/CollisionManager.h"
 
 void ObjectModel::Initialize(const std::string& _filePath)
 {

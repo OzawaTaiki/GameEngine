@@ -1,17 +1,18 @@
 #include "Model.h"
 #include "ModelManager.h"
-#include "DXCommon.h"
-#include "TextureManager.h"
-#include "Camera.h"
-#include "WorldTransform.h"
 #include "ObjectColor.h"
-#include "MatrixFunction.h"
-#include <cassert>
+#include "WorldTransform.h"
 
+#include <Core/DirectX/DXCommon.h>
+#include "TextureManager/TextureManager.h"
+#include "Camera/Camera.h"
+#include "Math/MatrixFunction.h"
+#include "Utility/Debug.h"
+
+#include <cassert>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <Debug.h>
 
 const std::string Model::defaultDirpath_ = "Resources/models/";
 

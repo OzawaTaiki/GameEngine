@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vector3.h"
-#include "Matrix4x4.h"
+#include "Math/Vector3.h"
+#include "Math/Matrix4x4.h"
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -20,7 +20,7 @@ public:
     ID3D12Resource* GetResource()const { return resource_.Get(); }
     Matrix4x4 GetViewProjection()const { return matViewProjection_; }
 
-    
+
     /// <summary>
     /// セットした行列を転送
     /// </summary>

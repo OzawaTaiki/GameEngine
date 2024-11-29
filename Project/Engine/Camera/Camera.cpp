@@ -1,10 +1,10 @@
 #include "Camera.h"
-#include "MatrixFunction.h"
-#include "DXCommon.h"
-#include "Input.h"
-#include "VectorFunction.h"
-#include "MatrixFunction.h"
-#include "RandomGenerator.h"
+#include "Math/MatrixFunction.h"
+#include "Core/DirectX/DXCommon.h"
+#include "Input/Input.h"
+#include "Math/VectorFunction.h"
+#include "Math/MatrixFunction.h"
+#include "Utility/RandomGenerator.h"
 #ifdef _DEBUG
 #include <imgui.h>
 #endif // _DEBUG

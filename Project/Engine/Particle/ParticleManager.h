@@ -1,5 +1,5 @@
 #pragma once
-#include "Model.h"
+#include "Model/Model.h"
 #include "Particle.h"
 
 #include <d3d12.h>

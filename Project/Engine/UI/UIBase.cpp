@@ -1,8 +1,9 @@
 #include "UIBase.h"
 
-#include "Input.h"
-#include "ConfigManager.h"
-#include "TextureManager.h"
+#include <Input/Input.h>
+#include <Utility/ConfigManager.h>
+#include <TextureManager/TextureManager.h>
+#include <ImGuiManager/ImGuiManager.h>
 
 void UIBase::Initialize(const std::string& _label)
 {
@@ -74,7 +75,6 @@ void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
 }
 
 #ifdef _DEBUG
-#include <ImGuiManager.h>
 void UIBase::ImGui()
 {
     ImGui::BeginTabBar("UI");

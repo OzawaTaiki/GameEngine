@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Vector2.h"
-#include "Sprite.h"
+#include "Math/Vector2.h"
+#include "Sprite/Sprite.h"
+
+
 #include <string>
 
 class  UIBase

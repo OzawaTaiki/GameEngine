@@ -1,5 +1,5 @@
 #include "SpriteManager.h"
-#include "DXCommon.h"
+#include <Core/DirectX/DXCommon.h>
 #include <cassert>
 
 SpriteManager* SpriteManager::GetInstance()

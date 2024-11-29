@@ -1,7 +1,8 @@
 #include "TextureManager.h"
-#include "DXCommon.h"
-#include "Debug.h"
-#include "SRVManager.h"
+#include <Core/DirectX/DXCommon.h>
+#include <Utility/Debug.h>
+#include <Render/SRVManager.h>
+
 #include <cassert>
 
 

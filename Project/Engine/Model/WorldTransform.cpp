@@ -1,6 +1,7 @@
 #include "WorldTransform.h"
-#include "MatrixFunction.h"
-#include "DXCommon.h"
+#include <Math/Matrix4x4.h>
+#include <Math/MatrixFunction.h>
+#include <Core/DirectX/DXCommon.h>
 
 void WorldTransform::Initialize()
 {

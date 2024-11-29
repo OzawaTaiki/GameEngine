@@ -1,6 +1,6 @@
 #include "Particle.h"
-#include "MatrixFunction.h"
-#include "MyLib.h"
+#include "Math/MatrixFunction.h"
+#include "Math/MyLib.h"
 
 void Particle::Initialize(float _lifeTime,
                           const Vector3& _size,

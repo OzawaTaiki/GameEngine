@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vector3.h"
-#include "Matrix4x4.h"
+#include <Math/Vector3.h>
+#include <Math/Matrix4x4.h>
 
 #include <d3d12.h>
 #include <wrl.h>

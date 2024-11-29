@@ -1,8 +1,8 @@
 #pragma once
-#include "WinApp.h"
+#include "Core/WinApp/WinApp.h"
 
-#include "Vector2.h"
-#include "Vector3.h"
+#include "Math/Vector2.h"
+#include "Math/Vector3.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

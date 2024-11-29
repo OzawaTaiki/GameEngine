@@ -1,6 +1,6 @@
 #include "SRVManager.h"
 
-#include "DXCommon.h"
+#include "Core/DirectX/DXCommon.h"
 
 const uint32_t SRVManager::kMaxIndex_ = 1024;
 

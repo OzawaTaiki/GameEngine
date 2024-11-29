@@ -1,10 +1,10 @@
 #include "Sprite.h"
 
-#include "TextureManager.h"
-#include "SpriteManager.h"
-#include "DXCommon.h"
-#include "WinApp.h"
-#include "MatrixFunction.h"
+#include <TextureManager/TextureManager.h>
+#include <Sprite/SpriteManager.h>
+#include <Core/DirectX/DXCommon.h>
+#include <Core/WinApp/WinApp.h>
+#include <Math/MatrixFunction.h>
 
 uint32_t Sprite::winWidth_ = 1280;
 uint32_t Sprite::winHeight_ = 720;

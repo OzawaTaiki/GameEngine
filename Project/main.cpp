@@ -1,29 +1,37 @@
-#include "WinApp.h"
-#include "DXCommon.h"
-#include "Input.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "Sprite.h"
-#include "GameScene.h"
-#include "LineDrawer.h"
-#include "SRVManager.h"
-#include "ImGuiManager.h"
-#include "ParticleManager.h"
-#include "RandomGenerator.h"
-#include <random>
+#include "Core/WinApp/WinApp.h"
+#include "Core/DirectX/DXCommon.h"
+#include "Input/Input.h"
+#include "TextureManager/TextureManager.h"
+#include "Model/ModelManager.h"
+#include "Sprite/Sprite.h"
+#include "LineDrawer/LineDrawer.h"
+#include "Render/SRVManager.h"
+#include "Render/PSOManager.h"
+#include "ImGuiManager/ImGuiManager.h"
+#include "Particle/ParticleManager.h"
+#include "Utility/RandomGenerator.h"
+#include "Utility/ConfigManager.h"
+
+/*-----シーン-----*/
+#include "eScene/SceneManager.h"
+#include "Scene/GameScene.h"
+#include "Scene/TitleScene.h"
+/*---------------*/
+
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	WinApp* winApp = WinApp::GetInstance();
-	winApp->Initilize(L"GameEngine");
+	winApp->Initilize();
 
-	DXCommon* dxCommon =  DXCommon::GetInstance();
-	dxCommon->Initialize(winApp,WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+	DXCommon* dxCommon = DXCommon::GetInstance();
+	dxCommon->Initialize(winApp, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
 	SRVManager* srvManager = SRVManager::GetInstance();
 	srvManager->Initialize();
 	PSOManager::GetInstance()->Initialize();
+
 
 	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
 	imguiManager->Initialize();
@@ -31,8 +39,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize();
 
+	ConfigManager::GetInstance()->Initialize();
+	ConfigManager::GetInstance()->LoadData();
 
 	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->Load("white.png");
 	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
 
@@ -45,9 +56,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
 
-	GameScene* gameScene = new GameScene;
-	gameScene->Initialize();
 
+	SceneManager::RegisterScene("title", TitleScene::Create);
+	SceneManager::RegisterScene("game", GameScene::Create);
+	SceneManager::GetInstance()->Initialize("title");
 
 	///
 	/// メインループ
@@ -61,7 +73,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// 更新処理ここから
 		///
 
-		gameScene->Update();
+		SceneManager::GetInstance()->Update();
+		//gameScene->Update();
 
 		///
 		/// 更新処理ここまで
@@ -74,7 +87,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// 描画ここから
 		///
 
-		gameScene->Draw();
+		SceneManager::GetInstance()->Draw();
+		//gameScene->Draw();
 
 
 		///
@@ -84,12 +98,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		imguiManager->Draw();
 
 		dxCommon->PostDraw();
+
+		SceneManager::ChangeScene();
 	}
 	imguiManager->Finalize();
 
 	winApp->Filalze();
 
-	delete gameScene;
 
 	return 0;
 }

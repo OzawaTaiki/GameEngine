@@ -1,6 +1,6 @@
 #include "PSOManager.h"
-#include "DXCommon.h"
-#include "Debug.h"
+#include "Core/DirectX/DXCommon.h"
+#include "Utility/Debug.h"
 #include <cassert>
 
 PSOManager* PSOManager::GetInstance()

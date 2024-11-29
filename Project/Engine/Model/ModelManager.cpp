@@ -1,7 +1,7 @@
 #include "ModelManager.h"
 
-#include "PSOManager.h"
-#include "DXCommon.h"
+#include <Render/PSOManager.h>
+#include <Core/DirectX/DXCommon.h>
 #include <cassert>
 
 ModelManager* ModelManager::GetInstance()

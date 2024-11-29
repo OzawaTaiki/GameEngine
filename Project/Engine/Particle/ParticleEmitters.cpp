@@ -1,12 +1,13 @@
 #include "ParticleEmitters.h"
 #include "ParticleManager.h"
-#include "RandomGenerator.h"
-#include "LineDrawer.h"
-#include "MatrixFunction.h"
-#include "ConfigManager.h"
-#include "VectorFunction.h"
 #include "ParticleInitParam.h"
-#include "ImGuiManager.h"
+
+#include "LineDrawer/LineDrawer.h"
+#include "Math/MatrixFunction.h"
+#include "Math/VectorFunction.h"
+#include "Utility/ConfigManager.h"
+#include "Utility/RandomGenerator.h"
+#include "ImGuiManager/ImGuiManager.h"
 
 void ParticleEmitter::Setting(const Vector3& _center,
                               const Vector3& _rotate,

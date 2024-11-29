@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Model.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Matrix4x4.h"
+#include "Model/Model.h"
+#include "Math/Vector3.h"
+#include "Math/Vector4.h"
+#include "Math/Matrix4x4.h"
 #include "ParticleInitParam.h"
 
 class Particle

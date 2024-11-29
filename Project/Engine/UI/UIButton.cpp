@@ -1,7 +1,7 @@
 #include "UIButton.h"
 
-#include "ConfigManager.h"
-#include "Input.h"
+#include "Utility/ConfigManager.h"
+#include "Input/Input.h"
 
 void UIButton::Initialize(const std::string& _label)
 {

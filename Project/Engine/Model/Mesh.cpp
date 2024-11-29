@@ -1,11 +1,12 @@
 #define NOMINMAX
 #include "Mesh.h"
-#include "DXCommon.h"
-#include "Debug.h"
-#include "../SkinCluster/SkinCluster.h"
+#include <Core/DirectX/DXCommon.h>
+#include <Utility/Debug.h>
+#include <Utility/Debug.h>
 #include <cassert>
 #include <iterator>
 #include <chrono>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

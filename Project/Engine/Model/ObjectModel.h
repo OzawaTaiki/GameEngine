@@ -2,8 +2,8 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "ObjectColor.h"
-#include "Camera.h"
-#include "../Collider/Collider.h"
+#include "Camera/Camera.h"
+#include "Collision/Collider.h"
 
 class ObjectModel
 {

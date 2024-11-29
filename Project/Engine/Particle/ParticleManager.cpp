@@ -1,11 +1,11 @@
 #include "ParticleManager.h"
-#include "DXCommon.h"
-#include "PSOManager.h"
-#include "SRVManager.h"
-#include "TextureManager.h"
-#include "Camera.h"
-#include "MatrixFunction.h"
-#include "ParticleEmitters.h"
+#include "Core/DirectX/DXCommon.h"
+#include "Render/PSOManager.h"
+#include "Render/SRVManager.h"
+#include "TextureManager/TextureManager.h"
+#include "Camera/Camera.h"
+#include "Math/MatrixFunction.h"
+#include "Particle/ParticleEmitters.h"
 #include <cassert>
 
 const uint32_t ParticleManager::kGroupMaxInstance = 1024;

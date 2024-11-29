@@ -1,13 +1,16 @@
 #pragma once
-#include "PSOManager.h"
 #include "Sprite.h"
-#include "Vector2.h"
+
+#include <Render/PSOManager.h>
+#include <Math/Vector2.h>
+
 #include <string>
 #include <memory>
-#include <wrl.h>
-#include <d3d12.h>
 #include <unordered_map>
 #include <optional>
+
+#include <wrl.h>
+#include <d3d12.h>
 
 class SpriteManager
 {

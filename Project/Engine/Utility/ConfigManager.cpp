@@ -1,6 +1,7 @@
 #include "ConfigManager.h"
 #include "JsonLoader.h"
-#include "Windows.h"
+
+#include <Windows.h>
 
 #include <sstream>
 #include <fstream>
@@ -28,6 +29,12 @@ void ConfigManager::Draw()
 
 void ConfigManager::LoadData()
 {
+    // directoryPath_が存在しない場合は作成
+    if (!std::filesystem::exists(directoryPath_))
+    {
+        std::filesystem::create_directories(directoryPath_);
+    }
+
     // ディレクトリ内のファイルを読み込む
     for (auto& entry : std::filesystem::directory_iterator(directoryPath_, std::filesystem::directory_options::skip_permission_denied))
     {
