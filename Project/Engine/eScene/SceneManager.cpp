@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 #include "Input/Input.h"
+#include "Utility/Time.h"
 #include <cassert>
-#include "../../Time.h"
 
 SceneManager* SceneManager::GetInstance()
 {
@@ -83,7 +83,7 @@ void SceneManager::ImGui()
 
     ImGui::Begin("SceneManager");
     ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
-    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime() * 1000);
+    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime() * 1000.0f);
 
     for (auto& scene : scenes_)
     {

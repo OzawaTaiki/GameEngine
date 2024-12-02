@@ -267,7 +267,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Time.cpp" />
+    <ClCompile Include="Engine\Utility\Time.cpp">
+      <Filter>Engine\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Scene\GameScene.h">
@@ -450,8 +452,8 @@
     <ClInclude Include="Engine\Utility\RandomGenerator.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Time.h">
-      <Filter>Engine</Filter>
+    <ClInclude Include="Engine\Utility\Time.h">
+      <Filter>Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
