@@ -8,9 +8,10 @@ env:
   SOLUTION_FILE_PATH: project/GameEngine.sln
   #Visual Studio の構成
   CONFIGRUATION: Debug
+  
 jobs:
   build:
-    runs-on windows-2022
+    runs-on: windows-2022
 
     steps:
       - name: Checkout
