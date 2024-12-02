@@ -19,10 +19,10 @@ jobs:
         
       - name: AddMsBuild to PATH
         uses: microsoft/setup-msbuild@v2
-          with:
-            msbuild-architecture: x64
+        with: 
+          msbuild-architecture: x64
 
-      -name: BUild
+      - name: Build
         run: |
           msbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration=${{env.CONFIGURATION}}                
         
