@@ -15,7 +15,7 @@ ConfigManager* ConfigManager::GetInstance()
 
 void ConfigManager::Initialize()
 {
-    directoryPath_ = "resources/Data/Parameter/";
+    directoryPath_ = "resources/Data";
     json_ = new JsonLoader(directoryPath_, false);
 }
 
@@ -36,23 +36,7 @@ void ConfigManager::LoadData()
     }
 
     // ディレクトリ内のファイルを読み込む
-    for (auto& entry : std::filesystem::directory_iterator(directoryPath_, std::filesystem::directory_options::skip_permission_denied))
-    {
-        // ディレクトリは無視
-        if (std::filesystem::is_directory(entry.path()) || entry.path().extension() != ".json")
-        {
-            continue;
-        }
-
-        std::string gName = entry.path().stem().string();
-        // ファイル名を取得
-        std::string path = directoryPath_ + gName;
-
-        // ファイル名を元にJsonLoaderに読み込みを依頼
-        json_->LoadJson(path);
-
-        groupNames_.push_back(gName);
-    }
+    LoadFilesRecursively(directoryPath_);
 
     for (const std::string& groupName : groupNames_)
     {
@@ -157,4 +141,34 @@ void ConfigManager::SaveData(const std::string& _groupName)
     }
     json_->SaveJson(_groupName);
 
+}
+
+void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
+{
+    for (auto& entry : std::filesystem::directory_iterator(_directoryPath, std::filesystem::directory_options::skip_permission_denied))
+    {
+        // ディレクトリであれば、再帰的に呼び出してその中も読み込む
+        if (std::filesystem::is_directory(entry.path()))
+        {
+            LoadFilesRecursively(entry.path().string());
+        }
+
+        // ファイルがjsonでない場合はスキップ
+        if (entry.path().extension() != ".json")
+        {
+            continue;
+        }
+
+        // ファイル名を取得（拡張子を除去）
+        std::string gName = entry.path().stem().string();
+
+        // ファイルパスを作成
+        std::string path = _directoryPath + "/" + gName;
+
+        // JsonLoaderに読み込みを依頼
+        json_->LoadJson(path);
+
+        // グループ名リストにファイル名を追加
+        groupNames_.push_back(gName);
+    }
 }

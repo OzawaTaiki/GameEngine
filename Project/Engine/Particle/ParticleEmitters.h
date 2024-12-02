@@ -45,6 +45,20 @@ enum class ParticleDirection
     Random
 };
 
+/*
+
+    struct colorKey{
+        float time;
+        vector4 color;
+    }
+    std::vector<colorKey> colorKeys;
+
+    １グループ内での発生タイミング ０～
+
+
+
+*/
+
 
 class Particle;
 class ParticleEmitter
@@ -54,24 +68,7 @@ public:
     ParticleEmitter() = default;
     ~ParticleEmitter() = default;
 
-    /// <summary>
-    /// エミッターの設定
-    /// </summary>
-    /// <param name="_center">中心座標</param>
-    /// <param name="_rotate">回転</param>
-    /// <param name="_countPerEmit">回あたりの発生数</param>
-    /// <param name="_emitPerSec">秒あたりの発生回数</param>
-    /// <param name="_maxParticle">最大数</param>
-    /// <param name=""></param>
-    void Setting(const Vector3& _center,
-                 const Vector3& _rotate,
-                 uint32_t _countPerEmit,
-                 uint32_t _emitPerSec,
-                 uint32_t _maxParticle,
-                 bool _randomColor,
-                 bool _fadeAlpha,
-                 float _fadeStartRatio
-                 );
+
     void Setting(const std::string& _name);
 
     void Update();
@@ -83,9 +80,12 @@ public:
 
     void SetWorldMatrix(const Matrix4x4* _mat) { parentMatWorld_ = _mat; }
     void SetCenter(const Vector3& _center) { position_ = _center; }
-    void SetEmit(bool _emit) { emit_ = _emit; }
+    void SetActive(bool _active) { isActive_ = _active; }
 
-    void Emit();
+    bool IsActive() const { return isActive_; }
+
+    bool EnableBillboard() const { return isEnableBillboard_; }
+
 
     std::string GetName() const { return name_; }
 
@@ -112,6 +112,8 @@ private:
     bool                    changeSize_;        // 生成後にサイズを変更するか
     bool                    changeColor_;       // 生成後に色を変更するか
     bool                    randomColor_;       // 色をランダムで生成するか
+    bool                    isEnableBillboard_; // ビルボードを使用するか
+    float                   delayTime_;         // 発生までの遅延時間
     float                   fadeStartRatio_;    // アルファを変え始める割合
     uint32_t                maxParticles_;      // 最大数
     uint32_t                countPerEmit_;      // 回当たりの発生数
@@ -119,8 +121,7 @@ private:
     uint32_t                emitRepeatCount_;   // 繰り返し回数
     uint32_t                emitCount_;         // 発生回数
 
-    bool                    emit_ = false;
+    bool                    isActive_ = false;
 
     Particle GenerateParticleData();
-    void EmitParticles();
 };

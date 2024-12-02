@@ -125,12 +125,6 @@ void ParticleManager::AddParticleToGroup(const std::string& _groupName, const st
     for(const auto& particle:_particles)
     {
         groups_[_groupName].particles.push_back(particle);
-
-        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].matWorld = MakeIdentity4x4();
-        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].matWorld.m[3][0] = groups_[_groupName].instanceNum;
-        //groups_[_groupName].constMap[groups_[_groupName].instanceNum].color = { 1,1,1,1 };
-        //groups_[_groupName].instanceNum++;
-
     }
 
 }
@@ -144,3 +138,4 @@ void ParticleManager::PreDraw()
     commandList->SetPipelineState(pipelineState_);
     commandList->SetGraphicsRootSignature(rootsignature_);
 }
+

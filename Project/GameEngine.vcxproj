@@ -136,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Core\DirectX\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Engine\Core\DirectX\DXCommon.cpp" />
     <ClCompile Include="Engine\Core\WinApp\WinApp.cpp" />
+    <ClCompile Include="Engine\eScene\ParticleTestScene.cpp" />
     <ClCompile Include="Engine\eScene\SceneManager.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
@@ -164,6 +165,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\ObjectColor.cpp" />
     <ClCompile Include="Engine\Model\ObjectModel.cpp" />
     <ClCompile Include="Engine\Model\WorldTransform.cpp" />
+    <ClCompile Include="Engine\Particle\Effect.cpp" />
     <ClCompile Include="Engine\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Particle\ParticleEmitters.cpp" />
     <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
@@ -196,6 +198,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\DirectX\DXCommon.h" />
     <ClInclude Include="Engine\Core\WinApp\WinApp.h" />
     <ClInclude Include="Engine\eScene\BaseScene.h" />
+    <ClInclude Include="Engine\eScene\ParticleTestScene.h" />
     <ClInclude Include="Engine\eScene\SceneManager.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
@@ -227,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\ObjectColor.h" />
     <ClInclude Include="Engine\Model\ObjectModel.h" />
     <ClInclude Include="Engine\Model\WorldTransform.h" />
+    <ClInclude Include="Engine\Particle\Effect.h" />
     <ClInclude Include="Engine\Particle\Particle.h" />
     <ClInclude Include="Engine\Particle\ParticleEmitters.h" />
     <ClInclude Include="Engine\Particle\ParticleInitParam.h" />

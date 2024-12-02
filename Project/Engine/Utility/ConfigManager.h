@@ -46,6 +46,8 @@ private:
     std::unordered_map<std::string, std::unordered_map<std::string, Type>> ptr_;
     std::unordered_map<std::string, std::unordered_map<std::string, Type2>> value_;
 
+    // ディレクトリ内のファイルを再帰的に読み込む
+    void LoadFilesRecursively(const std::string& _directoryPath);
 
     ConfigManager() = default;
     ~ConfigManager() = default;

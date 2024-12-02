@@ -9,37 +9,9 @@
 #include "Utility/RandomGenerator.h"
 #include "ImGuiManager/ImGuiManager.h"
 
-void ParticleEmitter::Setting(const Vector3& _center,
-                              const Vector3& _rotate,
-                              uint32_t _countPerEmit,
-                              uint32_t _emitPerSec,
-                              uint32_t _maxParticle,
-                              bool _randomColor,
-                              bool _fadeAlpha,
-                              float _fadeStartRatio)
-{
-    position_ = _center;
-    rotate_ = _rotate;
-    countPerEmit_ = _countPerEmit;
-    emitPerSec_ = _emitPerSec;
-    maxParticles_ = _maxParticle;
-    randomColor_ = _randomColor;
-
-    setting_.acceleration = { {0,0,0},{0,0,0} };
-    setting_.color = { {1,1,1,1},{1,1,1,1} };
-    setting_.direction = { {-1,-1,-1},{1,1,1} };
-    setting_.lifeTime = { 1,3 };
-    setting_.rotate = { {0,0,0} ,{0,0,0} };
-    setting_.size = { {1,1,1},{1,1,1} };
-    setting_.spped = { 0.1f,0.5f };
-
-    emitTime_ = 1.0f / static_cast<float> (emitPerSec_);
-}
-
 void ParticleEmitter::Setting(const std::string& _name)
 {
     name_ = _name;
-
 
     ConfigManager* instance = ConfigManager::GetInstance();
 
@@ -66,9 +38,11 @@ void ParticleEmitter::Setting(const std::string& _name)
     //instance->SetVariable(name_, "randomColor", reinterpret_cast<uint32_t*> (&randomColor_));
     instance->SetVariable(name_, "fadeAlpha", reinterpret_cast<uint32_t*> (&fadeAlpha_));
     instance->SetVariable(name_, "fadeStartRatio", &fadeStartRatio_);
+    instance->SetVariable(name_, "delayTime", &delayTime_);
     instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&loop_));
     instance->SetVariable(name_, "changeColor", reinterpret_cast<uint32_t*>(&changeColor_));
     instance->SetVariable(name_, "changeSize", reinterpret_cast<uint32_t*>(&changeSize_));
+    instance->SetVariable(name_, "useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
 
     instance->SetVariable(name_, "shape", reinterpret_cast<uint32_t*>(&shape_));
     instance->SetVariable(name_, "direction", reinterpret_cast<uint32_t*>(&particleDirection_));
@@ -93,8 +67,6 @@ void ParticleEmitter::Setting(const std::string& _name)
     default:
         break;
     }
-
-
 }
 
 void ParticleEmitter::Update()
@@ -105,7 +77,7 @@ void ParticleEmitter::Update()
         position_ = position_+offset_;
 
     currentTime_ += deltaTime_;
-    if (!emit_) {
+    if (!isActive_) {
         currentTime_ = 0;
     }
 
@@ -114,7 +86,7 @@ void ParticleEmitter::Update()
         // loop しない場合 かつ emit回数が emit回数に達した場合
         if (!loop_ && emitRepeatCount_ <= emitCount_)
         {
-            emit_ = false;
+            isActive_ = false;
             emitCount_ = 0;
         }
 
@@ -249,10 +221,6 @@ void ParticleEmitter::SetShape_Circle(float _radius)
     radius_ = _radius;
 }
 
-void ParticleEmitter::Emit()
-{
-
-}
 
 Particle ParticleEmitter::GenerateParticleData()
 {

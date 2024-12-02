@@ -40,6 +40,7 @@ private:
         uint32_t srvIndex;
         uint32_t instanceNum;
         ParticleEmitter* emitterPtr;
+
     };
 
     void PreDraw();

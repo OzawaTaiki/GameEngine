@@ -83,7 +83,7 @@ void SceneManager::ImGui()
 
     ImGui::Begin("SceneManager");
     ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
-    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime() * 1000.0f);
+    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime<double>() * 1000.0);
 
     for (auto& scene : scenes_)
     {
