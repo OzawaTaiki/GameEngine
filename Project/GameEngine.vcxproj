@@ -181,6 +181,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\JsonLoader.cpp" />
     <ClCompile Include="Engine\Utility\RandomGenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Scene\GameScene.h" />
@@ -243,6 +244,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Debug.h" />
     <ClInclude Include="Engine\Utility\JsonLoader.h" />
     <ClInclude Include="Engine\Utility\RandomGenerator.h" />
+    <ClInclude Include="Time.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\LineDrawer.hlsli">

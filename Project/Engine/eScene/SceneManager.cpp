@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "Input/Input.h"
 #include <cassert>
+#include "../../Time.h"
 
 SceneManager* SceneManager::GetInstance()
 {
@@ -35,6 +36,7 @@ void SceneManager::Initialize(const std::string& _name)
 
 void SceneManager::Update()
 {
+    Time::Update();
 #ifdef _DEBUG
     ImGui();
 #endif // _DEBUG
@@ -80,6 +82,9 @@ void SceneManager::ImGui()
     char comboLabel[128];
 
     ImGui::Begin("SceneManager");
+    ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
+    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime() * 1000);
+
     for (auto& scene : scenes_)
     {
         strcpy_s(comboLabel, scene.first.c_str());
