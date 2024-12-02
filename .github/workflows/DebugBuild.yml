@@ -24,6 +24,6 @@ jobs:
 
       - name: Build
         run: | 
-          msbuild ${{env.SOLUTION_FILE_PATH}} Configuration=${{env.CONFIGURATION}}                
+          msbuild ${{env.SOLUTION_FILE_PATH}} /p:Configuration=${{env.CONFIGURATION}}                
         
   
