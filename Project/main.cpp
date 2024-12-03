@@ -41,9 +41,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize();
 
-	ConfigManager::GetInstance()->Initialize();
-	ConfigManager::GetInstance()->LoadData();
-
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("white.png");
 	TextureManager::GetInstance()->Load("cube.jpg");
@@ -57,7 +54,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
-
 
 	SceneManager::RegisterScene("title", TitleScene::Create);
 	SceneManager::RegisterScene("game", GameScene::Create);

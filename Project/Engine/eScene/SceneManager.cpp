@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "Input/Input.h"
 #include "Utility/Time.h"
+#include "Utility/Config.h"
 #include <cassert>
 
 SceneManager* SceneManager::GetInstance()
@@ -26,6 +27,11 @@ void SceneManager::Initialize(const std::string& _name)
     assert(scenes_.size() > 0);
     auto it = scenes_.find(_name);
     assert(it != scenes_.end());
+
+    configManager_ = ConfigManager::GetInstance();
+    configManager_->Initialize();
+
+    configManager_->SetSceneNane(_name);
 
     currentScene_ = it->second();
     currentSceneName_ = _name;
@@ -73,6 +79,8 @@ void SceneManager::ChangeScene()
     instance->currentScene_->Initialize();
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
+
+    instance->configManager_->SetSceneNane(instance->currentSceneName_);
 }
 
 #ifdef _DEBUG

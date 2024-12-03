@@ -45,6 +45,8 @@ public:
 	void MakeJsonFile();
 
 	void SaveJson(const std::string& _groupName);
+    void SetFolderPath(const std::string& _directory) { folderPath_ = _directory; }
+
 
 	void SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride = true);
 	template<typename T>

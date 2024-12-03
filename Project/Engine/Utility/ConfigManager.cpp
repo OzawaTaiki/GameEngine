@@ -1,6 +1,6 @@
 #include "ConfigManager.h"
 #include "JsonLoader.h"
-
+#include "Config.h"
 #include <Windows.h>
 
 #include <sstream>
@@ -15,8 +15,10 @@ ConfigManager* ConfigManager::GetInstance()
 
 void ConfigManager::Initialize()
 {
+    rootDirectory_ = "resources/Data";
     directoryPath_ = "resources/Data";
     json_ = new JsonLoader(directoryPath_, false);
+    LoadRootDirectory();
 }
 
 void ConfigManager::Update()
@@ -25,6 +27,11 @@ void ConfigManager::Update()
 
 void ConfigManager::Draw()
 {
+}
+
+void ConfigManager::LoadRootDirectory()
+{
+    LoadFilesRecursively(rootDirectory_);
 }
 
 void ConfigManager::LoadData()
@@ -38,7 +45,12 @@ void ConfigManager::LoadData()
     // ディレクトリ内のファイルを読み込む
     LoadFilesRecursively(directoryPath_);
 
-    for (const std::string& groupName : groupNames_)
+    if (sceneName_ == "")
+    {
+        return;
+    }
+
+    for (auto& [groupName, variable] : ptr_[sceneName_])
     {
         auto data = json_->GetData(groupName);
 
@@ -57,32 +69,32 @@ void ConfigManager::LoadData()
                 {
                     // uint32_t
                     uint32_t val = std::get<uint32_t>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 1)
                 {
                     float val = std::get<float>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 2)
                 {
                     Vector2 val = std::get<Vector2>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 3)
                 {
                     Vector3 val = std::get<Vector3>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 4)
                 {
                     Vector4 val = std::get<Vector4>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
                 else if (value.datum.index() == 5)
                 {
                     std::string val = std::get<std::string>(value.datum);
-                    value_[groupName][variableName].variable = val;
+                    value_[sceneName_][groupName][variableName].variable = val;
                 }
             }
         }
@@ -91,16 +103,15 @@ void ConfigManager::LoadData()
 
 void ConfigManager::SaveData()
 {
-    for (auto [groupName, variable] : ptr_)
+    for (auto [groupName, variable] : ptr_[sceneName_])
     {
         SaveData(groupName);
     }
-
 }
 
 void ConfigManager::SaveData(const std::string& _groupName)
 {
-    for (auto [variableName, value] : ptr_[_groupName])
+    for (auto [variableName, value] : ptr_[sceneName_][_groupName])
     {
         if (value.address.index() == 0)
         {
@@ -143,6 +154,32 @@ void ConfigManager::SaveData(const std::string& _groupName)
 
 }
 
+void ConfigManager::SetSceneNane(const std::string& _scene)
+{
+    sceneName_ = _scene;
+    if (configs_.contains(_scene))
+        directoryPath_ = configs_[_scene]->GetDirectoryPath();
+    else
+        Create(_scene);
+
+    json_->SetFolderPath(directoryPath_ + "/");
+
+}
+
+Config* ConfigManager::Create(const std::string& _sceneName)
+{
+    // 存在しない場合は新規作成
+    if (!configs_.contains(_sceneName))
+    {
+        configs_[_sceneName] = std::make_unique<Config>();
+        directoryPath_ = configs_[_sceneName]->GetDirectoryPath() + "/" + _sceneName;
+        configs_[_sceneName]->SetDirectoryPath(directoryPath_);
+        LoadData();
+    }
+
+    return configs_[_sceneName].get();
+}
+
 void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
 {
     for (auto& entry : std::filesystem::directory_iterator(_directoryPath, std::filesystem::directory_options::skip_permission_denied))
@@ -156,6 +193,21 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
         // ファイルがjsonでない場合はスキップ
         if (entry.path().extension() != ".json")
         {
+            // parameter以降をsceneNameとして取得
+            std::string path = entry.path().string();
+            size_t pos = path.find("Parameter");
+            if (pos == std::string::npos||
+                pos + 10 >= path.length())
+                continue;
+            std::string sceneName = path.substr(pos + 10);
+            if (sceneName .empty())
+                continue;
+            sceneName = sceneName.substr(0, sceneName.find_last_of("/"));
+
+            // Configを作成
+            Create(sceneName);
+            configs_[sceneName]->SetDirectoryPath(path);
+
             continue;
         }
 

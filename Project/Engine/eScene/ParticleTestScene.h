@@ -5,6 +5,7 @@
 #include "Particle/ParticleEmitters.h"
 #include "Particle/Effect.h"
 
+#include <list>
 #include <memory>
 
 class ParticleTestScene : public BaseScene
@@ -21,8 +22,9 @@ public:
 
 private:
 
+    std::list<Effect> effects_ = {};
 
-
+    std::list<std::unique_ptr<ParticleEmitter>> emitters_ = {};
 
 
 #ifdef _DEBUG

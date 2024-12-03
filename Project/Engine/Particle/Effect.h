@@ -25,13 +25,14 @@ public:
 
     void AddEmitter(const std::string& _name, ParticleEmitter* _pEmitter, float _delayTime, float _duration, bool _loop);
 
+    void SetActive(bool _active) { isActive_ = _active; }
 
     void Save();
 private:
 
     std::list<EmitterData>      emitters_;          // エミッターのリスト
 
-    
+
     float                       elapsedTime_;       // 経過時間
     bool                        isLoop_;            // ループするか
     bool                        isActive_;          // アクティブか
