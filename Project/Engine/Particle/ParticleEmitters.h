@@ -89,6 +89,8 @@ public:
 
     std::string GetName() const { return name_; }
 
+    void ShowDebugWinsow();
+
     EmitParticleSettings    setting_{};
 private:
 

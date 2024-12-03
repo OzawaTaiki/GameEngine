@@ -101,79 +101,7 @@ void ParticleEmitter::Update()
         currentTime_ = 0;
         if(!loop_)emitCount_++;
     }
-#ifdef _DEBUG
 
-    ImGui::Begin("emit");
-
-    static const char* shapeCombo[1024] = { "Box","Sphere","Circle","None" };
-    static const char* directionCombo[1024] = { "inward","outward","random" };
-
-    ImGui::BeginTabBar("setting");
-    if (ImGui::BeginTabItem(name_.c_str()))
-    {
-        ImGui::Combo("shape", reinterpret_cast<int*>(&shape_), shapeCombo, 4);
-        ImGui::Combo("direction", reinterpret_cast<int*>(&particleDirection_), directionCombo, 3);
-
-
-        ImGui::SeparatorText("Emitter");
-        if (shape_ == EmitterShape::Box)
-            ImGui::DragFloat3("size", &size_.x, 0.01f);
-        else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
-            ImGui::DragFloat("radius", &radius_, 0.01f);
-
-        ImGui::DragFloat3("offset", &offset_.x, 0.01f);
-        ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_),1,0);
-        if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
-            emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
-        ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_),1);
-        ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
-        ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
-
-        ImGui::Checkbox("randomColor", &randomColor_);
-        ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
-        ImGui::Checkbox("loop", &loop_);
-        ImGui::Checkbox("changeColor", &changeColor_);
-        ImGui::Checkbox("changeSize", &changeSize_);
-
-
-        ImGui::Spacing();
-
-        ImGui::SeparatorText("Particle_Init");
-        ImGui::DragFloatRange2("lifeTime", &setting_.lifeTime.min, &setting_.lifeTime.max,0.01f);
-        ImGui::DragFloat3("size_min", &setting_.size.min.x, 0.01f);
-        ImGui::DragFloat3("size_max", &setting_.size.max.x, 0.01f);
-        ImGui::DragFloat3("rotate_min", &setting_.rotate.min.x, 0.01f);
-        ImGui::DragFloat3("rotate_max", &setting_.rotate.max.x, 0.01f);
-        ImGui::DragFloatRange2("spped", &setting_.spped.min, &setting_.spped.max,0.01f);
-        ImGui::DragFloat3("direction_min", &setting_.direction.min.x, 0.01f);
-        ImGui::DragFloat3("direction_max", &setting_.direction.max.x, 0.01f);
-        ImGui::DragFloat3("acceleration_min", &setting_.acceleration.min.x, 0.01f);
-        ImGui::DragFloat3("acceleration_max", &setting_.acceleration.max.x, 0.01f);
-        ImGui::ColorEdit4("color_min", &setting_.color.min.x);
-        ImGui::ColorEdit4("color_max", &setting_.color.max.x);
-
-        if (ImGui::Button("save"))
-        {
-            ConfigManager::GetInstance()->SaveData(name_);
-        }
-
-        if (ImGui::Button("add"))
-        {
-            std::vector<Particle> particles;
-
-            for (uint32_t count = 0; count < countPerEmit_; ++count)
-            {
-                particles.push_back(GenerateParticleData());
-            }
-
-            ParticleManager::GetInstance()->AddParticleToGroup(name_, particles);
-            currentTime_ = 0;
-        }
-        ImGui::EndTabItem();
-    }
-    ImGui::EndTabBar();
-    ImGui::End();
-#endif // _DEBUG
 }
 
 void ParticleEmitter::Draw()
@@ -219,6 +147,88 @@ void ParticleEmitter::SetShape_Circle(float _radius)
 {
     shape_ = EmitterShape::Circle;
     radius_ = _radius;
+}
+
+void ParticleEmitter::ShowDebugWinsow()
+{
+#ifdef _DEBUG
+
+    static const char* shapeCombo[1024] = { "Box","Sphere","Circle","None" };
+    static const char* directionCombo[1024] = { "inward","outward","random" };
+
+    ImGui::BeginTabBar("Emitter");
+    if (ImGui::BeginTabItem(name_.c_str()))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+
+        if (ImGui::TreeNodeEx("Emitter", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Combo("shape", reinterpret_cast<int*>(&shape_), shapeCombo, 4);
+            ImGui::Combo("direction", reinterpret_cast<int*>(&particleDirection_), directionCombo, 3);
+
+
+            ImGui::SeparatorText("Emitter");
+            if (shape_ == EmitterShape::Box)
+                ImGui::DragFloat3("size", &size_.x, 0.01f);
+            else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
+                ImGui::DragFloat("radius", &radius_, 0.01f);
+
+            ImGui::DragFloat3("offset", &offset_.x, 0.01f);
+            ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_), 1, 0);
+            if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
+                emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
+            ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_), 1);
+            ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
+            ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
+
+            ImGui::Checkbox("randomColor", &randomColor_);
+            ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
+            ImGui::Checkbox("loop", &loop_);
+            ImGui::Checkbox("changeColor", &changeColor_);
+            ImGui::Checkbox("changeSize", &changeSize_);
+            ImGui::TreePop();
+
+        }
+
+        if (ImGui::TreeNodeEx("Particle_Init", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::DragFloatRange2("lifeTime", &setting_.lifeTime.min, &setting_.lifeTime.max, 0.01f);
+            ImGui::DragFloat3("size_min", &setting_.size.min.x, 0.01f);
+            ImGui::DragFloat3("size_max", &setting_.size.max.x, 0.01f);
+            ImGui::DragFloat3("rotate_min", &setting_.rotate.min.x, 0.01f);
+            ImGui::DragFloat3("rotate_max", &setting_.rotate.max.x, 0.01f);
+            ImGui::DragFloatRange2("spped", &setting_.spped.min, &setting_.spped.max, 0.01f);
+            ImGui::DragFloat3("direction_min", &setting_.direction.min.x, 0.01f);
+            ImGui::DragFloat3("direction_max", &setting_.direction.max.x, 0.01f);
+            ImGui::DragFloat3("acceleration_min", &setting_.acceleration.min.x, 0.01f);
+            ImGui::DragFloat3("acceleration_max", &setting_.acceleration.max.x, 0.01f);
+            ImGui::ColorEdit4("color_min", &setting_.color.min.x);
+            ImGui::ColorEdit4("color_max", &setting_.color.max.x);
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+
+        if (ImGui::Button("save"))
+        {
+            ConfigManager::GetInstance()->SaveData(name_);
+        }
+
+        if (ImGui::Button("add"))
+        {
+            std::vector<Particle> particles;
+
+            for (uint32_t count = 0; count < countPerEmit_; ++count)
+            {
+                particles.push_back(GenerateParticleData());
+            }
+
+            ParticleManager::GetInstance()->AddParticleToGroup(name_, particles);
+            currentTime_ = 0;
+        }
+        ImGui::EndTabItem();
+    }
+    ImGui::EndTabBar();
+#endif // _DEBUG
 }
 
 

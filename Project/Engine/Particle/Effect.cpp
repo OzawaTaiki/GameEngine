@@ -1,6 +1,8 @@
 #include "Effect.h"
 #include "Utility/Time.h"
 #include "Utility/ConfigManager.h"
+
+
 void Effect::Update()
 {
     if (!isActive_)

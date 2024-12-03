@@ -22,9 +22,16 @@ public:
 
 private:
 
-    std::list<Effect> effects_ = {};
+    // パーティクル関連変数
 
+    static const _t kMaxEmitterNum = 30;
+    uint32_t selectedEmitter_ = 0;
+    std::list<Effect> effects_ = {};
     std::list<std::unique_ptr<ParticleEmitter>> emitters_ = {};
+    std::string addEmitterName_ = "";
+
+
+
 
 
 #ifdef _DEBUG
