@@ -1,0 +1,144 @@
+{
+    "a": {
+        "acceleration_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "acceleration_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "changeColor": [
+            0
+        ],
+        "changeSize": [
+            0
+        ],
+        "color_max": [
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        ],
+        "color_min": [
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        ],
+        "countPerEmit": [
+            0
+        ],
+        "delayTime": [
+            0.0
+        ],
+        "direction": [
+            2
+        ],
+        "direction_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "direction_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "emitPerSec": [
+            0
+        ],
+        "emitRepeatCount": [
+            0
+        ],
+        "fadeAlpha": [
+            0
+        ],
+        "fadeStartRatio": [
+            0.0
+        ],
+        "lifeTime_max": [
+            1.0
+        ],
+        "lifeTime_min": [
+            1.0
+        ],
+        "loop": [
+            0
+        ],
+        "maxParticles": [
+            0
+        ],
+        "offset": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "radius": [
+            0.0
+        ],
+        "rotate_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "rotate_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "shape": [
+            3
+        ],
+        "size": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "size_max": [
+            [
+                1.0,
+                1.0,
+                1.0
+            ]
+        ],
+        "size_min": [
+            [
+                1.0,
+                1.0,
+                1.0
+            ]
+        ],
+        "spped_max": [
+            1.0
+        ],
+        "spped_min": [
+            0.0
+        ],
+        "useBillboard": [
+            0
+        ]
+    }
+}

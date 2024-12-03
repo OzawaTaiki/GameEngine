@@ -79,15 +79,14 @@ public:
     void SetShape_Circle(float _radius);
 
     void SetWorldMatrix(const Matrix4x4* _mat) { parentMatWorld_ = _mat; }
+    void SetModelPath(const std::string& _path) { useModelPath_ = _path; }
     void SetCenter(const Vector3& _center) { position_ = _center; }
     void SetActive(bool _active) { isActive_ = _active; }
 
     bool IsActive() const { return isActive_; }
-
     bool EnableBillboard() const { return isEnableBillboard_; }
-
-
     std::string GetName() const { return name_; }
+    std::string GetModelPath() const { return useModelPath_; }
 
     void ShowDebugWinsow();
 
@@ -95,6 +94,7 @@ public:
 private:
 
     std::string             name_;
+    std::string             useModelPath_;
 
     float                   currentTime_            = 0;
     float                   deltaTime_              = 1.0f / 60.0f;

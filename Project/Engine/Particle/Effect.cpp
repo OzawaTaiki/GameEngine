@@ -3,6 +3,11 @@
 #include "Utility/ConfigManager.h"
 
 
+void Effect::Initialize(const std::string& _name)
+{
+    name_ = _name;
+}
+
 void Effect::Update()
 {
     if (!isActive_)
@@ -34,14 +39,30 @@ void Effect::Update()
     }
 }
 
-void Effect::AddEmitter(const std::string& _name, ParticleEmitter* _pEmitter, float _delayTime, float _duration, bool _loop)
+ParticleEmitter* Effect::AddEmitter(const std::string& _name,  float _delayTime, float _duration, bool _loop)
 {
-    EmitterData data;
-    data.pEmitterPtr = _pEmitter;
-    data.delayTime = _delayTime;
-    data.duration = _duration;
-    data.loop = _loop;
-    emitters_.push_back(data);
+    EmitterData& emitter = emitters_.emplace_back();
+    emitter.name = _name;
+    emitter.pEmitterPtr = std::make_unique<ParticleEmitter>();
+    emitter.delayTime = _delayTime;
+    emitter.duration = _duration;
+    emitter.loop = _loop;
+
+    emitter.pEmitterPtr->Setting(_name);
+
+    return emitter.pEmitterPtr.get();
+}
+
+std::list<ParticleEmitter*> Effect::GetEmitters() const
+{
+    std::list<ParticleEmitter*> list;
+
+    for (const EmitterData& emitter : emitters_)
+    {
+        list.push_back(emitter.pEmitterPtr.get());
+    }
+
+    return list;
 }
 
 void Effect::Save()

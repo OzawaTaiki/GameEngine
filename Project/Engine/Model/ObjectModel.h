@@ -18,9 +18,15 @@ public:
 
     void SetModel(const std::string& _filePath);
 
+    void UpdateUVTransform();
+
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
     Vector3 rotate_ = { 0,0,0 };
+
+    Vector2 uvTransform_ = { 0,0 };
+    Vector2 uvScale_ = { 1,1 };
+    float uvRotation_ = 0;
 
 
 private:

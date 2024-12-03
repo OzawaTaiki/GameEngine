@@ -114,6 +114,16 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
 
 }
 
+void ParticleManager::SetGroupModel(const std::string& _groupName, const std::string& _modelPath)
+{
+    if (!groups_.contains(_groupName))
+        throw std::runtime_error("not find particleGroup! name:" + '\"' + _groupName + '\"');
+
+    groups_[_groupName].model = Model::CreateFromObj(_modelPath);
+    groups_[_groupName].textureHandle = groups_[_groupName].model->GetMaterialPtr()->GetTexturehandle();
+}
+
+
 void ParticleManager::AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles)
 {
     if (!groups_.contains(_groupName))

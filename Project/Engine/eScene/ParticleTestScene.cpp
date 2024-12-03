@@ -1,9 +1,12 @@
 #include "ParticleTestScene.h"
 
+#include "Model/ModelManager.h"
+
 #include "SceneManager.h"
 #include "Utility/ConfigManager.h"
 #include "Particle/ParticleManager.h"
-#include  "ImGuiManager/ImGuiManager.h"
+#include "ImGuiManager/ImGuiManager.h"
+#include "Input/Input.h"
 
 std::unique_ptr<BaseScene>ParticleTestScene::Create()
 {
@@ -17,6 +20,20 @@ ParticleTestScene::~ParticleTestScene()
 void ParticleTestScene::Initialize()
 {
     addEmitterName_ = "";
+
+    SceneCamera_.Initialize();
+    SceneCamera_.UpdateMatrix();
+
+    debugCamera_.Initialize();
+
+    plane_ = std::make_unique<ObjectModel>();
+    plane_->Initialize("Tile/Tile.gltf");
+    plane_->uvScale_ = { 100,100 };
+
+    lineDrawer_ = LineDrawer::GetInstance();
+    lineDrawer_->Initialize();
+    lineDrawer_->SetCameraPtr(&SceneCamera_);
+
 }
 
 void ParticleTestScene::Update()
@@ -26,62 +43,137 @@ void ParticleTestScene::Update()
     {
         e.Update();
     }
+
+
+
+
+    // シーン関連更新
+#ifdef _DEBUG
+    if(Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
+       Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
+        enableDebugCamera_ = !enableDebugCamera_;
+#endif // _DEBUG
+
+
+    plane_->Update();
+
+    if (enableDebugCamera_)
+    {
+        debugCamera_.Update();
+        SceneCamera_.matView_ = debugCamera_.matView_;
+        SceneCamera_.TransferData();
+    }
+    else
+    {
+        SceneCamera_.UpdateMatrix();
+    }
+
+
+
 }
 
 void ParticleTestScene::Draw()
 {
+    ModelManager::GetInstance()->PreDrawForObjectModel();
+    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+
     for (auto& emitter : emitters_)
         emitter->Draw();
+
+    lineDrawer_->Draw();
 }
 
 #ifdef _DEBUG
 void ParticleTestScene::ImGui()
 {
-
     ImGui::Begin("ParticleTestScene");
 
-    // stringをcharに変換
-    static char buf[256];
-    if (ImGui::InputText("EmitterName", buf, 256))
-        addEmitterName_ = buf;
+#pragma region エフェクト
 
 
-    ImGui::BeginDisabled(strcmp(buf, "") == 0);
-    // エミッターの追加
-    if (ImGui::Button("Create New Emitter"))
+    static char effectBuf[256];
+    if(ImGui::InputText("EffectName", effectBuf, 256))
+        addEffectName_ = effectBuf;
+
+    ImGui::BeginDisabled(strcmp(effectBuf, "") == 0);
+    // エフェクトの追加
+    if(ImGui::Button(" Create New Effect"))
     {
-        addEmitterName_ = buf;
-        emitters_.push_back(std::make_unique<ParticleEmitter>());
-        emitters_.back()->Setting(addEmitterName_);
-        addEmitterName_ = "";
-
+        addEffectName_ = effectBuf;
+        effects_.emplace_back();
+        effects_.back().Initialize(addEffectName_);
+        strcpy_s(effectBuf, sizeof(effectBuf), "");
+        addEffectName_ = "";
     }
     ImGui::EndDisabled();
 
-    //エミッターの名前一覧
-
-    static bool isSelect[kMaxEmitterNum];
-    if (ImGui::TreeNode("Emitters"))
+    static std::vector<std::string> effectNames;
+    effectNames.clear();
+    std::vector<const char*> items;
+    for (auto& effect : effects_)
     {
-        size_t index = 0;
+        effectNames.push_back(effect.GetName());
+        items.push_back(effectNames.back().c_str());
+    }
+    static int selectedEffect = 0;
+    if (ImGui::ListBox("Effects", &selectedEffect, items.data(), static_cast<int>(effects_.size())))
+    {
+        auto it = effects_.begin();
+        std::advance(it, selectedEffect);
+        selectedEffect_ = it;
+        emitters_ = selectedEffect_->GetEmitters();
+    }
+
+
+
+#pragma endregion
+
+#pragma region エミッター
+
+    if (selectedEffect_ != effects_.end())
+    {
+        // stringをcharに変換
+        static char emitterBuf[256];
+        if (ImGui::InputText("EmitterName", emitterBuf, 256))
+            addEmitterName_ = emitterBuf;
+
+
+        ImGui::BeginDisabled(strcmp(emitterBuf, "") == 0);
+        // エミッターの追加
+        if (ImGui::Button("Create New Emitter"))
+        {
+            addEmitterName_ = emitterBuf;
+            emitters_.push_back(selectedEffect_->AddEmitter(addEmitterName_));
+            emitters_.back()->Setting(addEmitterName_);
+            strcpy_s(emitterBuf, sizeof(emitterBuf), "");
+            addEmitterName_ = "";
+        }
+        ImGui::EndDisabled();
+
+        //エミッターの名前一覧
+        static bool isSelect[kMaxEmitterNum];
+        if (ImGui::TreeNode("Emitters"))
+        {
+            size_t index = 0;
+            for (auto& emitter : emitters_)
+            {
+                ImGui::Selectable(emitter->GetName().c_str(), &isSelect[index]);
+                ++index;
+            }
+
+            ImGui::TreePop();
+        }
+
+        int cnt = 0;
         for (auto& emitter : emitters_)
         {
-            ImGui::Selectable(emitter->GetName().c_str(), &isSelect[index]);
-            ++index;
-        }
-
-        ImGui::TreePop();
-    }
-
-    int cnt = 0;
-    for (auto& emitter : emitters_)
-    {
-        if (isSelect[cnt++])
-        {
-            emitter->ShowDebugWinsow();
+            if (isSelect[cnt++])
+            {
+                emitter->ShowDebugWinsow();
+            }
         }
     }
-
+#pragma endregion
 
     ImGui::End();
 }

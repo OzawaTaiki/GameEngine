@@ -49,6 +49,12 @@ void ParticleEmitter::Setting(const std::string& _name)
     instance->SetVariable(name_, "size", &size_);
     instance->SetVariable(name_, "radius", &radius_);
     instance->SetVariable(name_, "offset", &offset_);
+    instance->SetVariable(name_, "rotate", &rotate_);
+    instance->SetVariable(name_, "position", &position_);
+
+    instance->SetVariable(name_, "modelPath", &useModelPath_);
+
+
     emitTime_ = 1.0f / static_cast<float> (emitPerSec_);
 
     switch (shape_)
@@ -67,6 +73,7 @@ void ParticleEmitter::Setting(const std::string& _name)
     default:
         break;
     }
+
 }
 
 void ParticleEmitter::Update()
@@ -74,7 +81,7 @@ void ParticleEmitter::Update()
     if (parentMatWorld_)
         position_ = Transform(offset_, *parentMatWorld_);
     else
-        position_ = position_+offset_;
+        position_ = position_ + offset_;
 
     currentTime_ += deltaTime_;
     if (!isActive_) {
@@ -173,6 +180,7 @@ void ParticleEmitter::ShowDebugWinsow()
             else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
                 ImGui::DragFloat("radius", &radius_, 0.01f);
 
+            ImGui::DragFloat3("position", &position_.x, 0.01f);
             ImGui::DragFloat3("offset", &offset_.x, 0.01f);
             ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_), 1, 0);
             if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
@@ -186,6 +194,15 @@ void ParticleEmitter::ShowDebugWinsow()
             ImGui::Checkbox("loop", &loop_);
             ImGui::Checkbox("changeColor", &changeColor_);
             ImGui::Checkbox("changeSize", &changeSize_);
+            char buf[256];
+            ImGui::InputText("modelPath", buf, 256);
+            useModelPath_ = buf;
+            ImGui::SameLine();
+            if (ImGui::Button("Set"))
+            {
+                ParticleManager::GetInstance()->SetGroupModel(name_, useModelPath_);
+            }
+
             ImGui::TreePop();
 
         }
