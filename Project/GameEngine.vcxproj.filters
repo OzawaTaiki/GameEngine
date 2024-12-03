@@ -276,6 +276,9 @@
     <ClCompile Include="Engine\Particle\Effect.cpp">
       <Filter>Engine\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Utility\Config.cpp">
+      <Filter>Engine\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Scene\GameScene.h">
@@ -466,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Particle\Effect.h">
       <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Config.h">
+      <Filter>Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
