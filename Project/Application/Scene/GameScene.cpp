@@ -73,7 +73,7 @@ void GameScene::Update()
     camera_->TransferData();
 
 
-    ParticleManager::GetInstance()->Update(camera_.get());
+    //ParticleManager::GetInstance()->Update(camera_.get());
     CollisionManager::GetInstance()->CheckAllCollision();
     //<-----------------------
 }

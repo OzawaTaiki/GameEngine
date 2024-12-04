@@ -454,6 +454,22 @@ Matrix4x4  MakeViewportMatrix(float _left, float _top, float _width, float _heig
     return result;
 }
 
+Matrix4x4 MakeLookAtMatrix(const Vector3& _velocity)
+{
+    Vector3 forward = _velocity.Normalize();
+    Vector3 right = Vector3(0, 1, 0).Cross(forward).Normalize();
+    Vector3 up = forward.Cross(right);
+
+    Matrix4x4 result = {
+        right.x, right.y, right.z, 0,
+        up.x, up.y, up.z, 0,
+        forward.x, forward.y, forward.z, 0,
+        0, 0, 0, 1
+    };
+
+    return result;
+}
+
 Matrix4x4 MakeRotateAxisAngle(const Vector3& _axis, float _angle)
 {
     Matrix4x4 result;

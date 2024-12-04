@@ -28,6 +28,7 @@ void ParticleTestScene::Initialize()
 
     debugCamera_.Initialize();
 
+
     plane_ = std::make_unique<ObjectModel>();
     plane_->Initialize("Tile/Tile.gltf");
     plane_->uvScale_ = { 100,100 };
@@ -64,15 +65,16 @@ void ParticleTestScene::Update()
         debugCamera_.Update();
         SceneCamera_.matView_ = debugCamera_.matView_;
         SceneCamera_.TransferData();
+        ParticleManager::GetInstance()->Update(debugCamera_.rotate_);
     }
     else
     {
         SceneCamera_.Update();
         SceneCamera_.UpdateMatrix();
+        ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
 
 
-    ParticleManager::GetInstance()->Update(&SceneCamera_);
 
 }
 

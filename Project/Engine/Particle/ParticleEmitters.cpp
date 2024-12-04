@@ -5,6 +5,7 @@
 #include "LineDrawer/LineDrawer.h"
 #include "Math/MatrixFunction.h"
 #include "Math/VectorFunction.h"
+#include "Math/MyLib.h"
 #include "Utility/ConfigManager.h"
 #include "Utility/RandomGenerator.h"
 #include "ImGuiManager/ImGuiManager.h"
@@ -146,6 +147,7 @@ void ParticleEmitter::Draw()
         LineDrawer::GetInstance()->DrawSphere(affine);
         break;
     case EmitterShape::Circle:
+        // TODO : 円の描画
         break;
     case EmitterShape::None:
         break;
@@ -178,110 +180,6 @@ void ParticleEmitter::SetActive(bool _active)
     isActive_ = _active;
 }
 
-void ParticleEmitter::ShowDebugWinsow()
-{
-#ifdef _DEBUG
-
-    static const char* shapeCombo[1024] = { "Box","Sphere","Circle","None" };
-    static const char* directionCombo[1024] = { "inward","outward","random" };
-
-    ImGui::BeginTabBar("Emitter");
-    if (ImGui::BeginTabItem(name_.c_str()))
-    {
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-
-        if (ImGui::TreeNodeEx("Emitter", ImGuiTreeNodeFlags_Framed))
-        {
-            ImGui::Combo("shape", reinterpret_cast<int*>(&shape_), shapeCombo, 4);
-            ImGui::Combo("direction", reinterpret_cast<int*>(&particleDirection_), directionCombo, 3);
-
-
-            ImGui::SeparatorText("Emitter");
-            if (shape_ == EmitterShape::Box)
-                ImGui::DragFloat3("size", &size_.x, 0.01f);
-            else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
-                ImGui::DragFloat("radius", &radius_, 0.01f);
-
-            ImGui::DragFloat3("position", &position_.x, 0.01f);
-            ImGui::DragFloat3("offset", &offset_.x, 0.01f);
-            ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_), 1, 0);
-            if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
-                emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
-            ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_), 1);
-            ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
-            ImGui::DragFloat("delayTime", &delayTime_, 0.01f);
-            ImGui::DragFloat("duration", &duration_, 0.01f);
-
-            ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
-
-            ImGui::Columns(2, "mycolumns", false);
-            ImGui::Checkbox("randomColor", &randomColor_);
-            ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
-
-            ImGui::Checkbox("loop", &loop_);
-            ImGui::NextColumn();
-            ImGui::Checkbox("changeColor", &changeColor_);
-
-            ImGui::Checkbox("changeSize", &changeSize_);
-            ImGui::Checkbox("useBillboard", &isEnableBillboard_);
-
-            ImGui::Columns(1);
-
-            ImGui::SeparatorText("use path");
-            ImGui::InputText("Model", name_buffer_, 256);
-            useModelPath_ = name_buffer_;
-            if (ImGui::Button("Set"))
-                ParticleManager::GetInstance()->SetGroupModel(name_, useModelPath_);
-
-            ImGui::InputText("Texture", texture_buffer_, 256);
-            useTextruePath_ = texture_buffer_;
-            if (ImGui::Button("Set"))
-                ParticleManager::GetInstance()->SetGroupTexture(name_, TextureManager::GetInstance()->Load(useTextruePath_));
-
-            ImGui::TreePop();
-
-        }
-
-        if (ImGui::TreeNodeEx("Particle_Init", ImGuiTreeNodeFlags_Framed))
-        {
-            ImGui::DragFloatRange2("lifeTime", &setting_.lifeTime.min, &setting_.lifeTime.max, 0.01f);
-            ImGui::DragFloat3("size_min", &setting_.size.min.x, 0.01f);
-            ImGui::DragFloat3("size_max", &setting_.size.max.x, 0.01f);
-            ImGui::DragFloat3("rotate_min", &setting_.rotate.min.x, 0.01f);
-            ImGui::DragFloat3("rotate_max", &setting_.rotate.max.x, 0.01f);
-            ImGui::DragFloatRange2("spped", &setting_.spped.min, &setting_.spped.max, 0.01f);
-            ImGui::DragFloat3("direction_min", &setting_.direction.min.x, 0.01f);
-            ImGui::DragFloat3("direction_max", &setting_.direction.max.x, 0.01f);
-            ImGui::DragFloat3("acceleration_min", &setting_.acceleration.min.x, 0.01f);
-            ImGui::DragFloat3("acceleration_max", &setting_.acceleration.max.x, 0.01f);
-            ImGui::ColorEdit4("color_min", &setting_.color.min.x);
-            ImGui::ColorEdit4("color_max", &setting_.color.max.x);
-            ImGui::TreePop();
-        }
-        ImGui::PopStyleColor();
-
-        if (ImGui::Button("save"))
-        {
-            ConfigManager::GetInstance()->SaveData(name_);
-        }
-
-        if (ImGui::Button("add"))
-        {
-            std::vector<Particle> particles;
-
-            for (uint32_t count = 0; count < countPerEmit_; ++count)
-            {
-                particles.push_back(GenerateParticleData());
-            }
-
-            ParticleManager::GetInstance()->AddParticleToGroup(name_, particles);
-            currentTime_ = 0;
-        }
-        ImGui::EndTabItem();
-    }
-    ImGui::EndTabBar();
-#endif // _DEBUG
-}
 
 void ParticleEmitter::Reset()
 {
@@ -373,15 +271,221 @@ Particle ParticleEmitter::GenerateParticleData()
         break;
     }
 
-        param.position += position_;
+    for (size_t index = 0; index < 3; ++index)
+    {
+        if (lockRotationAxes_[index])
+        {
+            param.direction[index] = lockRotationAxesValue_[index];
+        }
+    }
+
+    param.position += position_;
 
     param.changeColor = changeColor_;
     param.changeSize = changeSize_;
     param.isFade = fadeAlpha_;
     param.fadeRatio = fadeStartRatio_;
 
+    if (isLengthScalingEnabled_)
+    {
+        param.changeSize = false;
+        param.currentSize = setting_.size.min;
+        param.currentSize.x += 0.25f * param.speed;
+
+        param.directionMatrix = DirectionToDirection({ 1,0,0 }, param.direction);
+    }
+
     Particle particle;
     particle.Initialize(param);
 
     return particle;
+}
+
+
+void ParticleEmitter::ShowDebugWinsow()
+{
+#ifdef _DEBUG
+
+    static const char* shapeCombo[1024] = { "Box","Sphere","Circle","None" };
+    static const char* directionCombo[1024] = { "inward","outward","random" };
+
+    ImGui::BeginTabBar("Emitter");
+    if (ImGui::BeginTabItem(name_.c_str()))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+
+        if (ImGui::TreeNodeEx("Emitter", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Combo("shape", reinterpret_cast<int*>(&shape_), shapeCombo, 4);
+            ImGui::Combo("direction", reinterpret_cast<int*>(&particleDirection_), directionCombo, 3);
+
+
+            ImGui::SeparatorText("Emitter");
+            if (shape_ == EmitterShape::Box)
+                ImGui::DragFloat3("size", &size_.x, 0.01f);
+            else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
+                ImGui::DragFloat("radius", &radius_, 0.01f);
+
+            ImGui::DragFloat3("position", &position_.x, 0.01f);
+            ImGui::DragFloat3("offset", &offset_.x, 0.01f);
+            ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_), 1, 0);
+            if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
+                emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
+            ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_), 1);
+            ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
+            ImGui::DragFloat("delayTime", &delayTime_, 0.01f);
+            ImGui::DragFloat("duration", &duration_, 0.01f);
+
+            ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
+
+            DisplayFlags();
+
+            ImGui::SeparatorText("use path");
+            ImGui::InputText("Model", name_buffer_, 256);
+            useModelPath_ = name_buffer_;
+            if (ImGui::Button("Model Set"))
+                ParticleManager::GetInstance()->SetGroupModel(name_, useModelPath_);
+
+            ImGui::InputText("Texture", texture_buffer_, 256);
+            useTextruePath_ = texture_buffer_;
+            if (ImGui::Button("Texture Set"))
+                ParticleManager::GetInstance()->SetGroupTexture(name_, TextureManager::GetInstance()->Load(useTextruePath_));
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNodeEx("Particle_Init", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::DragFloatRange2("lifeTime", &setting_.lifeTime.min, &setting_.lifeTime.max, 0.01f);
+            ImGui::DragFloat3("size_min", &setting_.size.min.x, 0.01f);
+            ImGui::DragFloat3("size_max", &setting_.size.max.x, 0.01f);
+            //ImGui::DragFloat3("rotate_min", &setting_.rotate.min.x, 0.01f);
+            //ImGui::DragFloat3("rotate_max", &setting_.rotate.max.x, 0.01f);
+            ImGui::DragFloatRange2("spped", &setting_.spped.min, &setting_.spped.max, 0.01f);
+
+            DisplayDirectionParameters();
+
+            ImGui::DragFloat3("acceleration_min", &setting_.acceleration.min.x, 0.01f);
+            ImGui::DragFloat3("acceleration_max", &setting_.acceleration.max.x, 0.01f);
+            ImGui::ColorEdit4("color_min", &setting_.color.min.x);
+            ImGui::ColorEdit4("color_max", &setting_.color.max.x);
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+
+        if (ImGui::Button("save"))
+        {
+            ConfigManager::GetInstance()->SaveData(name_);
+        }
+
+        if (ImGui::Button("add"))
+        {
+            std::vector<Particle> particles;
+
+            for (uint32_t count = 0; count < countPerEmit_; ++count)
+            {
+                particles.push_back(GenerateParticleData());
+            }
+
+            ParticleManager::GetInstance()->AddParticleToGroup(name_, particles);
+            currentTime_ = 0;
+        }
+        ImGui::EndTabItem();
+    }
+    ImGui::EndTabBar();
+#endif // _DEBUG
+}
+
+void ParticleEmitter::DisplayDirectionParameters()
+{
+    if (ImGui::TreeNode("Direction"))
+    {
+        float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
+
+        /*ImGui::SeparatorText("Lock Axis");
+        ImGui::SetNextItemWidth(width);
+        ImGui::BeginDisabled(!lockRotationAxes_[0]);
+        ImGui::DragFloat("X", &lockRotationAxesValue_.x, 0.01f);
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+
+        ImGui::BeginDisabled(!lockRotationAxes_[1]);
+        ImGui::SetNextItemWidth(width);
+        ImGui::DragFloat("Y", &lockRotationAxesValue_.y, 0.01f);
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+
+        ImGui::BeginDisabled(!lockRotationAxes_[2]);
+        ImGui::SetNextItemWidth(width);
+        ImGui::DragFloat("Z", &lockRotationAxesValue_.z, 0.01f);
+        ImGui::EndDisabled();*/
+
+        ImGui::BeginDisabled(particleDirection_ != ParticleDirection::Random);
+        ImGui::SeparatorText("Direction Range");
+        ImGui::DragFloat3("min", &setting_.direction.min.x, 0.01f);
+        ImGui::DragFloat3("max", &setting_.direction.max.x, 0.01f);
+        ImGui::EndDisabled();
+
+        ImGui::TreePop();
+    }
+
+    for (size_t index = 0; index < 3; ++index)
+    {
+        if (lockRotationAxes_[index])
+        {
+            setting_.direction.min[index] = lockRotationAxesValue_[index];
+            setting_.direction.max[index] = lockRotationAxesValue_[index];
+        }
+    }
+
+}
+
+void ParticleEmitter::DisplayFlags()
+{
+    ImGui::Columns(2, "mycolumns", false);
+    ImGui::Checkbox("loop", &loop_);
+    ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
+    ImGui::BeginDisabled(isLengthScalingEnabled_);
+    if (ImGui::Checkbox("useBillboard", &isEnableBillboard_))
+        isLengthScalingEnabled_ = false;
+    ImGui::EndDisabled();
+    ImGui::BeginDisabled(isEnableBillboard_);
+    if (ImGui::Checkbox("shouldFaceDirection", &isLengthScalingEnabled_))
+        isEnableBillboard_ = false;
+    ImGui::EndDisabled();
+
+    ImGui::NextColumn();
+
+    ImGui::Checkbox("randomColor", &randomColor_);
+    ImGui::BeginDisabled(randomColor_);
+    ImGui::Checkbox("changeColor", &changeColor_);
+    ImGui::EndDisabled();
+    ImGui::Checkbox("changeSize", &changeSize_);
+
+    ImGui::Columns(1);
+
+   /* ImGui::SeparatorText("Lock Axis");
+    ImGui::Checkbox("X", &lockRotationAxes_[0]);
+    ImGui::SameLine();
+    ImGui::Checkbox("Y", &lockRotationAxes_[1]);
+    ImGui::SameLine();
+    ImGui::Checkbox("Z", &lockRotationAxes_[2]);*/
+
+    ImGui::SeparatorText("use billboard");
+    ImGui::PushID("billboard");
+    ImGui::Checkbox("X", &billboardAxes_[0]);
+    ImGui::SameLine();
+    ImGui::Checkbox("Y", &billboardAxes_[1]);
+    ImGui::SameLine();
+    ImGui::Checkbox("Z", &billboardAxes_[2]);
+    ImGui::PopID();
+
+}
+
+void ParticleEmitter::DisplaySizeParameters()
+{
+    // TODO: パラメータごとにfixedFlagを設定する（固定値か否か）
+    // そのフラグを参照して、DragFloatを一つにして,minを使う 後にmaxにminを代入する
+    // フラグを用意するパラメータ
+    // lifeTime,size,speed,direction,acceleration,color
 }

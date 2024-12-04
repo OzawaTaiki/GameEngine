@@ -51,10 +51,10 @@ private:
     std::list<ParticleEmitter*> emitters_ = {};
     // 追加するエミッターの名前
     std::string addEmitterName_ = "";
+    Camera SceneCamera_ = {};
 
 
     // シーン関連
-    Camera SceneCamera_ = {};
     DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 

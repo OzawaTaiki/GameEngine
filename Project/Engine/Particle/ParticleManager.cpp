@@ -34,34 +34,48 @@ void ParticleManager::Initialize()
    rootsignature_ = rootSignature.value();
 }
 
-void ParticleManager::Update(const Camera* _camera)
+void ParticleManager::Update(const Vector3& _cRotate)
 {
     // billBordはshaderで計算したい
 
-    Matrix4x4 billboradMat = Inverse(_camera->matView_);
-    billboradMat.m[3][0] = 0;
-    billboradMat.m[3][1] = 0;
-    billboradMat.m[3][2] = 0;
+    Vector3 cRotate = {};
+    Matrix4x4 billboradMat = Matrix4x4::Identity();
 
     for (auto& [name, group] : groups_)
     {
         group.instanceNum = 0;
-        for (auto it=group.particles.begin();it!=group.particles.end();)
+        for (auto it = group.particles.begin(); it != group.particles.end();)
         {
             it->Update();
             if (!it->IsAlive())
-                it = group.particles.erase(it);
-            else
             {
-                Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
-                mat = mat * billboradMat;
-                //mat = mat * MakeRotateMatrix(it->GetRotation());
-                mat = mat * MakeTranslateMatrix(it->GetPosition());
-                group.constMap[group.instanceNum].matWorld = mat;
-                group.constMap[group.instanceNum].color = it->GetColor();
-                group.instanceNum++;
-                ++it;
+                it = group.particles.erase(it);
+                continue;
             }
+
+            auto axes = group.emitterPtr->GetBillboardAxes();
+
+            for (uint32_t index = 0; index < 3; ++index)
+            {
+                if (axes[index])
+                {
+                    cRotate[index] = _cRotate[index];
+                }
+            }
+            billboradMat = MakeAffineMatrix({ 1,1,1 }, cRotate, { 0,0,0 });
+            //billboradMat = Inverse(billboradMat);
+
+            Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
+            if (group.emitterPtr->EnableBillboard())
+                mat = mat * billboradMat;
+            if (group.emitterPtr->ShouldFaceDirection())
+                mat = mat * it->GetDirectionMatrix();
+            //mat = mat * MakeRotateMatrix(it->GetRotation());
+            mat = mat * MakeTranslateMatrix(it->GetPosition());
+            group.constMap[group.instanceNum].matWorld = mat;
+            group.constMap[group.instanceNum].color = it->GetColor();
+            group.instanceNum++;
+            ++it;
         }
     }
 }

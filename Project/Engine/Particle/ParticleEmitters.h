@@ -6,6 +6,7 @@
 #include "Math/Matrix4x4.h"
 
 #include <string>
+#include <array>
 
 
 template<class T>
@@ -87,9 +88,11 @@ public:
     bool IsActive() const { return isActive_; }
     bool IsAlive() const { return isAlive_; }
     bool EnableBillboard() const { return isEnableBillboard_; }
+    bool ShouldFaceDirection() const { return isLengthScalingEnabled_; }
 
     float GetDelayTime() const { return delayTime_; }
     float GetDuration() const { return duration_; }
+    std::array<bool, 3> GetBillboardAxes() const { return billboardAxes_; }
 
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
@@ -126,6 +129,13 @@ private:
     bool                    changeColor_;           // 生成後に色を変更するか
     bool                    randomColor_;           // 色をランダムで生成するか
     bool                    isEnableBillboard_;     // ビルボードを使用するか
+    bool                    isLengthScalingEnabled_;// 方向を向くか
+
+    std::array <bool, 3>    lockRotationAxes_;      // 軸を固定するか
+    Vector3                 lockRotationAxesValue_; // 固定した軸の値
+
+    std::array <bool, 3>     billboardAxes_ = { 1 };     // ビルボードの軸
+
     float                   delayTime_;             // 発生までの遅延時間
     float                   fadeStartRatio_;        // アルファを変え始める割合
     float                   duration_ = 1;          // エミッターの持続時間
@@ -139,4 +149,7 @@ private:
     bool                    isAlive_ = true;       // まだ生きているか
 
     Particle GenerateParticleData();
+    void DisplayDirectionParameters();
+    void DisplayFlags();
+    void DisplaySizeParameters();
 };

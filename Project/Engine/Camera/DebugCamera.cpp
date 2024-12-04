@@ -22,8 +22,8 @@ void DebugCamera::Update()
     // ホイールクリックでカメラ回転
     if (Input::GetInstance()->IsMousePressed(2))
         Input::GetInstance()->GetRotate(rot);
-        rotation_ += rot;
-    Matrix4x4 matRot = MakeRotateMatrix(rotation_);
+        rotate_ += rot;
+    Matrix4x4 matRot = MakeRotateMatrix(rotate_);
 
 
     Vector3 rotVelo = TransformNormal(move, matRot);
@@ -32,7 +32,7 @@ void DebugCamera::Update()
     translate_.z += rotVelo.z;
 
 
-    matView_ = Inverse(MakeAffineMatrix(scale_, rotation_, translate_));
+    matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
 
 }
 
