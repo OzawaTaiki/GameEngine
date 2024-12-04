@@ -2,6 +2,8 @@
 #include "Utility/Time.h"
 #include "Utility/ConfigManager.h"
 
+// TODO : エフェクトの保存機能を実装する
+// TODO : エフェクトの読み込み機能を実装する
 
 void Effect::Initialize(const std::string& _name)
 {
