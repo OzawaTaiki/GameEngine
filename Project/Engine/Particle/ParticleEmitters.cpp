@@ -122,6 +122,7 @@ void ParticleEmitter::Update()
 
         for (uint32_t count = 0; count < countPerEmit_; ++count)
         {
+
             particles.push_back(GenerateParticleData());
         }
 
