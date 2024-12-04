@@ -9,14 +9,6 @@
 class Effect
 {
 private:
-    struct EmitterData
-    {
-        std::string         name;                       // エミッターの名前
-        std::unique_ptr<ParticleEmitter> pEmitterPtr;   // エミッターのポインタ
-        float               delayTime;                  // 発生までの遅延時間
-        float               duration;                   // エミッターの持続時間
-        bool                loop;                       // ループするか
-    };
 
 public:
     Effect() = default;
@@ -25,7 +17,7 @@ public:
     void Initialize(const std::string& _name);
     void Update();
 
-    ParticleEmitter* AddEmitter(const std::string& _name, float _delayTime = 0, float _duration = 1, bool _loop = false);
+    ParticleEmitter* AddEmitter(const std::string& _name);
 
     std::list<ParticleEmitter*> GetEmitters() const;
     std::string GetName() const { return name_; }
@@ -35,8 +27,8 @@ public:
     void Save();
 private:
 
-    std::string                 name_;              // エフェクトの名前
-    std::list<EmitterData>      emitters_;          // エミッターのリスト
+    std::string                     name_;              // エフェクトの名前
+    std::list<ParticleEmitter>      emitters_;          // エミッターのリスト
 
 
     float                       elapsedTime_;       // 経過時間

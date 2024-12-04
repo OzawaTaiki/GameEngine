@@ -62,7 +62,7 @@ private:
 
     std::unique_ptr<ObjectModel> plane_ = nullptr;
 
-    
+
 
 
 

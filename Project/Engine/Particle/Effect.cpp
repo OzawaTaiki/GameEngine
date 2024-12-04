@@ -13,58 +13,55 @@ void Effect::Update()
     if (!isActive_)
     {
         elapsedTime_ = 0;
+        for (auto& emitter : emitters_)
+        {
+            emitter.Reset();
+        }
         return;
     }
 
-    elapsedTime_ += Time::GetDeltaTime<float>();
+    elapsedTime_ += 1.0f / 60.0f;
+    //elapsedTime_ += Time::GetDeltaTime<float>();
 
     for (auto& emitter : emitters_)
     {
         // 遅延時間が経過していなかったらスキップ
-        if (elapsedTime_<=emitter.delayTime)
+        if (elapsedTime_ <= emitter.GetDelayTime())
         {
-            emitter.pEmitterPtr->SetActive(false);
+            emitter.SetActive(false);
             continue;
+        }
+        if (elapsedTime_ >= emitter.GetDuration() + emitter.GetDelayTime())
+        {
+            emitter.SetAlive(false);
         }
 
-        // エミッターの持続時間が経過していたらスキップ
-        if (emitter.duration <= elapsedTime_ - emitter.delayTime)
-        {
-            emitter.pEmitterPtr->SetActive(false);
-            continue;
-        }
+
+        if (!emitter.IsActive() && emitter.IsAlive())
+            emitter.SetActive(true);
 
         // 更新
-        if (!emitter.pEmitterPtr->IsActive())
-            emitter.pEmitterPtr->Update();
-        else
-            emitter.pEmitterPtr->SetActive(true);
+        emitter.Update();
     }
 }
 
-ParticleEmitter* Effect::AddEmitter(const std::string& _name,  float _delayTime, float _duration, bool _loop)
+ParticleEmitter* Effect::AddEmitter(const std::string& _name)
 {
-    EmitterData& emitter = emitters_.emplace_back();
-    emitter.name = _name;
-    emitter.pEmitterPtr = std::make_unique<ParticleEmitter>();
-    emitter.delayTime = _delayTime;
-    emitter.duration = _duration;
-    emitter.loop = _loop;
+    ParticleEmitter& emitter = emitters_.emplace_back();
 
-    emitter.pEmitterPtr->Setting(_name);
+    emitter.Setting(_name);
 
 
-
-    return emitter.pEmitterPtr.get();
+    return &emitter;
 }
 
 std::list<ParticleEmitter*> Effect::GetEmitters() const
 {
     std::list<ParticleEmitter*> list;
 
-    for (const EmitterData& emitter : emitters_)
+    for (const ParticleEmitter& emitter : emitters_)
     {
-        list.push_back(emitter.pEmitterPtr.get());
+        list.push_back(const_cast<ParticleEmitter*>(&emitter));
     }
 
     return list;

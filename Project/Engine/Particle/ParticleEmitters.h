@@ -81,14 +81,22 @@ public:
     void SetWorldMatrix(const Matrix4x4* _mat) { parentMatWorld_ = _mat; }
     void SetModelPath(const std::string& _path) { useModelPath_ = _path; }
     void SetCenter(const Vector3& _center) { position_ = _center; }
-    void SetActive(bool _active) { isActive_ = _active; }
+    void SetActive(bool _active);
+    void SetAlive(bool _alive) { isAlive_ = _alive; }
 
     bool IsActive() const { return isActive_; }
+    bool IsAlive() const { return isAlive_; }
     bool EnableBillboard() const { return isEnableBillboard_; }
+
+    float GetDelayTime() const { return delayTime_; }
+    float GetDuration() const { return duration_; }
+
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
 
     void ShowDebugWinsow();
+
+    void Reset();
 
     EmitParticleSettings    setting_{};
 private:
@@ -109,24 +117,26 @@ private:
     Vector3                 position_;
     Vector3                 offset_;
     Vector3                 rotate_;
-    Vector3                 size_;
-    float                   radius_;
+    Vector3                 size_ = { 1,1,1 };
+    float                   radius_ = 1;
 
-    bool                    loop_;              // ループするか
-    bool                    fadeAlpha_;         // 生成後にアルファを変更するか
-    bool                    changeSize_;        // 生成後にサイズを変更するか
-    bool                    changeColor_;       // 生成後に色を変更するか
-    bool                    randomColor_;       // 色をランダムで生成するか
-    bool                    isEnableBillboard_; // ビルボードを使用するか
-    float                   delayTime_;         // 発生までの遅延時間
-    float                   fadeStartRatio_;    // アルファを変え始める割合
-    uint32_t                maxParticles_;      // 最大数
-    uint32_t                countPerEmit_;      // 回当たりの発生数
-    uint32_t                emitPerSec_;        // 秒あたりの発生回数
-    uint32_t                emitRepeatCount_;   // 繰り返し回数
-    uint32_t                emitCount_;         // 発生回数
+    bool                    loop_;                  // ループするか
+    bool                    fadeAlpha_;             // 生成後にアルファを変更するか
+    bool                    changeSize_;            // 生成後にサイズを変更するか
+    bool                    changeColor_;           // 生成後に色を変更するか
+    bool                    randomColor_;           // 色をランダムで生成するか
+    bool                    isEnableBillboard_;     // ビルボードを使用するか
+    float                   delayTime_;             // 発生までの遅延時間
+    float                   fadeStartRatio_;        // アルファを変え始める割合
+    float                   duration_ = 1;          // エミッターの持続時間
+    uint32_t                maxParticles_;          // 最大数
+    uint32_t                countPerEmit_ = 1;      // 回当たりの発生数
+    uint32_t                emitPerSec_ = 1;        // 秒あたりの発生回数
+    uint32_t                emitRepeatCount_ = 1;   // 繰り返し回数
+    uint32_t                emitCount_ = 1;         // 発生回数
 
-    bool                    isActive_ = false;
+    bool                    isActive_ = false;     // アクティブか
+    bool                    isAlive_ = true;       // まだ生きているか
 
     Particle GenerateParticleData();
 };

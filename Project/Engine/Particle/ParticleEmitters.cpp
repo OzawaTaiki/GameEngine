@@ -89,15 +89,19 @@ void ParticleEmitter::Setting(const std::string& _name)
 
 void ParticleEmitter::Update()
 {
+    if (!isActive_ ||
+        !isAlive_) {
+        return;
+    }
+
     if (parentMatWorld_)
         position_ = Transform(offset_, *parentMatWorld_);
     else
         position_ = position_ + offset_;
 
     currentTime_ += deltaTime_;
-    if (!isActive_) {
-        currentTime_ = 0;
-    }
+
+    // エミッターの持続時間が経過していたらスキップ
 
     if (emitTime_ <= currentTime_)
     {
@@ -105,6 +109,7 @@ void ParticleEmitter::Update()
         if (!loop_ && emitRepeatCount_ <= emitCount_)
         {
             isActive_ = false;
+            isAlive_ = false;
             emitCount_ = 0;
         }
 
@@ -167,6 +172,12 @@ void ParticleEmitter::SetShape_Circle(float _radius)
     radius_ = _radius;
 }
 
+void ParticleEmitter::SetActive(bool _active)
+{
+    currentTime_ = emitTime_;
+    isActive_ = _active;
+}
+
 void ParticleEmitter::ShowDebugWinsow()
 {
 #ifdef _DEBUG
@@ -198,13 +209,24 @@ void ParticleEmitter::ShowDebugWinsow()
                 emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
             ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_), 1);
             ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
+            ImGui::DragFloat("delayTime", &delayTime_, 0.01f);
+            ImGui::DragFloat("duration", &duration_, 0.01f);
+
             ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
 
+            ImGui::Columns(2, "mycolumns", false);
             ImGui::Checkbox("randomColor", &randomColor_);
             ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
+
             ImGui::Checkbox("loop", &loop_);
+            ImGui::NextColumn();
             ImGui::Checkbox("changeColor", &changeColor_);
+
             ImGui::Checkbox("changeSize", &changeSize_);
+            ImGui::Checkbox("useBillboard", &isEnableBillboard_);
+
+            ImGui::Columns(1);
+
             ImGui::SeparatorText("use path");
             ImGui::InputText("Model", name_buffer_, 256);
             useModelPath_ = name_buffer_;
@@ -259,6 +281,14 @@ void ParticleEmitter::ShowDebugWinsow()
     }
     ImGui::EndTabBar();
 #endif // _DEBUG
+}
+
+void ParticleEmitter::Reset()
+{
+    currentTime_ = 0;
+    emitCount_ = 0;
+    isActive_ = false;
+    isAlive_ = true;
 }
 
 

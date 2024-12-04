@@ -43,8 +43,6 @@ void ParticleManager::Update(const Camera* _camera)
     billboradMat.m[3][1] = 0;
     billboradMat.m[3][2] = 0;
 
-    billboradMat = MakeIdentity4x4();
-
     for (auto& [name, group] : groups_)
     {
         group.instanceNum = 0;
