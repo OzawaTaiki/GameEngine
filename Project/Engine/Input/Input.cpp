@@ -150,7 +150,7 @@ void Input::GetMove(Vector3& _move, float _spped) const
 
     if (keys_[DIK_SPACE])
         _move.y += 1.0f;
-    if (keys_[DIK_LSHIFT])
+    if (keys_[DIK_LCONTROL])
         _move.y -= 1.0f;
 
     _move *= _spped;

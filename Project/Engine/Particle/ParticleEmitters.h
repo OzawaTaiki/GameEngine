@@ -95,6 +95,9 @@ private:
 
     std::string             name_;
     std::string             useModelPath_;
+    char                    name_buffer_[256];                 //imgui で入力用
+    std::string             useTextruePath_;
+    char                    texture_buffer_[256];              //imgui で入力用
 
     float                   currentTime_            = 0;
     float                   deltaTime_              = 1.0f / 60.0f;

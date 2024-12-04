@@ -43,6 +43,8 @@ void ParticleManager::Update(const Camera* _camera)
     billboradMat.m[3][1] = 0;
     billboradMat.m[3][2] = 0;
 
+    billboradMat = MakeIdentity4x4();
+
     for (auto& [name, group] : groups_)
     {
         group.instanceNum = 0;
@@ -120,7 +122,13 @@ void ParticleManager::SetGroupModel(const std::string& _groupName, const std::st
         throw std::runtime_error("not find particleGroup! name:" + '\"' + _groupName + '\"');
 
     groups_[_groupName].model = Model::CreateFromObj(_modelPath);
-    groups_[_groupName].textureHandle = groups_[_groupName].model->GetMaterialPtr()->GetTexturehandle();
+}
+
+void ParticleManager::SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle)
+{
+    if (!groups_.contains(_groupName))
+        throw std::runtime_error("not find particleGroup! name:" + '\"' + _groupName + '\"');
+    groups_[_groupName].textureHandle = _textureHandle;
 }
 
 

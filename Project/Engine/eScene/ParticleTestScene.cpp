@@ -22,6 +22,8 @@ void ParticleTestScene::Initialize()
     addEmitterName_ = "";
 
     SceneCamera_.Initialize();
+    SceneCamera_.translate_ = { 0,5,-20 };
+    SceneCamera_.rotate_ = { 0.26f,0,0 };
     SceneCamera_.UpdateMatrix();
 
     debugCamera_.Initialize();
@@ -65,10 +67,12 @@ void ParticleTestScene::Update()
     }
     else
     {
+        SceneCamera_.Update();
         SceneCamera_.UpdateMatrix();
     }
 
 
+    ParticleManager::GetInstance()->Update(&SceneCamera_);
 
 }
 
@@ -80,6 +84,7 @@ void ParticleTestScene::Draw()
     for (auto& emitter : emitters_)
         emitter->Draw();
 
+    ParticleManager::GetInstance()->Draw(&SceneCamera_);
     lineDrawer_->Draw();
 }
 
@@ -123,7 +128,10 @@ void ParticleTestScene::ImGui()
         selectedEffect_ = it;
         emitters_ = selectedEffect_->GetEmitters();
     }
-
+    static bool isActive = false;
+    ImGui::Checkbox("Active", &isActive);
+    if (selectedEffect_ != effects_.end())
+        selectedEffect_->SetActive(isActive);
 
 
 #pragma endregion

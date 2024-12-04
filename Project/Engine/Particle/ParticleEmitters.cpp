@@ -8,6 +8,7 @@
 #include "Utility/ConfigManager.h"
 #include "Utility/RandomGenerator.h"
 #include "ImGuiManager/ImGuiManager.h"
+#include "TextureManager/TextureManager.h"
 
 void ParticleEmitter::Setting(const std::string& _name)
 {
@@ -53,6 +54,7 @@ void ParticleEmitter::Setting(const std::string& _name)
     instance->SetVariable(name_, "position", &position_);
 
     instance->SetVariable(name_, "modelPath", &useModelPath_);
+    instance->SetVariable(name_, "texturePath", &useTextruePath_);
 
 
     emitTime_ = 1.0f / static_cast<float> (emitPerSec_);
@@ -73,6 +75,15 @@ void ParticleEmitter::Setting(const std::string& _name)
     default:
         break;
     }
+
+    if (useModelPath_.empty())
+        useModelPath_ = "plane/plane.gltf";
+
+    if (useTextruePath_.empty())
+        useTextruePath_ = "circle.png";
+
+    uint32_t handle = TextureManager::GetInstance()->Load(useTextruePath_);
+    ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, handle);
 
 }
 
@@ -194,14 +205,16 @@ void ParticleEmitter::ShowDebugWinsow()
             ImGui::Checkbox("loop", &loop_);
             ImGui::Checkbox("changeColor", &changeColor_);
             ImGui::Checkbox("changeSize", &changeSize_);
-            char buf[256];
-            ImGui::InputText("modelPath", buf, 256);
-            useModelPath_ = buf;
-            ImGui::SameLine();
+            ImGui::SeparatorText("use path");
+            ImGui::InputText("Model", name_buffer_, 256);
+            useModelPath_ = name_buffer_;
             if (ImGui::Button("Set"))
-            {
                 ParticleManager::GetInstance()->SetGroupModel(name_, useModelPath_);
-            }
+
+            ImGui::InputText("Texture", texture_buffer_, 256);
+            useTextruePath_ = texture_buffer_;
+            if (ImGui::Button("Set"))
+                ParticleManager::GetInstance()->SetGroupTexture(name_, TextureManager::GetInstance()->Load(useTextruePath_));
 
             ImGui::TreePop();
 

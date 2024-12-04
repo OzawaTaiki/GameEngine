@@ -11,7 +11,10 @@ void Effect::Initialize(const std::string& _name)
 void Effect::Update()
 {
     if (!isActive_)
+    {
+        elapsedTime_ = 0;
         return;
+    }
 
     elapsedTime_ += Time::GetDeltaTime<float>();
 
@@ -49,6 +52,8 @@ ParticleEmitter* Effect::AddEmitter(const std::string& _name,  float _delayTime,
     emitter.loop = _loop;
 
     emitter.pEmitterPtr->Setting(_name);
+
+
 
     return emitter.pEmitterPtr.get();
 }
