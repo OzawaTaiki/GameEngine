@@ -99,12 +99,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application\Scene\GameScene.cpp">
-      <Filter>Application\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scene\TitleScene.cpp">
-      <Filter>Application\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Audio\Audio.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
@@ -264,20 +258,11 @@
     <ClCompile Include="Engine\Utility\RandomGenerator.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Utility\Time.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\Scene\GameScene.h">
-      <Filter>Application\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scene\TitleScene.h">
-      <Filter>Application\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Audio\Audio.h">
       <Filter>Engine\Audio</Filter>
     </ClInclude>
