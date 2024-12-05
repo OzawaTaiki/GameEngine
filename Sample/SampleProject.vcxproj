@@ -76,6 +76,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\externals\assimp\include;$(ProjectDir)..\Engine\externals\DirectXTex;$(ProjectDir)..\Engine\externals\nlohmann;$(ProjectDir)..\Engine\externals\imgui;$(ProjectDir)..\Engine\Engine\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
