@@ -15,7 +15,8 @@
 
 /*-----シーン-----*/
 #include "eScene/SceneManager.h"
-#include "eScene/SampleScene.h"
+//#include "Scene/GameScene.h"
+//#include "Scene/TitleScene.h"
 /*---------------*/
 
 
@@ -56,11 +57,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
 
-	SceneManager::RegisterScene("Sample", SampleScene::Create);
 
-	SceneManager::GetInstance()->Initialize("Sample");
+	//SceneManager::RegisterScene("title", TitleScene::Create);
+	//SceneManager::RegisterScene("game", GameScene::Create);
+	SceneManager::GetInstance()->Initialize("title");
 
-	Time::Initialize();
+    Time::Initialize();
 
 	///
 	/// メインループ
