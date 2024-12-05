@@ -261,6 +261,7 @@
     <ClCompile Include="Engine\Utility\Time.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\eScene\SampleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -440,6 +441,7 @@
     <ClInclude Include="Engine\Utility\Time.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\eScene\SampleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shader\LineDrawer.hlsli">
