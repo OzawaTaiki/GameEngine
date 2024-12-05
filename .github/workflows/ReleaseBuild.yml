@@ -5,7 +5,7 @@ on:
       - master
 env:
   #リポジトリのルートディレクトリを起点としたソリューションファイルのパス
-  SOLUTION_FILE_PATH: project/GameEngine.sln
+  SOLUTION_FILE_PATH: Sample/SampleProject.sln
   #Visual Studio の構成
   CONFIGURATION: Release
   
