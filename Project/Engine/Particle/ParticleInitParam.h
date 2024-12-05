@@ -14,7 +14,7 @@ struct ParticleInitParam
     Vector3 startSize = { 1,1,1 };
     Vector3 endSize = { 1,1,1 };
 
-    // TODO : 回転も変更できるようにする
+    // TODO : 回転も変更できるようにする あと
     // 回転
     Vector3 rotate = { 0,0,0 };
     // 位置

@@ -6,7 +6,7 @@
 #include "Model/ObjectModel.h"
 
 #include "LineDrawer/LineDrawer.h"
-
+#include "Utility/ConfigManager.h"
 
 #include "Particle/ParticleManager.h"
 #include "Particle/ParticleEmitters.h"
@@ -62,8 +62,7 @@ private:
 
     std::unique_ptr<ObjectModel> plane_ = nullptr;
 
-
-
+    ConfigManager* pConfigManager_ = nullptr;
 
 
 #ifdef _DEBUG

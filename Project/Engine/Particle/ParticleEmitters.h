@@ -5,9 +5,11 @@
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
 
+#include <Utility/Config.h>
+
 #include <string>
 #include <array>
-
+#include <vector>
 
 template<class T>
 struct Range
@@ -134,7 +136,14 @@ private:
     std::array <bool, 3>    lockRotationAxes_;      // 軸を固定するか
     Vector3                 lockRotationAxesValue_; // 固定した軸の値
 
-    std::array <bool, 3>     billboardAxes_ = { 1 };     // ビルボードの軸
+    std::array <bool, 3>     billboardAxes_ = { 1 };// ビルボードの軸
+
+    bool                   isFixedDirection_ = false;// 方向を固定するか
+    bool                   isFixedSpeed_ = false;   // スピードを固定するか
+    bool                   isFixedSize_ = false;    // サイズを固定するか
+    bool                   isFixedLifeTime_ = false;// 寿命を固定するか
+    bool                   isFixedColor_ = false;   // 色を固定するか
+    bool                    isFixedAcceleration_ = false;// 加速度を固定するか
 
     float                   delayTime_;             // 発生までの遅延時間
     float                   fadeStartRatio_;        // アルファを変え始める割合
@@ -148,8 +157,16 @@ private:
     bool                    isActive_ = false;     // アクティブか
     bool                    isAlive_ = true;       // まだ生きているか
 
+    Config* pConfig_ = nullptr;     // 設定ファイル
+
     Particle GenerateParticleData();
-    void DisplayDirectionParameters();
     void DisplayFlags();
+
+    void DisplayLifeTimeParameters();
     void DisplaySizeParameters();
+    void DisplaySpeedParameters();
+    void DisplayDirectionParameters();
+    void DisplayAccelerationParameters();
+    void DisplayColorParameters();
+
 };

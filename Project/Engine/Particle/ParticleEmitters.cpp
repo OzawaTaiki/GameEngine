@@ -17,6 +17,8 @@ void ParticleEmitter::Setting(const std::string& _name)
 
     ConfigManager* instance = ConfigManager::GetInstance();
 
+    instance->SetDirectoryPath("resources/Data/Particles/Emitters");
+
     instance->SetVariable(name_, "lifeTime_min", &setting_.lifeTime.min);
     instance->SetVariable(name_, "lifeTime_max", &setting_.lifeTime.max);
     instance->SetVariable(name_, "size_min", &setting_.size.min);
@@ -312,7 +314,7 @@ void ParticleEmitter::ShowDebugWinsow()
     ImGui::BeginTabBar("Emitter");
     if (ImGui::BeginTabItem(name_.c_str()))
     {
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 0.5f));
 
         if (ImGui::TreeNodeEx("Emitter", ImGuiTreeNodeFlags_Framed))
         {
@@ -356,20 +358,18 @@ void ParticleEmitter::ShowDebugWinsow()
 
         if (ImGui::TreeNodeEx("Particle_Init", ImGuiTreeNodeFlags_Framed))
         {
-            ImGui::DragFloatRange2("lifeTime", &setting_.lifeTime.min, &setting_.lifeTime.max, 0.01f);
-            ImGui::DragFloat3("size_min", &setting_.size.min.x, 0.01f);
-            ImGui::DragFloat3("size_max", &setting_.size.max.x, 0.01f);
-            //ImGui::DragFloat3("rotate_min", &setting_.rotate.min.x, 0.01f);
-            //ImGui::DragFloat3("rotate_max", &setting_.rotate.max.x, 0.01f);
-            ImGui::DragFloatRange2("spped", &setting_.spped.min, &setting_.spped.max, 0.01f);
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.18f, 0.22f, 0.58f, 0.71f));
 
+            DisplayLifeTimeParameters();
+            DisplaySizeParameters();
             DisplayDirectionParameters();
+            DisplaySpeedParameters();
+            DisplayAccelerationParameters();
+            DisplayColorParameters();
 
-            ImGui::DragFloat3("acceleration_min", &setting_.acceleration.min.x, 0.01f);
-            ImGui::DragFloat3("acceleration_max", &setting_.acceleration.max.x, 0.01f);
-            ImGui::ColorEdit4("color_min", &setting_.color.min.x);
-            ImGui::ColorEdit4("color_max", &setting_.color.max.x);
+            ImGui::PopStyleColor();
             ImGui::TreePop();
+
         }
         ImGui::PopStyleColor();
 
@@ -398,7 +398,7 @@ void ParticleEmitter::ShowDebugWinsow()
 
 void ParticleEmitter::DisplayDirectionParameters()
 {
-    if (ImGui::TreeNode("Direction"))
+    if (ImGui::TreeNodeEx("Direction", ImGuiTreeNodeFlags_Framed))
     {
         float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
 
@@ -420,11 +420,31 @@ void ParticleEmitter::DisplayDirectionParameters()
         ImGui::DragFloat("Z", &lockRotationAxesValue_.z, 0.01f);
         ImGui::EndDisabled();*/
 
+        ImGui::PushID("direction");
+        ImGui::Checkbox("FixedDirection", &isFixedDirection_);
+
         ImGui::BeginDisabled(particleDirection_ != ParticleDirection::Random);
-        ImGui::SeparatorText("Direction Range");
-        ImGui::DragFloat3("min", &setting_.direction.min.x, 0.01f);
-        ImGui::DragFloat3("max", &setting_.direction.max.x, 0.01f);
+        ImGui::SeparatorText("");
+
+        if (isFixedDirection_)
+        {
+            ImGui::DragFloat3("Fix", &setting_.direction.min.x, 0.01f);
+            setting_.direction.max = setting_.direction.min;
+            ImGui::BeginDisabled(true);
+            ImGui::DragFloat3("Disabled", &setting_.direction.max.x);
+            ImGui::EndDisabled();
+        }
+        else
+        {
+            ImGui::DragFloat3("Min", &setting_.direction.min.x, 0.01f);
+            ImGui::DragFloat3("Max", &setting_.direction.max.x, 0.01f);
+        }
         ImGui::EndDisabled();
+        ImGui::PopID();
+
+
+
+
 
         ImGui::TreePop();
     }
@@ -437,6 +457,78 @@ void ParticleEmitter::DisplayDirectionParameters()
             setting_.direction.max[index] = lockRotationAxesValue_[index];
         }
     }
+
+}
+
+void ParticleEmitter::DisplayAccelerationParameters()
+{
+    ImGui::PushID("Acceleration");
+   if( ImGui::TreeNodeEx("Acceleration",ImGuiTreeNodeFlags_Framed))
+   {
+       ImGui::Checkbox("Fixed", &isFixedAcceleration_);
+
+       ImGui::SeparatorText("");
+       if (isFixedAcceleration_)
+       {
+           ImGui::DragFloat3("Fix", &setting_.acceleration.min.x, 0.01f);
+           setting_.acceleration.max = setting_.acceleration.min;
+           ImGui::BeginDisabled(true);
+           ImGui::DragFloat3("Disabled", &setting_.acceleration.max.x);
+           ImGui::EndDisabled();
+       }
+       else
+       {
+           ImGui::DragFloat3("Min", &setting_.acceleration.min.x, 0.01f);
+           ImGui::DragFloat3("Max", &setting_.acceleration.max.x, 0.01f);
+       }
+       ImGui::TreePop();
+   }
+
+    ImGui::PopID();
+}
+
+void ParticleEmitter::DisplayColorParameters()
+{
+    ImGui::PushID("Color");
+    if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Columns(2, "colorChec", false);
+        ImGui::BeginDisabled(changeColor_ || randomColor_);
+        ImGui::Checkbox("Fixed", &isFixedColor_);
+        ImGui::EndDisabled();
+
+        ImGui::BeginDisabled(isFixedColor_||randomColor_);
+        ImGui::Checkbox("Change", &changeColor_);
+        ImGui::EndDisabled();
+
+        ImGui::NextColumn();
+
+        ImGui::BeginDisabled(isFixedColor_||changeColor_);
+        ImGui::Checkbox("Ramdom", &randomColor_);
+        ImGui::EndDisabled();
+
+        ImGui::Checkbox("FadeAlpha", &fadeAlpha_);
+        ImGui::Columns(1);
+
+
+
+        ImGui::SeparatorText("");
+        if (isFixedColor_)
+        {
+            ImGui::ColorEdit4("Fix", &setting_.color.min.x);
+            setting_.color.max = setting_.color.min;
+            ImGui::BeginDisabled(true);
+            ImGui::ColorEdit4("Disabled", &setting_.color.max.x);
+            ImGui::EndDisabled();
+        }
+        else if (!randomColor_)
+        {
+            ImGui::ColorEdit4("Min", &setting_.color.min.x);
+            ImGui::ColorEdit4("Max", &setting_.color.max.x);
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
 
 }
 
@@ -471,6 +563,7 @@ void ParticleEmitter::DisplayFlags()
     ImGui::SameLine();
     ImGui::Checkbox("Z", &lockRotationAxes_[2]);*/
 
+    ImGui::BeginDisabled(!isEnableBillboard_);
     ImGui::SeparatorText("use billboard");
     ImGui::PushID("billboard");
     ImGui::Checkbox("X", &billboardAxes_[0]);
@@ -479,13 +572,106 @@ void ParticleEmitter::DisplayFlags()
     ImGui::SameLine();
     ImGui::Checkbox("Z", &billboardAxes_[2]);
     ImGui::PopID();
+    ImGui::EndDisabled();
 
+}
+
+void ParticleEmitter::DisplayLifeTimeParameters()
+{
+    float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
+
+    ImGui::PushID("LifeTime");
+    if (ImGui::TreeNodeEx("LifeTime", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Checkbox("Fixed", &isFixedLifeTime_);
+        ImGui::SeparatorText("");
+
+        if (isFixedLifeTime_)
+        {
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Fix", &setting_.lifeTime.min, 0.01f, 0);
+            setting_.lifeTime.max = setting_.lifeTime.min;
+            ImGui::BeginDisabled(true);
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Disabled", &setting_.lifeTime.max);
+            ImGui::EndDisabled();
+        }
+        else
+        {
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Min", &setting_.lifeTime.min, 0.01f, 0.0f, setting_.lifeTime.max);
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Max", &setting_.lifeTime.max, 0.01f, setting_.lifeTime.min);
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
 }
 
 void ParticleEmitter::DisplaySizeParameters()
 {
-    // TODO: パラメータごとにfixedFlagを設定する（固定値か否か）
-    // そのフラグを参照して、DragFloatを一つにして,minを使う 後にmaxにminを代入する
-    // フラグを用意するパラメータ
-    // lifeTime,size,speed,direction,acceleration,color
+    if (ImGui::TreeNodeEx("Size", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Columns(2, "chec",false);
+        if (ImGui::Checkbox("fixedSize", &isFixedSize_))
+            changeSize_ = false;
+        ImGui::NextColumn();
+        if (ImGui::Checkbox("ChangeSize", &changeSize_))
+            isFixedSize_ = false;
+
+        if (!(isFixedSize_ || changeSize_))
+            isFixedSize_ = true;
+
+        ImGui::Columns(1);
+
+        ImGui::SeparatorText("");
+
+        if (isFixedSize_)
+        {
+            ImGui::DragFloat3("Fix_Size", &setting_.size.min.x, 0.01f);
+            setting_.size.max = setting_.size.min;
+            ImGui::BeginDisabled(true);
+            ImGui::DragFloat3("Disabled", &setting_.size.max.x);
+            ImGui::EndDisabled();
+        }
+        else
+        {
+            ImGui::DragFloat3("Start_Size", &setting_.size.min.x, 0.01f);
+            ImGui::DragFloat3("End_Size", &setting_.size.max.x, 0.01f);
+        }
+        ImGui::TreePop();
+    }
+
+}
+
+void ParticleEmitter::DisplaySpeedParameters()
+{
+    float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
+
+    ImGui::PushID("Speed");
+    if(ImGui::TreeNodeEx("Speed", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Checkbox("Fixed", &isFixedSpeed_);
+        ImGui::SeparatorText("");
+
+        if (isFixedSpeed_)
+        {
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Fix", &setting_.spped.min, 0.01f);
+            setting_.spped.max = setting_.spped.min;
+            ImGui::BeginDisabled(true);
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Disabled", &setting_.spped.max);
+            ImGui::EndDisabled();
+        }
+        else
+        {
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Min", &setting_.spped.min, 0.01f);
+            ImGui::SetNextItemWidth(width * 4);
+            ImGui::DragFloat("Max", &setting_.spped.max, 0.01f);
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
 }

@@ -31,7 +31,7 @@ void SceneManager::Initialize(const std::string& _name)
     configManager_ = ConfigManager::GetInstance();
     configManager_->Initialize();
 
-    configManager_->SetSceneNane(_name);
+    configManager_->SetSceneName(_name);
 
     currentScene_ = it->second();
     currentSceneName_ = _name;
@@ -80,7 +80,7 @@ void SceneManager::ChangeScene()
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
 
-    instance->configManager_->SetSceneNane(instance->currentSceneName_);
+    instance->configManager_->SetSceneName(instance->currentSceneName_);
 }
 
 #ifdef _DEBUG

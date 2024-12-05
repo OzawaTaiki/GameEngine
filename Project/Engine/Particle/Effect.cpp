@@ -8,6 +8,13 @@
 void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
+
+    ConfigManager* instance = ConfigManager::GetInstance();
+
+    instance->SetDirectoryPath("resources/Data/Particles/Effects");
+
+    instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    
 }
 
 void Effect::Update()
