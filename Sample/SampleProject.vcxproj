@@ -58,7 +58,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine\externals\assimp\include;$(ProjectDir)Engine\externals\DirectXTex;$(ProjectDir)Engine\externals\nlohmann;$(ProjectDir)Engine\externals\imgui;$(ProjectDir)Engine\Engine\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\externals\assimp\include;$(ProjectDir)..\Engine\externals\DirectXTex;$(ProjectDir)..\Engine\externals\nlohmann;$(ProjectDir)..\Engine\externals\imgui;$(ProjectDir)..\Engine\Engine\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine\externals\assimp\include;$(ProjectDir)Engine\externals\DirectXTex;$(ProjectDir)Engine\externals\nlohmann;$(ProjectDir)Engine\externals\imgui;$(ProjectDir)Engine\Engine\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\externals\assimp\include;$(ProjectDir)..\Engine\externals\DirectXTex;$(ProjectDir)..\Engine\externals\nlohmann;$(ProjectDir)..\Engine\externals\imgui;$(ProjectDir)..\Engine\Engine\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -88,6 +88,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Engine\GameEngine.vcxproj">
+      <Project>{9fb9cd27-3069-43a4-90e8-44bc0a21d5da}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Project\Engine\GameEngine.vcxproj">
       <Project>{f79fd642-70bd-4c9f-8b88-ea7815757679}</Project>
     </ProjectReference>
