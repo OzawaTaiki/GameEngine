@@ -1,4 +1,4 @@
-name: DebugBuild
+name: ReleaseBuild
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ env:
   #リポジトリのルートディレクトリを起点としたソリューションファイルのパス
   SOLUTION_FILE_PATH: Sample/SampleProject.sln
   #Visual Studio の構成
-  CONFIGURATION: Debug
+  CONFIGURATION: Release
   
 jobs:
   build:
