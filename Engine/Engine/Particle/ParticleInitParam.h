@@ -1,6 +1,8 @@
 #pragma once
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
+#include "Math/Matrix4x4.h"
+
 struct ParticleInitParam
 {
     // 有効時間
@@ -12,6 +14,7 @@ struct ParticleInitParam
     Vector3 startSize = { 1,1,1 };
     Vector3 endSize = { 1,1,1 };
 
+    // TODO : 回転も変更できるようにする あと
     // 回転
     Vector3 rotate = { 0,0,0 };
     // 位置
@@ -33,4 +36,6 @@ struct ParticleInitParam
     // フェード
     bool isFade = false;
     float fadeRatio = 0.0f;
+
+    Matrix4x4 directionMatrix = Matrix4x4::Identity();
 };

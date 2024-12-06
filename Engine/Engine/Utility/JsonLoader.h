@@ -45,6 +45,8 @@ public:
 	void MakeJsonFile();
 
 	void SaveJson(const std::string& _groupName);
+    void SetFolderPath(const std::string& _directory) { folderPath_ = _directory; }
+
 
 	void SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride = true);
 	template<typename T>
@@ -150,7 +152,7 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _gro
 		for( const Datum& datum : it->second)
 		{
 			if (std::holds_alternative<T>(datum.datum))
-				result.push_back(std::get<T>(datum.datum));
+				result.emplace_back(std::get<T>(datum.datum));
 		}
 		return result;
 	}

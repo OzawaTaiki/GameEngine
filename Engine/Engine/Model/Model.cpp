@@ -145,6 +145,24 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     }
 }
 
+void Model::SetUVTransform(const Vector2& _transform, uint32_t _index)
+{
+    material_[_index]->transform_ = _transform;
+    material_[_index]->TransferData();
+}
+
+void Model::SetUVScale(const Vector2& _scale, uint32_t _index)
+{
+    material_[_index]->scale_ = _scale;
+    material_[_index]->TransferData();
+}
+
+void Model::SetUVRotation(float _rotation, uint32_t _index)
+{
+    material_[_index]->rotation_ = _rotation;
+    material_[_index]->TransferData();
+}
+
 Vector3 Model::GetMin(size_t _index) const
 {
     if (_index == -1)

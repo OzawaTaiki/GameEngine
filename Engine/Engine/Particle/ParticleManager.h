@@ -15,11 +15,14 @@ public:
     ~ParticleManager();
 
     void Initialize();
-    void Update(const Camera* _camera);
+    void Update(const Vector3& _cRotate);
     void Draw(const Camera* _camera);
 
     void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle = UINT32_MAX);
+    void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
+    void SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle);
 
+    
     void AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles);
 private:
 
@@ -40,6 +43,7 @@ private:
         uint32_t srvIndex;
         uint32_t instanceNum;
         ParticleEmitter* emitterPtr;
+
     };
 
     void PreDraw();

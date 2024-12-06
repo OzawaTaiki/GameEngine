@@ -58,8 +58,8 @@ void Camera::Draw()
 void Camera::TransferData()
 {
     // ビュー行列の逆行列を計算してカメラの位置を抽出
-    Matrix4x4 iView = Inverse(matView_);
-    translate_ = { iView.m[3][0], iView.m[3][1], iView.m[3][2] };
+    //Matrix4x4 iView = Inverse(matView_);
+    //translate_ = { iView.m[3][0], iView.m[3][1], iView.m[3][2] };
 
     // ビュー・プロジェクション行列を計算
     matViewProjection_ = matView_ * matProjection_;

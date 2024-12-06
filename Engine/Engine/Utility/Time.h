@@ -13,7 +13,9 @@ public:
     static void Initialize();
     static void Update();
 
-    static double GetDeltaTime() { return deltaTime_; }
+    template<typename T>
+    static T GetDeltaTime() { return static_cast<T>(deltaTime_); }
+
     static double GetTotalTime() { return totalTime_; }
     static double GetFramerate() { return framerate_; }
     static double GetCurrentTime();

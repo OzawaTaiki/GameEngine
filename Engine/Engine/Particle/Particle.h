@@ -36,6 +36,7 @@ public:
     Vector3 GetRotation() const { return rotation_; }
     Vector3 GetScale() const { return scale_; }
     Vector4 GetColor() const { return color_; }
+    Matrix4x4 GetDirectionMatrix() const { return directionMatrix_; }
 
 private:
 
@@ -67,6 +68,8 @@ private:
     bool isFade_;
     // フェードを始める割合
     float fadeRatio_;
+
+    Matrix4x4 directionMatrix_ = Matrix4x4::Identity();
 
 
 };

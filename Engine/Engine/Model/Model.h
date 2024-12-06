@@ -42,6 +42,10 @@ public:
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }
 
+    void SetUVTransform(const Vector2& _transform,uint32_t _index);
+    void SetUVScale(const Vector2& _scale, uint32_t _index);
+    void SetUVRotation(float _rotation, uint32_t _index);
+
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }
 

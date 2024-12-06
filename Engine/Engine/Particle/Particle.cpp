@@ -64,6 +64,8 @@ void Particle::Initialize(const ParticleInitParam& _param)
     velocity_ = direction_.Normalize() * speed_;
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 
+    directionMatrix_ = _param.directionMatrix;
+
 }
 
 void Particle::Update()

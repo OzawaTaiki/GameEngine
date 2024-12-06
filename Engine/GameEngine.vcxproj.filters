@@ -261,6 +261,15 @@
     <ClCompile Include="Engine\Utility\Time.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\eScene\ParticleTestScene.cpp">
+      <Filter>Engine\eScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\Effect.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utility\Config.cpp">
+      <Filter>Engine\Utility</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\eScene\SampleScene.cpp">
       <Filter>Engine\eScene</Filter>
     </ClCompile>
@@ -445,6 +454,15 @@
     </ClInclude>
     <ClInclude Include="Engine\eScene\SampleScene.h">
       <Filter>Engine\eScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\eScene\ParticleTestScene.h">
+      <Filter>Engine\eScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\Effect.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utility\Config.h">
+      <Filter>Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

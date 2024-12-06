@@ -12,14 +12,18 @@ void DebugCamera::Initialize()
 void DebugCamera::Update()
 {
     Vector3 move;
-    Input::GetInstance()->GetMove(move,0.1f);
+    // 左シフト押しながら移動
+    if (Input::GetInstance()->IsKeyPressed(DIK_LSHIFT))
+        Input::GetInstance()->GetMove(move, 0.1f);
     translate_.y += move.y;
     move.y = 0;
     Vector3 rot;
-    Input::GetInstance()->GetRotate(rot);
-    if (Input::GetInstance()->IsMousePressed(1))
-        rotation_ += rot;
-    Matrix4x4 matRot = MakeRotateMatrix(rotation_);
+
+    // ホイールクリックでカメラ回転
+    if (Input::GetInstance()->IsMousePressed(2))
+        Input::GetInstance()->GetRotate(rot);
+        rotate_ += rot;
+    Matrix4x4 matRot = MakeRotateMatrix(rotate_);
 
 
     Vector3 rotVelo = TransformNormal(move, matRot);
@@ -28,7 +32,7 @@ void DebugCamera::Update()
     translate_.z += rotVelo.z;
 
 
-    matView_ = Inverse(MakeAffineMatrix(scale_, rotation_, translate_));
+    matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
 
 }
 

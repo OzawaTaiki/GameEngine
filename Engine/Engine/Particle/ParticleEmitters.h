@@ -5,8 +5,11 @@
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
 
-#include <string>
+#include <Utility/Config.h>
 
+#include <string>
+#include <array>
+#include <vector>
 
 template<class T>
 struct Range
@@ -45,6 +48,20 @@ enum class ParticleDirection
     Random
 };
 
+/*
+
+    struct colorKey{
+        float time;
+        vector4 color;
+    }
+    std::vector<colorKey> colorKeys;
+
+    １グループ内での発生タイミング ０～
+
+
+
+*/
+
 
 class Particle;
 class ParticleEmitter
@@ -54,24 +71,7 @@ public:
     ParticleEmitter() = default;
     ~ParticleEmitter() = default;
 
-    /// <summary>
-    /// エミッターの設定
-    /// </summary>
-    /// <param name="_center">中心座標</param>
-    /// <param name="_rotate">回転</param>
-    /// <param name="_countPerEmit">回あたりの発生数</param>
-    /// <param name="_emitPerSec">秒あたりの発生回数</param>
-    /// <param name="_maxParticle">最大数</param>
-    /// <param name=""></param>
-    void Setting(const Vector3& _center,
-                 const Vector3& _rotate,
-                 uint32_t _countPerEmit,
-                 uint32_t _emitPerSec,
-                 uint32_t _maxParticle,
-                 bool _randomColor,
-                 bool _fadeAlpha,
-                 float _fadeStartRatio
-                 );
+
     void Setting(const std::string& _name);
 
     void Update();
@@ -82,17 +82,35 @@ public:
     void SetShape_Circle(float _radius);
 
     void SetWorldMatrix(const Matrix4x4* _mat) { parentMatWorld_ = _mat; }
+    void SetModelPath(const std::string& _path) { useModelPath_ = _path; }
     void SetCenter(const Vector3& _center) { position_ = _center; }
-    void SetEmit(bool _emit) { emit_ = _emit; }
+    void SetActive(bool _active);
+    void SetAlive(bool _alive) { isAlive_ = _alive; }
 
-    void Emit();
+    bool IsActive() const { return isActive_; }
+    bool IsAlive() const { return isAlive_; }
+    bool EnableBillboard() const { return isEnableBillboard_; }
+    bool ShouldFaceDirection() const { return isLengthScalingEnabled_; }
+
+    float GetDelayTime() const { return delayTime_; }
+    float GetDuration() const { return duration_; }
+    std::array<bool, 3> GetBillboardAxes() const { return billboardAxes_; }
 
     std::string GetName() const { return name_; }
+    std::string GetModelPath() const { return useModelPath_; }
+
+    void ShowDebugWinsow();
+
+    void Reset();
 
     EmitParticleSettings    setting_{};
 private:
 
     std::string             name_;
+    std::string             useModelPath_;
+    char                    name_buffer_[256];                 //imgui で入力用
+    std::string             useTextruePath_;
+    char                    texture_buffer_[256];              //imgui で入力用
 
     float                   currentTime_            = 0;
     float                   deltaTime_              = 1.0f / 60.0f;
@@ -104,23 +122,51 @@ private:
     Vector3                 position_;
     Vector3                 offset_;
     Vector3                 rotate_;
-    Vector3                 size_;
-    float                   radius_;
+    Vector3                 size_ = { 1,1,1 };
+    float                   radius_ = 1;
 
-    bool                    loop_;              // ループするか
-    bool                    fadeAlpha_;         // 生成後にアルファを変更するか
-    bool                    changeSize_;        // 生成後にサイズを変更するか
-    bool                    changeColor_;       // 生成後に色を変更するか
-    bool                    randomColor_;       // 色をランダムで生成するか
-    float                   fadeStartRatio_;    // アルファを変え始める割合
-    uint32_t                maxParticles_;      // 最大数
-    uint32_t                countPerEmit_;      // 回当たりの発生数
-    uint32_t                emitPerSec_;        // 秒あたりの発生回数
-    uint32_t                emitRepeatCount_;   // 繰り返し回数
-    uint32_t                emitCount_;         // 発生回数
+    bool                    loop_;                  // ループするか
+    bool                    fadeAlpha_;             // 生成後にアルファを変更するか
+    bool                    changeSize_;            // 生成後にサイズを変更するか
+    bool                    changeColor_;           // 生成後に色を変更するか
+    bool                    randomColor_;           // 色をランダムで生成するか
+    bool                    isEnableBillboard_;     // ビルボードを使用するか
+    bool                    isLengthScalingEnabled_;// 方向を向くか
 
-    bool                    emit_ = false;
+    std::array <bool, 3>    lockRotationAxes_;      // 軸を固定するか
+    Vector3                 lockRotationAxesValue_; // 固定した軸の値
+
+    std::array <bool, 3>     billboardAxes_ = { 1 };// ビルボードの軸
+
+    bool                   isFixedDirection_ = false;// 方向を固定するか
+    bool                   isFixedSpeed_ = false;   // スピードを固定するか
+    bool                   isFixedSize_ = false;    // サイズを固定するか
+    bool                   isFixedLifeTime_ = false;// 寿命を固定するか
+    bool                   isFixedColor_ = false;   // 色を固定するか
+    bool                    isFixedAcceleration_ = false;// 加速度を固定するか
+
+    float                   delayTime_;             // 発生までの遅延時間
+    float                   fadeStartRatio_;        // アルファを変え始める割合
+    float                   duration_ = 1;          // エミッターの持続時間
+    uint32_t                maxParticles_;          // 最大数
+    uint32_t                countPerEmit_ = 1;      // 回当たりの発生数
+    uint32_t                emitPerSec_ = 1;        // 秒あたりの発生回数
+    uint32_t                emitRepeatCount_ = 1;   // 繰り返し回数
+    uint32_t                emitCount_ = 1;         // 発生回数
+
+    bool                    isActive_ = false;     // アクティブか
+    bool                    isAlive_ = true;       // まだ生きているか
+
+    Config* pConfig_ = nullptr;     // 設定ファイル
 
     Particle GenerateParticleData();
-    void EmitParticles();
+    void DisplayFlags();
+
+    void DisplayLifeTimeParameters();
+    void DisplaySizeParameters();
+    void DisplaySpeedParameters();
+    void DisplayDirectionParameters();
+    void DisplayAccelerationParameters();
+    void DisplayColorParameters();
+
 };

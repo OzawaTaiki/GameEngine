@@ -15,8 +15,7 @@
 
 /*-----シーン-----*/
 #include "eScene/SceneManager.h"
-//#include "Scene/GameScene.h"
-//#include "Scene/TitleScene.h"
+#include "eScene/ParticleTestScene.h"
 /*---------------*/
 
 
@@ -40,9 +39,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize();
 
-	ConfigManager::GetInstance()->Initialize();
-	ConfigManager::GetInstance()->LoadData();
-
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("white.png");
 	TextureManager::GetInstance()->Load("cube.jpg");
@@ -60,7 +56,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//SceneManager::RegisterScene("title", TitleScene::Create);
 	//SceneManager::RegisterScene("game", GameScene::Create);
-	SceneManager::GetInstance()->Initialize("title");
+#ifdef _DEBUG
+	SceneManager::RegisterScene("particle", ParticleTestScene::Create);
+#endif // _DEBUG
+
+	SceneManager::GetInstance()->Initialize("particle");
 
     Time::Initialize();
 
