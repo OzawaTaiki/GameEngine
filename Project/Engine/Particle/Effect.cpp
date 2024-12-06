@@ -5,6 +5,7 @@
 // TODO : エフェクトの保存機能を実装する
 // TODO : エフェクトの読み込み機能を実装する
 
+
 void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
@@ -13,8 +14,11 @@ void Effect::Initialize(const std::string& _name)
 
     instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
+    emitterNames_.push_back("empty");
+
     instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&isLoop_));
-    
+    instance->SetVariable(name_, "emitters", &(*emitterNames_.begin()));
+
 }
 
 void Effect::Update()
@@ -56,6 +60,14 @@ void Effect::Update()
 
 ParticleEmitter* Effect::AddEmitter(const std::string& _name)
 {
+    if (emitterNames_.size() < kMaxEmitters)
+        emitterNames_.emplace_back(_name);
+    else
+        return nullptr;
+
+    if (emitterNames_[0] == "empty")
+        emitterNames_[0] = _name;
+
     ParticleEmitter& emitter = emitters_.emplace_back();
 
     emitter.Setting(_name);
@@ -70,12 +82,14 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
 
     for (const ParticleEmitter& emitter : emitters_)
     {
-        list.push_back(const_cast<ParticleEmitter*>(&emitter));
+        list.emplace_back(const_cast<ParticleEmitter*>(&emitter));
     }
 
     return list;
 }
 
-void Effect::Save()
+void Effect::Save() const
 {
+    ConfigManager::GetInstance()->SetDirectoryPath("resources/Data/Particles/Effects");
+    ConfigManager::GetInstance()->SaveData(name_);
 }

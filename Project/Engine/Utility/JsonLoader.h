@@ -152,7 +152,7 @@ inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _gro
 		for( const Datum& datum : it->second)
 		{
 			if (std::holds_alternative<T>(datum.datum))
-				result.push_back(std::get<T>(datum.datum));
+				result.emplace_back(std::get<T>(datum.datum));
 		}
 		return result;
 	}

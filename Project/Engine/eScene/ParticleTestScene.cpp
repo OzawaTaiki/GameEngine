@@ -133,7 +133,17 @@ void ParticleTestScene::ImGui()
     static bool isActive = false;
     ImGui::Checkbox("Active", &isActive);
     if (selectedEffect_ != effects_.end())
+    {
         selectedEffect_->SetActive(isActive);
+    }
+
+    if (selectedEffect_ != effects_.end())
+    {
+        if (ImGui::Button("Save"))
+        {
+            selectedEffect_->Save();
+        }
+    }
 
 
 #pragma endregion

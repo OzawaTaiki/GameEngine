@@ -24,14 +24,17 @@ public:
 
     void SetActive(bool _active) { isActive_ = _active; }
 
-    void Save();
+    void Save()const;
 private:
+
+    static const uint32_t          kMaxEmitters = 20;  // 最大エミッター数
 
     std::string                     name_;              // エフェクトの名前
     std::list<ParticleEmitter>      emitters_;          // エミッターのリスト
+    std::vector<std::string>        emitterNames_;      // エミッターの名前リスト
 
 
-    float                       elapsedTime_;       // 経過時間
-    bool                        isLoop_;            // ループするか
-    bool                        isActive_;          // アクティブか
+    float                           elapsedTime_;       // 経過時間
+    bool                            isLoop_;            // ループするか
+    bool                            isActive_;          // アクティブか
 };

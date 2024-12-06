@@ -31,6 +31,8 @@ void SceneManager::Initialize(const std::string& _name)
     configManager_ = ConfigManager::GetInstance();
     configManager_->Initialize();
 
+    configManager_->LoadData();
+
     configManager_->SetSceneName(_name);
 
     currentScene_ = it->second();

@@ -32,8 +32,6 @@ public:
 
     template<typename T>
     void SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr);
-    template<typename T>
-    void SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr);
 
     void SetSceneName(const std::string& _scene);
     void SetDirectoryPath(const std::string& _directoryPath);
@@ -127,7 +125,8 @@ inline void ConfigManager::SetVariable(const std::string& _groupName, const std:
             {
                 for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
                 {
-                    *_variablePtr = std::get<std::string>(value);
+                    std::string str= std::get<std::string>(value);
+                    *_variablePtr = str;
                     ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
                 }
             }
@@ -151,64 +150,4 @@ inline void ConfigManager::SetVariable(const std::string& _groupName, const std:
     }
 
 
-}
-
-template<typename T>
-inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr)
-{
-    if (sceneName_ == "")
-    {
-        return;
-    }
-    if (value_[sceneName_].contains(_groupName))
-    {
-        if (value_[sceneName_][_groupName].contains(_variableName))
-        {
-            if constexpr (std::is_same<T, uint32_t>::value)
-            {
-                *_variablePtr = std::get<std::vector<uint32_t>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-            else if constexpr (std::is_same<T, float>::value)
-            {
-                *_variablePtr = std::get<std::vector<float>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-            else if constexpr (std::is_same<T, Vector2>::value)
-            {
-                *_variablePtr = std::get<std::vector<Vector2>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-            else if constexpr (std::is_same<T, Vector3>::value)
-            {
-                *_variablePtr = std::get<std::vector<Vector3>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-            else if constexpr (std::is_same<T, Vector4>::value)
-            {
-                *_variablePtr = std::get<std::vector<Vector4>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-            else if constexpr (std::is_same<T, std::string>::value)
-            {
-                *_variablePtr = std::get<std::vector<std::string>>(value_[sceneName_][_groupName][_variableName].variable);
-                ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            }
-        }
-        else
-        {
-            ptr_[sceneName_][_groupName][_variableName] = Type();
-            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            value_[sceneName_][_groupName][_variableName] = Type2();
-            value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
-        }
-    }
-    else
-    {
-        ptr_[sceneName_][_groupName] = std::unordered_map<std::string, Type>();
-        ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-
-        value_[sceneName_][_groupName] = std::unordered_map<std::string, Type2>();
-        value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
-    }
 }

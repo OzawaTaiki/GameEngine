@@ -42,7 +42,7 @@ void JsonLoader::LoadJson(const std::string& _groupName, bool _isMakeFile) {
                 for (const auto& [key, values] : dataObj.items()) {
                     for (const auto& value : values)
                     {
-                        data.data[key].push_back(parseDatum(value, _groupName));
+                        data.data[key].emplace_back(parseDatum(value, _groupName));
                     }
                 }
                 dataGroup_[groupName] = data;
@@ -63,7 +63,7 @@ void JsonLoader::SaveJson() {
         for (const auto& [key, values] : dataObj.data)
         {
             for (const auto& value : values)
-                data[key].push_back(DatumToJson(value));
+                data[key].emplace_back(DatumToJson(value));
         }
         jsonData_[groupName] = data;
     }
@@ -86,7 +86,13 @@ void JsonLoader::SaveJson(const std::string& _groupName)
     // ファイルを開く
     std::ofstream outputFile(fileapath);
 
-    assert(outputFile.is_open() && "Cant Open OutputFile");
+    // ファイルが開けなかったら作成
+    if (!outputFile.is_open())
+    {
+        std::filesystem::create_directories(folderPath_);
+        outputFile = std::ofstream(_groupName + ".json");
+    }
+    //assert(&& "Cant Open OutputFile");
     // データをクリア
     json j;
 
@@ -94,7 +100,7 @@ void JsonLoader::SaveJson(const std::string& _groupName)
     for (const auto& [key, values] : dataGroup_[_groupName].data)
     {
         for (const auto& value : values)
-            j[_groupName][key].push_back(DatumToJson(value));
+            j[_groupName][key].emplace_back(DatumToJson(value));
     }
     // ファイルに書き込み
     outputFile << j.dump(4);
@@ -108,10 +114,10 @@ void JsonLoader::SetData(const std::string& _groupname, const std::string& _name
     if(_isOverride)
     {
         dataGroup_[_groupname].data[_name].clear();
-        dataGroup_[_groupname].data[_name].push_back(_data);
+        dataGroup_[_groupname].data[_name].emplace_back(_data);
     }
     else
-        dataGroup_[_groupname].data[_name].push_back(_data);
+        dataGroup_[_groupname].data[_name].emplace_back(_data);
 }
 
 JsonLoader::Datum JsonLoader::parseDatum(const json& j, const std::string& _groupName)

@@ -2,6 +2,7 @@
 #include "JsonLoader.h"
 #include "Config.h"
 #include <Windows.h>
+#include "Utility/Debug.h"
 
 #include <sstream>
 #include <fstream>
@@ -32,7 +33,10 @@ void ConfigManager::Draw()
 void ConfigManager::LoadRootDirectory()
 {
     LoadFilesRecursively(rootDirectory_);
+    LoadData();
 }
+
+// TODO:読み込んだstringが正常ではない
 
 void ConfigManager::LoadData()
 {
@@ -166,7 +170,8 @@ void ConfigManager::SetSceneName(const std::string& _scene)
 {
     sceneName_ = _scene;
     if (configs_.contains(_scene))
-        directoryPath_ = configs_[_scene]->GetDirectoryPath();
+
+    directoryPath_ = configs_[_scene]->GetDirectoryPath();
     else
         Create(_scene);
 
@@ -176,7 +181,11 @@ void ConfigManager::SetSceneName(const std::string& _scene)
 
 void ConfigManager::SetDirectoryPath(const std::string& _directoryPath)
 {
-    json_->SetFolderPath(_directoryPath);
+    // directoryPath_のさいごに"/" がない場合は追加
+    if (_directoryPath.back() != '/')
+        json_->SetFolderPath(_directoryPath + "/");
+    else
+        directoryPath_ = _directoryPath;
 }
 
 Config* ConfigManager::Create(const std::string& _sceneName)
@@ -197,6 +206,8 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
 {
     for (auto& entry : std::filesystem::directory_iterator(_directoryPath, std::filesystem::directory_options::skip_permission_denied))
     {
+        Utils::Log(entry.path().string() + "\n");
+
         // ディレクトリであれば、再帰的に呼び出してその中も読み込む
         if (std::filesystem::is_directory(entry.path()))
         {
@@ -235,5 +246,7 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
 
         // グループ名リストにファイル名を追加
         groupNames_.push_back(gName);
+
+        Utils::Log("         load comp " + entry.path().string() + "\n");
     }
 }
