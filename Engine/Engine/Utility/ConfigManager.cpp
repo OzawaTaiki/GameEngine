@@ -8,6 +8,8 @@
 #include <fstream>
 #include <filesystem>
 
+// TODO : アニメーションカーブみたいなのを作る
+
 ConfigManager* ConfigManager::GetInstance()
 {
     static ConfigManager instance;
@@ -33,7 +35,6 @@ void ConfigManager::Draw()
 void ConfigManager::LoadRootDirectory()
 {
     LoadFilesRecursively(rootDirectory_);
-    LoadData();
 }
 
 // TODO:読み込んだstringが正常ではない
@@ -60,7 +61,7 @@ void ConfigManager::LoadData()
         return;
     }
 
-    for (auto& [groupName, variable] : ptr_[sceneName_])
+    for (auto& [groupName, variable] : value_[sceneName_])
     {
         auto data = json_->GetData(groupName);
 
@@ -231,6 +232,7 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
             // Configを作成
             Create(sceneName);
             configs_[sceneName]->SetDirectoryPath(path);
+            sceneName_ = sceneName;
 
             continue;
         }
@@ -246,6 +248,8 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
 
         // グループ名リストにファイル名を追加
         groupNames_.push_back(gName);
+
+        value_[sceneName_][gName] = {};
 
         Utils::Log("         load comp " + entry.path().string() + "\n");
     }

@@ -3,6 +3,19 @@
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
 
+template <class T>
+struct ValueTransition
+{
+    T current;
+    T start;
+    T end;
+    bool isChange;
+
+    // イージング関数
+    // TODO : イージングクラスを作成
+
+};
+
 struct ParticleInitParam
 {
     // 有効時間
@@ -14,7 +27,7 @@ struct ParticleInitParam
     Vector3 startSize = { 1,1,1 };
     Vector3 endSize = { 1,1,1 };
 
-    // TODO : 回転も変更できるようにする あと
+    // TODO : 回転も変更できるようにする あとまわし
     // 回転
     Vector3 rotate = { 0,0,0 };
     // 位置

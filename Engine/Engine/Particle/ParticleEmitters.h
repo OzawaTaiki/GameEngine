@@ -99,6 +99,8 @@ public:
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
 
+
+    void Save()const;
     void ShowDebugWinsow();
 
     void Reset();
@@ -143,7 +145,7 @@ private:
     bool                   isFixedSize_ = false;    // サイズを固定するか
     bool                   isFixedLifeTime_ = false;// 寿命を固定するか
     bool                   isFixedColor_ = false;   // 色を固定するか
-    bool                    isFixedAcceleration_ = false;// 加速度を固定するか
+    bool                   isFixedAcceleration_ = false;// 加速度を固定するか
 
     float                   delayTime_;             // 発生までの遅延時間
     float                   fadeStartRatio_;        // アルファを変え始める割合

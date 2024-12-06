@@ -19,6 +19,11 @@ void Effect::Initialize(const std::string& _name)
     instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&isLoop_));
     instance->SetVariable(name_, "emitters", &(*emitterNames_.begin()));
 
+    for (std::string emitterName : emitterNames_)
+    {
+        ParticleEmitter& emitter = emitters_.emplace_back();
+        emitter.Setting(emitterName);
+    }
 }
 
 void Effect::Update()
@@ -92,4 +97,9 @@ void Effect::Save() const
 {
     ConfigManager::GetInstance()->SetDirectoryPath("resources/Data/Particles/Effects");
     ConfigManager::GetInstance()->SaveData(name_);
+
+    for (auto& emitter : emitters_)
+    {
+        emitter.Save();
+    }
 }

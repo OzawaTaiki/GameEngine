@@ -83,7 +83,7 @@ void ParticleEmitter::Setting(const std::string& _name)
         useModelPath_ = "plane/plane.gltf";
 
     if (useTextruePath_.empty())
-        useTextruePath_ = "circle.png";
+        useTextruePath_ = "particle/circle.png";
 
     uint32_t handle = TextureManager::GetInstance()->Load(useTextruePath_);
     ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, handle);
@@ -305,6 +305,13 @@ Particle ParticleEmitter::GenerateParticleData()
 }
 
 
+void ParticleEmitter::Save() const
+{
+    ConfigManager* instance = ConfigManager::GetInstance();
+    instance->SetDirectoryPath("resources/Data/Particles/Emitters");
+    instance->SaveData(name_);
+}
+
 void ParticleEmitter::ShowDebugWinsow()
 {
 #ifdef _DEBUG
@@ -376,7 +383,7 @@ void ParticleEmitter::ShowDebugWinsow()
 
         if (ImGui::Button("save"))
         {
-            ConfigManager::GetInstance()->SaveData(name_);
+            Save();
         }
 
         if (ImGui::Button("add"))
@@ -537,7 +544,6 @@ void ParticleEmitter::DisplayFlags()
 {
     ImGui::Columns(2, "mycolumns", false);
     ImGui::Checkbox("loop", &loop_);
-    ImGui::Checkbox("fadeAlpha", &fadeAlpha_);
     ImGui::BeginDisabled(isLengthScalingEnabled_);
     if (ImGui::Checkbox("useBillboard", &isEnableBillboard_))
         isLengthScalingEnabled_ = false;
@@ -547,13 +553,6 @@ void ParticleEmitter::DisplayFlags()
         isEnableBillboard_ = false;
     ImGui::EndDisabled();
 
-    ImGui::NextColumn();
-
-    ImGui::Checkbox("randomColor", &randomColor_);
-    ImGui::BeginDisabled(randomColor_);
-    ImGui::Checkbox("changeColor", &changeColor_);
-    ImGui::EndDisabled();
-    ImGui::Checkbox("changeSize", &changeSize_);
 
     ImGui::Columns(1);
 
