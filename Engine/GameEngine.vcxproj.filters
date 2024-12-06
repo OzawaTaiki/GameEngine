@@ -270,7 +270,7 @@
     <ClCompile Include="Engine\Utility\Config.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\eScene\SampleScene.cpp" /
+    <ClCompile Include="Engine\eScene\SampleScene.cpp">
       <Filter>Engine\eScene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -452,8 +452,8 @@
     <ClInclude Include="Engine\Utility\Time.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\eScene\SampleScene.h" />
-        <Filter>Engine\eScene</Filter>
+    <ClInclude Include="Engine\eScene\SampleScene.h">
+      <Filter>Engine\eScene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\eScene\ParticleTestScene.h">
       <Filter>Engine\eScene</Filter>
