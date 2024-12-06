@@ -273,6 +273,9 @@
     <ClCompile Include="Engine\eScene\SampleScene.cpp">
       <Filter>Engine\eScene</Filter>
     </ClCompile>
+    <ClCompile Include="Easing.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -463,6 +466,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Utility\Config.h">
       <Filter>Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Easing.h">
+      <Filter>Engine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
