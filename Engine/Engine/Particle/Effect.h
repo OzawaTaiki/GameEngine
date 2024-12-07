@@ -25,6 +25,8 @@ public:
 
     void SetActive(bool _active) { isActive_ = _active; }
 
+    void ExclusionEmitter(const std::string& _name);
+
     void Save()const;
 private:
 

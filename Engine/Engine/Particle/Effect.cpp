@@ -84,6 +84,19 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
     return list;
 }
 
+void Effect::ExclusionEmitter(const std::string& _name)
+{
+    for (auto it = emitters_.begin(); it != emitters_.end();)
+    {
+        if (it->GetName() == _name)
+        {
+            it = emitters_.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
 void Effect::Save() const
 {
     ConfigManager::GetInstance()->SetDirectoryPath("resources/Data/Particles/Effects");

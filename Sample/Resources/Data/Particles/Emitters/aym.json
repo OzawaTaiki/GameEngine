@@ -84,7 +84,7 @@
             0
         ],
         "modelPath": [
-            ""
+            "plane/plane.gltf"
         ],
         "offset": [
             [
@@ -155,7 +155,7 @@
             0.0
         ],
         "texturePath": [
-            ""
+            "particle/circle.png"
         ],
         "useBillboard": [
             0

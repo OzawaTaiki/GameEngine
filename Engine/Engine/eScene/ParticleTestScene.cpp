@@ -145,7 +145,6 @@ void ParticleTestScene::ImGui()
         }
     }
 
-
 #pragma endregion
 
 #pragma region エミッター
@@ -190,6 +189,12 @@ void ParticleTestScene::ImGui()
             if (isSelect[cnt++])
             {
                 emitter->ShowDebugWinsow();
+                if (ImGui::Button("Exclusion"))
+                {
+                    selectedEffect_->ExclusionEmitter(emitter->GetName());
+                    emitters_.remove(emitter);
+                    break;
+                }
             }
         }
     }
