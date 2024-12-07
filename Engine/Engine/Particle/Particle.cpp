@@ -42,6 +42,7 @@ void Particle::Initialize(const ParticleInitParam& _param)
     speed_ = _param.speed;
     direction_ = _param.direction;
     acceleration_ = _param.acceleration;
+    deceleration_ = _param.deceleration;
 
     if (isChangeColor_ = _param.changeColor; isChangeColor_)
     {
@@ -94,8 +95,13 @@ void Particle::Update()
         }
     }
 
-    velocity_ += acceleration_ * kDeltaTime;
+    if (deceleration_ != 0)
+        velocity_ += acceleration_ * kDeltaTime - velocity_ * deceleration_ * kDeltaTime;
+    else
+        velocity_ += acceleration_ * kDeltaTime;
+
     translate_ += velocity_ * kDeltaTime;
+    
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 

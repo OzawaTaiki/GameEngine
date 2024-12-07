@@ -3,6 +3,7 @@
 #include "Particle/ParticleEmitters.h"
 
 #include <string>
+#include <vector>
 #include <list>
 #include <memory>
 

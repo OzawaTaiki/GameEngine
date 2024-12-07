@@ -63,6 +63,7 @@ private:
     Vector3 direction_;
     Vector3 acceleration_;
     Vector3 velocity_;
+    float deceleration_;
 
     // フェードするか否か
     bool isFade_;

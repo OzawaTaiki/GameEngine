@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ImGuiManager/ImGuiManager.h>
+
 class Easing
 {
 public:

@@ -11,8 +11,10 @@ struct ValueTransition
     T end;
     bool isChange;
 
-    // イージング関数
-    // TODO : イージングクラスを作成
+    std::list <T> keys;
+
+    // イージング関数 ポインタで所持
+    float (*pEasingFunc)(float);
 
 };
 
@@ -39,6 +41,8 @@ struct ParticleInitParam
     Vector3 direction = { 0,0,0 };
     // 加速度，重力
     Vector3 acceleration = { 0,0,0 };
+    // 減速係数
+    float deceleration = 0.0f;
 
     // 色
     Vector4 currentColor = { 1,1,1,1 };

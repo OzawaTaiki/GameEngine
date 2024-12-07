@@ -288,12 +288,13 @@ Particle ParticleEmitter::GenerateParticleData()
     param.changeSize = changeSize_;
     param.isFade = fadeAlpha_;
     param.fadeRatio = fadeStartRatio_;
+    param.deceleration = decelelation_;
 
     if (isLengthScalingEnabled_)
     {
         param.changeSize = false;
         param.currentSize = setting_.size.min;
-        param.currentSize.x += 0.25f * param.speed;
+        //param.currentSize.x += 0.25f * param.speed;
 
         param.directionMatrix = DirectionToDirection({ 1,0,0 }, param.direction);
     }
@@ -671,6 +672,9 @@ void ParticleEmitter::DisplaySpeedParameters()
             ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Max", &setting_.spped.max, 0.01f);
         }
+
+        ImGui::DragFloat("Deceleration", &decelelation_, 0.01f);
+
         ImGui::TreePop();
     }
     ImGui::PopID();
