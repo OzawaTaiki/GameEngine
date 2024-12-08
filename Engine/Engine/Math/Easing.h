@@ -2,11 +2,13 @@
 
 #include <ImGuiManager/ImGuiManager.h>
 
+#include <functional>
+
 class Easing
 {
 public:
 
-    // ÉCÅ[ÉYÉCÉì
+    // „Ç§„Éº„Ç∫„Ç§„É≥
     static float EaseInsine(float _t);
     static float EaseInQuad(float _t);
     static float EaseInCubic(float _t);
@@ -18,7 +20,7 @@ public:
     static float EaseInElastic(float _t);
     static float EaseInBounce(float _t);
 
-    // ÉCÅ[ÉYÉAÉEÉg
+    // „Ç§„Éº„Ç∫„Ç¢„Ç¶„Éà
     static float EaseOutSine(float _t);
     static float EaseOutQuad(float _t);
     static float EaseOutCubic(float _t);
@@ -30,7 +32,7 @@ public:
     static float EaseOutElastic(float _t);
     static float EaseOutBounce(float _t);
 
-    // ÉCÅ[ÉYÉCÉìÉAÉEÉg
+    // „Ç§„Éº„Ç∫„Ç§„É≥„Ç¢„Ç¶„Éà
     static float EaseInOutSine(float _t);
     static float EaseInOutQuad(float _t);
     static float EaseInOutCubic(float _t);
@@ -41,5 +43,17 @@ public:
     static float EaseInOutBack(float _t);
     static float EaseInOutElastic(float _t);
     static float EaseInOutBounce(float _t);
+
+
+    static std::function<float(float)> SelectFuocPtr(int _funcNum);
+
+    static int SelectEasingFunc();
+
+private:
+    static const char* easingFuncs[];
+
+    // Èñ¢Êï∞„ÉÜ„Éº„Éñ„É´
+    static float (*pEasingFunc[])(float);
+
 
 };

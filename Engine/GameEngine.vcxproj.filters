@@ -273,7 +273,7 @@
     <ClCompile Include="Engine\eScene\SampleScene.cpp">
       <Filter>Engine\eScene</Filter>
     </ClCompile>
-    <ClCompile Include="Easing.cpp">
+    <ClCompile Include="Engine\Math\Easing.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
   </ItemGroup>
@@ -467,8 +467,51 @@
     <ClInclude Include="Engine\Utility\Config.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Easing.h">
+    <ClInclude Include="Engine\Math\Easing.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Sample\Resources\Shader\LineDrawer.hlsli">
+      <Filter>Resources\Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Object3d.hlsli">
+      <Filter>Resources\Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Particle.hlsli">
+      <Filter>Resources\Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
+      <Filter>Resources\Shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.VS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Object3d.PS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Object3d.VS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Particle.PS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Particle.VS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\SkinningObject3d.VS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Sprite.PS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl">
+      <Filter>Resources\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

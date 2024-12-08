@@ -47,9 +47,6 @@ void ParticleTestScene::Update()
         e.Update();
     }
 
-
-
-
     // シーン関連更新
 #ifdef _DEBUG
     if(Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
@@ -73,9 +70,6 @@ void ParticleTestScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
-
-
-
 }
 
 void ParticleTestScene::Draw()
@@ -188,12 +182,14 @@ void ParticleTestScene::ImGui()
         {
             if (isSelect[cnt++])
             {
-                emitter->ShowDebugWinsow();
-                if (ImGui::Button("Exclusion"))
+                if (emitter->ShowDebugWinsow())
                 {
-                    selectedEffect_->ExclusionEmitter(emitter->GetName());
-                    emitters_.remove(emitter);
-                    break;
+                    if (ImGui::Button("Exclusion"))
+                    {
+                        selectedEffect_->ExclusionEmitter(emitter->GetName());
+                        emitters_.remove(emitter);
+                        break;
+                    }
                 }
             }
         }

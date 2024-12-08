@@ -37,7 +37,6 @@ void ConfigManager::LoadRootDirectory()
     LoadFilesRecursively(rootDirectory_);
 }
 
-// TODO:読み込んだstringが正常ではない
 
 void ConfigManager::LoadData()
 {

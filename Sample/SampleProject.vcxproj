@@ -60,6 +60,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\externals\assimp\include;$(ProjectDir)..\Engine\externals\DirectXTex;$(ProjectDir)..\Engine\externals\nlohmann;$(ProjectDir)..\Engine\externals\imgui;$(ProjectDir)..\Engine\Engine\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -77,6 +78,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\externals\assimp\include;$(ProjectDir)..\Engine\externals\DirectXTex;$(ProjectDir)..\Engine\externals\nlohmann;$(ProjectDir)..\Engine\externals\imgui;$(ProjectDir)..\Engine\Engine\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,9 +93,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Engine\GameEngine.vcxproj">
       <Project>{9fb9cd27-3069-43a4-90e8-44bc0a21d5da}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Project\Engine\GameEngine.vcxproj">
-      <Project>{f79fd642-70bd-4c9f-8b88-ea7815757679}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
