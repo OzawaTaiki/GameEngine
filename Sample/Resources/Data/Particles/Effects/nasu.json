@@ -1,7 +1,9 @@
 {
     "nasu": {
         "emitters": [
-            "nkr"
+            "nkr",
+            "aym",
+            "hehehe"
         ],
         "loop": [
             0

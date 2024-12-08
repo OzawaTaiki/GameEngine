@@ -31,7 +31,10 @@ public:
     void SaveData(const std::string& _groupName);
 
     template<typename T>
-    void SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr);
+    inline void SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr);
+    template<typename T>
+    inline void SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr);
+
 
     void SetSceneName(const std::string& _scene);
     void SetDirectoryPath(const std::string& _directoryPath);
@@ -50,11 +53,19 @@ private:
 
     struct Type
     {
-        std::vector<std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*>> address;
+        std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*,
+            std::vector<uint32_t>*, std::vector<float>*,
+            std::vector<Vector2>*, std::vector<Vector3>*,
+            std::vector<Vector4>*, std::vector<std::string>*
+        > address;
     };
     struct Type2
     {
-        std::vector<std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string>> variable;
+        std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string,
+            std::vector<uint32_t>, std::vector<float>,
+            std::vector<Vector2>, std::vector<Vector3>,
+            std::vector<Vector4>, std::vector<std::string>
+        > variable;
     };
 
     std::map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, Type >>> ptr_;
@@ -68,86 +79,63 @@ private:
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
 };
-
 template<typename T>
 inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr)
 {
     if (sceneName_ == "")
-    {
         return;
-    }
 
-    if(value_[sceneName_].contains(_groupName))
+    // 既存のグループと変数の確認
+    if (value_[sceneName_].contains(_groupName))
     {
         if (value_[sceneName_][_groupName].contains(_variableName))
         {
-            if constexpr (std::is_same<T, uint32_t>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    *_variablePtr = std::get<uint32_t>(value);
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
-            else if constexpr (std::is_same<T, float>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    *_variablePtr = std::get<float>(value);
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
-            else if constexpr (std::is_same<T, Vector2>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    *_variablePtr = std::get<Vector2>(value);
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
-            else if constexpr (std::is_same<T, Vector3>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    *_variablePtr = std::get<Vector3>(value);
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
-            else if constexpr (std::is_same<T, Vector4>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    *_variablePtr = std::get<Vector4>(value);
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
-            else if constexpr (std::is_same<T, std::string>::value)
-            {
-                for (auto& value : value_[sceneName_][_groupName][_variableName].variable)
-                {
-                    std::string str= std::get<std::string>(value);
-                    *_variablePtr = str;
-                    ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-                }
-            }
+            // 単一の値を登録
+            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+            *_variablePtr = std::get<T>(value_[sceneName_][_groupName][_variableName].variable);
         }
         else
         {
-            ptr_[sceneName_][_groupName][_variableName] = Type();
-            ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-
-            value_[sceneName_][_groupName][_variableName] = Type2();
-            value_[sceneName_][_groupName][_variableName].variable.emplace_back(*_variablePtr);
+            // 新しい変数を登録
+            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+            value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
         }
     }
     else
     {
-        ptr_[sceneName_][_groupName] = std::unordered_map<std::string, Type>();
-        ptr_[sceneName_][_groupName][_variableName].address.emplace_back(_variablePtr);
-
-        value_[sceneName_][_groupName] = std::unordered_map<std::string, Type2>();
-        value_[sceneName_][_groupName][_variableName].variable.emplace_back(*_variablePtr);
+        // 新しいグループを登録
+        ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+        value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
     }
+}
 
+template<typename T>
+inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr)
+{
+    if (sceneName_ == "")
+        return;
 
+    // 既存のグループと変数の確認
+    if (value_[sceneName_].contains(_groupName))
+    {
+        // 既存のグループがある場合
+        if (value_[sceneName_][_groupName].contains(_variableName))
+        {
+            // ベクタの値を登録
+            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+            *_variablePtr = std::get<std::vector<T>>(value_[sceneName_][_groupName][_variableName].variable);
+        }
+        else
+        {
+            // 新しいベクタ変数を登録
+            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+            value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
+        }
+    }
+    else
+    {
+        // 新しいグループを登録
+        ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
+        value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
+    }
 }

@@ -3,6 +3,7 @@
 #include "Particle/ParticleEmitters.h"
 
 #include <string>
+#include <vector>
 #include <list>
 #include <memory>
 
@@ -23,6 +24,8 @@ public:
     std::string GetName() const { return name_; }
 
     void SetActive(bool _active) { isActive_ = _active; }
+
+    void ExclusionEmitter(const std::string& _name);
 
     void Save()const;
 private:

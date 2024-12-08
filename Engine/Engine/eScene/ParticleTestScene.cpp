@@ -41,14 +41,14 @@ void ParticleTestScene::Initialize()
 
 void ParticleTestScene::Update()
 {
+#ifdef _DEBUG
     ImGui();
+#endif // _DEBUG
+
     for (auto& e : effects_)
     {
         e.Update();
     }
-
-
-
 
     // シーン関連更新
 #ifdef _DEBUG
@@ -73,9 +73,6 @@ void ParticleTestScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
-
-
-
 }
 
 void ParticleTestScene::Draw()
@@ -145,7 +142,6 @@ void ParticleTestScene::ImGui()
         }
     }
 
-
 #pragma endregion
 
 #pragma region エミッター
@@ -189,7 +185,15 @@ void ParticleTestScene::ImGui()
         {
             if (isSelect[cnt++])
             {
-                emitter->ShowDebugWinsow();
+                if (emitter->ShowDebugWinsow())
+                {
+                    if (ImGui::Button("Exclusion"))
+                    {
+                        selectedEffect_->ExclusionEmitter(emitter->GetName());
+                        emitters_.remove(emitter);
+                        break;
+                    }
+                }
             }
         }
     }

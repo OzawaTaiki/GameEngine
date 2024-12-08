@@ -16,6 +16,7 @@
 /*-----シーン-----*/
 #include "eScene/SceneManager.h"
 #include "eScene/SampleScene.h"
+#include "eScene/ParticleTestScene.h"
 /*---------------*/
 
 
@@ -40,7 +41,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	particle->Initialize();
 
 	ConfigManager::GetInstance()->Initialize();
-	ConfigManager::GetInstance()->LoadData();
 
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("white.png");
@@ -57,8 +57,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	input->Initilize(winApp);
 
 	SceneManager::RegisterScene("Sample", SampleScene::Create);
+    SceneManager::RegisterScene("ParticleTest", ParticleTestScene::Create);
 
-	SceneManager::GetInstance()->Initialize("Sample");
+	SceneManager::GetInstance()->Initialize("ParticleTest");
 
 	Time::Initialize();
 

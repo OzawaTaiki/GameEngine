@@ -2,70 +2,44 @@
 #include "Math/MatrixFunction.h"
 #include "Math/MyLib.h"
 
-void Particle::Initialize(float _lifeTime,
-                          const Vector3& _size,
-                          const Vector3& _rotate,
-                          const Vector3& _pos,
-                          const Vector4& _color,
-                          float _speed,
-                          const Vector3& _direction,
-                          const Vector3& _acceleration,
-                          bool _fade,
-                          float _faderatio)
-{
-    lifeTime_ = _lifeTime;
-    scale_ = _size;
-    rotation_ = _rotate;
-    translate_ = _pos;
-    color_ = _color;
-    speed_ = _speed;
-    direction_ = _direction;
-    acceleration_ = _acceleration;
-    if (isFade_ = _fade; isFade_)
-        fadeRatio_ = _faderatio;
-    else fadeRatio_ = 1.0f;
-
-    isAlive_ = true;
-    currentTime_ = 0;
-
-    velocity_ = direction_.Normalize() * speed_;
-    matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
-}
+#include <algorithm>
 
 void Particle::Initialize(const ParticleInitParam& _param)
 {
-    lifeTime_ = _param.lifeTime;
-    scale_ = _param.currentSize;
-    rotation_ = _param.rotate;
-    translate_ = _param.position;
-    color_ = _param.currentColor;
-    speed_ = _param.speed;
-    direction_ = _param.direction;
-    acceleration_ = _param.acceleration;
+    parameter_ = _param;
 
-    if (isChangeColor_ = _param.changeColor; isChangeColor_)
-    {
-        startColor_ = _param.startColor;
-        endColor_ = _param.endColor;
-    }
+    lifeTime_ = parameter_.lifeTime;
 
-    if (isChangeScale_ = _param.changeSize; isChangeScale_)
-    {
-        minScale_ = _param.startSize;
-        maxScale_ = _param.endSize;
-    }
+    translate_ = parameter_.position;
+    rotation_ = parameter_.rotate;
+    scale_ = parameter_.size;
+    speed_ = parameter_.speed;
 
-    if (isFade_ = _param.isFade; isFade_)
-        fadeRatio_ = _param.fadeRatio;
+    direction_ = parameter_.direction;
+    acceleration_ = parameter_.acceleration;
+
+    deceleration_ = parameter_.deceleration;
+
+    color_ = parameter_.color;
+
+
 
     isAlive_ = true;
-    currentTime_ = 0;
+    currentTime_ = 0.0f;
 
     velocity_ = direction_.Normalize() * speed_;
+
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 
     directionMatrix_ = _param.directionMatrix;
 
+    parameter_.alphaTransition .keys.sort    ([](const KeyFrame<float  >& a, const KeyFrame< float >& b)     {return a.time < b.time; });
+    parameter_.colorTransition .keys.sort    ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
+    parameter_.rotateTransition.keys.sort   ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
+    parameter_.sizeTransition  .keys.sort     ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
+    parameter_.speedTransition .keys.sort    ([](const KeyFrame<float  >& a, const KeyFrame< float >& b)     {return a.time < b.time; });
+
+    t_ = 0;
 }
 
 void Particle::Update()
@@ -79,22 +53,23 @@ void Particle::Update()
         return;
     }
 
-    if (isChangeColor_)
-        color_ = Lerp(startColor_, endColor_, currentTime_ / lifeTime_);
+    t_ = currentTime_ / lifeTime_;
 
-    if(isChangeScale_)
-        scale_ = Lerp(minScale_, maxScale_, currentTime_ / lifeTime_);
+    color_ = parameter_.colorTransition.calculateValue(t_);
+    color_.w = parameter_.alphaTransition.calculateValue(t_);
+    rotation_ = parameter_.rotateTransition.calculateValue(t_);
+    scale_ = parameter_.sizeTransition.calculateValue(t_);
+    speed_ = parameter_.speedTransition.calculateValue(t_);
 
-    if (isFade_)
-    {
-        float t = currentTime_ / lifeTime_;
-        if (t >= fadeRatio_)
-        {
-            color_.w = 1.0f - (t - fadeRatio_) / (1.0f - fadeRatio_);
-        }
-    }
 
-    velocity_ += acceleration_ * kDeltaTime;
+    velocity_ = direction_.Normalize() * speed_;
+
+    velocity_ += acceleration_ * currentTime_;
+
+    if (deceleration_ != 0)
+    velocity_ -= velocity_ * deceleration_ * kDeltaTime;
+
+
     translate_ += velocity_ * kDeltaTime;
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);

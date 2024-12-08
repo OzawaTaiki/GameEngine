@@ -2,10 +2,6 @@
 #include "Utility/Time.h"
 #include "Utility/ConfigManager.h"
 
-// TODO : エフェクトの保存機能を実装する
-// TODO : エフェクトの読み込み機能を実装する
-
-
 void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
@@ -14,11 +10,14 @@ void Effect::Initialize(const std::string& _name)
 
     instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
-    emitterNames_.push_back("empty");
-
     instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&isLoop_));
-    instance->SetVariable(name_, "emitters", &(*emitterNames_.begin()));
+    instance->SetVariable(name_, "emitters", &emitterNames_);
 
+    for (std::string emitterName : emitterNames_)
+    {
+        ParticleEmitter& emitter = emitters_.emplace_back();
+        emitter.Setting(emitterName);
+    }
 }
 
 void Effect::Update()
@@ -65,13 +64,10 @@ ParticleEmitter* Effect::AddEmitter(const std::string& _name)
     else
         return nullptr;
 
-    if (emitterNames_[0] == "empty")
-        emitterNames_[0] = _name;
 
     ParticleEmitter& emitter = emitters_.emplace_back();
 
     emitter.Setting(_name);
-
 
     return &emitter;
 }
@@ -88,8 +84,26 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
     return list;
 }
 
+void Effect::ExclusionEmitter(const std::string& _name)
+{
+    for (auto it = emitters_.begin(); it != emitters_.end();)
+    {
+        if (it->GetName() == _name)
+        {
+            it = emitters_.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
 void Effect::Save() const
 {
     ConfigManager::GetInstance()->SetDirectoryPath("resources/Data/Particles/Effects");
     ConfigManager::GetInstance()->SaveData(name_);
+
+    for (auto& emitter : emitters_)
+    {
+        emitter.Save();
+    }
 }

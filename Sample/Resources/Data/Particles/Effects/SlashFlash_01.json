@@ -1,0 +1,11 @@
+{
+    "SlashFlash_01": {
+        "emitters": [
+            "impactWave",
+            "Sparks"
+        ],
+        "loop": [
+            256
+        ]
+    }
+}
