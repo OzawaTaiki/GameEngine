@@ -412,6 +412,7 @@ bool ParticleEmitter::ShowDebugWinsow()
 
 void ParticleEmitter::DisPlayEmitterParameters()
 {
+#ifdef _DEBUG
     static const char* shapeCombo[1024] = { "Box","Sphere","Circle","None" };
     static const char* directionCombo[1024] = { "inward","outward","random" };
 
@@ -484,10 +485,14 @@ void ParticleEmitter::DisPlayEmitterParameters()
         ImGui::TreePop();
         ImGui::PopStyleColor();
     }
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DisplayLifeTimeParameters()
 {
+#ifdef _DEBUG
+
+
     float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
 
     ImGui::PushID("LifeTime");
@@ -532,10 +537,14 @@ void ParticleEmitter::DisplayLifeTimeParameters()
         ImGui::TreePop();
     }
     ImGui::PopID();
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DisplaySizeParameters()
 {
+#ifdef _DEBUG
+
+
     if (ImGui::TreeNodeEx("Size", ImGuiTreeNodeFlags_Framed))
     {
         ImGui::Columns(2, "chec", false);
@@ -633,11 +642,13 @@ void ParticleEmitter::DisplaySizeParameters()
         }
         ImGui::TreePop();
     }
+#endif // _DEBUG
 
 }
 
 void ParticleEmitter::DisplaySpeedParameters()
 {
+#ifdef _DEBUG
     float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
 
     ImGui::PushID("Speed");
@@ -734,10 +745,14 @@ void ParticleEmitter::DisplaySpeedParameters()
         ImGui::TreePop();
     }
     ImGui::PopID();
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DisplayDirectionParameters()
 {
+#ifdef _DEBUG
+
+
     if (ImGui::TreeNodeEx("Direction", ImGuiTreeNodeFlags_Framed))
     {
         float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
@@ -803,10 +818,14 @@ void ParticleEmitter::DisplayDirectionParameters()
         }
     }*/
 
+#endif // _DEBUG
+
 }
 
 void ParticleEmitter::DisplayAccelerationParameters()
 {
+#ifdef _DEBUG
+
     ImGui::PushID("Acceleration");
    if( ImGui::TreeNodeEx("Acceleration",ImGuiTreeNodeFlags_Framed))
    {
@@ -834,10 +853,12 @@ void ParticleEmitter::DisplayAccelerationParameters()
    }
 
     ImGui::PopID();
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DisplayColorParameters()
 {
+#ifdef _DEBUG
     ImGui::PushID("Color");
     if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_Framed))
     {
@@ -987,10 +1008,14 @@ void ParticleEmitter::DisplayColorParameters()
         ImGui::TreePop();
     }
     ImGui::PopID();
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DisplayFlags()
 {
+#ifdef _DEBUG
+
+
     ImGui::Columns(2, "mycolumns", false);
     ImGui::Checkbox("loop", &loop_);
     ImGui::BeginDisabled(isLengthScalingEnabled_);
@@ -1023,4 +1048,5 @@ void ParticleEmitter::DisplayFlags()
     ImGui::PopID();
     ImGui::EndDisabled();
 
+#endif // _DEBUG
 }

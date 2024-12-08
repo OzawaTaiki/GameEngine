@@ -41,7 +41,10 @@ void ParticleTestScene::Initialize()
 
 void ParticleTestScene::Update()
 {
+#ifdef _DEBUG
     ImGui();
+#endif // _DEBUG
+
     for (auto& e : effects_)
     {
         e.Update();

@@ -332,15 +332,19 @@ float Easing::EaseInOutBounce(float _t)
 
 std::function<float(float)> Easing::SelectFuocPtr(int _funcNum)
 {
+#ifdef _DEBUG
     if (_funcNum < 0 || _funcNum >= IM_ARRAYSIZE(easingFuncs))
         return nullptr;
 
     return pEasingFunc[_funcNum];
+#endif // _DEBUG
 }
 
 int Easing::SelectEasingFunc()
 {
+#ifdef _DEBUG
     static int selectedEasingFunc_ = -1;
     ImGui::Combo("EasingFunc", &selectedEasingFunc_, easingFuncs, IM_ARRAYSIZE(easingFuncs));
     return selectedEasingFunc_;
+#endif // _DEBUG
 }
