@@ -2,7 +2,7 @@
 
 #include "Math/Vector2.h"
 #include "Sprite/Sprite.h"
-
+#include <Utility/Config.h>
 
 #include <string>
 
@@ -51,6 +51,8 @@ protected:
 
     std::string label_ = "";
     std::string textureName_ = "";
+
+    std::unique_ptr<Config> config_ = nullptr;
 
 #ifdef _DEBUG
     void ImGui();

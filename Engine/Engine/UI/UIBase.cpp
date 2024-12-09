@@ -9,15 +9,15 @@ void UIBase::Initialize(const std::string& _label)
 {
     label_ = _label;
 
-    ConfigManager* configManager = ConfigManager::GetInstance();
+    config_ = std::make_unique<Config>();
 
-    configManager->SetVariable("UI", label_ + "pos", &position_);
-    configManager->SetVariable("UI", label_ + "size", &size_);
-    configManager->SetVariable("UI", label_ + "anchor", &anchor_);
-    configManager->SetVariable("UI", label_ + "isActive", reinterpret_cast<uint32_t*>(&isActive_));
-    configManager->SetVariable("UI", label_ + "isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
-    configManager->SetVariable("UI", label_ + "textureName", &textureName_);
-    configManager->SetVariable("UI", label_ + "label", &label_);
+    config_->SetVariable( label_+"pos", &position_);
+    config_->SetVariable( label_+"size", &size_);
+    config_->SetVariable( label_+"anchor", &anchor_);
+    config_->SetVariable( label_+"isActive", reinterpret_cast<uint32_t*>(&isActive_));
+    config_->SetVariable( label_+"isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
+    config_->SetVariable( label_+"textureName", &textureName_);
+    config_->SetVariable( label_+"label", &label_);
 
     if (textureName_ == "")
         textureName_ = "white.png";

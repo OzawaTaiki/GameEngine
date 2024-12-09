@@ -18,47 +18,47 @@ void ParticleEmitter::Setting(const std::string& _name)
 
     ConfigManager* instance = ConfigManager::GetInstance();
 
-    instance->SetDirectoryPath("resources/Data/Particles/Emitters");
+    //instance->SetDirectoryPath("resources/Data/Particles/Emitters");
 
-    instance->SetVariable(name_, "lifeTime_min", &setting_.lifeTime.value.min);
-    instance->SetVariable(name_, "lifeTime_max", &setting_.lifeTime.value.max);
-    instance->SetVariable(name_, "size_min", &setting_.size.value.min);
-    instance->SetVariable(name_, "size_max", &setting_.size.value.max);
-    instance->SetVariable(name_, "rotate_min", &setting_.rotate.value.min);
-    instance->SetVariable(name_, "rotate_max", &setting_.rotate.value.max);
-    instance->SetVariable(name_, "spped_min", &setting_.speed.value.min);
-    instance->SetVariable(name_, "spped_max", &setting_.speed.value.max);
-    instance->SetVariable(name_, "direction_min", &setting_.direction.value.min);
-    instance->SetVariable(name_, "direction_max", &setting_.direction.value.max);
-    instance->SetVariable(name_, "acceleration_min", &setting_.acceleration.value.min);
-    instance->SetVariable(name_, "acceleration_max", &setting_.acceleration.value.max);
-    instance->SetVariable(name_, "color_min", &setting_.color.value.min);
-    instance->SetVariable(name_, "color_max", &setting_.color.value.max);
+    //instance->SetVariable(name_, "lifeTime_min", &setting_.lifeTime.value.min);
+    //instance->SetVariable(name_, "lifeTime_max", &setting_.lifeTime.value.max);
+    //instance->SetVariable(name_, "size_min", &setting_.size.value.min);
+    //instance->SetVariable(name_, "size_max", &setting_.size.value.max);
+    //instance->SetVariable(name_, "rotate_min", &setting_.rotate.value.min);
+    //instance->SetVariable(name_, "rotate_max", &setting_.rotate.value.max);
+    //instance->SetVariable(name_, "spped_min", &setting_.speed.value.min);
+    //instance->SetVariable(name_, "spped_max", &setting_.speed.value.max);
+    //instance->SetVariable(name_, "direction_min", &setting_.direction.value.min);
+    //instance->SetVariable(name_, "direction_max", &setting_.direction.value.max);
+    //instance->SetVariable(name_, "acceleration_min", &setting_.acceleration.value.min);
+    //instance->SetVariable(name_, "acceleration_max", &setting_.acceleration.value.max);
+    //instance->SetVariable(name_, "color_min", &setting_.color.value.min);
+    //instance->SetVariable(name_, "color_max", &setting_.color.value.max);
 
-    instance->SetVariable(name_, "countPerEmit", &countPerEmit_);
-    instance->SetVariable(name_, "emitPerSec", &emitPerSec_);
-    instance->SetVariable(name_, "maxParticles", &maxParticles_);
-    instance->SetVariable(name_, "emitRepeatCount", &emitRepeatCount_);
+    //instance->SetVariable(name_, "countPerEmit", &countPerEmit_);
+    //instance->SetVariable(name_, "emitPerSec", &emitPerSec_);
+    //instance->SetVariable(name_, "maxParticles", &maxParticles_);
+    //instance->SetVariable(name_, "emitRepeatCount", &emitRepeatCount_);
 
-    //instance->SetVariable(name_, "randomColor", reinterpret_cast<uint32_t*> (&randomColor_));
-    instance->SetVariable(name_, "fadeAlpha", reinterpret_cast<uint32_t*> (&fadeAlpha_));
-    instance->SetVariable(name_, "fadeStartRatio", &fadeStartRatio_);
-    instance->SetVariable(name_, "delayTime", &delayTime_);
-    instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&loop_));
-    instance->SetVariable(name_, "changeColor", reinterpret_cast<uint32_t*>(&changeColor_));
-    instance->SetVariable(name_, "changeSize", reinterpret_cast<uint32_t*>(&changeSize_));
-    instance->SetVariable(name_, "useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
+    ////instance->SetVariable(name_, "randomColor", reinterpret_cast<uint32_t*> (&randomColor_));
+    //instance->SetVariable(name_, "fadeAlpha", reinterpret_cast<uint32_t*> (&fadeAlpha_));
+    //instance->SetVariable(name_, "fadeStartRatio", &fadeStartRatio_);
+    //instance->SetVariable(name_, "delayTime", &delayTime_);
+    //instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&loop_));
+    //instance->SetVariable(name_, "changeColor", reinterpret_cast<uint32_t*>(&changeColor_));
+    //instance->SetVariable(name_, "changeSize", reinterpret_cast<uint32_t*>(&changeSize_));
+    //instance->SetVariable(name_, "useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
 
-    instance->SetVariable(name_, "shape", reinterpret_cast<uint32_t*>(&shape_));
-    instance->SetVariable(name_, "direction", reinterpret_cast<uint32_t*>(&particleDirection_));
-    instance->SetVariable(name_, "size", &size_);
-    instance->SetVariable(name_, "radius", &radius_);
-    instance->SetVariable(name_, "offset", &offset_);
-    instance->SetVariable(name_, "rotate", &rotate_);
-    instance->SetVariable(name_, "position", &position_);
+    //instance->SetVariable(name_, "shape", reinterpret_cast<uint32_t*>(&shape_));
+    //instance->SetVariable(name_, "direction", reinterpret_cast<uint32_t*>(&particleDirection_));
+    //instance->SetVariable(name_, "size", &size_);
+    //instance->SetVariable(name_, "radius", &radius_);
+    //instance->SetVariable(name_, "offset", &offset_);
+    //instance->SetVariable(name_, "rotate", &rotate_);
+    //instance->SetVariable(name_, "position", &position_);
 
-    instance->SetVariable(name_, "modelPath", &useModelPath_);
-    instance->SetVariable(name_, "texturePath", &useTextruePath_);
+    //instance->SetVariable(name_, "modelPath", &useModelPath_);
+    //instance->SetVariable(name_, "texturePath", &useTextruePath_);
 
 
     emitTime_ = 1.0f / static_cast<float> (emitPerSec_);

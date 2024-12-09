@@ -11,47 +11,17 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <optional>
 
 class JsonLoader;
 class Config;
 class ConfigManager
 {
-public:
 
-    static ConfigManager* GetInstance();
+public: // 構造体
 
-    void Initialize();
-    void Update();
-    void Draw();
-
-    void LoadRootDirectory();
-
-    void LoadData();
-    void SaveData();
-    void SaveData(const std::string& _groupName);
-
-    template<typename T>
-    inline void SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr);
-    template<typename T>
-    inline void SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr);
-
-
-    void SetSceneName(const std::string& _scene);
-    void SetDirectoryPath(const std::string& _directoryPath);
-
-    Config* Create(const std::string& _sceneName);
-
-private:
-
-    std::map<std::string, std::unique_ptr<Config>> configs_;
-    std::string sceneName_ = "";
-
-    JsonLoader* json_;
-    std::vector<std::string> groupNames_;
-    std::string rootDirectory_ = "resources/Data";
-    std::string directoryPath_ = "resources/Data/Parameter";
-
-    struct Type
+    // クラス外で使用
+    struct VariableAddress
     {
         std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*,
             std::vector<uint32_t>*, std::vector<float>*,
@@ -59,7 +29,10 @@ private:
             std::vector<Vector4>*, std::vector<std::string>*
         > address;
     };
-    struct Type2
+
+private:
+    // クラス内のみで使用
+    struct VariableValue
     {
         std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string,
             std::vector<uint32_t>, std::vector<float>,
@@ -68,8 +41,35 @@ private:
         > variable;
     };
 
-    std::map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, Type >>> ptr_;
-    std::map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, Type2>>> value_;
+public:
+
+    static ConfigManager* GetInstance();
+
+    void Initialize();
+
+    void LoadRootDirectory();
+
+    void LoadData();
+    void SaveData(const std::string& _groupName);
+
+    template<typename T>
+    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,T* _ptr);
+
+    template<typename T>
+    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,std::vector<T>* _ptr);
+
+    void SetDirectoryPath(const std::string& _directoryPath);
+
+private:
+
+
+    JsonLoader* json_;
+    std::vector<std::string> groupNames_;
+    std::string rootDirectory_ = "resources/Data";
+    std::string directoryPath_ = "resources/Data/Parameter";
+
+
+    std::unordered_map<std::string, std::unordered_map<std::string, VariableValue>> value_;
 
     // ディレクトリ内のファイルを再帰的に読み込む
     void LoadFilesRecursively(const std::string& _directoryPath);
@@ -79,63 +79,40 @@ private:
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
 };
-template<typename T>
-inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, T* _variablePtr)
-{
-    if (sceneName_ == "")
-        return;
 
-    // 既存のグループと変数の確認
-    if (value_[sceneName_].contains(_groupName))
+template<typename T>
+inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, T* _ptr)
+{
+    if (!value_.contains(_groupName))
     {
-        if (value_[sceneName_][_groupName].contains(_variableName))
-        {
-            // 単一の値を登録
-            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            *_variablePtr = std::get<T>(value_[sceneName_][_groupName][_variableName].variable);
-        }
-        else
-        {
-            // 新しい変数を登録
-            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
-        }
+        // グループ名が存在しない場合は新しく作成
+        value_[_groupName] = {};
     }
-    else
+
+    if (!value_[_groupName].contains(_variableName))
     {
-        // 新しいグループを登録
-        ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-        value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
+        // 変数名が存在しない場合は新しく作成
+        value_[_groupName][_variableName] = {};
     }
+
+    _ptr = &std::get<T>(value_[_groupName][_variableName].variable);
+
 }
 
 template<typename T>
-inline void ConfigManager::SetVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _variablePtr)
+inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _ptr)
 {
-    if (sceneName_ == "")
-        return;
+    if (!value_.contains(_groupName))
+    {
+        // グループ名が存在しない場合は新しく作成
+        value_[_groupName] = {};
+    }
 
-    // 既存のグループと変数の確認
-    if (value_[sceneName_].contains(_groupName))
+    if (!value_[_groupName].contains(_variableName))
     {
-        // 既存のグループがある場合
-        if (value_[sceneName_][_groupName].contains(_variableName))
-        {
-            // ベクタの値を登録
-            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            *_variablePtr = std::get<std::vector<T>>(value_[sceneName_][_groupName][_variableName].variable);
-        }
-        else
-        {
-            // 新しいベクタ変数を登録
-            ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-            value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
-        }
+        // 変数名が存在しない場合は新しく作成
+        value_[_groupName][_variableName] = {};
     }
-    else
-    {
-        // 新しいグループを登録
-        ptr_[sceneName_][_groupName][_variableName].address = _variablePtr;
-        value_[sceneName_][_groupName][_variableName].variable = *_variablePtr;
-    }
+
+    _ptr = &std::get<std::vector<T>>(value_[_groupName][_variableName].variable);
 }

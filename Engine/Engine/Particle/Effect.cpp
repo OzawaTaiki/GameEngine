@@ -6,12 +6,12 @@ void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
 
-    ConfigManager* instance = ConfigManager::GetInstance();
+    config_ = std::make_unique<Config>();
 
-    instance->SetDirectoryPath("resources/Data/Particles/Effects");
+    //instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
-    instance->SetVariable(name_, "loop", reinterpret_cast<uint32_t*>(&isLoop_));
-    instance->SetVariable(name_, "emitters", &emitterNames_);
+    config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    config_->SetVariable( "emitters", &emitterNames_);
 
     for (std::string emitterName : emitterNames_)
     {

@@ -1,20 +1,19 @@
 #include "Config.h"
 
-#include "ConfigManager.h"
+#include <sstream>
 
-Config* Config::Create(const std::string& _sceneName, const std::string& _directoryPath)
+
+Config::Config(const std::string& _name) : groupName_(_name)
 {
-    Config* instance = ConfigManager::GetInstance()->Create(_sceneName);
-    instance->sceneName_ = _sceneName;
-    return instance;
+    std::ostringstream oss;
+    oss << this;
+    ptrString_ = oss.str();
 }
 
-void Config::LoadData()
+void Config::Save() const
 {
-    ConfigManager::GetInstance()->LoadData();
-}
-
-void Config::SaveData()
-{
-    ConfigManager::GetInstance()->SaveData();
+    for (auto [groupName, variable] : ptr_)
+    {
+        ConfigManager::GetInstance()->SaveData(groupName);
+    }
 }
