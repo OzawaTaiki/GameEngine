@@ -138,7 +138,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Framework\Particle\Particle.cpp" />
     <ClCompile Include="Framework\Particle\ParticleEmitters.cpp" />
     <ClCompile Include="Framework\Particle\ParticleManager.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Physics\Collision\CollisionManager.cpp" />
     <ClCompile Include="Physics\Collision\Shapes.cpp" />

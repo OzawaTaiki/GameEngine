@@ -51,7 +51,7 @@ inline void Config::SetVariable( const std::string& _variableName, T* _variableP
 
     ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, _variablePtr);
 
-    ptr_[_groupName][_variableName].address = _variablePtr;
+    ptr_[groupName_][_variableName].address = _variablePtr;
 }
 
 template<typename T>
@@ -67,5 +67,5 @@ inline void Config::SetVariable( const std::string& _variableName, std::vector<T
 
     ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, _variablePtr);
 
-    ptr_[_groupName][_variableName].address = _variablePtr;
+    ptr_[groupName_][_variableName].address = _variablePtr;
 }
