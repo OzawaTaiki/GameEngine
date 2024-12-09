@@ -91,6 +91,9 @@
     <Filter Include="Framework\Camera">
       <UniqueIdentifier>{abaaa991-94de-458c-ad45-9a1c6724822d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{73e48db5-afe9-4edb-a2dc-b87282d45549}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DirectX\D3DResourceLeakChecker.cpp">
@@ -264,7 +267,6 @@
     <ClCompile Include="UI\UISprite.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Framework\Camera\Camera.cpp">
       <Filter>Framework\Camera</Filter>
     </ClCompile>
@@ -273,21 +275,47 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.VS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Object3d.PS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Object3d.VS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Particle.PS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Particle.VS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\SkinningObject3d.VS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Sprite.PS.hlsl" />
-    <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl" />
+    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Object3d.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Object3d.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Particle.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Particle.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\SkinningObject3d.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Sprite.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sample\Resources\Shader\LineDrawer.hlsli" />
-    <None Include="..\Sample\Resources\Shader\Object3d.hlsli" />
-    <None Include="..\Sample\Resources\Shader\Particle.hlsli" />
-    <None Include="..\Sample\Resources\Shader\Sprite.hlsli" />
+    <None Include="..\Sample\Resources\Shader\LineDrawer.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Object3d.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Particle.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\DirectX\D3DResourceLeakChecker.h">
