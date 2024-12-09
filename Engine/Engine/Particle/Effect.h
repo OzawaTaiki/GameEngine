@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Particle/ParticleEmitters.h"
-
+#include <Utility/Config.h>
 #include <string>
 #include <vector>
 #include <list>
@@ -40,4 +40,6 @@ private:
     float                           elapsedTime_;       // 経過時間
     bool                            isLoop_;            // ループするか
     bool                            isActive_;          // アクティブか
+
+    std::unique_ptr<Config> config_ = nullptr;  // 設定ファイル
 };

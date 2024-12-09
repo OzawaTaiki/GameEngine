@@ -28,13 +28,6 @@ void SceneManager::Initialize(const std::string& _name)
     auto it = scenes_.find(_name);
     assert(it != scenes_.end());
 
-    configManager_ = ConfigManager::GetInstance();
-    configManager_->Initialize();
-
-    configManager_->LoadData();
-
-    configManager_->SetSceneName(_name);
-
     currentScene_ = it->second();
     currentSceneName_ = _name;
 
@@ -82,7 +75,6 @@ void SceneManager::ChangeScene()
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
 
-    instance->configManager_->SetSceneName(instance->currentSceneName_);
 }
 
 #ifdef _DEBUG
