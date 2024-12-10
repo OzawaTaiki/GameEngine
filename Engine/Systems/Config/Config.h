@@ -19,10 +19,10 @@ class Config
 public:
 
     Config() = default;
-    Config(const std::string& _name);
+    Config(const std::string& _name, const std::string& _folderpath);
     ~Config() = default;
 
-    void Save() const;
+    void Save();
 
     template< typename T>
     inline void SetVariable( const std::string& _variableName, T* _variablePtr);
@@ -32,8 +32,11 @@ public:
 
 private:
 
-    std::unordered_map<std::string, std::unordered_map<std::string, ConfigManager::VariableAddress>> ptr_;
+    std::unordered_map<std::string, ConfigManager::VariableAddress> mPtr_;
+    std::unordered_map<std::string, ConfigManager::VariableAddress> valueAddress_;
+
     std::string ptrString_;
+    std::string folderPath_ = "";
 
     std::string groupName_ = "";
 };
@@ -44,14 +47,25 @@ inline void Config::SetVariable( const std::string& _variableName, T* _variableP
     if(groupName_.empty())
         throw std::runtime_error("groupName is empty");
 
-    if (!ptr_.contains(groupName_) || !ptr_[groupName_].contains(_variableName))
+    // variableNameがない
+    if ( !mPtr_.contains(_variableName))
     {
-        ptr_[groupName_][_variableName].address = {};
+        // 追加
+        mPtr_[_variableName].address = {};
+        valueAddress_[_variableName].address = {};
     }
 
-    ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, _variablePtr);
+    // configManagerから値のアドレスを取得
+    T* variablePtr = nullptr;
+    ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, variablePtr);
 
-    ptr_[groupName_][_variableName].address = _variablePtr;
+    // 値のアドレスを保存
+    valueAddress_[_variableName].address = variablePtr;
+    // メンバのアドレスを保存
+    mPtr_[_variableName].address = _variablePtr;
+
+    // 値のアドレスに値をコピー
+    *_variablePtr = *variablePtr;
 }
 
 template<typename T>
@@ -60,12 +74,24 @@ inline void Config::SetVariable( const std::string& _variableName, std::vector<T
     if (groupName_.empty())
         throw std::runtime_error("groupName is empty");
 
-    if (!ptr_.contains(groupName_) || !ptr_[groupName_].contains(_variableName))
+    // variableNameがない
+    if (!mPtr_.contains(_variableName))
     {
-        ptr_[groupName_][_variableName].address = {};
+        // 追加
+        mPtr_[_variableName].address = {};
+        valueAddress_[_variableName].address = {};
     }
 
-    ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, _variablePtr);
+    // configManagerから値のアドレスを取得
+    std::vector<T>* variablePtr = nullptr;
+    ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, variablePtr);
 
-    ptr_[groupName_][_variableName].address = _variablePtr;
+    // 値のアドレスを保存
+    valueAddress_[_variableName].address = std::ref(*variablePtr);
+    // メンバのアドレスを保存
+    mPtr_[_variableName].address = std::ref(*_variablePtr);
+
+    // 値のアドレスに値をコピー
+    *_variablePtr = *variablePtr;
+
 }

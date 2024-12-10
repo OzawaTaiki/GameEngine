@@ -13,25 +13,25 @@
 #include <unordered_map>
 #include <optional>
 
+template<typename T>
+using RefVector = std::reference_wrapper<std::vector<T>>;
+
 class JsonLoader;
 class Config;
 class ConfigManager
 {
-
 public: // 構造体
 
     // クラス外で使用
     struct VariableAddress
     {
         std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*,
-            std::vector<uint32_t>*, std::vector<float>*,
-            std::vector<Vector2>*, std::vector<Vector3>*,
-            std::vector<Vector4>*, std::vector<std::string>*
+            RefVector<uint32_t>, RefVector<float>,
+            RefVector<Vector2>, RefVector<Vector3>,
+            RefVector<Vector4>, RefVector<std::string>
         > address;
     };
 
-private:
-    // クラス内のみで使用
     struct VariableValue
     {
         std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string,
@@ -53,10 +53,12 @@ public:
     void SaveData(const std::string& _groupName);
 
     template<typename T>
-    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,T* _ptr);
+    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,T*& _ptr);
 
     template<typename T>
-    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,std::vector<T>* _ptr);
+    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,std::vector<T>*& _ptr);
+
+    void EraseData(const std::string& _groupName, const std::string& _variableName);
 
     void SetDirectoryPath(const std::string& _directoryPath);
 
@@ -81,7 +83,7 @@ private:
 };
 
 template<typename T>
-inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, T* _ptr)
+inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, T*& _ptr)
 {
     if (!value_.contains(_groupName))
     {
@@ -100,7 +102,7 @@ inline void ConfigManager::GetVariableValue(const std::string& _groupName, const
 }
 
 template<typename T>
-inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T>* _ptr)
+inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T>*& _ptr)
 {
     if (!value_.contains(_groupName))
     {
@@ -115,4 +117,5 @@ inline void ConfigManager::GetVariableValue(const std::string& _groupName, const
     }
 
     _ptr = &std::get<std::vector<T>>(value_[_groupName][_variableName].variable);
+
 }

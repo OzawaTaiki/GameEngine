@@ -6,8 +6,7 @@ void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
 
-    config_ = std::make_unique<Config>();
-
+    config_ = std::make_unique<Config>(name_,"Resources/Data/Particles/Effects/");
     //instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
     config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
@@ -91,6 +90,8 @@ void Effect::ExclusionEmitter(const std::string& _name)
         if (it->GetName() == _name)
         {
             it = emitters_.erase(it);
+            auto nameIt = std::find(emitterNames_.begin(), emitterNames_.end(), _name);
+            emitterNames_.erase(nameIt);
             return;
         }
         ++it;
@@ -99,8 +100,7 @@ void Effect::ExclusionEmitter(const std::string& _name)
 
 void Effect::Save() const
 {
-    ConfigManager::GetInstance()->SetDirectoryPath("resources/Data/Particles/Effects");
-    ConfigManager::GetInstance()->SaveData(name_);
+    config_->Save();
 
     for (auto& emitter : emitters_)
     {

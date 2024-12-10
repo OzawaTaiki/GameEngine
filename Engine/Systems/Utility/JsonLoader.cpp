@@ -6,7 +6,7 @@
 
 JsonLoader::JsonLoader(bool _autoSave) {
     dataGroup_.clear();
-    folderPath_ = "Resources/Data";
+    folderPath_ = "Resources/Data/";
     autoSave_ = _autoSave;
 }
 
@@ -14,6 +14,10 @@ JsonLoader::JsonLoader(const std::string& _directory, bool _autoSave) {
     dataGroup_.clear();
     folderPath_ = _directory;
     autoSave_ = _autoSave;
+
+    // folderPath_のさいごに'\\'がない場合は追加
+    if (folderPath_.back() != '\\')
+        folderPath_ += "\\";
 }
 
 JsonLoader::~JsonLoader() {
@@ -21,9 +25,14 @@ JsonLoader::~JsonLoader() {
         SaveJson();
 }
 
-void JsonLoader::LoadJson(const std::string& _groupName, bool _isMakeFile) {
+void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
 
-    filePath_ = _groupName + ".json";
+    // 拡張子の有無
+    if (_filepath.find(".json") == std::string::npos)
+        filePath_ = _filepath + ".json";
+    else
+        filePath_ = _filepath;
+
     std::ifstream inputFile(filePath_);
     if (!inputFile.is_open())
     {
@@ -34,6 +43,8 @@ void JsonLoader::LoadJson(const std::string& _groupName, bool _isMakeFile) {
     }
     else
     {
+        Utils::Log("Begin Load :" + _filepath + "\n");
+
         if (inputFile.peek() != std::ifstream::traits_type::eof())
         {
             inputFile >> jsonData_;
@@ -42,13 +53,15 @@ void JsonLoader::LoadJson(const std::string& _groupName, bool _isMakeFile) {
                 for (const auto& [key, values] : dataObj.items()) {
                     for (const auto& value : values)
                     {
-                        data.data[key].emplace_back(parseDatum(value, _groupName));
+                        data.data[key].emplace_back(parseDatum(value, groupName));
                     }
                 }
                 dataGroup_[groupName] = data;
             }
         }
         inputFile.close();
+        Utils::Log("End Load   :" + filePath_ + "\n");
+
     }
 }
 
