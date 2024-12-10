@@ -45,11 +45,8 @@ void ConfigManager::LoadData()
         std::filesystem::create_directories(directoryPath_);
     }
 
-    // ディレクトリ内のファイルを読み込む
-    LoadFilesRecursively(directoryPath_);
 
-
-    for (auto& [groupName, variable] : value_)
+    for (std::string& groupName : groupNames_)
     {
         auto data = json_->GetData(groupName);
 
@@ -155,73 +152,78 @@ void ConfigManager::LoadData()
 
 void ConfigManager::SaveData(const std::string& _groupName)
 {
-    for (auto [groupName, values] : value_)
+    for (auto& [variableName, value] : value_[_groupName])
     {
-        for (auto& [variableName, value] : values)
+        if (value.variable.index() == 0)
         {
-            if (value.variable.index() == 0)
-            {
-                // uint32_t
-                uint32_t val = std::get<uint32_t>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 1)
-            {
-                float val = std::get<float>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 2)
-            {
-                Vector2 val = std::get<Vector2>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 3)
-            {
-                Vector3 val = std::get<Vector3>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 4)
-            {
-                Vector4 val = std::get<Vector4>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 5)
-            {
-                std::string val = std::get<std::string>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 6)
-            {
-                std::vector<uint32_t> val = std::get<std::vector<uint32_t>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 7)
-            {
-                std::vector<float> val = std::get<std::vector<float>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 8)
-            {
-                std::vector<Vector2> val = std::get<std::vector<Vector2>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 9)
-            {
-                std::vector<Vector3> val = std::get<std::vector<Vector3>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 10)
-            {
-                std::vector<Vector4> val = std::get<std::vector<Vector4>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
-            else if (value.variable.index() == 11)
-            {
-                std::vector<std::string> val = std::get<std::vector<std::string>>(value.variable);
-                json_->SetData(_groupName, variableName, val);
-            }
+            // uint32_t
+            uint32_t val = std::get<uint32_t>(value.variable);
+            json_->SetData(_groupName, variableName, val);
         }
-        json_->SaveJson(groupName);
+        else if (value.variable.index() == 1)
+        {
+            float val = std::get<float>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 2)
+        {
+            Vector2 val = std::get<Vector2>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 3)
+        {
+            Vector3 val = std::get<Vector3>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 4)
+        {
+            Vector4 val = std::get<Vector4>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 5)
+        {
+            std::string val = std::get<std::string>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 6)
+        {
+            std::vector<uint32_t> val = std::get<std::vector<uint32_t>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 7)
+        {
+            std::vector<float> val = std::get<std::vector<float>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 8)
+        {
+            std::vector<Vector2> val = std::get<std::vector<Vector2>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 9)
+        {
+            std::vector<Vector3> val = std::get<std::vector<Vector3>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 10)
+        {
+            std::vector<Vector4> val = std::get<std::vector<Vector4>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+        else if (value.variable.index() == 11)
+        {
+            std::vector<std::string> val = std::get<std::vector<std::string>>(value.variable);
+            json_->SetData(_groupName, variableName, val);
+        }
+    }
+    json_->SaveJson(_groupName);
+}
+
+void ConfigManager::EraseData(const std::string& _groupName, const std::string& _variableName)
+{
+    if (value_.contains(_groupName)&&value_[_groupName].contains(_variableName))
+    {
+        value_[_groupName].erase(_variableName);
     }
 }
 
@@ -231,7 +233,11 @@ void ConfigManager::SetDirectoryPath(const std::string& _directoryPath)
     if (_directoryPath.back() != '/')
         json_->SetFolderPath(_directoryPath + "/");
     else
+    {
         directoryPath_ = _directoryPath;
+        json_->SetFolderPath(directoryPath_);
+    }
+
 }
 
 
@@ -248,19 +254,24 @@ void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
         }
         else
         {
+
             // パスを取得
             std::string path = entry.path().string();
             // 拡張子を取得
             std::string ext = entry.path().extension().string();
             // 拡張子がjsonの場合は読み込む
-            if (ext == "json")
+            if (ext == ".json")
             {
                 // ファイル名からグループ名を取得
-                std::string groupName = path.substr(path.find_last_of("/") + 1);
+                std::string groupName = path.substr(path.find_last_of("\\") + 1);
+
+                // jsonファイルを読み込む
+                json_->LoadJson(entry.path().string());
+
                 groupName = groupName.substr(0, groupName.find_last_of("."));
-                // ファイルを読み込む
-                json_->LoadJson(groupName);
+                groupNames_.push_back(groupName);
             }
+
         }
     }
 }
