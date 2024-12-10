@@ -36,18 +36,20 @@ void Config::Save()
                     T v = std::get<T>(valueAddress_[name].address);
                     T ptr = std::get<T>(val.address);
                     // vectorの中身を取得
-                    for (auto val : v.get())
+                    for (auto it = v.get().begin(); it != v.get().end();)
                     {
-                        // ptrにvalがなかったら削除
-                        auto it = std::find(ptr.get().begin(), ptr.get().end(), val);
-                        if (it == ptr.get().end())
+                        if (std::find(ptr.get().begin(), ptr.get().end(), *it) == ptr.get().end())
                         {
-                            v.get().erase(std::remove(v.get().begin(), v.get().end(), val), v.get().end());
+                            it = v.get().erase(it);
                         }
+                        else
+                        {
+                            ++it;
+                        }
+
                     }
                 }
                        }, valueAddress_[name].address);
-
         }
 
         std::visit([&](auto&& arg) {
@@ -59,7 +61,17 @@ void Config::Save()
                     *std::get<T>(valueAddress_[name].address) = *ptr;
                 }
             }
-                   }, val.address);
+            else if constexpr (std::is_same_v<T, RefVector<uint32_t>> ||
+                               std::is_same_v<T, RefVector<float>> ||
+                               std::is_same_v<T, RefVector<Vector2>> ||
+                               std::is_same_v<T, RefVector<Vector3>> ||
+                               std::is_same_v<T, RefVector<Vector4>> ||
+                               std::is_same_v<T, RefVector<std::string>>)
+            {
+                T& v = std::get<T>(valueAddress_[name].address);
+                T& ptr = std::get<T>(val.address);
+                v.get() = ptr.get();
+            }}, val.address);
     }
 
     ConfigManager::GetInstance()->SetDirectoryPath(folderPath_);

@@ -32,7 +32,6 @@ public: // 構造体
         > address;
     };
 
-
     struct VariableValue
     {
         std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string,
