@@ -181,6 +181,8 @@ private:
     bool                    isAlive_ = true;                // まだ生きているか
 
 
+    std::unique_ptr<Config> config_ = nullptr;
+
     Particle GenerateParticleData();
 
     void DisplayFlags();

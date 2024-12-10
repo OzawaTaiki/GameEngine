@@ -104,10 +104,11 @@ void ParticleManager::Draw(const Camera* _camera)
 void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle)
 {
     if (groups_.contains(_groupName))
-        return;
+        throw std::runtime_error("already exist particleGroup! name:" + '\"' + _groupName + '\"');
 
+    std::string groupName = _groupName;
     if (!_emitterPtr)
-        throw std::runtime_error("emitterPtr == nullPtr");
+        groupName += "NoEmitter";
 
     Group& group = groups_[_groupName];
     group.model = Model::CreateFromObj(_modelPath);
@@ -124,7 +125,14 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
 
     group.instanceNum = 0;
 
-    group.emitterPtr = _emitterPtr;
+    if (!_emitterPtr)
+    {
+        group.emitterPtr = nullptr;
+    }
+    else
+    {
+        group.emitterPtr = _emitterPtr;
+    }
 
 }
 
@@ -146,7 +154,11 @@ void ParticleManager::SetGroupTexture(const std::string& _groupName, uint32_t _t
 
 void ParticleManager::AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles)
 {
-    if (!groups_.contains(_groupName))
+    std::string gName = _groupName;
+    if (!groups_[_groupName].emitterPtr)
+        gName += "NoEmitter";
+
+    if (!groups_.contains(gName))
     {
         std::string err = "not find particleGroup! name:" + '\"' + _groupName + '\"';
         throw std::runtime_error(err);
@@ -158,6 +170,7 @@ void ParticleManager::AddParticleToGroup(const std::string& _groupName, const st
     }
 
 }
+
 
 void ParticleManager::PreDraw()
 {
