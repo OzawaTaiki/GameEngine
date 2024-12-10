@@ -22,6 +22,7 @@ public:
     void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
     void SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle);
 
+    void AddParticleToGroup(const std::string& _groupName, const Particle& _particles);
     void AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles);
 
 private:

@@ -22,9 +22,8 @@ void Particle::Initialize(const ParticleInitParam& _param)
 
     color_ = parameter_.color;
 
-
-
     isAlive_ = true;
+    isInfiniteLife_ = parameter_.isInfiniteLife;
     currentTime_ = 0.0f;
 
     velocity_ = direction_.Normalize() * speed_;
@@ -47,7 +46,7 @@ void Particle::Update()
     const float kDeltaTime = 1.0f / 60.0f;
     currentTime_ += kDeltaTime;
 
-    if (currentTime_ >= lifeTime_)
+    if (currentTime_ >= lifeTime_ && !isInfiniteLife_)
     {
         isAlive_ = false;
         return;
@@ -55,11 +54,16 @@ void Particle::Update()
 
     t_ = currentTime_ / lifeTime_;
 
-    color_ = parameter_.colorTransition.calculateValue(t_);
-    color_.w = parameter_.alphaTransition.calculateValue(t_);
-    rotation_ = parameter_.rotateTransition.calculateValue(t_);
-    scale_ = parameter_.sizeTransition.calculateValue(t_);
-    speed_ = parameter_.speedTransition.calculateValue(t_);
+    if (!parameter_.colorTransition.keys.empty())
+        color_ = parameter_.colorTransition.calculateValue(t_);
+    if (!parameter_.alphaTransition.keys.empty())
+        color_.w = parameter_.alphaTransition.calculateValue(t_);
+    if (!parameter_.rotateTransition.keys.empty())
+        rotation_ = parameter_.rotateTransition.calculateValue(t_);
+    if (!parameter_.sizeTransition.keys.empty())
+        scale_ = parameter_.sizeTransition.calculateValue(t_);
+    if (!parameter_.speedTransition.keys.empty())
+        speed_ = parameter_.speedTransition.calculateValue(t_);
 
 
     velocity_ = direction_.Normalize() * speed_;
@@ -67,7 +71,7 @@ void Particle::Update()
     velocity_ += acceleration_ * currentTime_;
 
     if (deceleration_ != 0)
-    velocity_ -= velocity_ * deceleration_ * kDeltaTime;
+        velocity_ -= velocity_ * deceleration_ * kDeltaTime;
 
 
     translate_ += velocity_ * kDeltaTime;
@@ -78,4 +82,20 @@ void Particle::Update()
 
 void Particle::Draw()
 {
+}
+
+void Particle::ShowDebugWindow()
+{
+    ImGui::PushID(this);
+
+    ImGui::DragFloat("LifeTime", &lifeTime_);
+    ImGui::DragFloat3("Position", &translate_.x);
+    ImGui::DragFloat3("Rotation", &rotation_.x);
+    ImGui::DragFloat3("Scale", &scale_.x);
+    ImGui::DragFloat("Speed", &speed_);
+    ImGui::DragFloat3("Direction", &direction_.x);
+    ImGui::DragFloat3("Acceleration", &acceleration_.x);
+    ImGui::ColorEdit4("Color", &color_.x);
+    ImGui::Checkbox("InfiniteLife", &isInfiniteLife_);
+    ImGui::PopID();
 }

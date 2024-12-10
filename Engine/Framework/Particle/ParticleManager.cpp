@@ -52,27 +52,34 @@ void ParticleManager::Update(const Vector3& _cRotate)
                 it = group.particles.erase(it);
                 continue;
             }
-
-            auto axes = group.emitterPtr->GetBillboardAxes();
-
-            for (uint32_t index = 0; index < 3; ++index)
+            if(group.emitterPtr)
             {
-                if (axes[index])
-                {
-                    cRotate[index] = _cRotate[index];
-                }
-            }
-            billboradMat = MakeAffineMatrix({ 1,1,1 }, cRotate, { 0,0,0 });
-            //billboradMat = Inverse(billboradMat);
+                auto axes = group.emitterPtr->GetBillboardAxes();
 
-            Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
-            if (group.emitterPtr->EnableBillboard())
-                mat = mat * billboradMat;
-            if (group.emitterPtr->ShouldFaceDirection())
-                mat = mat * it->GetDirectionMatrix();
-            //mat = mat * MakeRotateMatrix(it->GetRotation());
-            mat = mat * MakeTranslateMatrix(it->GetPosition());
-            group.constMap[group.instanceNum].matWorld = mat;
+                for (uint32_t index = 0; index < 3; ++index)
+                {
+                    if (axes[index])
+                    {
+                        cRotate[index] = _cRotate[index];
+                    }
+                }
+                billboradMat = MakeAffineMatrix({ 1,1,1 }, cRotate, { 0,0,0 });
+                //billboradMat = Inverse(billboradMat);
+
+                Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
+                if (group.emitterPtr->EnableBillboard())
+                    mat = mat * billboradMat;
+                if (group.emitterPtr->ShouldFaceDirection())
+                    mat = mat * it->GetDirectionMatrix();
+                //mat = mat * MakeRotateMatrix(it->GetRotation());
+                mat = mat * MakeTranslateMatrix(it->GetPosition());
+                group.constMap[group.instanceNum].matWorld = mat;
+            }
+            else
+            {
+                Matrix4x4 mat = MakeAffineMatrix(it->GetScale(), it->GetRotation(), it->GetPosition());
+                group.constMap[group.instanceNum].matWorld = mat;
+            }
             group.constMap[group.instanceNum].color = it->GetColor();
             group.instanceNum++;
             ++it;
@@ -152,7 +159,7 @@ void ParticleManager::SetGroupTexture(const std::string& _groupName, uint32_t _t
 }
 
 
-void ParticleManager::AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles)
+void ParticleManager::AddParticleToGroup(const std::string& _groupName, const Particle& _particles)
 {
     std::string gName = _groupName;
     if (!groups_[_groupName].emitterPtr)
@@ -160,15 +167,18 @@ void ParticleManager::AddParticleToGroup(const std::string& _groupName, const st
 
     if (!groups_.contains(gName))
     {
-        std::string err = "not find particleGroup! name:" + '\"' + _groupName + '\"';
-        throw std::runtime_error(err);
+        CreateParticleGroup(gName, "plane/plane.gltf", nullptr);
     }
 
+    groups_[gName].particles.push_back(_particles);
+}
+
+void ParticleManager::AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles)
+{
     for(const auto& particle:_particles)
     {
-        groups_[_groupName].particles.push_back(particle);
+        AddParticleToGroup(_groupName, particle);
     }
-
 }
 
 
