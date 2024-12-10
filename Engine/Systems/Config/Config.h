@@ -32,7 +32,6 @@ public:
 
 private:
 
-
     std::unordered_map<std::string, ConfigManager::VariableAddress> mPtr_;
     std::unordered_map<std::string, ConfigManager::VariableAddress> valueAddress_;
 
@@ -88,9 +87,9 @@ inline void Config::SetVariable( const std::string& _variableName, std::vector<T
     ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, variablePtr);
 
     // 値のアドレスを保存
-    valueAddress_[_variableName].address = variablePtr;
+    valueAddress_[_variableName].address = std::ref(*variablePtr);
     // メンバのアドレスを保存
-    mPtr_[_variableName].address = _variablePtr;
+    mPtr_[_variableName].address = std::ref(*_variablePtr);
 
     // 値のアドレスに値をコピー
     *_variablePtr = *variablePtr;

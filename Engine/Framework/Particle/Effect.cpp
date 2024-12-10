@@ -90,6 +90,8 @@ void Effect::ExclusionEmitter(const std::string& _name)
         if (it->GetName() == _name)
         {
             it = emitters_.erase(it);
+            auto nameIt = std::find(emitterNames_.begin(), emitterNames_.end(), _name);
+            emitterNames_.erase(nameIt);
             return;
         }
         ++it;

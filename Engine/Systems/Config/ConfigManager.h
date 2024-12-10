@@ -13,6 +13,9 @@
 #include <unordered_map>
 #include <optional>
 
+template<typename T>
+using RefVector = std::reference_wrapper<std::vector<T>>;
+
 class JsonLoader;
 class Config;
 class ConfigManager
@@ -23,9 +26,9 @@ public: // 構造体
     struct VariableAddress
     {
         std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*,
-            std::vector<uint32_t>*, std::vector<float>*,
-            std::vector<Vector2>*, std::vector<Vector3>*,
-            std::vector<Vector4>*, std::vector<std::string>*
+            RefVector<uint32_t>, RefVector<float>,
+            RefVector<Vector2>, RefVector<Vector3>,
+            RefVector<Vector4>, RefVector<std::string>
         > address;
     };
 
