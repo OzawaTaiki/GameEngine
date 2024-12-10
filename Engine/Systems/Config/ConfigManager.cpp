@@ -243,6 +243,9 @@ void ConfigManager::SetDirectoryPath(const std::string& _directoryPath)
 
 void ConfigManager::LoadFilesRecursively(const std::string& _directoryPath)
 {
+
+    std::vector<std::string> groupNames;
+
     // ディレクトリ内のファイルを読み込む
     for (auto& entry : std::filesystem::directory_iterator(_directoryPath, std::filesystem::directory_options::skip_permission_denied))
     {
