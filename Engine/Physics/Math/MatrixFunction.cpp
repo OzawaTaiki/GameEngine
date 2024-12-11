@@ -540,6 +540,15 @@ Matrix4x4 DirectionToDirection(const Vector3& _from, const Vector3& _to)
     return result;
 }
 
+Matrix4x4 MakeRotateMatrix(const Quaternion& _q)
+{
+    Matrix4x4 result;
+
+
+
+    return Matrix4x4();
+}
+
 Matrix4x4 operator*(const Matrix4x4& _mat1, const Matrix4x4& _mat2)
 {
     return Matrix4x4(Multiply(_mat1, _mat2));
