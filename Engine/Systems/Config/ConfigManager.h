@@ -85,16 +85,10 @@ private:
 template<typename T>
 inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, T*& _ptr)
 {
-    if (!value_.contains(_groupName))
+    if (!value_.contains(_groupName) || !value_[_groupName].contains(_variableName))
     {
-        // グループ名が存在しない場合は新しく作成
-        value_[_groupName] = {};
-    }
-
-    if (!value_[_groupName].contains(_variableName))
-    {
-        // 変数名が存在しない場合は新しく作成
-        value_[_groupName][_variableName] = {};
+        // グループ名 変数名 が存在しない場合は新しく作成
+        value_[_groupName][_variableName].variable = T();
     }
 
     _ptr = &std::get<T>(value_[_groupName][_variableName].variable);
@@ -104,16 +98,10 @@ inline void ConfigManager::GetVariableValue(const std::string& _groupName, const
 template<typename T>
 inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T>*& _ptr)
 {
-    if (!value_.contains(_groupName))
+    if (!value_.contains(_groupName) || !value_[_groupName].contains(_variableName))
     {
-        // グループ名が存在しない場合は新しく作成
-        value_[_groupName] = {};
-    }
-
-    if (!value_[_groupName].contains(_variableName))
-    {
-        // 変数名が存在しない場合は新しく作成
-        value_[_groupName][_variableName] = {};
+        // グループ名 変数名 が存在しない場合は新しく作成
+        value_[_groupName][_variableName].variable = std::vector<T>();
     }
 
     _ptr = &std::get<std::vector<T>>(value_[_groupName][_variableName].variable);
