@@ -4,9 +4,14 @@
 #include <Core/DirectX/DXCommon.h>
 #include <Physics/Collision/CollisionManager.h>
 
-void ObjectModel::Initialize(const std::string& _filePath)
+void ObjectModel::Initialize(const std::string& _filePath, const std::string& _name)
 {
     model_ = Model::CreateFromObj(_filePath);
+
+    if (_name.empty())
+        name_ = _filePath;
+    else
+        name_ = _name;
 
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
@@ -58,7 +63,7 @@ void ObjectModel::UpdateUVTransform()
 void ObjectModel::ImGui()
 {
     ImGui::PushID(this);
-    ImGui::SeparatorText("model");
+    ImGui::SeparatorText(name_.c_str());
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
     ImGui::DragFloat3("Rotate", &rotate_.x, 0.01f);

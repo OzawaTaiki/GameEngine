@@ -12,7 +12,7 @@ public:
     ObjectModel() = default;
     ~ObjectModel() = default;
 
-    void Initialize(const std::string& _filePath);
+    void Initialize(const std::string& _filePath, const std::string& _name);
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
 
@@ -34,6 +34,7 @@ private:
     WorldTransform worldTransform_;
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;
     Model* model_ = nullptr;
+    std::string name_ = "";
 
 #ifdef _DEBUG
     void ImGui();
