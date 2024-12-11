@@ -62,86 +62,106 @@ void ConfigManager::LoadData()
                 {
                     auto value = values[0];
 
-                    // valueの型を取得
-                    if (value.datum.index() == 0)
+                    switch (value.datum.index())
                     {
-                        // uint32_t
-                        uint32_t val = std::get<uint32_t>(value.datum);
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 1)
-                    {
-                        float val = std::get<float>(value.datum);
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 2)
-                    {
-                        Vector2 val = std::get<Vector2>(value.datum);
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 3)
-                    {
-                        Vector3 val = std::get<Vector3>(value.datum);
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 4)
-                    {
-                        Vector4 val = std::get<Vector4>(value.datum);
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 5)
-                    {
-                        std::string val = std::get<std::string>(value.datum);
-                        value_[groupName][variableName].variable = val;
+                    case 0:// uint32_t
+                        {
+                            uint32_t val = std::get<uint32_t>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 1:// float
+                        {
+                            float val = std::get<float>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 2:// Vector2
+                        {
+                            Vector2 val = std::get<Vector2>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 3:// Vector3
+                        {
+                            Vector3 val = std::get<Vector3>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 4:// Vector4
+                        {
+                            Vector4 val = std::get<Vector4>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 5:// std::string
+                        {
+                            std::string val = std::get<std::string>(value.datum);
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+
+                    default:
+                        break;
                     }
                 }
                 else
                 {
                     auto value = values[0];
 
-                    // valueの型を取得
-                    if (value.datum.index() == 0)
+                    switch (value.datum.index())
                     {
-                        std::vector<uint32_t> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<uint32_t>(v.datum));
+                    case 0:// uint32_t
+                        {
+                            std::vector<uint32_t> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<uint32_t>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 1:// float
+                        {
+                            std::vector<float> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<float>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 2:// Vector2
+                        {
+                            std::vector<Vector2> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<Vector2>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 3:// Vector3
+                        {
+                            std::vector<Vector3> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<Vector3>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 4:// Vector4
+                        {
+                            std::vector<Vector4> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<Vector4>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
+                    case 5:// std::string
+                        {
+                            std::vector<std::string> val;
+                            for (auto& v : values)
+                                val.push_back(std::get<std::string>(v.datum));
+                            value_[groupName][variableName].variable = val;
+                        }
+                        break;
 
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 1)
-                    {
-                        std::vector<float> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<float>(v.datum));
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 2)
-                    {
-                        std::vector<Vector2> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<Vector2>(v.datum));
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 3)
-                    {
-                        std::vector<Vector3> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<Vector3>(v.datum));
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 4)
-                    {
-                        std::vector<Vector4> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<Vector4>(v.datum));
-                        value_[groupName][variableName].variable = val;
-                    }
-                    else if (value.datum.index() == 5)
-                    {
-                        std::vector<std::string> val;
-                        for (auto& v : values)
-                            val.push_back(std::get<std::string>(v.datum));
-                        value_[groupName][variableName].variable = val;
+                    default:
+                        break;
                     }
                 }
             }
@@ -154,67 +174,132 @@ void ConfigManager::SaveData(const std::string& _groupName)
 {
     for (auto& [variableName, value] : value_[_groupName])
     {
-        if (value.variable.index() == 0)
+        switch (value.variable.index())
         {
-            // uint32_t
-            uint32_t val = std::get<uint32_t>(value.variable);
-            json_->SetData(_groupName, variableName, val);
+        case 0:// uint32_t
+            {
+                uint32_t val = std::get<uint32_t>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 1:// float
+            {
+                float val = std::get<float>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 2:// Vector2
+            {
+                Vector2 val = std::get<Vector2>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 3:// Vector3
+            {
+                Vector3 val = std::get<Vector3>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 4:// Vector4
+            {
+                Vector4 val = std::get<Vector4>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 5:// std::string
+            {
+                std::string val = std::get<std::string>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 6:// std::vector<uint32_t>
+            {
+                std::vector<uint32_t> val = std::get<std::vector<uint32_t>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 7:// std::vector<float>
+            {
+                std::vector<float> val = std::get<std::vector<float>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 8:// std::vector<Vector2>
+            {
+                std::vector<Vector2> val = std::get<std::vector<Vector2>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 9:// std::vector<Vector3>
+            {
+                std::vector<Vector3> val = std::get<std::vector<Vector3>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 10:// std::vector<Vector4>
+            {
+                std::vector<Vector4> val = std::get<std::vector<Vector4>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 11:// std::vector<std::string>
+            {
+                std::vector<std::string> val = std::get<std::vector<std::string>>(value.variable);
+                json_->SetData(_groupName, variableName, val);
+            }
+            break;
+        case 12:// std::list<uint32_t>
+            {
+                std::list<uint32_t> val = std::get<std::list<uint32_t>>(value.variable);
+                // listをvectorに変換
+                std::vector<uint32_t> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        case 13:// std::list<float>
+            {
+                std::list<float> val = std::get<std::list<float>>(value.variable);
+                // listをvectorに変換
+                std::vector<float> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        case 14:// std::list<Vector2>
+            {
+                std::list<Vector2> val = std::get<std::list<Vector2>>(value.variable);
+                // listをvectorに変換
+                std::vector<Vector2> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        case 15:// std::list<Vector3>
+            {
+                std::list<Vector3> val = std::get<std::list<Vector3>>(value.variable);
+                // listをvectorに変換
+                std::vector<Vector3> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        case 16:// std::list<Vector4>
+            {
+                std::list<Vector4> val = std::get<std::list<Vector4>>(value.variable);
+                // listをvectorに変換
+                std::vector<Vector4> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        case 17:// std::list<std::string>
+            {
+                std::list<std::string> val = std::get<std::list<std::string>>(value.variable);
+                // listをvectorに変換
+                std::vector<std::string> vec(val.begin(), val.end());
+                json_->SetData(_groupName, variableName, vec);
+            }
+            break;
+        default:
+            break;
         }
-        else if (value.variable.index() == 1)
-        {
-            float val = std::get<float>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 2)
-        {
-            Vector2 val = std::get<Vector2>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 3)
-        {
-            Vector3 val = std::get<Vector3>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 4)
-        {
-            Vector4 val = std::get<Vector4>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 5)
-        {
-            std::string val = std::get<std::string>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 6)
-        {
-            std::vector<uint32_t> val = std::get<std::vector<uint32_t>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 7)
-        {
-            std::vector<float> val = std::get<std::vector<float>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 8)
-        {
-            std::vector<Vector2> val = std::get<std::vector<Vector2>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 9)
-        {
-            std::vector<Vector3> val = std::get<std::vector<Vector3>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 10)
-        {
-            std::vector<Vector4> val = std::get<std::vector<Vector4>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
-        else if (value.variable.index() == 11)
-        {
-            std::vector<std::string> val = std::get<std::vector<std::string>>(value.variable);
-            json_->SetData(_groupName, variableName, val);
-        }
+
     }
     json_->SaveJson(_groupName);
 }

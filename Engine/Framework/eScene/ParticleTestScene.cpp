@@ -133,10 +133,13 @@ void ParticleTestScene::ImGui()
         emitters_ = selectedEffect_->GetEmitters();
     }
     static bool isActive = false;
-    ImGui::Checkbox("Active", &isActive);
-    if (selectedEffect_ != effects_.end())
+    if (ImGui::Button("Active"))
     {
-        selectedEffect_->SetActive(isActive);
+        isActive = true;
+        if (selectedEffect_ != effects_.end())
+        {
+            selectedEffect_->SetActive(isActive);
+        }
     }
 
     if (selectedEffect_ != effects_.end())

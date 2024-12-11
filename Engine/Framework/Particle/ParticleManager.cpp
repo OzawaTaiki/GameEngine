@@ -115,7 +115,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
                                           ParticleEmitter* _emitterPtr, BlendMode _blendMode, uint32_t _textureHandle)
 {
     if (groups_.contains(_groupName))
-        throw std::runtime_error("already exist particleGroup! name:" + '\"' + _groupName + '\"');
+        return;
 
     std::string groupName = _groupName;
     if (!_emitterPtr)
@@ -156,6 +156,18 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
 
 }
 
+void ParticleManager::DeleteParticleGroup(const std::string& _groupName)
+{
+    if (!groups_.contains(_groupName))
+    {
+        if (!groups_.contains(_groupName + "NoEmitter"))
+            return;
+        groups_.erase(_groupName + "NoEmitter");
+    }
+    else
+        groups_.erase(_groupName);
+}
+
 void ParticleManager::SetGroupModel(const std::string& _groupName, const std::string& _modelPath)
 {
     if (!groups_.contains(_groupName))
@@ -175,8 +187,13 @@ void ParticleManager::SetGroupTexture(const std::string& _groupName, uint32_t _t
 void ParticleManager::AddParticleToGroup(const std::string& _groupName, const Particle& _particles)
 {
     std::string gName = _groupName;
-    if (!groups_[_groupName].emitterPtr)
-        gName += "NoEmitter";
+    if (!groups_.contains(_groupName))
+    {
+        if (!groups_.contains(_groupName + "NoEmitter"))
+            return;
+        else if(!groups_[_groupName + "NoEmitter"].emitterPtr)
+            gName = _groupName + "NoEmitter";
+    }
 
     if (!groups_.contains(gName))
     {

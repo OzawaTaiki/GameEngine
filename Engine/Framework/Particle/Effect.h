@@ -23,12 +23,13 @@ public:
     std::list<ParticleEmitter*> GetEmitters() const;
     std::string GetName() const { return name_; }
 
-    void SetActive(bool _active) { isActive_ = _active; }
+    void SetActive(bool _active);
 
     void ExclusionEmitter(const std::string& _name);
 
     void Save()const;
 private:
+    void Reset();
 
     static const uint32_t          kMaxEmitters = 20;  // 最大エミッター数
 

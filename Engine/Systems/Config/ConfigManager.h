@@ -28,7 +28,10 @@ public: // 構造体
         std::variant<uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*,
             RefVector<uint32_t>, RefVector<float>,
             RefVector<Vector2>, RefVector<Vector3>,
-            RefVector<Vector4>, RefVector<std::string>
+            RefVector<Vector4>, RefVector<std::string>,
+            std::list<uint32_t>, std::list<float>,
+            std::list<Vector2>, std::list<Vector3>,
+            std::list<Vector4>, std::list<std::string>
         > address;
     };
 
@@ -37,7 +40,10 @@ public: // 構造体
         std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string,
             std::vector<uint32_t>, std::vector<float>,
             std::vector<Vector2>, std::vector<Vector3>,
-            std::vector<Vector4>, std::vector<std::string>
+            std::vector<Vector4>, std::vector<std::string>,
+            std::list<uint32_t>, std::list<float>,
+            std::list<Vector2>, std::list<Vector3>,
+            std::list<Vector4>, std::list<std::string>
         > variable;
     };
 
@@ -57,6 +63,10 @@ public:
 
     template<typename T>
     inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName,std::vector<T>*& _ptr);
+
+    template<typename T>
+    inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::list<T>*& _ptr);
+
 
     void EraseData(const std::string& _groupName, const std::string& _variableName);
 
@@ -106,4 +116,16 @@ inline void ConfigManager::GetVariableValue(const std::string& _groupName, const
 
     _ptr = &std::get<std::vector<T>>(value_[_groupName][_variableName].variable);
 
+}
+
+template<typename T>
+inline void ConfigManager::GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::list<T>*& _ptr)
+{
+    if (!value_.contains(_groupName) || !value_[_groupName].contains(_variableName))
+    {
+        // グループ名 変数名 が存在しない場合は新しく作成
+        value_[_groupName][_variableName].variable = std::list<T>();
+    }
+
+    _ptr = &std::get<std::list<T>>(value_[_groupName][_variableName].variable);
 }

@@ -23,16 +23,15 @@ void Effect::Update()
 {
     if (!isActive_)
     {
-        elapsedTime_ = 0;
-        for (auto& emitter : emitters_)
-        {
-            emitter.Reset();
-        }
+        Reset();
         return;
     }
 
     elapsedTime_ += 1.0f / 60.0f;
     //elapsedTime_ += Time::GetDeltaTime<float>();
+
+    // isActive_制御用
+    bool active = false;
 
     for (auto& emitter : emitters_)
     {
@@ -51,9 +50,15 @@ void Effect::Update()
         if (!emitter.IsActive() && emitter.IsAlive())
             emitter.SetActive(true);
 
+        // 未だ有効なエミッターがあるときフラグを立てる
+        if(emitter.IsActive() && !emitter.IsAlive())
+            active = true;
         // 更新
         emitter.Update();
     }
+    // 一個でもエミッターが有効なら true
+    // そうじゃなければ false
+    isActive_ = active;
 }
 
 ParticleEmitter* Effect::AddEmitter(const std::string& _name)
@@ -83,6 +88,12 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
     return list;
 }
 
+void Effect::SetActive(bool _active)
+{
+    isActive_ = _active;
+    Reset();
+}
+
 void Effect::ExclusionEmitter(const std::string& _name)
 {
     for (auto it = emitters_.begin(); it != emitters_.end();)
@@ -105,5 +116,14 @@ void Effect::Save() const
     for (auto& emitter : emitters_)
     {
         emitter.Save();
+    }
+}
+
+void Effect::Reset()
+{
+    elapsedTime_ = 0;
+    for (auto& emitter : emitters_)
+    {
+        emitter.Reset();
     }
 }

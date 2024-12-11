@@ -22,6 +22,8 @@ public:
     void Draw(const Camera* _camera);
 
     void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, BlendMode _blendMode = BlendMode::Add, uint32_t _textureHandle = UINT32_MAX);
+    void DeleteParticleGroup(const std::string& _groupName);
+
     void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
     void SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle);
 

@@ -18,8 +18,6 @@ void Particle::Initialize(const ParticleInitParam& _param)
     direction_ = parameter_.direction;
     acceleration_ = parameter_.acceleration;
 
-    deceleration_ = parameter_.deceleration;
-
     color_ = parameter_.color;
 
     isAlive_ = true;
@@ -31,12 +29,6 @@ void Particle::Initialize(const ParticleInitParam& _param)
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 
     directionMatrix_ = _param.directionMatrix;
-
-    parameter_.alphaTransition .keys.sort    ([](const KeyFrame<float  >& a, const KeyFrame< float >& b)     {return a.time < b.time; });
-    parameter_.colorTransition .keys.sort    ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
-    parameter_.rotateTransition.keys.sort   ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
-    parameter_.sizeTransition  .keys.sort     ([](const KeyFrame<Vector3>& a, const KeyFrame<Vector3>& b)     {return a.time < b.time; });
-    parameter_.speedTransition .keys.sort    ([](const KeyFrame<float  >& a, const KeyFrame< float >& b)     {return a.time < b.time; });
 
     t_ = 0;
 }

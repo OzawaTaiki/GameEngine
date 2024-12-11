@@ -17,46 +17,12 @@ void ParticleEmitter::Setting(const std::string& _name)
     name_ = _name;
 
     config_ = std::make_unique<Config>(name_, "Resources/Data/Particles/Emitters/");
+    // TODO : 変数の使用の有無の確認
+    // いらないものは消す
+    // 確認後，登録しなおす
 
-    config_->SetVariable("lifeTime_min", &setting_.lifeTime.value.min);
-    config_->SetVariable("lifeTime_max", &setting_.lifeTime.value.max);
-    config_->SetVariable("size_min", &setting_.size.value.min);
-    config_->SetVariable("size_max", &setting_.size.value.max);
-    config_->SetVariable("rotate_min", &setting_.rotate.value.min);
-    config_->SetVariable("rotate_max", &setting_.rotate.value.max);
-    config_->SetVariable("spped_min", &setting_.speed.value.min);
-    config_->SetVariable("spped_max", &setting_.speed.value.max);
-    config_->SetVariable("direction_min", &setting_.direction.value.min);
-    config_->SetVariable("direction_max", &setting_.direction.value.max);
-    config_->SetVariable("acceleration_min", &setting_.acceleration.value.min);
-    config_->SetVariable("acceleration_max", &setting_.acceleration.value.max);
-    config_->SetVariable("color_min", &setting_.color.value.min);
-    config_->SetVariable("color_max", &setting_.color.value.max);
+    RegisterEmitParticleSettings();
 
-    config_->SetVariable("countPerEmit", &countPerEmit_);
-    config_->SetVariable("emitPerSec", &emitPerSec_);
-    config_->SetVariable("maxParticles", &maxParticles_);
-    config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
-
-    //config_->SetVariabl(  "randomCoor", reinterpret_cast<uint32_t*> (&randomColor_));
-    config_->SetVariable("fadeAlpha", reinterpret_cast<uint32_t*> (&fadeAlpha_));
-    config_->SetVariable("fadeStartRatio", &fadeStartRatio_);
-    config_->SetVariable("delayTime", &delayTime_);
-    config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
-    config_->SetVariable("changeColor", reinterpret_cast<uint32_t*>(&changeColor_));
-    config_->SetVariable("changeSize", reinterpret_cast<uint32_t*>(&changeSize_));
-    config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
-
-    config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
-    config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
-    config_->SetVariable("size", &size_);
-    config_->SetVariable("radius", &radius_);
-    config_->SetVariable("offset", &offset_);
-    config_->SetVariable("rotate", &rotate_);
-    config_->SetVariable("position", &position_);
-
-    config_->SetVariable("modelPath", &useModelPath_);
-    config_->SetVariable("texturePath", &useTextruePath_);
 
 
     emitTime_ = 1.0f / static_cast<float> (emitPerSec_);
@@ -197,6 +163,70 @@ void ParticleEmitter::Reset()
     emitCount_ = 0;
     isActive_ = false;
     isAlive_ = true;
+}
+
+void ParticleEmitter::RegisterEmitParticleSettings()
+{
+    // 配列にしてもいいかも vector
+    config_->SetVariable("lifeTime_min", &setting_.lifeTime.value.min);
+    config_->SetVariable("lifeTime_max", &setting_.lifeTime.value.max);
+    config_->SetVariable("lifeTime_fixed", reinterpret_cast<uint32_t*>(&setting_.lifeTime.fixed));
+    config_->SetVariable("lifeTime_random", reinterpret_cast<uint32_t*>(&setting_.lifeTime.random));
+
+    config_->SetVariable("size_min", &setting_.size.value.min);
+    config_->SetVariable("size_max", &setting_.size.value.max);
+    config_->SetVariable("size_fixed", reinterpret_cast<uint32_t*>(&setting_.size.fixed));
+    config_->SetVariable("size_random", reinterpret_cast<uint32_t*>(&setting_.size.random));
+
+    config_->SetVariable("rotate_min", &setting_.rotate.value.min);
+    config_->SetVariable("rotate_max", &setting_.rotate.value.max);
+    config_->SetVariable("rotate_fixed", reinterpret_cast<uint32_t*>(&setting_.rotate.fixed));
+    config_->SetVariable("rotate_random", reinterpret_cast<uint32_t*>(&setting_.rotate.random));
+
+    config_->SetVariable("spped_min", &setting_.speed.value.min);
+    config_->SetVariable("spped_max", &setting_.speed.value.max);
+    config_->SetVariable("spped_fixed", reinterpret_cast<uint32_t*>(&setting_.speed.fixed));
+    config_->SetVariable("spped_random", reinterpret_cast<uint32_t*>(&setting_.speed.random));
+
+    config_->SetVariable("direction_min", &setting_.direction.value.min);
+    config_->SetVariable("direction_max", &setting_.direction.value.max);
+    config_->SetVariable("direction_fixed", reinterpret_cast<uint32_t*>(&setting_.direction.fixed));
+    config_->SetVariable("direction_random", reinterpret_cast<uint32_t*>(&setting_.direction.random));
+
+    config_->SetVariable("acceleration_min", &setting_.acceleration.value.min);
+    config_->SetVariable("acceleration_max", &setting_.acceleration.value.max);
+    config_->SetVariable("acceleration_fixed", reinterpret_cast<uint32_t*>(&setting_.acceleration.fixed));
+    config_->SetVariable("acceleration_random", reinterpret_cast<uint32_t*>(&setting_.acceleration.random));
+
+    config_->SetVariable("color_min", &setting_.color.value.min);
+    config_->SetVariable("color_max", &setting_.color.value.max);
+    config_->SetVariable("color_fixed", reinterpret_cast<uint32_t*>(&setting_.color.fixed));
+    config_->SetVariable("color_random", reinterpret_cast<uint32_t*>(&setting_.color.random));
+
+}
+
+void ParticleEmitter::RegisterEmitterSettings()
+{
+
+    config_->SetVariable("countPerEmit", &countPerEmit_);
+    config_->SetVariable("emitPerSec", &emitPerSec_);
+    config_->SetVariable("maxParticles", &maxParticles_);
+    config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
+
+    config_->SetVariable("delayTime", &delayTime_);
+    config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
+    config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
+
+    config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
+    config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
+    config_->SetVariable("size", &size_);
+    config_->SetVariable("radius", &radius_);
+    config_->SetVariable("offset", &offset_);
+    config_->SetVariable("rotate", &rotate_);
+    config_->SetVariable("position", &position_);
+
+    config_->SetVariable("modelPath", &useModelPath_);
+    config_->SetVariable("texturePath", &useTextruePath_);
 }
 
 
@@ -385,7 +415,7 @@ bool ParticleEmitter::ShowDebugWinsow()
             Save();
         }
 
-        if (ImGui::Button("add"))
+        if (ImGui::Button("Emit"))
         {
             std::vector<Particle> particles;
 
@@ -558,6 +588,7 @@ void ParticleEmitter::DisplaySizeParameters()
 
         ImGui::SeparatorText("");
 
+        ImGui::Text("Start Parameter");
         if (setting_.size.fixed)
         {
             ImGui::DragFloat3("Fix_Size", &setting_.size.value.min.x, 0.01f);
@@ -568,19 +599,22 @@ void ParticleEmitter::DisplaySizeParameters()
         }
         else
         {
-            ImGui::DragFloat3("Start_Size", &setting_.size.value.min.x, 0.01f);
-            ImGui::DragFloat3("End_Size", &setting_.size.value.max.x, 0.01f);
+            ImGui::DragFloat3("Start", &setting_.size.value.min.x, 0.01f);
+            ImGui::DragFloat3(" End ", &setting_.size.value.max.x, 0.01f);
         }
 
         if (parametor_.sizeTransition.isChange)
         {
             ImGui::SeparatorText("ChangeParameter");
-            ImGui::DragFloat("Time", &addSize_.time, 0.01f);
+            ImGui::DragFloat("Time", &addSize_.time, 0.01f, 0.01f, 0.99f);
             ImGui::DragFloat3("Size", &addSize_.value.x, 0.01f);
-            addSize_.pEasingFunc = Easing::SelectFuocPtr(Easing::SelectEasingFunc());
+
+            addSize_.easingFuncNum = Easing::SelectEasingFunc();
 
             if (ImGui::Button("Save"))
             {
+                addSize_.time = std::clamp(addSize_.time, 0.01f, 0.99f);
+
                 if (parametor_.sizeTransition.keys.empty()) {
                     parametor_.sizeTransition.keys.emplace_back(addSize_);
                 }
@@ -604,7 +638,10 @@ void ParticleEmitter::DisplaySizeParameters()
 
                 for (auto it = parametor_.sizeTransition.keys.begin(); it != parametor_.sizeTransition.keys.end();)
                 {
-                    std::string str = "Time:" + std::to_string(it->time);
+
+                    std::string str =
+                        "Time:" + std::to_string(it->time) + "##" +
+                        std::to_string(std::distance(parametor_.sizeTransition.keys.begin(), it));
 
                     if (ImGui::Selectable(str.c_str(), selectedSizeKey_ == index))
                         selectedSizeKey_ = index;
@@ -615,6 +652,7 @@ void ParticleEmitter::DisplaySizeParameters()
 
                         ImGui::Text("Time:%f", it->time);
                         ImGui::Text("Size:%f,%f,%f", it->value.x, it->value.y, it->value.z);
+                        ImGui::Text("Func:%s", Easing::GetEasingFuncName(it->easingFuncNum).c_str());
 
                         if (ImGui::Button("Delete"))
                         {
@@ -660,46 +698,56 @@ void ParticleEmitter::DisplaySpeedParameters()
 
         ImGui::NextColumn();
         ImGui::Checkbox("Change", &parametor_.speedTransition.isChange);
-
         ImGui::Columns(1);
         ImGui::SeparatorText("");
 
+        ImGui::PushItemWidth(width * 4);
+
+        ImGui::Text("Start Parameter");
         if (isFixedSpeed_)
         {
-            ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Fix", &setting_.speed.value.min, 0.01f);
             setting_.speed.value.max = setting_.speed.value.min;
             ImGui::BeginDisabled(true);
-            ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Disabled", &setting_.speed.value.max);
             ImGui::EndDisabled();
         }
         else
         {
-            ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Min", &setting_.speed.value.min, 0.01f);
-            ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Max", &setting_.speed.value.max, 0.01f);
         }
-
-        ImGui::DragFloat("Deceleration", &parametor_.deceleration, 0.01f);
+        ImGui::PopItemWidth();
 
         if (parametor_.speedTransition.isChange)
         {
             ImGui::SeparatorText("ChangeParameter");
-            ImGui::DragFloat("Time", &addSpeed_.time, 0.01f);
+            ImGui::DragFloat("Time", &addSpeed_.time, 0.01f, 0.01f, 0.99f);
             ImGui::DragFloat("Speed", &addSpeed_.value, 0.01f);
+
+            addSpeed_.easingFuncNum = Easing::SelectEasingFunc();
+
             if (ImGui::Button("Save"))
             {
-                for (auto it = parametor_.speedTransition.keys.begin(); it != parametor_.speedTransition.keys.end(); ++it)
+                addSpeed_.time = std::clamp(addSpeed_.time, 0.01f, 0.99f);
+
+                if (parametor_.speedTransition.keys.empty())
                 {
-                    if (it->time >= addSpeed_.time)
-                    {
-                        parametor_.speedTransition.keys.insert(it, addSpeed_);
-                        addSpeed_ = {};
-                        break;
-                    }
+                    parametor_.speedTransition.keys.emplace_back(addSpeed_);
                 }
+                else
+                {
+                    auto it = parametor_.speedTransition.keys.begin();
+                    for (; it != parametor_.speedTransition.keys.end(); ++it)
+                    {
+                        if (it->time >= addSpeed_.time)
+                        {
+                            break;
+                        }
+                    }
+                    parametor_.speedTransition.keys.insert(it, addSpeed_);
+                }
+                addSpeed_ = {};
             }
 
             if (parametor_.speedTransition.keys.size() != 0)
@@ -709,14 +757,21 @@ void ParticleEmitter::DisplaySpeedParameters()
                 int32_t index = 0;
                 for (auto it = parametor_.speedTransition.keys.begin(); it != parametor_.speedTransition.keys.end();)
                 {
-                    std::string str = "Time:" + std::to_string(it->time);
+                    std::string str =
+                        "Time:" + std::to_string(it->time) + "##" +
+                        std::to_string(std::distance(parametor_.speedTransition.keys.begin(), it));
+
                     if (ImGui::Selectable(str.c_str(), selectedSpeedKey_ == index))
                         selectedSpeedKey_ = index;
+
                     if (ImGui::BeginPopupContextItem())
                     {
                         selectedSpeedKey_ = index;
+
                         ImGui::Text("Time:%f", it->time);
                         ImGui::Text("Speed:%f", it->value);
+                        ImGui::Text("Func:%s", Easing::GetEasingFuncName(it->easingFuncNum).c_str());
+
                         if (ImGui::Button("Delete"))
                         {
                             it = parametor_.speedTransition.keys.erase(it);
@@ -784,24 +839,32 @@ void ParticleEmitter::DisplayDirectionParameters()
             setting_.direction.fixed = false;
         }
 
+
         ImGui::SeparatorText("");
 
-        ImGui::BeginDisabled(particleDirection_ != ParticleDirection::Random);
+        ImGui::Text("Start Parameter");
 
-        if (particleDirection_ != ParticleDirection::Random && setting_.direction.fixed)
+        if(particleDirection_ == ParticleDirection::Random)
         {
-            ImGui::DragFloat3("Fix", &setting_.direction.value.min.x, 0.01f);
-            setting_.direction.value.max = setting_.direction.value.min;
-            ImGui::BeginDisabled(true);
-            ImGui::DragFloat3("Disabled", &setting_.direction.value.max.x);
-            ImGui::EndDisabled();
+            if (setting_.direction.fixed)
+            {
+                ImGui::DragFloat3("Fix", &setting_.direction.value.min.x, 0.01f);
+                setting_.direction.value.max = setting_.direction.value.min;
+                ImGui::BeginDisabled(true);
+                ImGui::DragFloat3("Disabled", &setting_.direction.value.max.x);
+                ImGui::EndDisabled();
+            }
+            else
+            {
+                ImGui::DragFloat3("Min", &setting_.direction.value.min.x, 0.01f);
+                ImGui::DragFloat3("Max", &setting_.direction.value.max.x, 0.01f);
+            }
         }
         else
         {
             ImGui::DragFloat3("Min", &setting_.direction.value.min.x, 0.01f);
             ImGui::DragFloat3("Max", &setting_.direction.value.max.x, 0.01f);
         }
-        ImGui::EndDisabled();
         ImGui::PopID();
 
         ImGui::TreePop();
@@ -834,6 +897,7 @@ void ParticleEmitter::DisplayAccelerationParameters()
 
        ImGui::SeparatorText("");
 
+       ImGui::Text("Start Parameter");
        if (setting_.acceleration.fixed)
        {
            ImGui::DragFloat3("Fix", &setting_.acceleration.value.min.x, 0.01f);
@@ -868,11 +932,11 @@ void ParticleEmitter::DisplayColorParameters()
 
         ImGui::NextColumn();
         ImGui::Checkbox("Change", &parametor_.colorTransition.isChange);
-        ImGui::Checkbox("FadeAlpha", &parametor_.alphaTransition.isChange);
         ImGui::Columns(1);
 
 
         ImGui::SeparatorText("");
+        ImGui::Text("Start Parameter");
         if (setting_.color.fixed)
         {
             ImGui::ColorEdit4("Fix", &setting_.color.value.min.x);
@@ -896,14 +960,21 @@ void ParticleEmitter::DisplayColorParameters()
                 ImGui::ColorEdit3("Color", &addColor_.value.x);
                 if (ImGui::Button("Save"))
                 {
-                    for (auto it = parametor_.colorTransition.keys.begin(); it != parametor_.colorTransition.keys.end(); ++it)
+                    if (parametor_.colorTransition.keys.empty())
                     {
-                        if (it->time >= addColor_.time)
+                        parametor_.colorTransition.keys.emplace_back(addColor_);
+                    }
+                    else
+                    {
+                        auto it = parametor_.colorTransition.keys.begin();
+                        for (; it != parametor_.colorTransition.keys.end(); ++it)
                         {
-                            parametor_.colorTransition.keys.insert(it, addColor_);
-                            addColor_ = {};
-                            break;
+                            if (it->time >= addColor_.time)
+                            {
+                                break;
+                            }
                         }
+                        parametor_.colorTransition.keys.insert(it, addColor_);
                     }
                 }
 
@@ -914,7 +985,10 @@ void ParticleEmitter::DisplayColorParameters()
                     int32_t index = 0;
                     for (auto it = parametor_.colorTransition.keys.begin(); it != parametor_.colorTransition.keys.end();)
                     {
-                        std::string str = "Time:" + std::to_string(it->time);
+                        std::string str =
+                            "Time:" + std::to_string(it->time) + "##" +
+                            std::to_string(std::distance(parametor_.colorTransition.keys.begin(), it));
+
                         if (ImGui::Selectable(str.c_str(), selectedColorKey_ == index))
                             selectedColorKey_ = index;
                         if (ImGui::BeginPopupContextItem())
@@ -952,14 +1026,21 @@ void ParticleEmitter::DisplayColorParameters()
                 ImGui::DragFloat("Alpha", &addAlpha_.value, 0.01f);
                 if (ImGui::Button("Save"))
                 {
-                    for (auto it = parametor_.alphaTransition.keys.begin(); it != parametor_.alphaTransition.keys.end(); ++it)
+                    if (parametor_.alphaTransition.keys.empty())
                     {
-                        if (it->time >= addAlpha_.time)
+                        parametor_.alphaTransition.keys.emplace_back(addAlpha_);
+                    }
+                    else
+                    {
+                        auto it = parametor_.alphaTransition.keys.begin();
+                        for (; it != parametor_.alphaTransition.keys.end(); ++it)
                         {
-                            parametor_.alphaTransition.keys.insert(it, addAlpha_);
-                            addAlpha_ = {};
-                            break;
+                            if (it->time >= addAlpha_.time)
+                            {
+                                break;
+                            }
                         }
+                        parametor_.alphaTransition.keys.insert(it, addAlpha_);
                     }
                 }
 
@@ -970,7 +1051,10 @@ void ParticleEmitter::DisplayColorParameters()
                     int32_t index = 0;
                     for (auto it = parametor_.alphaTransition.keys.begin(); it != parametor_.alphaTransition.keys.end();)
                     {
-                        std::string str = "Time:" + std::to_string(it->time);
+                        std::string str =
+                            "Time:" + std::to_string(it->time) + "##" +
+                            std::to_string(std::distance(parametor_.alphaTransition.keys.begin(), it));
+
                         if (ImGui::Selectable(str.c_str(), selectedAlphaKey_ == index))
                             selectedAlphaKey_ = index;
                         if (ImGui::BeginPopupContextItem())

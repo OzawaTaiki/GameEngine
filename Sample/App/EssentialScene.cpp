@@ -12,6 +12,7 @@ std::unique_ptr<BaseScene>EssentialScene::Create()
 
 EssentialScene::~EssentialScene()
 {
+    ParticleManager::GetInstance()->DeleteParticleGroup("Essential");
 }
 
 void EssentialScene::Initialize()
@@ -24,7 +25,7 @@ void EssentialScene::Initialize()
     debugCamera_.Initialize();
 
     plane_ = std::make_unique<ObjectModel>();
-    plane_->Initialize("Tile/Tile.gltf");
+    plane_->Initialize("Tile/Tile.gltf","Ground");
     plane_->uvScale_ = { 100,100 };
 
     lineDrawer_ = LineDrawer::GetInstance();
@@ -37,7 +38,7 @@ void EssentialScene::Initialize()
     for (int i = 0; i < 10; i++)
     {
         ParticleInitParam param;
-        param.position = { i * 0.3f,i * 0.1f,0 };
+        param.position = { i * 0.3f,i * 0.1f,i * 0.1f };
         param.isInfiniteLife = true;
         param.color = { 1,1,1,1 };
         param.size = { 1,1,1 };

@@ -32,12 +32,14 @@ struct SettingGroup
 struct EmitParticleSettings
 {
     SettingGroup<float>     lifeTime = { false,true,{1,1} };
-     SettingGroup<Vector3>   size = { false,true,{{1,1,1},{1,1,1}} };
-     SettingGroup<Vector3>   rotate = { false,true,{{1,1,1},{1,1,1}} };
-     SettingGroup<float>     speed = { false,true,{0,1} };
-     SettingGroup<Vector3>   direction = { false,true,{{-1,-1,-1},{1,1,1}} };
-     SettingGroup<Vector3>   acceleration = { false,true,{{0,0,0},{0,0,0}} };
-     SettingGroup<Vector4>   color = { false,true,{} };
+    SettingGroup<Vector3>   size = { false,true,{{1,1,1},{1,1,1}} };
+    SettingGroup<Vector3>   rotate = { false,true,{{1,1,1},{1,1,1}} };
+    SettingGroup<float>     speed = { false,true,{0,1} };
+    SettingGroup<Vector3>   direction = { false,true,{{-1,-1,-1},{1,1,1}} };
+    SettingGroup<Vector3>   acceleration = { false,true,{{0,0,0},{0,0,0}} };
+    SettingGroup<Vector4>   color = { false,true,{} };
+
+
 };
 
 enum class EmitterShape
@@ -55,21 +57,6 @@ enum class ParticleDirection
     Outward,
     Random
 };
-
-/*
-
-    struct colorKey{
-        float time;
-        vector4 color;
-    }
-    std::vector<colorKey> colorKeys;
-
-    １グループ内での発生タイミング ０～
-
-
-
-*/
-
 
 class Particle;
 class ParticleEmitter
@@ -114,9 +101,13 @@ public:
     void Reset();
 
 private:
+    // EmitParticleSettingsのcofig登録
+    void RegisterEmitParticleSettings();
+
+    // emitterのパラメータのconfgi登録
+    void RegisterEmitterSettings();
+
     EmitParticleSettings    setting_{};
-
-
 
     ParticleInitParam       parametor_ = {}; // NEW!!!
 
@@ -146,7 +137,6 @@ private:
     float                   radius_ = 1;
 
     bool                    loop_;                          // ループするか
-    bool                    fadeAlpha_;                     // 生成後にアルファを変更するか
     bool                    changeSize_;                    // 生成後にサイズを変更するか
     bool                    changeColor_;                   // 生成後に色を変更するか
     bool                    randomColor_;                   // 色をランダムで生成するか
@@ -169,7 +159,6 @@ private:
     float                   decelelation_       = 0;        // 減速係数
 
     float                   delayTime_;                     // 発生までの遅延時間
-    float                   fadeStartRatio_;                // アルファを変え始める割合
     float                   duration_ = 1;                  // エミッターの持続時間
     uint32_t                maxParticles_;                  // 最大数
     uint32_t                countPerEmit_ = 1;              // 回当たりの発生数

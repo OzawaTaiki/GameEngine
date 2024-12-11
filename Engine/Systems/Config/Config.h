@@ -27,8 +27,11 @@ public:
     template< typename T>
     inline void SetVariable( const std::string& _variableName, T* _variablePtr);
 
-    template< typename T>
+    template<typename T>
     inline void SetVariable( const std::string& _variableName, std::vector<T>* _variablePtr);
+
+    template<typename T>
+    inline void SetVariable(const std::string& _variableName, std::list<T>* _variablePtr);
 
 private:
 
@@ -94,4 +97,31 @@ inline void Config::SetVariable( const std::string& _variableName, std::vector<T
     // 値のアドレスに値をコピー
     *_variablePtr = *variablePtr;
 
+}
+
+template<typename T>
+inline void Config::SetVariable(const std::string& _variableName, std::list<T>* _variablePtr)
+{
+    if (groupName_.empty())
+        throw std::runtime_error("groupName is empty");
+
+    // variableNameがない
+    if (!mPtr_.contains(_variableName))
+    {
+        // 追加
+        mPtr_[_variableName].address = {};
+        valueAddress_[_variableName].address = {};
+    }
+
+    // configManagerから値のアドレスを取得
+    std::list<T>* variablePtr = nullptr;
+    ConfigManager::GetInstance()->GetVariableValue(groupName_, _variableName, variablePtr);
+
+    // 値のアドレスを保存
+    valueAddress_[_variableName].address = std::ref(*variablePtr);
+    // メンバのアドレスを保存
+    mPtr_[_variableName].address = std::ref(*_variablePtr);
+
+    // 値のアドレスに値をコピー
+    *_variablePtr = *variablePtr;
 }
