@@ -4,6 +4,9 @@
 #include <Core/DirectX/DXCommon.h>
 #include <Physics/Collision/CollisionManager.h>
 
+// TODO : ライトを独立させる
+// ライトをstructureにして，ライトの数だけ配列を作る
+
 void ObjectModel::Initialize(const std::string& _filePath, const std::string& _name)
 {
     model_ = Model::CreateFromObj(_filePath);
@@ -42,8 +45,6 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
 
-
-    //model_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)
