@@ -186,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="UI\UISprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\DirectX\BlendMode.h" />
     <ClInclude Include="Core\DirectX\D3DResourceLeakChecker.h" />
     <ClInclude Include="Core\DirectX\DXCommon.h" />
     <ClInclude Include="Core\DirectX\PSOManager.h" />

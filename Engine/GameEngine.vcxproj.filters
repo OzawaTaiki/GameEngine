@@ -510,5 +510,8 @@
     <ClInclude Include="Framework\Camera\DebugCamera.h">
       <Filter>Framework\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Core\DirectX\BlendMode.h">
+      <Filter>Core\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -33,17 +33,20 @@ void EssentialScene::Initialize()
 
     input_ = Input::GetInstance();
 
+    ParticleManager::GetInstance()->CreateParticleGroup("Essential", "plane/plane.gltf", nullptr, BlendMode::Normal);
     for (int i = 0; i < 10; i++)
     {
         ParticleInitParam param;
-        param.position = { i * 0.3f,i * 0.3f,0 };
+        param.position = { i * 0.3f,i * 0.1f,0 };
         param.isInfiniteLife = true;
         param.color = { 1,1,1,1 };
         param.size = { 1,1,1 };
 
         Particle& particle = particles_.emplace_back();
         particle.Initialize(param);
+
     }
+
     ParticleManager::GetInstance()->AddParticleToGroup("Essential", particles_);
 
 }
@@ -80,7 +83,7 @@ void EssentialScene::Update()
 void EssentialScene::Draw()
 {
     ModelManager::GetInstance()->PreDrawForObjectModel();
-    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+   // plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
 //-------------------------------------------------------------------------
     ModelManager::GetInstance()->PreDrawForAnimationModel();

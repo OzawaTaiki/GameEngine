@@ -25,14 +25,15 @@ void ParticleManager::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
 
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle",PSOManager::BlendMode::Add);
-    pipelineState_ = pso.value();
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle",BlendMode::Add);
     assert(pso.has_value());
+    pipelineState_[BlendMode::Add] = pso.value();
 
    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Particle");
    assert(rootSignature.has_value());
    rootsignature_ = rootSignature.value();
 }
+
 
 void ParticleManager::Update(const Vector3& _cRotate)
 {
@@ -97,6 +98,8 @@ void ParticleManager::Draw(const Camera* _camera)
         if (particles.instanceNum == 0)
             continue;
 
+        commandList->SetPipelineState(pipelineState_[particles.blendMode]);
+
         commandList->IASetVertexBuffers(0, 1, particles.model->GetMeshPtr()->GetVertexBufferView());
         commandList->IASetIndexBuffer(particles.model->GetMeshPtr()->GetIndexBufferView());
 
@@ -108,7 +111,8 @@ void ParticleManager::Draw(const Camera* _camera)
     }
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle)
+void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath,
+                                          ParticleEmitter* _emitterPtr, BlendMode _blendMode, uint32_t _textureHandle)
 {
     if (groups_.contains(_groupName))
         throw std::runtime_error("already exist particleGroup! name:" + '\"' + _groupName + '\"');
@@ -117,7 +121,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
     if (!_emitterPtr)
         groupName += "NoEmitter";
 
-    Group& group = groups_[_groupName];
+    Group& group = groups_[groupName];
     group.model = Model::CreateFromObj(_modelPath);
     if (_textureHandle == UINT32_MAX)
         group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
@@ -139,6 +143,15 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
     else
     {
         group.emitterPtr = _emitterPtr;
+    }
+
+    group.blendMode = _blendMode;
+
+    if (!pipelineState_.contains(_blendMode))
+    {
+        auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle", _blendMode);
+        assert(pso.has_value());
+        pipelineState_[_blendMode] = pso.value();
     }
 
 }
@@ -188,7 +201,6 @@ void ParticleManager::PreDraw()
 
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    commandList->SetPipelineState(pipelineState_);
     commandList->SetGraphicsRootSignature(rootsignature_);
 }
 

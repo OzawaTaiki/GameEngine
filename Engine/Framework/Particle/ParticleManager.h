@@ -1,8 +1,11 @@
 #pragma once
 #include <Rendering/Model/Model.h>
 #include "Particle.h"
+#include <Core/DirectX/BlendMode.h>
 
+#include <unordered_map>
 #include <d3d12.h>
+
 class SRVManager;
 class ParticleEmitter;
 class ParticleManager
@@ -18,7 +21,7 @@ public:
     void Update(const Vector3& _cRotate);
     void Draw(const Camera* _camera);
 
-    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, uint32_t _textureHandle = UINT32_MAX);
+    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, BlendMode _blendMode = BlendMode::Add, uint32_t _textureHandle = UINT32_MAX);
     void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
     void SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle);
 
@@ -44,14 +47,14 @@ private:
         uint32_t srvIndex;
         uint32_t instanceNum;
         ParticleEmitter* emitterPtr;
-
+        BlendMode blendMode;
     };
 
     void PreDraw();
 
     std::unordered_map <std::string, Group> groups_;
 
-    ID3D12PipelineState* pipelineState_;
+    std::map<BlendMode,ID3D12PipelineState*> pipelineState_;
     ID3D12RootSignature* rootsignature_;
 
     SRVManager* srvManager_ = nullptr;

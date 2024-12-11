@@ -91,7 +91,7 @@ void ParticleEmitter::Setting(const std::string& _name)
     //parametor_.speedTransition.keys.emplace_back(KeyFrame{ 1.0f,0.0f });
 
     uint32_t handle = TextureManager::GetInstance()->Load(useTextruePath_);
-    ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, handle);
+    ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, BlendMode::Add, handle);
 
 }
 
