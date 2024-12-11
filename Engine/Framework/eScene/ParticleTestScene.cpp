@@ -30,7 +30,7 @@ void ParticleTestScene::Initialize()
 
 
     plane_ = std::make_unique<ObjectModel>();
-    plane_->Initialize("Tile/Tile.gltf");
+    plane_->Initialize("Tile/Tile.gltf", "Ground");
     plane_->uvScale_ = { 100,100 };
 
     lineDrawer_ = LineDrawer::GetInstance();
