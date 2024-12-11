@@ -24,12 +24,22 @@ void SampleScene::Initialize()
 void SampleScene::Update()
 {
 
-    Vector3 axis = { 1,1,1 };
-    axis = axis.Normalize();
-    float angle = 0.44f;
-    Matrix4x4 rot = MakeRotateAxisAngle(axis, angle);
-    rot.ShowData("Rot", false);
 
+    Quaternion rotation0 = Quaternion::MakeRotateAxisAngleQuaternion({ 0.71f, 0.71f, 0.0f }, 0.3f);
+    Quaternion rotation1 = Quaternion::MakeRotateAxisAngleQuaternion({ 0.71f, 0.0f, 0.71f }, 3.141592f);
+
+    Quaternion interpolate0 = Slerp(rotation0, rotation1, 0.0f);
+    Quaternion interpolate1 = Slerp(rotation0, rotation1, 0.3f);
+    Quaternion interpolate2 = Slerp(rotation0, rotation1, 0.5f);
+    Quaternion interpolate3 = Slerp(rotation0, rotation1, 0.7f);
+    Quaternion interpolate4 = Slerp(rotation0, rotation1, 1.0f);
+
+
+    interpolate0.ShowData("interpolate0 :Slerp(q1,q2,0.0f)",false);
+    interpolate1.ShowData("interpolate1 :Slerp(q1,q2,0.3f)", false);
+    interpolate2.ShowData("interpolate2 :Slerp(q1,q2,0.5f)", false);
+    interpolate3.ShowData("interpolate3 :Slerp(q1,q2,0.7f)", false);
+    interpolate4.ShowData("interpolate4 :Slerp(q1,q2,1.0f)", false);
 }
 
 void SampleScene::Draw()
