@@ -24,11 +24,25 @@ void SampleScene::Initialize()
 void SampleScene::Update()
 {
 
-    Vector3 axis = { 1,1,1 };
-    axis = axis.Normalize();
-    float angle = 0.44f;
-    Matrix4x4 rot = MakeRotateAxisAngle(axis, angle);
-    rot.ShowData("Rot", false);
+    Quaternion q1 = { 2.0f,3.0f,4.0,1.0f };
+    Quaternion q2 = { 1.0f,3.0f,5.0,2.0f };
+    Quaternion identity = Quaternion::Identity();
+    Quaternion coj = q1.Conjugate();
+    Quaternion inv = q1.Inverse();
+    Quaternion normal = q1.Normalize();
+    Quaternion mul1 = q1 * q2;
+    Quaternion mul2 = q2 * q1;
+
+    float norm = q1.Norm();
+
+    identity.ShowData("identity", false);
+    coj.ShowData("conjugate", false);
+    inv.ShowData("inverse", false);
+    normal.ShowData("normalize", false);
+    mul1.ShowData("mul1", false);
+    mul2.ShowData("mul2", false);
+
+    ImGui::Text("norm : %.2f", norm);
 
 }
 
