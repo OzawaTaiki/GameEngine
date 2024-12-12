@@ -16,7 +16,11 @@ public:
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
 
+
     void SetModel(const std::string& _filePath);
+    void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
+
+    const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
     void UpdateUVTransform();
 
