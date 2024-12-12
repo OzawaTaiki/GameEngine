@@ -1,0 +1,130 @@
+{
+    "aa": {
+        "acceleration_fixed": [
+            0
+        ],
+        "acceleration_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "acceleration_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "acceleration_random": [
+            0
+        ],
+        "color_fixed": [
+            0
+        ],
+        "color_max": [
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "color_min": [
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "color_random": [
+            0
+        ],
+        "direction_fixed": [
+            0
+        ],
+        "direction_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "direction_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "direction_random": [
+            0
+        ],
+        "lifeTime_fixed": [
+            0
+        ],
+        "lifeTime_max": [
+            0.0
+        ],
+        "lifeTime_min": [
+            0.0
+        ],
+        "lifeTime_random": [
+            0
+        ],
+        "rotate_fixed": [
+            0
+        ],
+        "rotate_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "rotate_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "rotate_random": [
+            0
+        ],
+        "size_fixed": [
+            0
+        ],
+        "size_max": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "size_min": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "size_random": [
+            0
+        ],
+        "spped_fixed": [
+            0
+        ],
+        "spped_max": [
+            0.0
+        ],
+        "spped_min": [
+            0.0
+        ],
+        "spped_random": [
+            0
+        ]
+    }
+}

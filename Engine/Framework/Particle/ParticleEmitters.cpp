@@ -156,6 +156,17 @@ void ParticleEmitter::SetActive(bool _active)
     isActive_ = _active;
 }
 
+std::array<bool, 3> ParticleEmitter::GetBillboardAxes() const
+{
+    std::array<bool, 3> axes;
+
+    axes[0] = billboardAxes_[0];
+    axes[1] = billboardAxes_[1];
+    axes[2] = billboardAxes_[2];
+
+    return axes;
+}
+
 
 void ParticleEmitter::Reset()
 {
@@ -205,25 +216,36 @@ void ParticleEmitter::RegisterEmitParticleSettings()
 
 }
 
-void ParticleEmitter::RegisterEmitterSettings()
+void ParticleEmitter::RegisterParticleInitParam()
 {
 
-    config_->SetVariable("countPerEmit", &countPerEmit_);
-    config_->SetVariable("emitPerSec", &emitPerSec_);
-    config_->SetVariable("maxParticles", &maxParticles_);
-    config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
+}
 
-    config_->SetVariable("delayTime", &delayTime_);
-    config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
-    config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
-
+void ParticleEmitter::RegisterEmitterSettings()
+{
     config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
     config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
-    config_->SetVariable("size", &size_);
-    config_->SetVariable("radius", &radius_);
+
+    config_->SetVariable("position", &position_);
     config_->SetVariable("offset", &offset_);
     config_->SetVariable("rotate", &rotate_);
-    config_->SetVariable("position", &position_);
+    config_->SetVariable("size", &size_);
+    config_->SetVariable("radius", &radius_);
+
+    config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
+    config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
+    config_->SetVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
+
+    config_->SetVariable("billBoardAxes", &billboardAxes_);
+
+    config_->SetVariable("delayTime", &delayTime_);
+    config_->SetVariable("duration", &duration_);
+
+    config_->SetVariable("maxParticles", &maxParticles_);
+    config_->SetVariable("countPerEmit", &countPerEmit_);
+    config_->SetVariable("emitPerSec", &emitPerSec_);
+    config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
+
 
     config_->SetVariable("modelPath", &useModelPath_);
     config_->SetVariable("texturePath", &useTextruePath_);
@@ -540,12 +562,12 @@ void ParticleEmitter::DisplayLifeTimeParameters()
         ImGui::Columns(1);
         ImGui::SeparatorText("");
 
-        if (isInfiniteLife_)
+        if (parametor_.isInfiniteLife)
         {
             // 無限寿命だから設定できない余
             ImGui::TextDisabled(" Infinite LifeTime");
         }
-        else if (isFixedLifeTime_)
+        else if (setting_.lifeTime.fixed)
         {
             ImGui::SetNextItemWidth(width * 4);
             ImGui::DragFloat("Fix", &setting_.lifeTime.value.min, 0.01f, 0);
@@ -704,7 +726,7 @@ void ParticleEmitter::DisplaySpeedParameters()
         ImGui::PushItemWidth(width * 4);
 
         ImGui::Text("Start Parameter");
-        if (isFixedSpeed_)
+        if (setting_.speed.fixed)
         {
             ImGui::DragFloat("Fix", &setting_.speed.value.min, 0.01f);
             setting_.speed.value.max = setting_.speed.value.min;
@@ -1122,11 +1144,11 @@ void ParticleEmitter::DisplayFlags()
     ImGui::BeginDisabled(!isEnableBillboard_);
     ImGui::SeparatorText("use billboard");
     ImGui::PushID("billboard");
-    ImGui::Checkbox("X", &billboardAxes_[0]);
+    ImGui::Checkbox("X", reinterpret_cast<bool*> (&billboardAxes_[0]));
     ImGui::SameLine();
-    ImGui::Checkbox("Y", &billboardAxes_[1]);
+    ImGui::Checkbox("Y", reinterpret_cast<bool*> (&billboardAxes_[1]));
     ImGui::SameLine();
-    ImGui::Checkbox("Z", &billboardAxes_[2]);
+    ImGui::Checkbox("Z", reinterpret_cast<bool*> (&billboardAxes_[2]));
     ImGui::PopID();
     ImGui::EndDisabled();
 

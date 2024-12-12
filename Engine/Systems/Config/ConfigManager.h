@@ -29,9 +29,9 @@ public: // 構造体
             RefVector<uint32_t>, RefVector<float>,
             RefVector<Vector2>, RefVector<Vector3>,
             RefVector<Vector4>, RefVector<std::string>,
-            std::list<uint32_t>, std::list<float>,
-            std::list<Vector2>, std::list<Vector3>,
-            std::list<Vector4>, std::list<std::string>
+            std::list<uint32_t>*, std::list<float>*,
+            std::list<Vector2>*, std::list<Vector3>*,
+            std::list<Vector4>*, std::list<std::string>*
         > address;
     };
 

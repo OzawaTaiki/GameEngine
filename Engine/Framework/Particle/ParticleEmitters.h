@@ -82,6 +82,10 @@ public:
     void SetActive(bool _active);
     void SetAlive(bool _alive) { isAlive_ = _alive; }
 
+
+    //
+    // Getter
+    //
     bool IsActive() const { return isActive_; }
     bool IsAlive() const { return isAlive_; }
     bool EnableBillboard() const { return isEnableBillboard_; }
@@ -89,7 +93,7 @@ public:
 
     float GetDelayTime() const { return delayTime_; }
     float GetDuration() const { return duration_; }
-    std::array<bool, 3> GetBillboardAxes() const { return billboardAxes_; }
+    std::array<bool, 3> GetBillboardAxes() const;
 
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
@@ -104,12 +108,16 @@ private:
     // EmitParticleSettingsのcofig登録
     void RegisterEmitParticleSettings();
 
+    // ParticleInitParamのconfig登録
+    void RegisterParticleInitParam();
+
     // emitterのパラメータのconfgi登録
     void RegisterEmitterSettings();
 
+
     EmitParticleSettings    setting_{};
 
-    ParticleInitParam       parametor_ = {}; // NEW!!!
+    ParticleInitParam       parametor_ = {};
 
     std::string             name_;
     std::string             useModelPath_;
@@ -137,26 +145,15 @@ private:
     float                   radius_ = 1;
 
     bool                    loop_;                          // ループするか
-    bool                    changeSize_;                    // 生成後にサイズを変更するか
-    bool                    changeColor_;                   // 生成後に色を変更するか
-    bool                    randomColor_;                   // 色をランダムで生成するか
     bool                    isEnableBillboard_;             // ビルボードを使用するか
     bool                    isLengthScalingEnabled_;        // 方向を向くか
-    bool                    isInfiniteLife_;                // 無限寿命か
 
-    std::array <bool, 3>    lockRotationAxes_;              // 軸を固定するか
-    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
+    // 保留
+    //    std::array <bool, 3>    lockRotationAxes_;              // 軸を固定するか
+    //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
+    // 保留
 
-    std::array <bool, 3>     billboardAxes_ = { 0 };        // ビルボードの軸
-
-    bool                   isFixedDirection_    = false;    // 方向を固定するか
-    bool                   isFixedSpeed_        = false;    // スピードを固定するか
-    bool                   isFixedSize_         = false;    // サイズを固定するか
-    bool                   isFixedLifeTime_     = false;    // 寿命を固定するか
-    bool                   isFixedColor_        = false;    // 色を固定するか
-    bool                   isFixedAcceleration_ = false;    // 加速度を固定するか
-
-    float                   decelelation_       = 0;        // 減速係数
+    std::vector <uint32_t>  billboardAxes_ = { 1,1,1 };        // ビルボードの軸
 
     float                   delayTime_;                     // 発生までの遅延時間
     float                   duration_ = 1;                  // エミッターの持続時間
