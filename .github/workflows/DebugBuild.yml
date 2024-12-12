@@ -2,7 +2,7 @@ name: DebugBuild
 on:
   push:
     branches:
-      - Particle
+      - master
 env:
   #リポジトリのルートディレクトリを起点としたソリューションファイルのパス
   SOLUTION_FILE_PATH: Sample/SampleProject.sln
