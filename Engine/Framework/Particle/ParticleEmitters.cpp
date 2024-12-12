@@ -22,6 +22,7 @@ void ParticleEmitter::Setting(const std::string& _name)
     // 確認後，登録しなおす
 
     RegisterEmitParticleSettings();
+    RegisterEmitterSettings();
 
 
 
@@ -236,7 +237,7 @@ void ParticleEmitter::RegisterEmitterSettings()
     config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
     config_->SetVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
 
-    config_->SetVariable("billBoardAxes", &billboardAxes_);
+    //config_->SetVariable("billBoardAxes", &billboardAxes_);
 
     config_->SetVariable("delayTime", &delayTime_);
     config_->SetVariable("duration", &duration_);

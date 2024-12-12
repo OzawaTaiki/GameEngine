@@ -17,6 +17,8 @@ void Effect::Initialize(const std::string& _name)
         ParticleEmitter& emitter = emitters_.emplace_back();
         emitter.Setting(emitterName);
     }
+
+    isActive_ = false;
 }
 
 void Effect::Update()
