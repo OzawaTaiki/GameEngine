@@ -348,6 +348,7 @@ std::string Easing::GetEasingFuncName(int _funcNum)
         return "";
     return easingFuncs[_funcNum];
 #endif // _DEBUG
+    return "";
 }
 
 std::function<float(float)> Easing::SelectFuncPtr(int _funcNum)
@@ -358,6 +359,7 @@ std::function<float(float)> Easing::SelectFuncPtr(int _funcNum)
 
     return pEasingFunc[_funcNum];
 #endif // _DEBUG
+    return &Linear;
 }
 
 int Easing::SelectEasingFunc()
@@ -367,4 +369,5 @@ int Easing::SelectEasingFunc()
     ImGui::Combo("EasingFunc", &selectedEasingFunc_, easingFuncs, IM_ARRAYSIZE(easingFuncs));
     return selectedEasingFunc_;
 #endif // _DEBUG
+    return 0;
 }
