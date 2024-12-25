@@ -78,6 +78,7 @@ void Particle::Draw()
 
 void Particle::ShowDebugWindow()
 {
+#ifdef _DEBUG
     ImGui::PushID(this);
 
     ImGui::DragFloat("LifeTime", &lifeTime_);
@@ -90,4 +91,5 @@ void Particle::ShowDebugWindow()
     ImGui::ColorEdit4("Color", &color_.x);
     ImGui::Checkbox("InfiniteLife", &isInfiniteLife_);
     ImGui::PopID();
+#endif // _DEBUG
 }
