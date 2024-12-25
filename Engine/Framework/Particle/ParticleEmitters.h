@@ -5,7 +5,6 @@
 #include <Physics/Math/Vector4.h>
 #include <Physics/Math/Matrix4x4.h>
 
-#include <Systems/Config/Config.h>
 #include <Framework/Particle/ParticleInitParam.h>
 
 #include <string>
@@ -167,7 +166,6 @@ private:
     bool                    isAlive_ = true;                // まだ生きているか
 
 
-    std::unique_ptr<Config> config_ = nullptr;
 
     Particle GenerateParticleData();
 

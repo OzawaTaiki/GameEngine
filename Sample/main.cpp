@@ -10,7 +10,6 @@
 #include "UI/ImGuiManager/ImGuiManager.h"
 #include "Framework/Particle/ParticleManager.h"
 #include "Systems/Utility/RandomGenerator.h"
-#include "Systems/Config/ConfigManager.h"
 #include "Systems/Time/Time.h"
 
 /*-----シーン-----*/
@@ -41,8 +40,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize();
 
-	ConfigManager::GetInstance()->Initialize();
-	ConfigManager::GetInstance()->LoadData();
+	//ConfigManager::GetInstance()->Initialize();
+	//ConfigManager::GetInstance()->LoadData();
 
 
 	TextureManager::GetInstance()->Initialize();
@@ -58,6 +57,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Input* input = Input::GetInstance();
 	input->Initilize(winApp);
+
+    JsonHub::GetInstance()->Initialize("Resources/Data/");
 
 	SceneManager::RegisterScene("Sample", SampleScene::Create);
     SceneManager::RegisterScene("ParticleTest", ParticleTestScene::Create);

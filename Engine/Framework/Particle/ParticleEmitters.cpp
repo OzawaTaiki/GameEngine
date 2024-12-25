@@ -7,7 +7,6 @@
 #include <Physics/Math/MatrixFunction.h>
 #include <Physics/Math/VectorFunction.h>
 #include <Physics/Math/MyLib.h>
-#include <Systems/Config/ConfigManager.h>
 #include <Systems/Utility/RandomGenerator.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <ResourceManagement/TextureManager/TextureManager.h>
@@ -16,7 +15,7 @@ void ParticleEmitter::Setting(const std::string& _name)
 {
     name_ = _name;
 
-    config_ = std::make_unique<Config>(name_, "Resources/Data/Particles/Emitters/");
+    //config_ = std::make_unique<Config>(name_, "Resources/Data/Particles/Emitters/");
     // TODO : 変数の使用の有無の確認
     // いらないものは消す
     // 確認後，登録しなおす
@@ -180,7 +179,7 @@ void ParticleEmitter::Reset()
 void ParticleEmitter::RegisterEmitParticleSettings()
 {
     // 配列にしてもいいかも vector
-    config_->SetVariable("lifeTime_min", &setting_.lifeTime.value.min);
+   /* config_->SetVariable("lifeTime_min", &setting_.lifeTime.value.min);
     config_->SetVariable("lifeTime_max", &setting_.lifeTime.value.max);
     config_->SetVariable("lifeTime_fixed", reinterpret_cast<uint32_t*>(&setting_.lifeTime.fixed));
     config_->SetVariable("lifeTime_random", reinterpret_cast<uint32_t*>(&setting_.lifeTime.random));
@@ -213,7 +212,7 @@ void ParticleEmitter::RegisterEmitParticleSettings()
     config_->SetVariable("color_min", &setting_.color.value.min);
     config_->SetVariable("color_max", &setting_.color.value.max);
     config_->SetVariable("color_fixed", reinterpret_cast<uint32_t*>(&setting_.color.fixed));
-    config_->SetVariable("color_random", reinterpret_cast<uint32_t*>(&setting_.color.random));
+    config_->SetVariable("color_random", reinterpret_cast<uint32_t*>(&setting_.color.random));*/
 
 }
 
@@ -224,32 +223,32 @@ void ParticleEmitter::RegisterParticleInitParam()
 
 void ParticleEmitter::RegisterEmitterSettings()
 {
-    config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
-    config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
+    //config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
+    //config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
 
-    config_->SetVariable("position", &position_);
-    config_->SetVariable("offset", &offset_);
-    config_->SetVariable("rotate", &rotate_);
-    config_->SetVariable("size", &size_);
-    config_->SetVariable("radius", &radius_);
+    //config_->SetVariable("position", &position_);
+    //config_->SetVariable("offset", &offset_);
+    //config_->SetVariable("rotate", &rotate_);
+    //config_->SetVariable("size", &size_);
+    //config_->SetVariable("radius", &radius_);
 
-    config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
-    config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
-    config_->SetVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
+    //config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
+    //config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
+    //config_->SetVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
 
-    //config_->SetVariable("billBoardAxes", &billboardAxes_);
+    ////config_->SetVariable("billBoardAxes", &billboardAxes_);
 
-    config_->SetVariable("delayTime", &delayTime_);
-    config_->SetVariable("duration", &duration_);
+    //config_->SetVariable("delayTime", &delayTime_);
+    //config_->SetVariable("duration", &duration_);
 
-    config_->SetVariable("maxParticles", &maxParticles_);
-    config_->SetVariable("countPerEmit", &countPerEmit_);
-    config_->SetVariable("emitPerSec", &emitPerSec_);
-    config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
+    //config_->SetVariable("maxParticles", &maxParticles_);
+    //config_->SetVariable("countPerEmit", &countPerEmit_);
+    //config_->SetVariable("emitPerSec", &emitPerSec_);
+    //config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
 
 
-    config_->SetVariable("modelPath", &useModelPath_);
-    config_->SetVariable("texturePath", &useTextruePath_);
+    //config_->SetVariable("modelPath", &useModelPath_);
+    //config_->SetVariable("texturePath", &useTextruePath_);
 }
 
 
@@ -357,9 +356,9 @@ Particle ParticleEmitter::GenerateParticleData()
 
 void ParticleEmitter::Save() const
 {
-    ConfigManager* instance = ConfigManager::GetInstance();
-    instance->SetDirectoryPath("resources/Data/Particles/Emitters");
-    instance->SaveData(name_);
+    //ConfigManager* instance = ConfigManager::GetInstance();
+    /*instance->SetDirectoryPath("resources/Data/Particles/Emitters");
+    instance->SaveData(name_);*/
 }
 
 bool ParticleEmitter::ShowDebugWinsow()

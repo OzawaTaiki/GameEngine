@@ -70,9 +70,6 @@
     <Filter Include="Systems\Audio">
       <UniqueIdentifier>{D6DD8F6A-0419-4F1A-AE39-799FA165646B1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\Config">
-      <UniqueIdentifier>{FAC97E67-E1C3-424A-A1A6-E0B4E5CA9D228}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Systems\Input">
       <UniqueIdentifier>{997B1C83-B509-4D6F-83BE-E5782D504CCD7}</UniqueIdentifier>
     </Filter>
@@ -93,6 +90,9 @@
     </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{73e48db5-afe9-4edb-a2dc-b87282d45549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\JsonBinder">
+      <UniqueIdentifier>{c8199b99-d1b1-4844-8499-8cec8159eac0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -231,20 +231,11 @@
     <ClCompile Include="Systems\Audio\Audio.cpp">
       <Filter>Systems\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Systems\Config\Config.cpp">
-      <Filter>Systems\Config</Filter>
-    </ClCompile>
-    <ClCompile Include="Systems\Config\ConfigManager.cpp">
-      <Filter>Systems\Config</Filter>
-    </ClCompile>
     <ClCompile Include="Systems\Input\Input.cpp">
       <Filter>Systems\Input</Filter>
     </ClCompile>
     <ClCompile Include="Systems\Time\Time.cpp">
       <Filter>Systems\Time</Filter>
-    </ClCompile>
-    <ClCompile Include="Systems\Utility\CatmulRomSpline.cpp">
-      <Filter>Systems\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Systems\Utility\Debug.cpp">
       <Filter>Systems\Utility</Filter>
@@ -272,6 +263,12 @@
     </ClCompile>
     <ClCompile Include="Framework\Camera\DebugCamera.cpp">
       <Filter>Framework\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\JsonBinder\JsonBinder.cpp">
+      <Filter>Systems\JsonBinder</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\JsonBinder\JsonHub.cpp">
+      <Filter>Systems\JsonBinder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -316,6 +313,7 @@
     <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
       <Filter>Shader</Filter>
     </None>
+    <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\DirectX\D3DResourceLeakChecker.h">
@@ -468,20 +466,11 @@
     <ClInclude Include="Systems\Audio\Audio.h">
       <Filter>Systems\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Systems\Config\Config.h">
-      <Filter>Systems\Config</Filter>
-    </ClInclude>
-    <ClInclude Include="Systems\Config\ConfigManager.h">
-      <Filter>Systems\Config</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\Input\Input.h">
       <Filter>Systems\Input</Filter>
     </ClInclude>
     <ClInclude Include="Systems\Time\Time.h">
       <Filter>Systems\Time</Filter>
-    </ClInclude>
-    <ClInclude Include="Systems\Utility\CatmulRomSpline.h">
-      <Filter>Systems\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Systems\Utility\Debug.h">
       <Filter>Systems\Utility</Filter>
@@ -512,6 +501,12 @@
     </ClInclude>
     <ClInclude Include="Core\DirectX\BlendMode.h">
       <Filter>Core\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\JsonBinder\JsonBinder.h">
+      <Filter>Systems\JsonBinder</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\JsonBinder\JsonHub.h">
+      <Filter>Systems\JsonBinder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

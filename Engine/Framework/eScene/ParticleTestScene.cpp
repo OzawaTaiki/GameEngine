@@ -3,7 +3,6 @@
 #include <Rendering/Model/ModelManager.h>
 
 #include "SceneManager.h"
-#include <Systems/Config/ConfigManager.h>
 #include <Framework/Particle/ParticleManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Systems/Input/Input.h>

@@ -1,16 +1,21 @@
 #include "Effect.h"
 #include <Systems/Time/Time.h>
-#include <Systems/Config/ConfigManager.h>
 
 void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
 
-    config_ = std::make_unique<Config>(name_,"Resources/Data/Particles/Effects/");
+    jsonBinder_ = std::make_unique<JsonBinder>(_name, "Resources/Data/Particles/Effects/");
+    jsonBinder_->SetFolderPath();
+    
+    jsonBinder_->RegisterVariable("loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    jsonBinder_->RegisterVariable("emitters", &emitterNames_);
+
+    //config_ = std::make_unique<Config>(name_,"Resources/Data/Particles/Effects/");
     //instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
-    config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
-    config_->SetVariable( "emitters", &emitterNames_);
+    //config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    //config_->SetVariable( "emitters", &emitterNames_);
 
     for (std::string emitterName : emitterNames_)
     {
@@ -113,7 +118,7 @@ void Effect::ExclusionEmitter(const std::string& _name)
 
 void Effect::Save() const
 {
-    config_->Save();
+    jsonBinder_->Save();
 
     for (auto& emitter : emitters_)
     {

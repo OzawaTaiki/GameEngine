@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Framework/Particle/ParticleEmitters.h>
-#include <Systems/Config/Config.h>
+#include <Systems/JsonBinder/JsonBinder.h>
 #include <string>
 #include <vector>
 #include <list>
@@ -42,5 +42,6 @@ private:
     bool                            isLoop_;            // ループするか
     bool                            isActive_;          // アクティブか
 
-    std::unique_ptr<Config> config_ = nullptr;  // 設定ファイル
+    std::unique_ptr<JsonBinder>     jsonBinder_ = nullptr;  // 設定ファイル
+    //std::unique_ptr<Config> config_ = nullptr;  
 };
