@@ -2,9 +2,6 @@
 
 #include <Physics/Math/Vector2.h>
 #include <Rendering/Sprite/Sprite.h>
-#include <Systems/Config/Config.h>
-
-#include <string>
 
 class  UIBase
 {
@@ -52,7 +49,7 @@ protected:
     std::string label_ = "";
     std::string textureName_ = "";
 
-    std::unique_ptr<Config> config_ = nullptr;
+    //std::unique_ptr<Config> config_ = nullptr;
 
 #ifdef _DEBUG
     void ImGui();

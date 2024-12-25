@@ -1,8 +1,5 @@
 {
-    "Sparks": {
-        "LengthScaling": [
-            0
-        ],
+    "aa": {
         "acceleration_fixed": [
             0
         ],
@@ -23,42 +20,27 @@
         "acceleration_random": [
             0
         ],
-        "changeColor": [
-            16777216
-        ],
-        "changeSize": [
-            0
-        ],
         "color_fixed": [
             0
         ],
         "color_max": [
             [
-                1.0,
-                0.38235294818878174,
                 0.0,
-                1.0
+                0.0,
+                0.0,
+                0.0
             ]
         ],
         "color_min": [
             [
-                1.0,
-                0.38235294818878174,
                 0.0,
-                1.0
+                0.0,
+                0.0,
+                0.0
             ]
         ],
         "color_random": [
             0
-        ],
-        "countPerEmit": [
-            20
-        ],
-        "delayTime": [
-            0.0
-        ],
-        "direction": [
-            1
         ],
         "direction_fixed": [
             0
@@ -80,65 +62,17 @@
         "direction_random": [
             0
         ],
-        "duration": [
-            0.0
-        ],
-        "emitPerSec": [
-            1
-        ],
-        "emitRepeatCount": [
-            1
-        ],
-        "fadeAlpha": [
-            1
-        ],
-        "fadeStartRatio": [
-            0.6200000047683716
-        ],
         "lifeTime_fixed": [
             0
         ],
         "lifeTime_max": [
-            0.699999988079071
+            0.0
         ],
         "lifeTime_min": [
-            0.699999988079071
+            0.0
         ],
         "lifeTime_random": [
             0
-        ],
-        "loop": [
-            256
-        ],
-        "maxParticles": [
-            0
-        ],
-        "modelPath": [
-            ""
-        ],
-        "offset": [
-            [
-                0.0,
-                0.0,
-                0.0
-            ]
-        ],
-        "position": [
-            [
-                0.0,
-                2.0,
-                0.0
-            ]
-        ],
-        "radius": [
-            0.029999999329447746
-        ],
-        "rotate": [
-            [
-                0.0,
-                0.0,
-                0.0
-            ]
         ],
         "rotate_fixed": [
             0
@@ -160,31 +94,21 @@
         "rotate_random": [
             0
         ],
-        "shape": [
-            1
-        ],
-        "size": [
-            [
-                1.0,
-                1.0,
-                1.0
-            ]
-        ],
         "size_fixed": [
             0
         ],
         "size_max": [
             [
-                0.20000000298023224,
-                0.07000000029802322,
-                1.0
+                0.0,
+                0.0,
+                0.0
             ]
         ],
         "size_min": [
             [
-                0.20000000298023224,
-                0.07000000029802322,
-                1.0
+                0.0,
+                0.0,
+                0.0
             ]
         ],
         "size_random": [
@@ -194,19 +118,13 @@
             0
         ],
         "spped_max": [
-            3.0
+            0.0
         ],
         "spped_min": [
-            3.0
+            0.0
         ],
         "spped_random": [
             0
-        ],
-        "texturePath": [
-            ""
-        ],
-        "useBillboard": [
-            256
         ]
     }
 }

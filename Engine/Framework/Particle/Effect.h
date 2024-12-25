@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Framework/Particle/ParticleEmitters.h>
-#include <Systems/Config/Config.h>
+#include <Systems/JsonBinder/JsonBinder.h>
 #include <string>
 #include <vector>
 #include <list>
@@ -23,12 +23,13 @@ public:
     std::list<ParticleEmitter*> GetEmitters() const;
     std::string GetName() const { return name_; }
 
-    void SetActive(bool _active) { isActive_ = _active; }
+    void SetActive(bool _active);
 
     void ExclusionEmitter(const std::string& _name);
 
     void Save()const;
 private:
+    void Reset();
 
     static const uint32_t          kMaxEmitters = 20;  // 最大エミッター数
 
@@ -41,5 +42,6 @@ private:
     bool                            isLoop_;            // ループするか
     bool                            isActive_;          // アクティブか
 
-    std::unique_ptr<Config> config_ = nullptr;  // 設定ファイル
+    std::unique_ptr<JsonBinder>     jsonBinder_ = nullptr;  // 設定ファイル
+    //std::unique_ptr<Config> config_ = nullptr;  
 };

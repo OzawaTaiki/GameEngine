@@ -1,5 +1,11 @@
 {
     "impactWave": {
+        "LengthScaling": [
+            0
+        ],
+        "acceleration_fixed": [
+            0
+        ],
         "acceleration_max": [
             [
                 0.0,
@@ -14,11 +20,17 @@
                 0.0
             ]
         ],
+        "acceleration_random": [
+            0
+        ],
         "changeColor": [
             65536
         ],
         "changeSize": [
             16777217
+        ],
+        "color_fixed": [
+            0
         ],
         "color_max": [
             [
@@ -36,6 +48,9 @@
                 1.0
             ]
         ],
+        "color_random": [
+            0
+        ],
         "countPerEmit": [
             1
         ],
@@ -44,6 +59,9 @@
         ],
         "direction": [
             2
+        ],
+        "direction_fixed": [
+            0
         ],
         "direction_max": [
             [
@@ -59,6 +77,12 @@
                 0.0
             ]
         ],
+        "direction_random": [
+            0
+        ],
+        "duration": [
+            0.0
+        ],
         "emitPerSec": [
             1
         ],
@@ -71,11 +95,17 @@
         "fadeStartRatio": [
             0.0
         ],
+        "lifeTime_fixed": [
+            0
+        ],
         "lifeTime_max": [
             0.699999988079071
         ],
         "lifeTime_min": [
             0.699999988079071
+        ],
+        "lifeTime_random": [
+            0
         ],
         "loop": [
             65792
@@ -110,6 +140,9 @@
                 0.0
             ]
         ],
+        "rotate_fixed": [
+            0
+        ],
         "rotate_max": [
             [
                 0.0,
@@ -124,6 +157,9 @@
                 0.0
             ]
         ],
+        "rotate_random": [
+            0
+        ],
         "shape": [
             1
         ],
@@ -133,6 +169,9 @@
                 1.0,
                 1.0
             ]
+        ],
+        "size_fixed": [
+            0
         ],
         "size_max": [
             [
@@ -148,11 +187,20 @@
                 0.0
             ]
         ],
+        "size_random": [
+            0
+        ],
+        "spped_fixed": [
+            0
+        ],
         "spped_max": [
             0.0
         ],
         "spped_min": [
             0.0
+        ],
+        "spped_random": [
+            0
         ],
         "texturePath": [
             "particle/donuts.png"

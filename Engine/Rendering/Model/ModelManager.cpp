@@ -12,7 +12,7 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Initialize()
 {
-    blendMode_ = PSOManager::BlendMode::Normal;
+    blendMode_ = BlendMode::Normal;
 
 
     /// PSOを取得

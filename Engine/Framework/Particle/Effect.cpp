@@ -1,38 +1,44 @@
 #include "Effect.h"
 #include <Systems/Time/Time.h>
-#include <Systems/Config/ConfigManager.h>
 
 void Effect::Initialize(const std::string& _name)
 {
     name_ = _name;
 
-    config_ = std::make_unique<Config>(name_,"Resources/Data/Particles/Effects/");
+    jsonBinder_ = std::make_unique<JsonBinder>(_name, "Resources/Data/Particles/Effects/");
+    jsonBinder_->SetFolderPath();
+    
+    jsonBinder_->RegisterVariable("loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    jsonBinder_->RegisterVariable("emitters", &emitterNames_);
+
+    //config_ = std::make_unique<Config>(name_,"Resources/Data/Particles/Effects/");
     //instance->SetDirectoryPath("resources/Data/Particles/Effects");
 
-    config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
-    config_->SetVariable( "emitters", &emitterNames_);
+    //config_->SetVariable( "loop", reinterpret_cast<uint32_t*>(&isLoop_));
+    //config_->SetVariable( "emitters", &emitterNames_);
 
     for (std::string emitterName : emitterNames_)
     {
         ParticleEmitter& emitter = emitters_.emplace_back();
         emitter.Setting(emitterName);
     }
+
+    isActive_ = false;
 }
 
 void Effect::Update()
 {
     if (!isActive_)
     {
-        elapsedTime_ = 0;
-        for (auto& emitter : emitters_)
-        {
-            emitter.Reset();
-        }
+        Reset();
         return;
     }
 
     elapsedTime_ += 1.0f / 60.0f;
     //elapsedTime_ += Time::GetDeltaTime<float>();
+
+    // isActive_制御用
+    bool active = false;
 
     for (auto& emitter : emitters_)
     {
@@ -51,9 +57,15 @@ void Effect::Update()
         if (!emitter.IsActive() && emitter.IsAlive())
             emitter.SetActive(true);
 
+        // 未だ有効なエミッターがあるときフラグを立てる
+        if(emitter.IsActive() && !emitter.IsAlive())
+            active = true;
         // 更新
         emitter.Update();
     }
+    // 一個でもエミッターが有効なら true
+    // そうじゃなければ false
+    isActive_ = active;
 }
 
 ParticleEmitter* Effect::AddEmitter(const std::string& _name)
@@ -83,6 +95,12 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
     return list;
 }
 
+void Effect::SetActive(bool _active)
+{
+    isActive_ = _active;
+    Reset();
+}
+
 void Effect::ExclusionEmitter(const std::string& _name)
 {
     for (auto it = emitters_.begin(); it != emitters_.end();)
@@ -100,10 +118,19 @@ void Effect::ExclusionEmitter(const std::string& _name)
 
 void Effect::Save() const
 {
-    config_->Save();
+    jsonBinder_->Save();
 
     for (auto& emitter : emitters_)
     {
         emitter.Save();
+    }
+}
+
+void Effect::Reset()
+{
+    elapsedTime_ = 0;
+    for (auto& emitter : emitters_)
+    {
+        emitter.Reset();
     }
 }

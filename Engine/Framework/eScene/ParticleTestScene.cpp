@@ -3,10 +3,10 @@
 #include <Rendering/Model/ModelManager.h>
 
 #include "SceneManager.h"
-#include <Systems/Config/ConfigManager.h>
 #include <Framework/Particle/ParticleManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Systems/Input/Input.h>
+#include <Rendering/Sprite/Sprite.h>
 
 std::unique_ptr<BaseScene>ParticleTestScene::Create()
 {
@@ -80,6 +80,10 @@ void ParticleTestScene::Draw()
     ModelManager::GetInstance()->PreDrawForObjectModel();
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
+    ModelManager::GetInstance()->PreDrawForAnimationModel();
+
+    Sprite::PreDraw();
+
     for (auto& emitter : emitters_)
         emitter->Draw();
 
@@ -128,10 +132,13 @@ void ParticleTestScene::ImGui()
         emitters_ = selectedEffect_->GetEmitters();
     }
     static bool isActive = false;
-    ImGui::Checkbox("Active", &isActive);
-    if (selectedEffect_ != effects_.end())
+    if (ImGui::Button("Active"))
     {
-        selectedEffect_->SetActive(isActive);
+        isActive = true;
+        if (selectedEffect_ != effects_.end())
+        {
+            selectedEffect_->SetActive(isActive);
+        }
     }
 
     if (selectedEffect_ != effects_.end())

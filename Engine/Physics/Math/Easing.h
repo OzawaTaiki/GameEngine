@@ -3,10 +3,13 @@
 #include <UI/ImGuiManager/ImGuiManager.h>
 
 #include <functional>
-
+#include <string>
 class Easing
 {
 public:
+
+    // 定量
+    static float Linear(float _t);
 
     // イーズイン
     static float EaseInsine(float _t);
@@ -44,10 +47,11 @@ public:
     static float EaseInOutElastic(float _t);
     static float EaseInOutBounce(float _t);
 
+    static std::string GetEasingFuncName(int _funcNum);
 
-    static std::function<float(float)> SelectFuocPtr(int _funcNum);
-
+    static std::function<float(float)> SelectFuncPtr(int _funcNum);
     static int SelectEasingFunc();
+
 
 private:
     static const char* easingFuncs[];
