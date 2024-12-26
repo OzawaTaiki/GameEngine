@@ -13,6 +13,8 @@ private:
 
 public:
     Effect() = default;
+    // TODO :emitterの解放周りでエラーが出る
+    // 所有権がどこにあるか明確にする
     ~Effect() = default;
 
     void Initialize(const std::string& _name);
@@ -43,5 +45,5 @@ private:
     bool                            isActive_;          // アクティブか
 
     std::unique_ptr<JsonBinder>     jsonBinder_ = nullptr;  // 設定ファイル
-    //std::unique_ptr<Config> config_ = nullptr;  
+    //std::unique_ptr<Config> config_ = nullptr;
 };

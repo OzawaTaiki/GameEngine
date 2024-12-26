@@ -1,11 +1,13 @@
 #pragma once
 #include <functional>
 
+#include <json.hpp>
+
 struct Vector2
 {
 	float x, y;
 
-    
+
     Vector2 operator+(const Vector2& _v)const;
     Vector2 operator-(const Vector2& _v)const;
     Vector2 operator*(float _value)const;
@@ -19,6 +21,8 @@ struct Vector2
 
     float Length() const;
     Vector2 Normalize() const;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Vector2, x, y)
 };
 
 template <>

@@ -1,0 +1,217 @@
+{
+    "nasu": {
+        "LengthScaling": [
+            868220928
+        ],
+        "acceleration": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "acceleration_fixed": [
+            1
+        ],
+        "acceleration_max": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "acceleration_min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "acceleration_random": [
+            256
+        ],
+        "alphaTransition": [
+            false,
+            []
+        ],
+        "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "colorTransition": [
+            false,
+            []
+        ],
+        "color_fixed": [
+            1
+        ],
+        "color_max": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "color_min": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "color_random": [
+            256
+        ],
+        "countPerEmit": [
+            1
+        ],
+        "delayTime": [
+            0.0
+        ],
+        "direction": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "direction_fixed": [
+            1
+        ],
+        "direction_max": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "direction_min": [
+            -1.0,
+            -1.0,
+            -1.0
+        ],
+        "direction_random": [
+            256
+        ],
+        "duration": [
+            1.0
+        ],
+        "emitDirection": [
+            2
+        ],
+        "emitPerSec": [
+            1
+        ],
+        "emitRepeatCount": [
+            1
+        ],
+        "isInfiniteLife": [
+            0
+        ],
+        "lifeTime": [
+            1.0
+        ],
+        "lifeTime_fixed": [
+            1
+        ],
+        "lifeTime_max": [
+            1.0
+        ],
+        "lifeTime_min": [
+            1.0
+        ],
+        "lifeTime_random": [
+            256
+        ],
+        "loop": [
+            0
+        ],
+        "maxParticles": [
+            0
+        ],
+        "modelPath": [
+            "plane/plane.gltf"
+        ],
+        "offset": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "position": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "radius": [
+            1.0
+        ],
+        "rotate": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "rotateTransition": [
+            false,
+            []
+        ],
+        "rotate_fixed": [
+            1
+        ],
+        "rotate_max": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "rotate_min": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "rotate_random": [
+            256
+        ],
+        "shape": [
+            3
+        ],
+        "size": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "sizeTransition": [
+            false,
+            []
+        ],
+        "size_fixed": [
+            1
+        ],
+        "size_max": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "size_min": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "size_random": [
+            256
+        ],
+        "speed": [
+            0.0
+        ],
+        "speedTransition": [
+            false,
+            []
+        ],
+        "spped_fixed": [
+            1
+        ],
+        "spped_max": [
+            1.0
+        ],
+        "spped_min": [
+            0.0
+        ],
+        "spped_random": [
+            256
+        ],
+        "texturePath": [
+            "particle/circle.png"
+        ],
+        "useBillboard": [
+            3221225472
+        ]
+    }
+}

@@ -4,7 +4,7 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Vector4.h>
 #include <Physics/Math/Matrix4x4.h>
-
+#include <Systems/JsonBinder/JsonBinder.h>
 #include <Framework/Particle/ParticleInitParam.h>
 
 #include <string>
@@ -128,11 +128,11 @@ private:
     float                   deltaTime_              = 1.0f / 60.0f;
     float                   emitTime_               = 0;
 
-    KeyFrame<Vector3>       addSize_ = {};
-    KeyFrame<Vector3>       addRotate_ = {};
-    KeyFrame<float>         addSpeed_ = {};
-    KeyFrame<Vector3>       addColor_ = {};
-    KeyFrame<float>         addAlpha_ = {};
+    TransitionKeyFrame<Vector3>       addSize_ = {};
+    TransitionKeyFrame<Vector3>       addRotate_ = {};
+    TransitionKeyFrame<float>         addSpeed_ = {};
+    TransitionKeyFrame<Vector3>       addColor_ = {};
+    TransitionKeyFrame<float>         addAlpha_ = {};
 
     EmitterShape            shape_ = EmitterShape::None;
     ParticleDirection       particleDirection_ = ParticleDirection::Random;
@@ -165,6 +165,7 @@ private:
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
 
+    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;      // 
 
 
     Particle GenerateParticleData();

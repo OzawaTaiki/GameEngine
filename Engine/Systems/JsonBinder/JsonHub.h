@@ -66,13 +66,22 @@ public:
     inline void GetVariableValue(const std::string& _groupName, const std::string& _variableName, std::list<T>& _ptr);
 
     template<typename T>
-    inline void SendVariableValue(const std::string& _groupName, const std::string& _variableName, T _ptr);
+    inline void RegisterVariable(const std::string& _groupName, const std::string& _variableName, T _ptr);
 
     template<typename T>
-    inline void SendVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T> _ptr);
+    inline void RegisterVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T> _ptr);
 
     template<typename T>
-    inline void SendVariableValue(const std::string& _groupName, const std::string& _variableName, std::list<T> _ptr);
+    inline void RegisterVariable(const std::string& _groupName, const std::string& _variableName, std::list<T> _ptr);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _groupName, const std::string& _variableName, const T& _value);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _groupName, const std::string& _variableName, const std::vector<T>& _value);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _groupName, const std::string& _variableName, const std::list<T>& _value);
 
     void SetRootDirectoryPath(const std::string& _rootDirectoryPath) { rootDirectoryPath_ = _rootDirectoryPath; }
     void SetDirectoryPathFromRoot(const std::string& _directoryPathFromRoot) { jsonLoader_->SetFolderPath(_directoryPathFromRoot); }
@@ -115,19 +124,37 @@ inline void JsonHub::GetVariableValue(const std::string& _groupName, const std::
 }
 
 template<typename T>
-inline void JsonHub::SendVariableValue(const std::string& _groupName, const std::string& _variableName, T _ptr)
+inline void JsonHub::RegisterVariable(const std::string& _groupName, const std::string& _variableName, T _ptr)
 {
     jsonLoader_->SetValue(_groupName, _variableName, _ptr);
 }
 
 template<typename T>
-inline void JsonHub::SendVariableValue(const std::string& _groupName, const std::string& _variableName, std::vector<T> _ptr)
+inline void JsonHub::RegisterVariable(const std::string& _groupName, const std::string& _variableName, std::vector<T> _ptr)
 {
     jsonLoader_->SetValue(_groupName, _variableName, _ptr);
 }
 
 template<typename T>
-inline void JsonHub::SendVariableValue(const std::string& _groupName, const std::string& _variableName, std::list<T> _ptr)
+inline void JsonHub::RegisterVariable(const std::string& _groupName, const std::string& _variableName, std::list<T> _ptr)
 {
     jsonLoader_->SetValue(_groupName, _variableName, _ptr);
+}
+
+template<typename T>
+inline void JsonHub::SetJsonValue(const std::string& _groupName, const std::string& _variableName, const T& _value)
+{
+    jsonLoader_->SetJsonValue(_groupName, _variableName, _value);
+}
+
+template<typename T>
+inline void JsonHub::SetJsonValue(const std::string& _groupName, const std::string& _variableName, const std::vector<T>& _value)
+{
+    jsonLoader_->SetJsonValue(_groupName, _variableName, _value);
+}
+
+template<typename T>
+inline void JsonHub::SetJsonValue(const std::string& _groupName, const std::string& _variableName, const std::list<T>& _value)
+{
+    jsonLoader_->SetJsonValue(_groupName, _variableName, _value);
 }
