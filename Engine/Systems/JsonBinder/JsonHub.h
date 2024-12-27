@@ -86,7 +86,6 @@ public:
     void SetRootDirectoryPath(const std::string& _rootDirectoryPath) { rootDirectoryPath_ = _rootDirectoryPath; }
     void SetDirectoryPathFromRoot(const std::string& _directoryPathFromRoot) { jsonLoader_->SetFolderPath(_directoryPathFromRoot); }
 
-
 private:
 
     void LoadRootDirectory();

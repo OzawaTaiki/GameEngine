@@ -1,6 +1,6 @@
 {
-    "aaa": {
-        "LengthScaling": 2607808512,
+    "nasui": {
+        "LengthScaling": 32505856,
         "acceleration": {
             "x": 0.0,
             "y": 0.0,
@@ -20,18 +20,7 @@
         "acceleration_random": 256,
         "alphaTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": 1.0
-                }
-            ]
-        },
-        "billBoardAxes": {
-            "x":1.0,
-            "y":1.0,
-            "z":1.0
+            "keys": []
         },
         "color": {
             "w": 1.0,
@@ -41,17 +30,7 @@
         },
         "colorTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                }
-            ]
+            "keys": []
         },
         "color_fixed": 1,
         "color_max": {
@@ -117,17 +96,7 @@
         },
         "rotateTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    }
-                }
-            ]
+            "keys": []
         },
         "rotate_fixed": 1,
         "rotate_max": {
@@ -149,17 +118,7 @@
         },
         "sizeTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                }
-            ]
+            "keys": []
         },
         "size_fixed": 1,
         "size_max": {
@@ -176,19 +135,13 @@
         "speed": 0.0,
         "speedTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": 1.0
-                }
-            ]
+            "keys": []
         },
         "spped_fixed": 1,
         "spped_max": 1.0,
         "spped_min": 0.0,
         "spped_random": 256,
         "texturePath": "particle/circle.png",
-        "useBillboard": 1879048192
+        "useBillboard": 4026531840
     }
 }

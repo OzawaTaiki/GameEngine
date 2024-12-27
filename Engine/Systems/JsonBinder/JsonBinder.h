@@ -64,6 +64,8 @@ public:
     template<typename T>
     inline void SendVariable(const std::string& _variableName, const std::list<T>& _var);
 
+    //void SetDirectoryPath() const {jsonHub_->SetDirectoryPathFromRoot}
+
 #pragma endregion
 
 private:

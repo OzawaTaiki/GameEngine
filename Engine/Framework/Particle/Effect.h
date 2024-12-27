@@ -9,18 +9,16 @@
 
 class Effect
 {
-private:
-
 public:
     Effect() = default;
     // TODO :emitterの解放周りでエラーが出る
     // 所有権がどこにあるか明確にする
-    ~Effect() = default;
+    ~Effect();
 
     void Initialize(const std::string& _name);
     void Update();
 
-    ParticleEmitter* AddEmitter(const std::string& _name);
+    void AddEmitter(const std::string& _name);
 
     std::list<ParticleEmitter*> GetEmitters() const;
     std::string GetName() const { return name_; }
@@ -29,6 +27,8 @@ public:
 
     void ExclusionEmitter(const std::string& _name);
 
+    void DebugShowForEmitterCreate();
+
     void Save()const;
 private:
     void Reset();
@@ -36,8 +36,11 @@ private:
     static const uint32_t          kMaxEmitters = 20;  // 最大エミッター数
 
     std::string                     name_;              // エフェクトの名前
-    std::list<ParticleEmitter>      emitters_;          // エミッターのリスト
+    std::list<std::unique_ptr<ParticleEmitter>>      emitters_;          // エミッターのリスト
     std::vector<std::string>        emitterNames_;      // エミッターの名前リスト
+
+    std::string                     addEmitterName_;    // 追加するエミッターの名前
+    char                            emitterBuf_[256];    // エミッターの名前バッファ
 
 
     float                           elapsedTime_;       // 経過時間

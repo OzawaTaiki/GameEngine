@@ -30,7 +30,7 @@ JsonBinder::JsonBinder(const std::string& _name, const std::string& _folderPath)
 
 void JsonBinder::SetFolderPath()
 {
-    jsonHub_->SetDirectoryPathFromRoot(folderPath_ + groupName_ + '/');
+    jsonHub_->SetDirectoryPathFromRoot(folderPath_);
 }
 
 void JsonBinder::Save()

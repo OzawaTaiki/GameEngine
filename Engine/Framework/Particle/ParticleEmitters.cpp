@@ -15,12 +15,8 @@ void ParticleEmitter::Setting(const std::string& _name)
 {
     name_ = _name;
 
-    //config_ = std::make_unique<Config>(name_, "Resources/Data/Particles/Emitters/");
-    // TODO : 変数の使用の有無の確認
-    // いらないものは消す
-    // 確認後，登録しなおす
-
     jsonBinder_ = std::make_unique<JsonBinder>(_name, "Resources/Data/Particles/Emitters/");
+
 
     RegisterEmitParticleSettings();
     RegisterParticleInitParam();
@@ -171,9 +167,9 @@ std::array<bool, 3> ParticleEmitter::GetBillboardAxes() const
 {
     std::array<bool, 3> axes;
 
-    axes[0] = billboardAxes_[0];
-    axes[1] = billboardAxes_[1];
-    axes[2] = billboardAxes_[2];
+    axes[0] = billboardAxes_.x == 0 ? false : true;
+    axes[1] = billboardAxes_.y == 0 ? false : true;
+    axes[2] = billboardAxes_.z == 0 ? false : true;
 
     return axes;
 }
@@ -262,7 +258,7 @@ void ParticleEmitter::RegisterEmitterSettings()
     jsonBinder_->RegisterVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
     jsonBinder_->RegisterVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
 
-    //jsonBinder_->RegisterVariable("billBoardAxes", &billboardAxes_);
+    jsonBinder_->RegisterVariable("billBoardAxes", &billboardAxes_);
 
     jsonBinder_->RegisterVariable("delayTime", &delayTime_);
     jsonBinder_->RegisterVariable("duration", &duration_);
@@ -382,6 +378,8 @@ Particle ParticleEmitter::GenerateParticleData()
 
 void ParticleEmitter::Save() const
 {
+    jsonBinder_->SetFolderPath();
+
     jsonBinder_->SendVariable("sizeTransition", parametor_.sizeTransition);
     jsonBinder_->SendVariable("rotateTransition", parametor_.rotateTransition);
     jsonBinder_->SendVariable("speedTransition", parametor_.speedTransition);
@@ -1008,7 +1006,7 @@ void ParticleEmitter::DisplayColorParameters()
             ImGui::SeparatorText("ChangeParameter");
             if (ImGui::TreeNode("RGB"))
             {
-                ImGui::DragFloat("Time", &addColor_.time, 0.01f);
+                ImGui::DragFloat("Time", &addColor_.time, 0.01f, 0.01f, 0.99f);
                 ImGui::ColorEdit3("Color", &addColor_.value.x);
                 if (ImGui::Button("Save"))
                 {
@@ -1074,7 +1072,7 @@ void ParticleEmitter::DisplayColorParameters()
             }
             if (ImGui::TreeNode("Alpha"))
             {
-                ImGui::DragFloat("Time", &addAlpha_.time, 0.01f);
+                ImGui::DragFloat("Time", &addAlpha_.time, 0.01f, 0.01f, 0.99f);
                 ImGui::DragFloat("Alpha", &addAlpha_.value, 0.01f);
                 if (ImGui::Button("Save"))
                 {
@@ -1174,11 +1172,17 @@ void ParticleEmitter::DisplayFlags()
     ImGui::BeginDisabled(!isEnableBillboard_);
     ImGui::SeparatorText("use billboard");
     ImGui::PushID("billboard");
-    ImGui::Checkbox("X", reinterpret_cast<bool*> (&billboardAxes_[0]));
+
+    std::array<bool, 3> axes;
+    axes[0] = billboardAxes_.x == 0 ? false : true;
+    axes[1] = billboardAxes_.y == 0 ? false : true;
+    axes[2] = billboardAxes_.z == 0 ? false : true;
+
+    ImGui::Checkbox("X", &axes[0]);
     ImGui::SameLine();
-    ImGui::Checkbox("Y", reinterpret_cast<bool*> (&billboardAxes_[1]));
+    ImGui::Checkbox("Y", &axes[1]);
     ImGui::SameLine();
-    ImGui::Checkbox("Z", reinterpret_cast<bool*> (&billboardAxes_[2]));
+    ImGui::Checkbox("Z", &axes[2]);
     ImGui::PopID();
     ImGui::EndDisabled();
 

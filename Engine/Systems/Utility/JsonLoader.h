@@ -176,9 +176,6 @@ void JsonLoader::SetValue(std::string _gName, std::string _vName, const T& _v)
 {
     std::string name = typeid (T).name();
 
-    // TODO: valueTransitionが入る恐れがあるとエラーで実行できない
-    // 定義していない型用で別で関数を作成することでそれを回避
-    //  values_にvalueTransitionが入らなければいいのだから
     if (values_[_gName].contains(_vName))
     {
         values_[_gName][_vName].clear();

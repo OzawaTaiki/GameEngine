@@ -152,7 +152,9 @@ private:
     //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
     // 保留
 
-    std::vector <uint32_t>  billboardAxes_ = { 1,1,1 };        // ビルボードの軸
+    // TODO:これが原因で終了時に例外が発生する
+    //std::vector <uint32_t>  billboardAxes_ = { };        // ビルボードの軸
+    Vector3  billboardAxes_ = { };        // ビルボードの軸
 
     float                   delayTime_;                     // 発生までの遅延時間
     float                   duration_ = 1;                  // エミッターの持続時間
@@ -165,7 +167,7 @@ private:
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
 
-    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;      // 
+    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;      //
 
 
     Particle GenerateParticleData();
