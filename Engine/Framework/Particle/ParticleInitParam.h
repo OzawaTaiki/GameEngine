@@ -4,18 +4,21 @@
 #include <Physics/Math/Matrix4x4.h>
 #include <Physics/Math/MyLib.h>
 #include <Physics/Math/Easing.h>
+#include <Systems/Utility/JsonLoader.h>
 #include <list>
 #include <functional>
 
 template <typename T>
-struct KeyFrame
+struct TransitionKeyFrame
 {
     // time で value に変化する
     float time = 0.99f;
     T value = {};
 
     // イージング関数 indexで持つ
-    uint32_t easingFuncNum = 0;
+    int32_t easingFuncNum = 0;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TransitionKeyFrame, time, value, easingFuncNum)
 };
 
 template <typename T>
@@ -25,7 +28,7 @@ struct ValueTransition
     bool isChange = false;
 
     // 変更する値
-    std::list<KeyFrame<T>> keys = {};
+    std::list<TransitionKeyFrame<T>> keys = {};
 
 
 
@@ -52,6 +55,8 @@ struct ValueTransition
         }
         return keys.back().value;
     }
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ValueTransition, isChange, keys)
 };
 
 struct ParticleInitParam

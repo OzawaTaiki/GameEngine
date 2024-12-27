@@ -15,12 +15,11 @@ void ParticleEmitter::Setting(const std::string& _name)
 {
     name_ = _name;
 
-    //config_ = std::make_unique<Config>(name_, "Resources/Data/Particles/Emitters/");
-    // TODO : 変数の使用の有無の確認
-    // いらないものは消す
-    // 確認後，登録しなおす
+    jsonBinder_ = std::make_unique<JsonBinder>(_name, "Resources/Data/Particles/Emitters/");
+
 
     RegisterEmitParticleSettings();
+    RegisterParticleInitParam();
     RegisterEmitterSettings();
 
 
@@ -50,11 +49,19 @@ void ParticleEmitter::Setting(const std::string& _name)
     if (useTextruePath_.empty())
         useTextruePath_ = "particle/circle.png";
 
-    //parametor_.alphaTransition.keys.emplace_back(KeyFrame{ 1.0f ,1.0f });
-    //parametor_.colorTransition.keys.emplace_back(KeyFrame{ 1.0f,Vector3{1,1,1} });
-    //parametor_.rotateTransition.keys.emplace_back(KeyFrame{ 1.0f,Vector3{0,0,0} });
-    //parametor_.sizeTransition.keys.emplace_back(KeyFrame{ 1.0f,Vector3{1,1,1} });
-    //parametor_.speedTransition.keys.emplace_back(KeyFrame{ 1.0f,0.0f });
+    //parametor_.alphaTransition.keys.emplace_back(TransitionKeyFrame{ 1.0f ,1.0f });
+    //parametor_.colorTransition.keys.emplace_back(TransitionKeyFrame{ 1.0f,Vector3{1,1,1} });
+    //parametor_.rotateTransition.keys.emplace_back(TransitionKeyFrame{ 1.0f,Vector3{0,0,0} });
+    //parametor_.sizeTransition.keys.emplace_back(TransitionKeyFrame{ 1.0f,Vector3{1,1,1} });
+    //parametor_.speedTransition.keys.emplace_back(TransitionKeyFrame{ 1.0f,0.0f });
+
+
+    //parametor_.alphaTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, 1.0f });
+    //parametor_.colorTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, Vector3{1,1,1} });
+    //parametor_.rotateTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, Vector3{0,0,0} });
+    //parametor_.sizeTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, Vector3{1,1,1} });
+    //parametor_.speedTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, 1.0f });
+
 
     uint32_t handle = TextureManager::GetInstance()->Load(useTextruePath_);
     ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, BlendMode::Add, handle);
@@ -160,9 +167,9 @@ std::array<bool, 3> ParticleEmitter::GetBillboardAxes() const
 {
     std::array<bool, 3> axes;
 
-    axes[0] = billboardAxes_[0];
-    axes[1] = billboardAxes_[1];
-    axes[2] = billboardAxes_[2];
+    axes[0] = billboardAxes_.x == 0 ? false : true;
+    axes[1] = billboardAxes_.y == 0 ? false : true;
+    axes[2] = billboardAxes_.z == 0 ? false : true;
 
     return axes;
 }
@@ -179,76 +186,91 @@ void ParticleEmitter::Reset()
 void ParticleEmitter::RegisterEmitParticleSettings()
 {
     // 配列にしてもいいかも vector
-   /* config_->SetVariable("lifeTime_min", &setting_.lifeTime.value.min);
-    config_->SetVariable("lifeTime_max", &setting_.lifeTime.value.max);
-    config_->SetVariable("lifeTime_fixed", reinterpret_cast<uint32_t*>(&setting_.lifeTime.fixed));
-    config_->SetVariable("lifeTime_random", reinterpret_cast<uint32_t*>(&setting_.lifeTime.random));
+    jsonBinder_->RegisterVariable("lifeTime_min", &setting_.lifeTime.value.min);
+    jsonBinder_->RegisterVariable("lifeTime_max", &setting_.lifeTime.value.max);
+    jsonBinder_->RegisterVariable("lifeTime_fixed", reinterpret_cast<uint32_t*>(&setting_.lifeTime.fixed));
+    jsonBinder_->RegisterVariable("lifeTime_random", reinterpret_cast<uint32_t*>(&setting_.lifeTime.random));
 
-    config_->SetVariable("size_min", &setting_.size.value.min);
-    config_->SetVariable("size_max", &setting_.size.value.max);
-    config_->SetVariable("size_fixed", reinterpret_cast<uint32_t*>(&setting_.size.fixed));
-    config_->SetVariable("size_random", reinterpret_cast<uint32_t*>(&setting_.size.random));
+    jsonBinder_->RegisterVariable("size_min", &setting_.size.value.min);
+    jsonBinder_->RegisterVariable("size_max", &setting_.size.value.max);
+    jsonBinder_->RegisterVariable("size_fixed", reinterpret_cast<uint32_t*>(&setting_.size.fixed));
+    jsonBinder_->RegisterVariable("size_random", reinterpret_cast<uint32_t*>(&setting_.size.random));
 
-    config_->SetVariable("rotate_min", &setting_.rotate.value.min);
-    config_->SetVariable("rotate_max", &setting_.rotate.value.max);
-    config_->SetVariable("rotate_fixed", reinterpret_cast<uint32_t*>(&setting_.rotate.fixed));
-    config_->SetVariable("rotate_random", reinterpret_cast<uint32_t*>(&setting_.rotate.random));
+    jsonBinder_->RegisterVariable("rotate_min", &setting_.rotate.value.min);
+    jsonBinder_->RegisterVariable("rotate_max", &setting_.rotate.value.max);
+    jsonBinder_->RegisterVariable("rotate_fixed", reinterpret_cast<uint32_t*>(&setting_.rotate.fixed));
+    jsonBinder_->RegisterVariable("rotate_random", reinterpret_cast<uint32_t*>(&setting_.rotate.random));
 
-    config_->SetVariable("spped_min", &setting_.speed.value.min);
-    config_->SetVariable("spped_max", &setting_.speed.value.max);
-    config_->SetVariable("spped_fixed", reinterpret_cast<uint32_t*>(&setting_.speed.fixed));
-    config_->SetVariable("spped_random", reinterpret_cast<uint32_t*>(&setting_.speed.random));
+    jsonBinder_->RegisterVariable("spped_min", &setting_.speed.value.min);
+    jsonBinder_->RegisterVariable("spped_max", &setting_.speed.value.max);
+    jsonBinder_->RegisterVariable("spped_fixed", reinterpret_cast<uint32_t*>(&setting_.speed.fixed));
+    jsonBinder_->RegisterVariable("spped_random", reinterpret_cast<uint32_t*>(&setting_.speed.random));
 
-    config_->SetVariable("direction_min", &setting_.direction.value.min);
-    config_->SetVariable("direction_max", &setting_.direction.value.max);
-    config_->SetVariable("direction_fixed", reinterpret_cast<uint32_t*>(&setting_.direction.fixed));
-    config_->SetVariable("direction_random", reinterpret_cast<uint32_t*>(&setting_.direction.random));
+    jsonBinder_->RegisterVariable("direction_min", &setting_.direction.value.min);
+    jsonBinder_->RegisterVariable("direction_max", &setting_.direction.value.max);
+    jsonBinder_->RegisterVariable("direction_fixed", reinterpret_cast<uint32_t*>(&setting_.direction.fixed));
+    jsonBinder_->RegisterVariable("direction_random", reinterpret_cast<uint32_t*>(&setting_.direction.random));
 
-    config_->SetVariable("acceleration_min", &setting_.acceleration.value.min);
-    config_->SetVariable("acceleration_max", &setting_.acceleration.value.max);
-    config_->SetVariable("acceleration_fixed", reinterpret_cast<uint32_t*>(&setting_.acceleration.fixed));
-    config_->SetVariable("acceleration_random", reinterpret_cast<uint32_t*>(&setting_.acceleration.random));
+    jsonBinder_->RegisterVariable("acceleration_min", &setting_.acceleration.value.min);
+    jsonBinder_->RegisterVariable("acceleration_max", &setting_.acceleration.value.max);
+    jsonBinder_->RegisterVariable("acceleration_fixed", reinterpret_cast<uint32_t*>(&setting_.acceleration.fixed));
+    jsonBinder_->RegisterVariable("acceleration_random", reinterpret_cast<uint32_t*>(&setting_.acceleration.random));
 
-    config_->SetVariable("color_min", &setting_.color.value.min);
-    config_->SetVariable("color_max", &setting_.color.value.max);
-    config_->SetVariable("color_fixed", reinterpret_cast<uint32_t*>(&setting_.color.fixed));
-    config_->SetVariable("color_random", reinterpret_cast<uint32_t*>(&setting_.color.random));*/
+    jsonBinder_->RegisterVariable("color_min", &setting_.color.value.min);
+    jsonBinder_->RegisterVariable("color_max", &setting_.color.value.max);
+    jsonBinder_->RegisterVariable("color_fixed", reinterpret_cast<uint32_t*>(&setting_.color.fixed));
+    jsonBinder_->RegisterVariable("color_random", reinterpret_cast<uint32_t*>(&setting_.color.random));
 
 }
 
 void ParticleEmitter::RegisterParticleInitParam()
 {
+    jsonBinder_->RegisterVariable("lifeTime", &parametor_.lifeTime);
+    jsonBinder_->RegisterVariable("isInfiniteLife", reinterpret_cast<uint32_t*>(&parametor_.isInfiniteLife));
+    jsonBinder_->RegisterVariable("size", &parametor_.size);
+    jsonBinder_->RegisterVariable("rotate", &parametor_.rotate);
+    jsonBinder_->RegisterVariable("position", &parametor_.position);
+    jsonBinder_->RegisterVariable("speed", &parametor_.speed);
+    jsonBinder_->RegisterVariable("direction", &parametor_.direction);
+    jsonBinder_->RegisterVariable("acceleration", &parametor_.acceleration);
+    jsonBinder_->RegisterVariable("color", &parametor_.color);
+
+    jsonBinder_->GetVariableValue("speedTransition", parametor_.speedTransition);
+    jsonBinder_->GetVariableValue("sizeTransition", parametor_.sizeTransition);
+    jsonBinder_->GetVariableValue("rotateTransition", parametor_.rotateTransition);
+    jsonBinder_->GetVariableValue("colorTransition", parametor_.colorTransition);
+    jsonBinder_->GetVariableValue("alphaTransition", parametor_.alphaTransition);
 
 }
 
 void ParticleEmitter::RegisterEmitterSettings()
 {
-    //config_->SetVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
-    //config_->SetVariable("direction", reinterpret_cast<uint32_t*>(&particleDirection_));
+    jsonBinder_->RegisterVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
+    jsonBinder_->RegisterVariable("emitDirection", reinterpret_cast<uint32_t*>(&particleDirection_));
 
-    //config_->SetVariable("position", &position_);
-    //config_->SetVariable("offset", &offset_);
-    //config_->SetVariable("rotate", &rotate_);
-    //config_->SetVariable("size", &size_);
-    //config_->SetVariable("radius", &radius_);
+    jsonBinder_->RegisterVariable("position", &position_);
+    jsonBinder_->RegisterVariable("offset", &offset_);
+    jsonBinder_->RegisterVariable("rotate", &rotate_);
+    jsonBinder_->RegisterVariable("size", &size_);
+    jsonBinder_->RegisterVariable("radius", &radius_);
 
-    //config_->SetVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
-    //config_->SetVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
-    //config_->SetVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
+    jsonBinder_->RegisterVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
+    jsonBinder_->RegisterVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
+    jsonBinder_->RegisterVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
 
-    ////config_->SetVariable("billBoardAxes", &billboardAxes_);
+    jsonBinder_->RegisterVariable("billBoardAxes", &billboardAxes_);
 
-    //config_->SetVariable("delayTime", &delayTime_);
-    //config_->SetVariable("duration", &duration_);
+    jsonBinder_->RegisterVariable("delayTime", &delayTime_);
+    jsonBinder_->RegisterVariable("duration", &duration_);
 
-    //config_->SetVariable("maxParticles", &maxParticles_);
-    //config_->SetVariable("countPerEmit", &countPerEmit_);
-    //config_->SetVariable("emitPerSec", &emitPerSec_);
-    //config_->SetVariable("emitRepeatCount", &emitRepeatCount_);
+    jsonBinder_->RegisterVariable("maxParticles", &maxParticles_);
+    jsonBinder_->RegisterVariable("countPerEmit", &countPerEmit_);
+    jsonBinder_->RegisterVariable("emitPerSec", &emitPerSec_);
+    jsonBinder_->RegisterVariable("emitRepeatCount", &emitRepeatCount_);
 
 
-    //config_->SetVariable("modelPath", &useModelPath_);
-    //config_->SetVariable("texturePath", &useTextruePath_);
+    jsonBinder_->RegisterVariable("modelPath", &useModelPath_);
+    jsonBinder_->RegisterVariable("texturePath", &useTextruePath_);
 }
 
 
@@ -330,11 +352,11 @@ Particle ParticleEmitter::GenerateParticleData()
     param.size = random->GetUniformVec3(setting_.size.value.min, setting_.size.value.max);
 
 
-    param.alphaTransition.keys.emplace_front(KeyFrame{ 0.0f, param.color.w });
-    param.colorTransition.keys.emplace_front(KeyFrame{ 0.0f, param.color.xyz() });
-    param.rotateTransition.keys.emplace_front(KeyFrame{ 0.0f, param.rotate });
-    param.sizeTransition.keys.emplace_front(KeyFrame{ 0.0f, param.size });
-    param.speedTransition.keys.emplace_front(KeyFrame{ 0.0f, param.speed });
+    //param.alphaTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.color.w });
+    //param.colorTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.color.xyz() });
+    //param.rotateTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.rotate });
+    //param.sizeTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.size });
+    //param.speedTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.speed });
 
 
     if (isLengthScalingEnabled_)
@@ -356,9 +378,15 @@ Particle ParticleEmitter::GenerateParticleData()
 
 void ParticleEmitter::Save() const
 {
-    //ConfigManager* instance = ConfigManager::GetInstance();
-    /*instance->SetDirectoryPath("resources/Data/Particles/Emitters");
-    instance->SaveData(name_);*/
+    jsonBinder_->SetFolderPath();
+
+    jsonBinder_->SendVariable("sizeTransition", parametor_.sizeTransition);
+    jsonBinder_->SendVariable("rotateTransition", parametor_.rotateTransition);
+    jsonBinder_->SendVariable("speedTransition", parametor_.speedTransition);
+    jsonBinder_->SendVariable("colorTransition", parametor_.colorTransition);
+    jsonBinder_->SendVariable("alphaTransition", parametor_.alphaTransition);
+
+    jsonBinder_->Save();
 }
 
 bool ParticleEmitter::ShowDebugWinsow()
@@ -978,7 +1006,7 @@ void ParticleEmitter::DisplayColorParameters()
             ImGui::SeparatorText("ChangeParameter");
             if (ImGui::TreeNode("RGB"))
             {
-                ImGui::DragFloat("Time", &addColor_.time, 0.01f);
+                ImGui::DragFloat("Time", &addColor_.time, 0.01f, 0.01f, 0.99f);
                 ImGui::ColorEdit3("Color", &addColor_.value.x);
                 if (ImGui::Button("Save"))
                 {
@@ -1044,7 +1072,7 @@ void ParticleEmitter::DisplayColorParameters()
             }
             if (ImGui::TreeNode("Alpha"))
             {
-                ImGui::DragFloat("Time", &addAlpha_.time, 0.01f);
+                ImGui::DragFloat("Time", &addAlpha_.time, 0.01f, 0.01f, 0.99f);
                 ImGui::DragFloat("Alpha", &addAlpha_.value, 0.01f);
                 if (ImGui::Button("Save"))
                 {
@@ -1144,11 +1172,17 @@ void ParticleEmitter::DisplayFlags()
     ImGui::BeginDisabled(!isEnableBillboard_);
     ImGui::SeparatorText("use billboard");
     ImGui::PushID("billboard");
-    ImGui::Checkbox("X", reinterpret_cast<bool*> (&billboardAxes_[0]));
+
+    std::array<bool, 3> axes;
+    axes[0] = billboardAxes_.x == 0 ? false : true;
+    axes[1] = billboardAxes_.y == 0 ? false : true;
+    axes[2] = billboardAxes_.z == 0 ? false : true;
+
+    ImGui::Checkbox("X", &axes[0]);
     ImGui::SameLine();
-    ImGui::Checkbox("Y", reinterpret_cast<bool*> (&billboardAxes_[1]));
+    ImGui::Checkbox("Y", &axes[1]);
     ImGui::SameLine();
-    ImGui::Checkbox("Z", reinterpret_cast<bool*> (&billboardAxes_[2]));
+    ImGui::Checkbox("Z", &axes[2]);
     ImGui::PopID();
     ImGui::EndDisabled();
 

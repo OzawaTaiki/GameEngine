@@ -12,7 +12,7 @@ SceneManager* SceneManager::GetInstance()
 SceneManager::~SceneManager()
 {
     scenes_.clear();
-    currentScene_.reset();
+    //currentScene_.reset();
 }
 
 void SceneManager::RegisterScene(const std::string& _name, SceneFactory _scene)
