@@ -1,0 +1,10 @@
+{
+    "a": {
+        "emitters": [
+            "aa",
+            "aaa",
+            "aaaa"
+        ],
+        "loop": 0
+    }
+}

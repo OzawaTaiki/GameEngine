@@ -1,0 +1,194 @@
+{
+    "aaaa": {
+        "LengthScaling": 3263168512,
+        "acceleration": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "acceleration_fixed": 1,
+        "acceleration_max": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "acceleration_min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "acceleration_random": 256,
+        "alphaTransition": {
+            "isChange": false,
+            "keys": [
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.0,
+                    "value": 1.0
+                }
+            ]
+        },
+        "billBoardAxes": {
+            "x":1.0,
+            "y":1.0,
+            "z":1.0
+        },
+        "color": {
+            "w": 1.0,
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "colorTransition": {
+            "isChange": false,
+            "keys": [
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.0,
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                }
+            ]
+        },
+        "color_fixed": 1,
+        "color_max": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "color_min": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "color_random": 256,
+        "countPerEmit": 1,
+        "delayTime": 0.0,
+        "direction": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "direction_fixed": 1,
+        "direction_max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "direction_min": {
+            "x": -1.0,
+            "y": -1.0,
+            "z": -1.0
+        },
+        "direction_random": 256,
+        "duration": 1.0,
+        "emitDirection": 2,
+        "emitPerSec": 1,
+        "emitRepeatCount": 1,
+        "isInfiniteLife": 0,
+        "lifeTime": 1.0,
+        "lifeTime_fixed": 1,
+        "lifeTime_max": 1.0,
+        "lifeTime_min": 1.0,
+        "lifeTime_random": 256,
+        "loop": 0,
+        "maxParticles": 0,
+        "modelPath": "plane/plane.gltf",
+        "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "radius": 1.0,
+        "rotate": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "rotateTransition": {
+            "isChange": false,
+            "keys": [
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.0,
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            ]
+        },
+        "rotate_fixed": 1,
+        "rotate_max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "rotate_min": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "rotate_random": 256,
+        "shape": 3,
+        "size": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "sizeTransition": {
+            "isChange": false,
+            "keys": [
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.0,
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                }
+            ]
+        },
+        "size_fixed": 1,
+        "size_max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "size_min": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "size_random": 256,
+        "speed": 0.0,
+        "speedTransition": {
+            "isChange": false,
+            "keys": [
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.0,
+                    "value": 1.0
+                }
+            ]
+        },
+        "spped_fixed": 1,
+        "spped_max": 1.0,
+        "spped_min": 0.0,
+        "spped_random": 256,
+        "texturePath": "particle/circle.png",
+        "useBillboard": 2147483648
+    }
+}

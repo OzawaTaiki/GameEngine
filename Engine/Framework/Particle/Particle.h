@@ -26,11 +26,14 @@ public:
     Vector4 GetColor() const { return color_; }
     Matrix4x4 GetDirectionMatrix() const { return directionMatrix_; }
 
+    void ShowDebugWindow();
+
 private:
 
     ParticleInitParam parameter_;
 
     bool isAlive_ = true;
+    bool isInfiniteLife_ = false;
 
     float currentTime_ = 0;
     float t_ = 0;

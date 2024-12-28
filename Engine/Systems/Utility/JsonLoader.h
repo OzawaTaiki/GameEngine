@@ -7,156 +7,243 @@
 #include <string>
 #include <vector>
 #include <variant>
-#include <optional>
 
 #include "json.hpp"
 
 using json = nlohmann::json;
 
+using ValueVariant = std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, std::string>;
 class JsonLoader {
-private:
-	struct Datum
-	{
-		std::variant<uint32_t, float, Vector2, Vector3, Vector4, std::string> datum;
-		Datum() = default;
-
-		Datum(uint32_t _uint) { datum = _uint; };
-		Datum(float _f) { datum = _f; };
-		Datum(const Vector2& _vec2) { datum = _vec2; };
-		Datum(const Vector3& _vec3) { datum = _vec3; };
-		Datum(const Vector4& _vec4) { datum = _vec4; };
-        Datum(const std::string& _str) { datum = _str; };
-
-	};
-	struct Data
-	{
-		// 変数名,値
-		std::unordered_map<std::string, std::vector<Datum>> data;
-	};
-	// obj名,Data
 
 public:
-	JsonLoader(bool _autoSave = true);
-	JsonLoader(const std::string& _directory, bool _autoSave = true);
-	~JsonLoader();
 
-	void LoadJson(const std::string& _filepath, bool _isMakeFile = false);
-	void SaveJson();
-	void MakeJsonFile();
+    JsonLoader(bool _autoSave = true);
+    JsonLoader(const std::string& _directory, bool _autoSave = true);
+    ~JsonLoader();
 
-	void SaveJson(const std::string& _groupName);
+    void LoadJson(const std::string& _filepath, bool _isMakeFile = false);
+    void MakeJsonFile()const;
+
     void SetFolderPath(const std::string& _directory) { folderPath_ = _directory; }
 
+    template<typename T>
+    void GetValue(std::string _gName, std::string _vName, T& _v);
+    template<typename T>
+    void GetValue(std::string _gName, std::string _vName, std::vector<T>& _v);
+    template<typename T>
+    void GetValue(std::string _gName, std::string _vName, std::list<T>& _v);
 
-	void SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride = true);
-	template<typename T>
-	void SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data);
+    void OutPutJsonFile(const std::string& _groupName);
 
-	Datum parseDatum(const json& j, const std::string& _groupName);
-	json DatumToJson(const Datum& _datum);
+    template<typename T>
+    void SetValue(std::string _gName, std::string _vName, const T& _v);
 
+    template<typename T>
+    void SetValue(std::string _gName, std::string _vName, std::vector<T> _v);
 
-	std::optional<Data> GetData(const std::string& _groupName);
-	template<typename T>
-	inline std::optional<T> GetDatum(const std::string& _groupName, const std::string& _variableName);
-	template<typename T>
-	inline std::optional<std::vector <T>>  GetDatumArray(std::string _groupName, std::string _variableName);
+    template<typename T>
+    void SetValue(std::string _gName, std::string _vName, std::list<T> _v);
 
-	void PrepareForSave();
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const T& _v);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const std::vector<T>& _v);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const std::list<T>& _v);
 
 private:
-	json jsonData_;
-	std::string folderPath_;
-	std::string filePath_;
-	bool autoSave_;
+    json jsonData_;
 
-	std::unordered_map < std::string, Data > dataGroup_;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::vector<ValueVariant>>> values_;
 
+    std::vector<ValueVariant> FromJson(const json& _data);
+    json ToJson(const std::vector<ValueVariant>& _data);
+
+    std::string folderPath_;
+    std::string filePath_;
+    bool autoSave_;
 };
 
-
 template<typename T>
-inline void JsonLoader::SetData(const std::string& _groupname, const std::string& _name, const std::vector<T>& _data)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, T& _v)
 {
-	dataGroup_[_groupname].data[_name].clear();
+    if ((!values_[_gName].contains(_vName) ||
+        values_[_gName][_vName].empty()) &&
+        (!jsonData_[_gName].contains(_vName) ||
+        jsonData_[_gName][_vName].empty()))
+    {
+        return;
+    }
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
+    {
+        _v = static_cast<T>(std::get<int32_t>(values_[_gName][_vName][0]));
+    }
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
+    {
+        _v = std::get<T>(values_[_gName][_vName][0]);
+    }
+    else
+    {
+        //jsonData_[_gName][_vName].get_to(_v);
+        _v = jsonData_[_gName][_vName].get<T>();
+    }
 
-	Data& groupData = dataGroup_[_groupname];
 
-	for (const auto& value : _data) {
-		groupData.data[_name].emplace_back(value);
-	}
 }
 
 template<typename T>
-inline std::optional<T> JsonLoader::GetDatum(const std::string& _groupName, const std::string& _variableName)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, std::vector<T>& _v)
 {
-	//objのデータを取得
-	auto groupIt = dataGroup_.find(_groupName);
-	if (groupIt != dataGroup_.end())
-	{
-		// 取得したデータの変数を取得
-		auto it = groupIt->second.data.find(_variableName);
-		if (it == groupIt->second.data.end())
-			assert(false && "not found variaber");   // 見つからなければ止める
-
-		const Datum& datum = it->second.front();
-
-		if constexpr (std::is_same_v<T, uint32_t>)
-		{
-			if (auto value = std::get_if<uint32_t>(&datum.datum))
-				return *value;
-		}
-		else if constexpr (std::is_same_v<T, float>)
-		{
-			if (auto value = std::get_if<float>(&datum.datum))
-				return *value;
-		}
-		else if constexpr (std::is_same_v<T, Vector2>)
-		{
-			if (auto value = std::get_if<Vector2>(&datum.datum))
-				return *value;
-		}
-		else if constexpr (std::is_same_v<T, Vector3>)
-		{
-			if (auto value = std::get_if<Vector3>(&datum.datum))
-				return *value;
-		}
-		else if constexpr (std::is_same_v<T, Vector4>)
-		{
-			if (auto value = std::get_if<Vector4>(&datum.datum))
-				return *value;
-		}
-	}
-	Utils::Log("not found " + _variableName + "in" + _groupName);
-	//assert(false && "not found variaber");   // 見つからなければ止める
-	return T();
+    if (!values_[_gName].contains(_vName))
+        return;
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
+    {
+        std::vector<T> vec;
+        for (auto& v : values_[_gName][_vName])
+        {
+            vec.push_back(static_cast<T>(std::get<int32_t>(v)));
+        }
+        _v = vec;
+    }
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
+    {
+        std::vector<T> vec;
+        for (auto& v : values_[_gName][_vName])
+        {
+            vec.push_back(std::get<T>(v));
+        }
+        _v = vec;
+    }
+    else
+    {
+        _v = jsonData_[_gName][_vName].get<std::vector<T>>();
+    }
 }
 
 template<typename T>
-inline std::optional<std::vector <T>> JsonLoader::GetDatumArray(std::string _groupName, std::string _variableName)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, std::list<T>& _v)
 {
-	//objのデータを取得
-	auto groupIt = dataGroup_.find(_groupName);
-	if (groupIt != dataGroup_.end())
-	{
-		// 取得したデータの変数を取得
-		auto it = groupIt->second.data.find(_variableName);
-		if (it == groupIt->second.data.end())
-		{
-			Utils::Log("not found " + _variableName + "in" + _groupName);
-			return std::vector<T>();
-			//assert(false && "not found variaber");   // 見つからなければ止める
-		}
+    if (!values_[_gName].contains(_vName))
+        return;
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
+    {
+        std::list<T> list;
+        for (auto& v : values_[_gName][_vName])
+        {
+            list.push_back(static_cast<T>(std::get<int32_t>(v)));
+        }
+        _v = list;
+    }
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
+    {
+        std::list<T> list;
+        for (auto& v : values_[_gName][_vName])
+        {
+            list.push_back(std::get<T>(v));
+        }
+        _v = list;
+    }
+    else
+    {
+        _v = jsonData_[_gName][_vName].get<std::list<T>>();
+    }
 
-		std::vector<T> result;
-		for( const Datum& datum : it->second)
-		{
-			if (std::holds_alternative<T>(datum.datum))
-				result.emplace_back(std::get<T>(datum.datum));
-		}
-		return result;
-	}
-	Utils::Log("not found Group"  + _groupName);
-	//assert(false && "not found variaber");   // 見つからなければ止める
-	return std::vector<T>();
+
+}
+
+template<typename T>
+void JsonLoader::SetValue(std::string _gName, std::string _vName, const T& _v)
+{
+    std::string name = typeid (T).name();
+
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        values_[_gName][_vName].push_back(_v);
+
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetValue(std::string _gName, std::string _vName, std::vector<T> _v)
+{
+    std::string name = typeid (T).name();
+
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        for (auto& v : _v)
+        {
+            values_[_gName][_vName].push_back(v);
+        }
+
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetValue(std::string _gName, std::string _vName, std::list<T> _v)
+{
+    std::string name = typeid (T).name();
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        for (auto& v : _v)
+        {
+            values_[_gName][_vName].push_back(v);
+        }
+
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
+
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const T& _v)
+{
+    jsonData_[_gName][_vName] = _v;
+    json j;
+    j[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const std::vector<T>& _v)
+{
+    jsonData_[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const std::list<T>& _v)
+{
+    jsonData_[_gName][_vName] = _v;
 }

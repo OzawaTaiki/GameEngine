@@ -1,6 +1,5 @@
 #pragma once
 #include "BaseScene.h"
-#include <Systems/Config/ConfigManager.h>
 #include <iostream>
 #include <cstdint>
 #include <string>
@@ -38,7 +37,7 @@ public:
     static void ChangeScene();
 
 private:
-    ConfigManager* configManager_;
+    //ConfigManager* configManager_;
 
     // シーンのリスト
     std::unordered_map<std::string, SceneFactory>   scenes_ = {};

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/DirectX/BlendMode.h>
+
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <string>
@@ -13,16 +15,6 @@ class PSOManager
 {
 public:
 
-	enum class BlendMode
-	{
-		Normal,
-		Add,
-		Sub,
-		Multiply,
-		Screen,
-
-		ModeNum
-	};
 
 	static PSOManager* GetInstance();
 

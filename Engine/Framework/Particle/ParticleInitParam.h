@@ -3,19 +3,22 @@
 #include <Physics/Math/Vector4.h>
 #include <Physics/Math/Matrix4x4.h>
 #include <Physics/Math/MyLib.h>
-
+#include <Physics/Math/Easing.h>
+#include <Systems/Utility/JsonLoader.h>
 #include <list>
 #include <functional>
 
 template <typename T>
-struct KeyFrame
+struct TransitionKeyFrame
 {
     // time で value に変化する
-    float time = 1.0f;
+    float time = 0.99f;
     T value = {};
 
-    // イージング関数 ポインタで所持
-    std::function<float(float)> pEasingFunc = nullptr;
+    // イージング関数 indexで持つ
+    int32_t easingFuncNum = 0;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TransitionKeyFrame, time, value, easingFuncNum)
 };
 
 template <typename T>
@@ -25,7 +28,7 @@ struct ValueTransition
     bool isChange = false;
 
     // 変更する値
-    std::list<KeyFrame<T>> keys = {};
+    std::list<TransitionKeyFrame<T>> keys = {};
 
 
 
@@ -43,16 +46,17 @@ struct ValueTransition
         {
             if (it->time <= _t && _t <= itNext->time)
             {
-                float t = (itNext->time - _t) / (itNext->time - it->time);
-                if (itNext->pEasingFunc)
-                    t = itNext->pEasingFunc(t);
-                else if (it->pEasingFunc)
-                    t = it->pEasingFunc(t);
+                float t = (_t) / (itNext->time - it->time);
+
+                t = Easing::SelectFuncPtr(itNext->easingFuncNum)(t);
+
                 return Lerp(it->value, itNext->value, t);
             }
         }
         return keys.back().value;
     }
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ValueTransition, isChange, keys)
 };
 
 struct ParticleInitParam
@@ -81,9 +85,6 @@ struct ParticleInitParam
 
     // 加速度，重力
     Vector3 acceleration = { 0,0,0 };
-
-    // 減速係数
-    float deceleration = 0.0f;
 
     Vector4 color = { 1,1,1,1 };
     // 色 RGB

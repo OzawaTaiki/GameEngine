@@ -905,27 +905,27 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(BlendMode _mode)
 
     switch (_mode)
     {
-    case PSOManager::BlendMode::Normal:
+    case BlendMode::Normal:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
         break;
-    case PSOManager::BlendMode::Add:
+    case BlendMode::Add:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case PSOManager::BlendMode::Sub:
+    case BlendMode::Sub:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case PSOManager::BlendMode::Multiply:
+    case BlendMode::Multiply:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
         break;
-    case PSOManager::BlendMode::Screen:
+    case BlendMode::Screen:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;

@@ -2,6 +2,8 @@
 #include "Vector3.h"
 #include <functional>
 
+#include <json.hpp>
+
 struct Vector4
 {
 	float x, y, z, w;
@@ -12,6 +14,9 @@ struct Vector4
     inline Vector4(const Vector3& _v, float _f) :x(_v.x), y(_v.y), z(_v.z), w(_f) {};
 
     Vector3 xyz()const { return Vector3(x, y, z); }
+
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Vector4, x, y, z, w)
 
 
     inline void operator =(const Vector3& _v) {

@@ -10,7 +10,7 @@ SpriteManager* SpriteManager::GetInstance()
 
 void SpriteManager::Initialize()
 {
-    blendMode_ = PSOManager::BlendMode::Normal;
+    blendMode_ = BlendMode::Normal;
 
     /// PSOを取得
     auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Sprite", blendMode_);

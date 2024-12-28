@@ -7,6 +7,7 @@
 constexpr float pi_f = std::numbers::pi_v<float>;
 
 const char* Easing::easingFuncs[] = {
+    "Linear",
     "EaseInsine",
     "EaseInQuad",
     "EaseInCubic",
@@ -17,6 +18,7 @@ const char* Easing::easingFuncs[] = {
     "EaseInBack",
     "EaseInElastic",
     "EaseInBounce",
+
     "EaseOutSine",
     "EaseOutQuad",
     "EaseOutCubic",
@@ -27,6 +29,7 @@ const char* Easing::easingFuncs[] = {
     "EaseOutBack",
     "EaseOutElastic",
     "EaseOutBounce",
+
     "EaseInOutSine",
     "EaseInOutQuad",
     "EaseInOutCubic",
@@ -40,38 +43,46 @@ const char* Easing::easingFuncs[] = {
 };
 
 float (*Easing::pEasingFunc[])(float) = {
-    EaseInsine,
-    EaseInQuad,
-    EaseInCubic,
-    EaseInQuart,
-    EaseInQuint,
-    EaseInExpo,
-    EaseInCirc,
-    EaseInBack,
-    EaseInElastic,
-    EaseInBounce,
-    EaseOutSine,
-    EaseOutQuad,
-    EaseOutCubic,
-    EaseOutQuart,
-    EaseOutQuint,
-    EaseOutExpo,
-    EaseOutCirc,
-    EaseOutBack,
-    EaseOutElastic,
-    EaseOutBounce,
-    EaseInOutSine,
-    EaseInOutQuad,
-    EaseInOutCubic,
-    EaseInOutQuart,
-    EaseInOutQuint,
-    EaseInOutExpo,
-    EaseInOutCirc,
-    EaseInOutBack,
-    EaseInOutElastic,
-    EaseInOutBounce
+    &Linear,
+    &EaseInsine,
+    &EaseInQuad,
+    &EaseInCubic,
+    &EaseInQuart,
+    &EaseInQuint,
+    &EaseInExpo,
+    &EaseInCirc,
+    &EaseInBack,
+    &EaseInElastic,
+    &EaseInBounce,
+
+    &EaseOutSine,
+    &EaseOutQuad,
+    &EaseOutCubic,
+    &EaseOutQuart,
+    &EaseOutQuint,
+    &EaseOutExpo,
+    &EaseOutCirc,
+    &EaseOutBack,
+    &EaseOutElastic,
+    &EaseOutBounce,
+
+    &EaseInOutSine,
+    &EaseInOutQuad,
+    &EaseInOutCubic,
+    &EaseInOutQuart,
+    &EaseInOutQuint,
+    &EaseInOutExpo,
+    &EaseInOutCirc,
+    &EaseInOutBack,
+    &EaseInOutElastic,
+    &EaseInOutBounce
 };
 
+
+float Easing::Linear(float _t)
+{
+    return _t;
+}
 
 float Easing::EaseInsine(float _t)
 {
@@ -330,21 +341,33 @@ float Easing::EaseInOutBounce(float _t)
         return 1.0f + EaseOutBounce(2.0f * _t - 1.0f) * 0.5f;
 }
 
-std::function<float(float)> Easing::SelectFuocPtr(int _funcNum)
+std::string Easing::GetEasingFuncName(int _funcNum)
 {
 #ifdef _DEBUG
     if (_funcNum < 0 || _funcNum >= IM_ARRAYSIZE(easingFuncs))
-        return nullptr;
+        return "";
+    return easingFuncs[_funcNum];
+#endif // _DEBUG
+    return "";
+}
+
+std::function<float(float)> Easing::SelectFuncPtr(int _funcNum)
+{
+#ifdef _DEBUG
+    if (_funcNum < 0 || _funcNum >= IM_ARRAYSIZE(easingFuncs))
+        return &Linear;
 
     return pEasingFunc[_funcNum];
 #endif // _DEBUG
+    return &Linear;
 }
 
 int Easing::SelectEasingFunc()
 {
 #ifdef _DEBUG
-    static int selectedEasingFunc_ = -1;
+    static int selectedEasingFunc_ = 0;
     ImGui::Combo("EasingFunc", &selectedEasingFunc_, easingFuncs, IM_ARRAYSIZE(easingFuncs));
     return selectedEasingFunc_;
 #endif // _DEBUG
+    return 0;
 }

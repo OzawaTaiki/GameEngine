@@ -5,13 +5,11 @@
 #include <sstream>
 
 JsonLoader::JsonLoader(bool _autoSave) {
-    dataGroup_.clear();
     folderPath_ = "Resources/Data/";
     autoSave_ = _autoSave;
 }
 
 JsonLoader::JsonLoader(const std::string& _directory, bool _autoSave) {
-    dataGroup_.clear();
     folderPath_ = _directory;
     autoSave_ = _autoSave;
 
@@ -21,8 +19,6 @@ JsonLoader::JsonLoader(const std::string& _directory, bool _autoSave) {
 }
 
 JsonLoader::~JsonLoader() {
-    if(autoSave_)
-        SaveJson();
 }
 
 void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
@@ -43,175 +39,190 @@ void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
     }
     else
     {
-        Utils::Log("Begin Load :" + _filepath + "\n");
+        //Utils::Log("Begin Load :" + _filepath + "\n");
 
         if (inputFile.peek() != std::ifstream::traits_type::eof())
         {
-            inputFile >> jsonData_;
-            for (const auto& [groupName, dataObj] : jsonData_.items()) {
-                Data data;
-                for (const auto& [key, values] : dataObj.items()) {
-                    for (const auto& value : values)
-                    {
-                        data.data[key].emplace_back(parseDatum(value, groupName));
-                    }
+            // 名前を取得
+            json j;
+            inputFile >> j;
+
+            // groupName
+            for (const auto& [groupName, dataObj] : j.items()) {
+                jsonData_[groupName] = dataObj;
+                // variableName
+                for (const auto& [key, values] : dataObj.items())
+                {
+                    //for (const auto& val : values)
+                        values_[groupName][key] = FromJson(values);
+                        //values_[groupName][key].push_back(0);
                 }
-                dataGroup_[groupName] = data;
             }
         }
         inputFile.close();
-        Utils::Log("End Load   :" + filePath_ + "\n");
+        //Utils::Log("End Load   :" + filePath_ + "\n");
 
     }
 }
 
-void JsonLoader::SaveJson() {
-    std::ofstream outputFile(filePath_);
-    assert(outputFile.is_open() && "Cant Open OutputFile");
-    jsonData_.clear();
-    // objでfor
-    for (const auto& [groupName, dataObj] : dataGroup_)
-    {
-        json data;
-        for (const auto& [key, values] : dataObj.data)
-        {
-            for (const auto& value : values)
-                data[key].emplace_back(DatumToJson(value));
-        }
-        jsonData_[groupName] = data;
-    }
-
-    outputFile << jsonData_.dump(4);
-    outputFile.close();
-}
-
-void JsonLoader::MakeJsonFile() {
+void JsonLoader::MakeJsonFile() const {
 
     std::filesystem::create_directories(folderPath_);
     std::ofstream outputFile(filePath_);
     outputFile.close();
 }
 
-void JsonLoader::SaveJson(const std::string& _groupName)
+void JsonLoader::OutPutJsonFile(const std::string& _groupName)
 {
-    // ファイル名を取得
-    std::string fileapath = folderPath_ + _groupName + ".json";
+    // /がない場合はフォルダパスを追加
+    if (_groupName.find('/') == std::string::npos)
+        filePath_ =  folderPath_+ _groupName + ".json";
+    else
+        filePath_ = _groupName;
+
+    // 拡張子の有無
+    if (filePath_.find(".json") == std::string::npos)
+        filePath_ = filePath_ + ".json";
     // ファイルを開く
-    std::ofstream outputFile(fileapath);
+    std::ofstream outputFile(filePath_);
 
-    // ファイルが開けなかったら作成
-    if (!outputFile.is_open())
-    {
-        std::filesystem::create_directories(folderPath_);
-        outputFile = std::ofstream(_groupName + ".json");
-    }
-    //assert(&& "Cant Open OutputFile");
-    // データをクリア
     json j;
+    j[_groupName] = jsonData_[_groupName];
 
-    // データを追加
-    for (const auto& [key, values] : dataGroup_[_groupName].data)
+    /*for (const auto& [key, values] : jsonData_[_groupName].items())
     {
         for (const auto& value : values)
-            j[_groupName][key].emplace_back(DatumToJson(value));
-    }
-    // ファイルに書き込み
+                j[_groupName][key].emplace_back(value);
+    }*/
+
     outputFile << j.dump(4);
     outputFile.close();
+
 }
 
-void JsonLoader::SetData(const std::string& _groupname, const std::string& _name, const Datum& _data, bool _isOverride)
+std::vector<ValueVariant> JsonLoader::FromJson(const json& _j)
 {
-    //if (dataGroup_[_groupname].data[_name].empty())
+    // valuesを受け取る
+    // これはたいてい配列 vectorで返す
+    std::vector<ValueVariant> vec;
 
-    if(_isOverride)
+    if (_j.is_number_integer())
     {
-        dataGroup_[_groupname].data[_name].clear();
-        dataGroup_[_groupname].data[_name].emplace_back(_data);
+        vec.push_back(_j.get<int32_t>());
     }
-    else
-        dataGroup_[_groupname].data[_name].emplace_back(_data);
-}
-
-JsonLoader::Datum JsonLoader::parseDatum(const json& j, const std::string& _groupName)
-{
-    Datum d;
-    if (j.is_number_unsigned())
+    else if (_j.is_number_float())
     {
-        d.datum = j.get<uint32_t>();
+        vec.push_back(_j.get<float>());
     }
-    else if (j.is_number_float())
+    else if (_j.is_string())
     {
-        d.datum = j.get<float>();
+        vec.push_back(_j.get<std::string>());
     }
-    else if (j.is_array() && j.size() == 2 || j.contains("x") && j.contains("y"))
+    else if (_j.is_object() && _j.size() == 2 && _j.contains("x") && _j.contains("y"))
     {
-        d.datum=Vector2(j[0].get<float>(), j[1].get<float>());
+        vec.push_back(Vector2(_j["x"].get<float>(), _j["y"].get<float>()));
     }
-    else if (j.is_array() && j.size() == 3 || j.contains("x") && j.contains("y") && j.contains("z"))
+    else if (_j.is_object() && _j.size() == 3 && _j.contains("x") && _j.contains("y") && _j.contains("z"))
     {
-        d.datum = Vector3(j[0].get<float>(), j[1].get<float>(), j[2].get<float>());
+        vec.push_back(Vector3(_j["x"].get<float>(), _j["y"].get<float>(), _j["z"].get<float>()));
     }
-    else if (j.is_array() && j.size() == 4 || j.contains("x") && j.contains("y") && j.contains("z") && j.contains("w"))
+    else if (_j.is_object() && _j.size() == 4 && _j.contains("x") && _j.contains("y") && _j.contains("z") && _j.contains("w"))
     {
-        d.datum = Vector4(j[0].get<float>(), j[1].get<float>(), j[2].get<float>(), j[3].get<float>());
+        vec.push_back(Vector4(_j["x"].get<float>(), _j["y"].get<float>(), _j["z"].get<float>(), _j["w"].get<float>()));
     }
-    else if (j.is_string())
+    else if (_j.is_array())
     {
-        d.datum = j.get<std::string>();
-    }
-    else
-    {
-        throw std::runtime_error("Unsupported data format");
-    }
-    return d;
-}
-
-json JsonLoader::DatumToJson(const Datum& _datum)
-{
-    nlohmann::json j = json::array(); // 複数の datum を扱うために array として初期化
-
-    // variant に応じた処理を行う
-    std::visit([&j](auto&& arg) {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, uint32_t>)
+        for (auto j : _j)
         {
-            j = arg; // uint32_t の場合
+            if (j.is_number_integer())
+            {
+                vec.push_back(j.get<int32_t>());
+            }
+            else if (j.is_number_float())
+            {
+                vec.push_back(j.get<float>());
+            }
+            else if (j.is_string())
+            {
+                vec.push_back(j.get<std::string>());
+            }
+        }
+    }
+
+    return vec;
+}
+
+json JsonLoader::ToJson(const std::vector<ValueVariant>& _data)
+{
+    json j;
+
+    for (auto v : _data)
+    {
+        switch (v.index())
+        {
+        case 0: // int32_t
+            j.push_back(std::get<int32_t>(v));
+            break;
+        case 1: // uint32_t
+            j.push_back(std::get<uint32_t>(v));
+            break;
+        case 2: // float
+            j.push_back(std::get<float>(v));
+            break;
+        case 3: // Vector2
+            {
+                Vector2 vec = std::get<Vector2>(v);
+                j.push_back({ vec.x,vec.y });
+            }
+            break;
+        case 4: // Vector3
+            {
+                Vector3 vec3 = std::get<Vector3>(v);
+                j.push_back({ vec3.x,vec3.y,vec3.z });
+            }
+            break;
+        case 5: // Vector4
+            {
+                Vector4 vec4 = std::get<Vector4>(v);
+                j.push_back({ vec4.x,vec4.y,vec4.z,vec4.w });
+            }
+            break;
+        case 6: // std::string
+            j.push_back(std::get<std::string>(v));
+            break;
+        default:
+            break;
+        }
+
+        /*if constexpr (v.index() == 0)
+        {
+            j.push_back(std::get<int32_t>(v));
         }
         else if constexpr (std::is_same_v<T, float>)
         {
-            j = arg; // float の場合
+            j.push_back(std::get<float>(v));
         }
         else if constexpr (std::is_same_v<T, Vector2>)
         {
-            j = { arg.x,arg.y };
+            Vector2 vec = std::get<Vector2>(v);
+            j.push_back({ vec.x,vec.y });
         }
         else if constexpr (std::is_same_v<T, Vector3>)
         {
-            j = { arg.x, arg.y,arg.z };
+            Vector3 vec = std::get<Vector3>(v);
+            j.push_back({ vec.x,vec.y,vec.z });
         }
         else if constexpr (std::is_same_v<T, Vector4>)
         {
-            j = { arg.x, arg.y,arg.z,arg.w };
+            Vector4 vec = std::get<Vector4>(v);
+            j.push_back({ vec.x,vec.y,vec.z,vec.w });
         }
         else if constexpr (std::is_same_v<T, std::string>)
         {
-            j = arg;
-        }
-               }, _datum.datum);
+            j.push_back(std::get<std::string>(v));
+        }*/
+    }
+
     return j;
 }
 
-std::optional<JsonLoader::Data> JsonLoader::GetData(const std::string& _groupName)
-{
-    // オブジェクトのデータを取得
-    auto it = dataGroup_.find(_groupName);
-    if (it != dataGroup_.end())
-    {
-        return it->second;
-    }
-    return std::nullopt;
-}
-
-
-void JsonLoader::PrepareForSave() { jsonData_.clear(); }

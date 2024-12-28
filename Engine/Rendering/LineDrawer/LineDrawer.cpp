@@ -17,7 +17,7 @@ void LineDrawer::Initialize()
     color_ = { 0.0f,0.0f,0.0f,1.0f };
 
     /// PSOを取得
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("LineDrawer", PSOManager::BlendMode::Normal);
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("LineDrawer", BlendMode::Normal);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
     graphicsPipelineState_ = pso.value();

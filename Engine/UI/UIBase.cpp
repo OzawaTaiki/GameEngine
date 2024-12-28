@@ -1,7 +1,6 @@
 #include "UIBase.h"
 
 #include <Systems/Input/Input.h>
-#include <Systems/Config/ConfigManager.h>
 #include <ResourceManagement/TextureManager/TextureManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 
@@ -9,7 +8,7 @@ void UIBase::Initialize(const std::string& _label)
 {
     label_ = _label;
 
-    config_ = std::make_unique<Config>();
+    /*config_ = std::make_unique<Config>();
 
     config_->SetVariable( label_+"pos", &position_);
     config_->SetVariable( label_+"size", &size_);
@@ -17,7 +16,7 @@ void UIBase::Initialize(const std::string& _label)
     config_->SetVariable( label_+"isActive", reinterpret_cast<uint32_t*>(&isActive_));
     config_->SetVariable( label_+"isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
     config_->SetVariable( label_+"textureName", &textureName_);
-    config_->SetVariable( label_+"label", &label_);
+    config_->SetVariable( label_+"label", &label_);*/
 
     if (textureName_ == "")
         textureName_ = "white.png";
@@ -95,7 +94,7 @@ void UIBase::ImGui()
 
         if (ImGui::Button("save"))
         {
-            ConfigManager::GetInstance()->SaveData("UI");
+            //ConfigManager::GetInstance()->SaveData("UI");
             textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
             sprite_->SetTextureHandle(textureHandle_);
         }

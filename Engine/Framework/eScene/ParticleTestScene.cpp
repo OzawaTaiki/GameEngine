@@ -3,10 +3,10 @@
 #include <Rendering/Model/ModelManager.h>
 
 #include "SceneManager.h"
-#include <Systems/Config/ConfigManager.h>
 #include <Framework/Particle/ParticleManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Systems/Input/Input.h>
+#include <Rendering/Sprite/Sprite.h>
 
 std::unique_ptr<BaseScene>ParticleTestScene::Create()
 {
@@ -80,6 +80,10 @@ void ParticleTestScene::Draw()
     ModelManager::GetInstance()->PreDrawForObjectModel();
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
+    ModelManager::GetInstance()->PreDrawForAnimationModel();
+
+    Sprite::PreDraw();
+
     for (auto& emitter : emitters_)
         emitter->Draw();
 
@@ -128,10 +132,13 @@ void ParticleTestScene::ImGui()
         emitters_ = selectedEffect_->GetEmitters();
     }
     static bool isActive = false;
-    ImGui::Checkbox("Active", &isActive);
-    if (selectedEffect_ != effects_.end())
+    if (ImGui::Button("Active"))
     {
-        selectedEffect_->SetActive(isActive);
+        isActive = true;
+        if (selectedEffect_ != effects_.end())
+        {
+            selectedEffect_->SetActive(isActive);
+        }
     }
 
     if (selectedEffect_ != effects_.end())
@@ -148,54 +155,55 @@ void ParticleTestScene::ImGui()
 
     if (selectedEffect_ != effects_.end())
     {
-        // stringをcharに変換
-        static char emitterBuf[256];
-        if (ImGui::InputText("EmitterName", emitterBuf, 256))
-            addEmitterName_ = emitterBuf;
-
-
-        ImGui::BeginDisabled(strcmp(emitterBuf, "") == 0);
-        // エミッターの追加
-        if (ImGui::Button("Create New Emitter"))
-        {
-            addEmitterName_ = emitterBuf;
-            emitters_.push_back(selectedEffect_->AddEmitter(addEmitterName_));
-            emitters_.back()->Setting(addEmitterName_);
-            strcpy_s(emitterBuf, sizeof(emitterBuf), "");
-            addEmitterName_ = "";
-        }
-        ImGui::EndDisabled();
-
-        //エミッターの名前一覧
-        static bool isSelect[kMaxEmitterNum];
-        if (ImGui::TreeNode("Emitters"))
-        {
-            size_t index = 0;
-            for (auto& emitter : emitters_)
-            {
-                ImGui::Selectable(emitter->GetName().c_str(), &isSelect[index]);
-                ++index;
-            }
-
-            ImGui::TreePop();
-        }
-
-        int cnt = 0;
-        for (auto& emitter : emitters_)
-        {
-            if (isSelect[cnt++])
-            {
-                if (emitter->ShowDebugWinsow())
-                {
-                    if (ImGui::Button("Exclusion"))
-                    {
-                        selectedEffect_->ExclusionEmitter(emitter->GetName());
-                        emitters_.remove(emitter);
-                        break;
-                    }
-                }
-            }
-        }
+        selectedEffect_->DebugShowForEmitterCreate();
+        //// stringをcharに変換
+        //static char emitterBuf[256];
+        //if (ImGui::InputText("EmitterName", emitterBuf, 256))
+        //    addEmitterName_ = emitterBuf;
+        //
+        //
+        //ImGui::BeginDisabled(strcmp(emitterBuf, "") == 0);
+        //// エミッターの追加
+        //if (ImGui::Button("Create New Emitter"))
+        //{
+        //    addEmitterName_ = emitterBuf;
+        //    emitters_.push_back(selectedEffect_->AddEmitter(addEmitterName_));
+        //    //emitters_.back()->Setting(addEmitterName_);
+        //    strcpy_s(emitterBuf, sizeof(emitterBuf), "");
+        //    addEmitterName_ = "";
+        //}
+        //ImGui::EndDisabled();
+        //
+        ////エミッターの名前一覧
+        //static bool isSelect[kMaxEmitterNum];
+        //if (ImGui::TreeNode("Emitters"))
+        //{
+        //    size_t index = 0;
+        //    for (auto& emitter : emitters_)
+        //    {
+        //        ImGui::Selectable(emitter->GetName().c_str(), &isSelect[index]);
+        //        ++index;
+        //    }
+        //
+        //    ImGui::TreePop();
+        //}
+        //
+        //int cnt = 0;
+        //for (auto& emitter : emitters_)
+        //{
+        //    if (isSelect[cnt++])
+        //    {
+        //        if (emitter->ShowDebugWinsow())
+        //        {
+        //            if (ImGui::Button("Exclusion"))
+        //            {
+        //                selectedEffect_->ExclusionEmitter(emitter->GetName());
+        //                emitters_.remove(emitter);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
     }
 #pragma endregion
 

@@ -4,8 +4,7 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Vector4.h>
 #include <Physics/Math/Matrix4x4.h>
-
-#include <Systems/Config/Config.h>
+#include <Systems/JsonBinder/JsonBinder.h>
 #include <Framework/Particle/ParticleInitParam.h>
 
 #include <string>
@@ -32,12 +31,14 @@ struct SettingGroup
 struct EmitParticleSettings
 {
     SettingGroup<float>     lifeTime = { false,true,{1,1} };
-     SettingGroup<Vector3>   size = { false,true,{{1,1,1},{1,1,1}} };
-     SettingGroup<Vector3>   rotate = { false,true,{{1,1,1},{1,1,1}} };
-     SettingGroup<float>     speed = { false,true,{0,1} };
-     SettingGroup<Vector3>   direction = { false,true,{{-1,-1,-1},{1,1,1}} };
-     SettingGroup<Vector3>   acceleration = { false,true,{{0,0,0},{0,0,0}} };
-     SettingGroup<Vector4>   color = { false,true,{} };
+    SettingGroup<Vector3>   size = { false,true,{{1,1,1},{1,1,1}} };
+    SettingGroup<Vector3>   rotate = { false,true,{{1,1,1},{1,1,1}} };
+    SettingGroup<float>     speed = { false,true,{0,1} };
+    SettingGroup<Vector3>   direction = { false,true,{{-1,-1,-1},{1,1,1}} };
+    SettingGroup<Vector3>   acceleration = { false,true,{{0,0,0},{0,0,0}} };
+    SettingGroup<Vector4>   color = { false,true,{} };
+
+
 };
 
 enum class EmitterShape
@@ -55,21 +56,6 @@ enum class ParticleDirection
     Outward,
     Random
 };
-
-/*
-
-    struct colorKey{
-        float time;
-        vector4 color;
-    }
-    std::vector<colorKey> colorKeys;
-
-    １グループ内での発生タイミング ０～
-
-
-
-*/
-
 
 class Particle;
 class ParticleEmitter
@@ -95,6 +81,10 @@ public:
     void SetActive(bool _active);
     void SetAlive(bool _alive) { isAlive_ = _alive; }
 
+
+    //
+    // Getter
+    //
     bool IsActive() const { return isActive_; }
     bool IsAlive() const { return isAlive_; }
     bool EnableBillboard() const { return isEnableBillboard_; }
@@ -102,7 +92,7 @@ public:
 
     float GetDelayTime() const { return delayTime_; }
     float GetDuration() const { return duration_; }
-    std::array<bool, 3> GetBillboardAxes() const { return billboardAxes_; }
+    std::array<bool, 3> GetBillboardAxes() const;
 
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
@@ -114,11 +104,19 @@ public:
     void Reset();
 
 private:
+    // EmitParticleSettingsのcofig登録
+    void RegisterEmitParticleSettings();
+
+    // ParticleInitParamのconfig登録
+    void RegisterParticleInitParam();
+
+    // emitterのパラメータのconfgi登録
+    void RegisterEmitterSettings();
+
+
     EmitParticleSettings    setting_{};
 
-
-
-    ParticleInitParam       parametor_ = {}; // NEW!!!
+    ParticleInitParam       parametor_ = {};
 
     std::string             name_;
     std::string             useModelPath_;
@@ -130,11 +128,11 @@ private:
     float                   deltaTime_              = 1.0f / 60.0f;
     float                   emitTime_               = 0;
 
-    KeyFrame<Vector3>       addSize_ = {};
-    KeyFrame<Vector3>       addRotate_ = {};
-    KeyFrame<float>         addSpeed_ = {};
-    KeyFrame<Vector3>       addColor_ = {};
-    KeyFrame<float>         addAlpha_ = {};
+    TransitionKeyFrame<Vector3>       addSize_ = {};
+    TransitionKeyFrame<Vector3>       addRotate_ = {};
+    TransitionKeyFrame<float>         addSpeed_ = {};
+    TransitionKeyFrame<Vector3>       addColor_ = {};
+    TransitionKeyFrame<float>         addAlpha_ = {};
 
     EmitterShape            shape_ = EmitterShape::None;
     ParticleDirection       particleDirection_ = ParticleDirection::Random;
@@ -146,30 +144,19 @@ private:
     float                   radius_ = 1;
 
     bool                    loop_;                          // ループするか
-    bool                    fadeAlpha_;                     // 生成後にアルファを変更するか
-    bool                    changeSize_;                    // 生成後にサイズを変更するか
-    bool                    changeColor_;                   // 生成後に色を変更するか
-    bool                    randomColor_;                   // 色をランダムで生成するか
     bool                    isEnableBillboard_;             // ビルボードを使用するか
     bool                    isLengthScalingEnabled_;        // 方向を向くか
-    bool                    isInfiniteLife_;                // 無限寿命か
 
-    std::array <bool, 3>    lockRotationAxes_;              // 軸を固定するか
-    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
+    // 保留
+    //    std::array <bool, 3>    lockRotationAxes_;              // 軸を固定するか
+    //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
+    // 保留
 
-    std::array <bool, 3>     billboardAxes_ = { 0 };        // ビルボードの軸
-
-    bool                   isFixedDirection_    = false;    // 方向を固定するか
-    bool                   isFixedSpeed_        = false;    // スピードを固定するか
-    bool                   isFixedSize_         = false;    // サイズを固定するか
-    bool                   isFixedLifeTime_     = false;    // 寿命を固定するか
-    bool                   isFixedColor_        = false;    // 色を固定するか
-    bool                   isFixedAcceleration_ = false;    // 加速度を固定するか
-
-    float                   decelelation_       = 0;        // 減速係数
+    // TODO:これが原因で終了時に例外が発生する
+    //std::vector <uint32_t>  billboardAxes_ = { };        // ビルボードの軸
+    Vector3  billboardAxes_ = { };        // ビルボードの軸
 
     float                   delayTime_;                     // 発生までの遅延時間
-    float                   fadeStartRatio_;                // アルファを変え始める割合
     float                   duration_ = 1;                  // エミッターの持続時間
     uint32_t                maxParticles_;                  // 最大数
     uint32_t                countPerEmit_ = 1;              // 回当たりの発生数
@@ -179,6 +166,8 @@ private:
 
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
+
+    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;      //
 
 
     Particle GenerateParticleData();
