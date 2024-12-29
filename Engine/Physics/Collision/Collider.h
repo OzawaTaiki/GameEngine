@@ -82,7 +82,7 @@ public:
     // 判定属性を取得する
     uint32_t GetMask()const { return mask_; }
     // 判定マスクを取得する
-    uint32_t GetAtrribute_()const { return atrribute_; }
+    uint32_t GetAtrribute()const { return atrribute_; }
 
     std::string GetName()const { return name_; }
 

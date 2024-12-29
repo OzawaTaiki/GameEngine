@@ -40,8 +40,8 @@ void CollisionManager::CheckAllCollision()
         for (auto itB = std::next(itA); itB != colliders_.end(); itB++)
         {
             (*itB)->NotHit();
-            if ((*itA)->GetMask() & (*itB)->GetAtrribute_() &&
-                (*itB)->GetMask() & (*itA)->GetAtrribute_())
+            if ((*itA)->GetMask() & (*itB)->GetAtrribute() &&
+                (*itB)->GetMask() & (*itA)->GetAtrribute())
             {
                 CheckCollisionPair(*itA, *itB);
             }

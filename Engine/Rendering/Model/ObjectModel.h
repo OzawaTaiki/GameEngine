@@ -3,7 +3,6 @@
 #include "WorldTransform.h"
 #include "ObjectColor.h"
 #include <Framework/Camera/Camera.h>
-#include <Physics/Collision/Collider.h>
 
 class ObjectModel
 {
@@ -23,6 +22,9 @@ public:
     const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
     void UpdateUVTransform();
+
+    Vector3 GetMin()const { return model_->GetMin(); }
+    Vector3 GetMax()const { return model_->GetMax(); } 
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
