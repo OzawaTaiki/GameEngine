@@ -3,6 +3,7 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Quaternion.h>
 #include <Physics/Math/Matrix4x4.h>
+#include <Physics/Math/QuaternionTransform.h>
 
 #include <vector>
 #include <map>
@@ -24,6 +25,7 @@ public:
     void Draw();
 
     void ReadAnimation(const aiAnimation* _animation);
+    void ToIdle(float _timeToIdle);
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
 
@@ -63,6 +65,10 @@ private:
 
     bool isLoop_ = false;
     bool isPlaying_ = false;
+    bool toIdle_ = false;
+    float timeToIdle_ = 0.0f;
+    // idle状態になる前のアニメーションの状態
+    QuaternionTransform beforeIdleTransform_ = {};
 
     Vector3 CalculateValue(const AnimationCurve<Vector3>& _curve, float _time);
     Quaternion CalculateValue(const AnimationCurve<Quaternion>& _curve, float _time);

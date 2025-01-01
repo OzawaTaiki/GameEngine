@@ -48,7 +48,6 @@ void SampleScene::Update()
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
-#endif // _DEBUG
 
     if(ImGui::Button("rotate"))
     {
@@ -56,8 +55,18 @@ void SampleScene::Update()
     }
     if (ImGui::Button("scale"))
     {
-        aModel_->SetAnimation("ScaleAnim");
+        aModel_->SetAnimation("ScaleAnim",true);
     }
+    if (ImGui::Button("stop"))
+    {
+        aModel_->StopAnimation();
+    }
+    if (ImGui::Button("idle"))
+    {
+        aModel_->ToIdle(1.0f);
+    }
+#endif // _DEBUG
+
 
     plane_->Update();
     aModel_->Update();

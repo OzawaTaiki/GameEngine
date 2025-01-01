@@ -19,7 +19,9 @@ public:
     void Update();
     void Draw(const Camera* _camera, const Vector4& _color);
 
-    void SetAnimation(const std::string& _name);
+    void SetAnimation(const std::string& _name, bool _isLoop = false);
+    void StopAnimation() { model_->StopAnimation(); }
+    void ToIdle(float _timeToIdle) { model_->ToIdle(_timeToIdle); }
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
