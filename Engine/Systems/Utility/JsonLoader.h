@@ -36,23 +36,30 @@ public:
     void OutPutJsonFile(const std::string& _groupName);
 
     template<typename T>
-    inline void SetValue(std::string _gName, std::string _vName, T _v);
+    void SetValue(std::string _gName, std::string _vName, const T& _v);
 
     template<typename T>
-    inline void SetValue(std::string _gName, std::string _vName, std::vector<T> _v);
+    void SetValue(std::string _gName, std::string _vName, std::vector<T> _v);
 
     template<typename T>
-    inline void SetValue(std::string _gName, std::string _vName, std::list<T> _v);
+    void SetValue(std::string _gName, std::string _vName, std::list<T> _v);
 
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const T& _v);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const std::vector<T>& _v);
+
+    template<typename T>
+    void SetJsonValue(const std::string& _gName, const std::string& _vName, const std::list<T>& _v);
 
 private:
     json jsonData_;
 
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<ValueVariant>>> values_;
 
-    ValueVariant FromJson(const json& _data);
+    std::vector<ValueVariant> FromJson(const json& _data);
     json ToJson(const std::vector<ValueVariant>& _data);
-
 
     std::string folderPath_;
     std::string filePath_;
@@ -60,103 +67,183 @@ private:
 };
 
 template<typename T>
-inline void JsonLoader::GetValue(std::string _gName, std::string _vName, T& _v)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, T& _v)
 {
-    if (jsonData_[_gName].contains(_vName))
+    if ((!values_[_gName].contains(_vName) ||
+        values_[_gName][_vName].empty()) &&
+        (!jsonData_[_gName].contains(_vName) ||
+        jsonData_[_gName][_vName].empty()))
     {
-        if constexpr (std::is_same_v<T, int32_t>)
-        {
-            _v = static_cast<int32_t> (std::get<int32_t>(values_[_gName][_vName][0]));
-        }
-
-        else if constexpr (std::is_same_v<T, uint32_t>)
-        {
-            _v = static_cast<uint32_t> (std::get<int32_t>(values_[_gName][_vName][0]));
-        }
-
-        else
-            _v = std::get<T>(values_[_gName][_vName][0]);
+        return;
     }
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
+    {
+        _v = static_cast<T>(std::get<int32_t>(values_[_gName][_vName][0]));
+    }
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
+    {
+        _v = std::get<T>(values_[_gName][_vName][0]);
+    }
+    else
+    {
+        //jsonData_[_gName][_vName].get_to(_v);
+        _v = jsonData_[_gName][_vName].get<T>();
+    }
+
+
 }
 
 template<typename T>
-inline void JsonLoader::GetValue(std::string _gName, std::string _vName, std::vector<T>& _v)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, std::vector<T>& _v)
 {
-    if (jsonData_[_gName].contains(_vName))
+    if (!values_[_gName].contains(_vName))
+        return;
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
     {
-        if constexpr (std::is_same_v<T, int32_t> ||
-                      std::is_same_v<T, uint32_t>)
-        {
-            values_[_gName][_vName].clear();
-
-            for (auto& v : jsonData_[_gName][_vName])
-            {
-                T val = v.get<T>();
-                values_[_gName][_vName].push_back(val);
-                _v.push_back(val);
-            }
-        }
-
+        std::vector<T> vec;
         for (auto& v : values_[_gName][_vName])
         {
-            _v.push_back(std::get<T>(v));
+            vec.push_back(static_cast<T>(std::get<int32_t>(v)));
         }
+        _v = vec;
     }
-}
-
-template<typename T>
-inline void JsonLoader::GetValue(std::string _gName, std::string _vName, std::list<T>& _v)
-{
-    if (jsonData_[_gName].contains(_vName))
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
     {
-        if constexpr (std::is_same_v<T, int32_t> ||
-                      std::is_same_v<T, uint32_t>)
-        {
-            values_[_gName][_vName].clear();
-            for (auto& v : jsonData_[_gName][_vName])
-            {
-                T val = v.get<T>();
-                values_[_gName][_vName].push_back(val);
-                _v.push_back(val);
-            }
-        }
-
+        std::vector<T> vec;
         for (auto& v : values_[_gName][_vName])
         {
-            _v.push_back(std::get<T>(v));
+            vec.push_back(std::get<T>(v));
         }
+        _v = vec;
+    }
+    else
+    {
+        _v = jsonData_[_gName][_vName].get<std::vector<T>>();
     }
 }
 
 template<typename T>
-inline void JsonLoader::SetValue(std::string _gName, std::string _vName, T _v)
+void JsonLoader::GetValue(std::string _gName, std::string _vName, std::list<T>& _v)
 {
-    values_[_gName][_vName].clear();
-    values_[_gName][_vName].push_back(_v);
+    if (!values_[_gName].contains(_vName))
+        return;
+    std::string name = typeid (T).name();
+    if constexpr (std::is_same_v<T, int32_t> ||
+                  std::is_same_v<T, uint32_t>)
+    {
+        std::list<T> list;
+        for (auto& v : values_[_gName][_vName])
+        {
+            list.push_back(static_cast<T>(std::get<int32_t>(v)));
+        }
+        _v = list;
+    }
+    else if constexpr (std::is_same_v<T, float> ||
+                       std::is_same_v<T, Vector2> ||
+                       std::is_same_v<T, Vector3> ||
+                       std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, std::string>)
+    {
+        std::list<T> list;
+        for (auto& v : values_[_gName][_vName])
+        {
+            list.push_back(std::get<T>(v));
+        }
+        _v = list;
+    }
+    else
+    {
+        _v = jsonData_[_gName][_vName].get<std::list<T>>();
+    }
 
-    jsonData_[_gName][_vName].clear();
-    jsonData_[_gName][_vName]=ToJson(values_[_gName][_vName]);
+
 }
 
 template<typename T>
-inline void JsonLoader::SetValue(std::string _gName, std::string _vName, std::vector<T> _v)
+void JsonLoader::SetValue(std::string _gName, std::string _vName, const T& _v)
 {
-    values_[_gName][_vName].clear();
-    for (auto& v : _v)
-        values_[_gName][_vName].push_back(v);
+    std::string name = typeid (T).name();
 
-    jsonData_[_gName][_vName].clear();
-    jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        values_[_gName][_vName].push_back(_v);
+
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
 }
 
 template<typename T>
-inline void JsonLoader::SetValue(std::string _gName, std::string _vName, std::list<T> _v)
+void JsonLoader::SetValue(std::string _gName, std::string _vName, std::vector<T> _v)
 {
-    values_[_gName][_vName].clear();
-    for (auto& v : _v)
-        values_[_gName][_vName].push_back(v);
+    std::string name = typeid (T).name();
 
-    jsonData_[_gName][_vName].clear();
-    jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        for (auto& v : _v)
+        {
+            values_[_gName][_vName].push_back(v);
+        }
 
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetValue(std::string _gName, std::string _vName, std::list<T> _v)
+{
+    std::string name = typeid (T).name();
+    if (values_[_gName].contains(_vName))
+    {
+        values_[_gName][_vName].clear();
+        for (auto& v : _v)
+        {
+            values_[_gName][_vName].push_back(v);
+        }
+
+        jsonData_[_gName][_vName].clear();
+        jsonData_[_gName][_vName] = ToJson(values_[_gName][_vName]);
+    }
+    else
+        jsonData_[_gName][_vName] = _v;
+
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const T& _v)
+{
+    jsonData_[_gName][_vName] = _v;
+    json j;
+    j[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const std::vector<T>& _v)
+{
+    jsonData_[_gName][_vName] = _v;
+}
+
+template<typename T>
+void JsonLoader::SetJsonValue(const std::string& _gName, const std::string& _vName, const std::list<T>& _v)
+{
+    jsonData_[_gName][_vName] = _v;
 }

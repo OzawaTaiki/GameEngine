@@ -53,11 +53,9 @@ void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
                 // variableName
                 for (const auto& [key, values] : dataObj.items())
                 {
-                    // array
-                    for (const auto& value : values)
-                    {
-                        values_[groupName][key].push_back(FromJson(value));
-                    }
+                    //for (const auto& val : values)
+                        values_[groupName][key] = FromJson(values);
+                        //values_[groupName][key].push_back(0);
                 }
             }
         }
@@ -89,55 +87,69 @@ void JsonLoader::OutPutJsonFile(const std::string& _groupName)
     std::ofstream outputFile(filePath_);
 
     json j;
+    j[_groupName] = jsonData_[_groupName];
 
-    for (const auto& [key, values] : jsonData_[_groupName].items())
+    /*for (const auto& [key, values] : jsonData_[_groupName].items())
     {
         for (const auto& value : values)
-            j[_groupName][key].emplace_back(value);
-    }
+                j[_groupName][key].emplace_back(value);
+    }*/
 
     outputFile << j.dump(4);
     outputFile.close();
 
 }
 
-ValueVariant JsonLoader::FromJson(const json& _data)
+std::vector<ValueVariant> JsonLoader::FromJson(const json& _j)
 {
-    ValueVariant value{};
+    // valuesを受け取る
+    // これはたいてい配列 vectorで返す
+    std::vector<ValueVariant> vec;
 
-    // 配列じゃない
-    if (!_data.is_array())
+    if (_j.is_number_integer())
     {
-        if (_data.is_number_integer())
+        vec.push_back(_j.get<int32_t>());
+    }
+    else if (_j.is_number_float())
+    {
+        vec.push_back(_j.get<float>());
+    }
+    else if (_j.is_string())
+    {
+        vec.push_back(_j.get<std::string>());
+    }
+    else if (_j.is_object() && _j.size() == 2 && _j.contains("x") && _j.contains("y"))
+    {
+        vec.push_back(Vector2(_j["x"].get<float>(), _j["y"].get<float>()));
+    }
+    else if (_j.is_object() && _j.size() == 3 && _j.contains("x") && _j.contains("y") && _j.contains("z"))
+    {
+        vec.push_back(Vector3(_j["x"].get<float>(), _j["y"].get<float>(), _j["z"].get<float>()));
+    }
+    else if (_j.is_object() && _j.size() == 4 && _j.contains("x") && _j.contains("y") && _j.contains("z") && _j.contains("w"))
+    {
+        vec.push_back(Vector4(_j["x"].get<float>(), _j["y"].get<float>(), _j["z"].get<float>(), _j["w"].get<float>()));
+    }
+    else if (_j.is_array())
+    {
+        for (auto j : _j)
         {
-            return _data.get<int32_t>();
-        }
-        else if (_data.is_number_float())
-        {
-            return _data.get<float>();
-        }
-        else if (_data.is_string())
-        {
-            return _data.get<std::string>();
+            if (j.is_number_integer())
+            {
+                vec.push_back(j.get<int32_t>());
+            }
+            else if (j.is_number_float())
+            {
+                vec.push_back(j.get<float>());
+            }
+            else if (j.is_string())
+            {
+                vec.push_back(j.get<std::string>());
+            }
         }
     }
-    else
-    {
-        if (_data.size() == 2)
-        {
-            return Vector2(_data[0].get<float>(), _data[1].get<float>());
-        }
-        else if (_data.size() == 3)
-        {
-            return Vector3(_data[0].get<float>(), _data[1].get<float>(), _data[2].get<float>());
-        }
-        else if (_data.size() == 4)
-        {
-            return Vector4(_data[0].get<float>(), _data[1].get<float>(), _data[2].get<float>(), _data[3].get<float>());
-        }
-    }
 
-    return value;
+    return vec;
 }
 
 json JsonLoader::ToJson(const std::vector<ValueVariant>& _data)

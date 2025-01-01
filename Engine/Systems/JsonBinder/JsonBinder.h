@@ -50,19 +50,21 @@ public:
 #pragma region 変数送信関数
 
     // 登録した変数を送信する関数
-    void SendVariableValue();
+    void RegisterVariable();
 
     // データを送信する関数
     template<typename T>
-    inline void SendVariableValue(const std::string& _variableName, const T& _var);
+    inline void SendVariable(const std::string& _variableName, const T& _var);
 
     // データを送信する関数
     template<typename T>
-    inline void SendVariableValue(const std::string& _variableName, const std::vector<T>& _var);
+    inline void SendVariable(const std::string& _variableName, const std::vector<T>& _var);
 
     // データを送信する関数
     template<typename T>
-    inline void SendVariableValue(const std::string& _variableName, const std::list<T>& _var);
+    inline void SendVariable(const std::string& _variableName, const std::list<T>& _var);
+
+    //void SetDirectoryPath() const {jsonHub_->SetDirectoryPathFromRoot}
 
 #pragma endregion
 
@@ -145,21 +147,21 @@ inline void JsonBinder::GetVariableValue(const std::string& _variableName, std::
 }
 
 template<typename T>
-inline void JsonBinder::SendVariableValue(const std::string& _variableName, const T& _var)
+inline void JsonBinder::SendVariable(const std::string& _variableName, const T& _var)
 {
-    jsonHub_->SendVariableValue(groupName_, _variableName, _var);
+    jsonHub_->SetJsonValue(groupName_, _variableName, _var);
 }
 
 template<typename T>
-inline void JsonBinder::SendVariableValue(const std::string& _variableName, const std::vector<T>& _var)
+inline void JsonBinder::SendVariable(const std::string& _variableName, const std::vector<T>& _var)
 {
-    jsonHub_->SendVariableValue(groupName_, _variableName, _var);
+    jsonHub_->SetJsonValue(groupName_, _variableName, _var);
 }
 
 template<typename T>
-inline void JsonBinder::SendVariableValue(const std::string& _variableName, const std::list<T>& _var)
+inline void JsonBinder::SendVariable(const std::string& _variableName, const std::list<T>& _var)
 {
-    jsonHub_->SendVariableValue(groupName_, _variableName, _var);
+    jsonHub_->SetJsonValue(groupName_, _variableName, _var);
 }
 
 template<typename T>

@@ -30,18 +30,18 @@ JsonBinder::JsonBinder(const std::string& _name, const std::string& _folderPath)
 
 void JsonBinder::SetFolderPath()
 {
-    jsonHub_->SetDirectoryPathFromRoot(folderPath_ + groupName_ + '/');
+    jsonHub_->SetDirectoryPathFromRoot(folderPath_);
 }
 
 void JsonBinder::Save()
 {
-    SendVariableValue();
+    RegisterVariable();
 
     jsonHub_->SetDirectoryPathFromRoot(folderPath_);
     jsonHub_->Save(groupName_);
 
 }
-void JsonBinder::SendVariableValue()
+void JsonBinder::RegisterVariable()
 {
     for (auto& [name, pVal] : memberPtrMap_)
     {
@@ -50,7 +50,7 @@ void JsonBinder::SendVariableValue()
                        using T = std::decay_t<decltype(_arg)>;
                            if constexpr(std::is_pointer_v<T>)
                            {
-                               SendVariableValue(name, *std::get<T>(pVal.address));
+                               SendVariable(name, *std::get<T>(pVal.address));
                            }
                            else if constexpr (std::is_same_v<T, RefVector<int32_t>> ||
                                               std::is_same_v<T, RefVector<uint32_t>> ||
@@ -62,7 +62,7 @@ void JsonBinder::SendVariableValue()
                            {
                                std::vector<element_type_t<T>> vec;
                                vec = std::get<RefVector<element_type_t<T>>>(pVal.address).get();
-                               SendVariableValue(name, vec);
+                               SendVariable(name, vec);
                            }
                            else if constexpr (std::is_same_v<T, std::list<int32_t>*> ||
                                               std::is_same_v<T, std::list<uint32_t>*> ||
@@ -74,9 +74,8 @@ void JsonBinder::SendVariableValue()
                            {
                                std::list<element_type_t<T>> list;
                                list = std::get<std::list<element_type_t<T>>>(pVal.address).get();
-                               SendVariableValue(name, list);
+                               RegisterVariable(name, list);
                            }
-                           int dummy = 0;
                    }, pVal.address);
 
     }

@@ -1,9 +1,6 @@
 {
-    "aa": {
-        "EmitDirection": [
-            2
-        ],
-        "LengthScaling": 1044381696,
+    "aaa": {
+        "LengthScaling": 2607808512,
         "acceleration": {
             "x": 0.0,
             "y": 0.0,
@@ -43,7 +40,7 @@
             "z": 1.0
         },
         "colorTransition": {
-            "isChange": true,
+            "isChange": false,
             "keys": [
                 {
                     "easingFuncNum": 0,
@@ -53,64 +50,19 @@
                         "y": 1.0,
                         "z": 1.0
                     }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.05999999865889549,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.550000011920929,
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.1921568661928177,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.8799999952316284,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.8799999952316284,
-                    "value": {
-                        "x": 0.5568627715110779,
-                        "y": 0.23529411852359772,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.949999988079071,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
                 }
             ]
         },
         "color_fixed": 1,
         "color_max": {
-            "w": 1.0,
-            "x": 1.0,
+            "w": 0.0,
+            "x": 0.0,
             "y": 0.0,
             "z": 0.0
         },
         "color_min": {
-            "w": 1.0,
-            "x": 1.0,
+            "w": 0.0,
+            "x": 0.0,
             "y": 0.0,
             "z": 0.0
         },
@@ -135,7 +87,7 @@
         },
         "direction_random": 256,
         "duration": 1.0,
-        "emitDirection": 1,
+        "emitDirection": 2,
         "emitPerSec": 1,
         "emitRepeatCount": 1,
         "isInfiniteLife": 0,
@@ -189,7 +141,7 @@
             "z": 1.0
         },
         "rotate_random": 256,
-        "shape": 0,
+        "shape": 3,
         "size": {
             "x": 1.0,
             "y": 1.0,
@@ -237,6 +189,6 @@
         "spped_min": 0.0,
         "spped_random": 256,
         "texturePath": "particle/circle.png",
-        "useBillboard": 1073741824
+        "useBillboard": 1879048192
     }
 }

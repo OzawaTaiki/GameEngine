@@ -1,10 +1,10 @@
 {
     "a": {
         "emitters": [
-            "aa"
+            "aa",
+            "aaa",
+            "aaaa"
         ],
-        "loop": [
-            0
-        ]
+        "loop": 0
     }
 }
