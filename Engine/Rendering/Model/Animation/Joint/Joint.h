@@ -23,6 +23,7 @@ public:
 
     void SetTransform(const QuaternionTransform& _transform) { transform_ = _transform; }
     Matrix4x4 GetSkeletonSpaceMatrix() const { return SkeletonSpcaceMatrix_; }
+    QuaternionTransform GetTransform() const { return transform_; }
 
     std::string name_ = {};
     int32_t index_ = 0;

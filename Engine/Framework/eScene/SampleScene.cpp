@@ -56,8 +56,17 @@ void SampleScene::Update()
     }
     if (ImGui::Button("scale"))
     {
-        aModel_->SetAnimation("ScaleAnim");
+        aModel_->SetAnimation("ScaleAnim",true);
     }
+    if (ImGui::Button("stop"))
+    {
+        aModel_->StopAnimation();
+    }
+    if (ImGui::Button("idle"))
+    {
+        aModel_->ToIdle(1.0f);
+    }
+
 
     plane_->Update();
     aModel_->Update();

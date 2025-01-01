@@ -17,6 +17,36 @@ void ModelAnimation::Update(std::vector<Joint>& _joints)
     isPlaying_ = true;
     animetionTimer_ += 1.0f / 60.0f;
 
+    if (toIdle_)
+    {
+        if (animetionTimer_ >= timeToIdle_)
+        {
+            animetionTimer_ = 0.0f;
+            toIdle_ = false;
+            isPlaying_ = false;
+            QuaternionTransform transform = {};
+            transform.translate = Vector3(0, 0, 0);
+            transform.rotation = Quaternion(0, 0, 0, 1);
+            transform.scale = Vector3(1, 1, 1);
+            for (Joint& joint : _joints)
+            {
+                joint.SetTransform(transform);
+            }
+            return;
+        }
+
+        for (Joint& joint : _joints)
+        {
+            float t = animetionTimer_ / timeToIdle_;
+            QuaternionTransform transform = {};
+            transform.translate = Lerp(joint.GetTransform().translate, Vector3(0, 0, 0), t);
+            transform.rotation = Slerp(joint.GetTransform().rotation, Quaternion(0, 0, 0, 1), t);
+            transform.scale = Lerp(joint.GetTransform().scale, Vector3(1, 1, 1), t);
+            joint.SetTransform(transform);
+        }
+        return;
+    }
+
     // ループしない場合
     if (!isLoop_)
     {
@@ -46,13 +76,6 @@ void ModelAnimation::Update(std::vector<Joint>& _joints)
     if (!isPlaying_)
         Initialize();
 
-    /*ImGui::Text("%f", animetionTimer_);
-    NodeAnimation& rootAnimation = animation_.nodeAnimations[_rootNodeName];
-    Vector3 translate = CalculateValue(rootAnimation.translate, animetionTimer_);
-    Quaternion rotation = CalculateValue(rootAnimation.rotation, animetionTimer_);
-    rotation.ShowData("q", false);
-    Vector3 scale = CalculateValue(rootAnimation.scale, animetionTimer_);
-    localMatrix_ = MakeAffineMatrix(scale, rotation, translate);*/
 }
 
 void ModelAnimation::Draw()
@@ -95,6 +118,14 @@ void ModelAnimation::ReadAnimation(const aiAnimation* _animation)
     }
     Initialize();
 }
+
+void ModelAnimation::ToIdle(float _timeToIdle)
+{
+    animetionTimer_ = 0.0f;
+    toIdle_ = true;
+    timeToIdle_ = _timeToIdle;
+}
+
 
 Vector3 ModelAnimation::CalculateValue(const AnimationCurve<Vector3>& _curve, float _time)
 {

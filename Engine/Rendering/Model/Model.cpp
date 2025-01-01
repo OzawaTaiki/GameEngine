@@ -159,6 +159,14 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
     currentAnimation_->SetLoop(_loop);
 }
 
+void Model::ToIdle(float _timeToIdle)
+{
+    if (currentAnimation_)
+    {
+        currentAnimation_->ToIdle(_timeToIdle);
+    }
+}
+
 void Model::SetUVTransform(const Vector2& _transform, uint32_t _index)
 {
     material_[_index]->transform_ = _transform;

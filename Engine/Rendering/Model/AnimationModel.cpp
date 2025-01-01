@@ -39,9 +39,9 @@ void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
     model_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
-void AnimationModel::SetAnimation(const std::string& _name)
+void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)
 {
-    model_->SetAnimation(_name);
+    model_->SetAnimation(_name,_isLoop);
 }
 
 
