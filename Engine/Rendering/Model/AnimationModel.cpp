@@ -34,9 +34,14 @@ void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
-
+    model_->QueueCommandAndDraw(commandList, true);// BVB IBV MTL2 TEX4 LIGHT567
+    
     model_->DrawSkeleton(worldTransform_.matWorld_);
+}
+
+void AnimationModel::SetAnimation(const std::string& _name)
+{
+    model_->SetAnimation(_name);
 }
 
 

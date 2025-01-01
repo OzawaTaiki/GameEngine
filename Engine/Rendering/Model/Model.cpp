@@ -23,12 +23,15 @@ void Model::Initialize()
 
 void Model::Update()
 {
-    for (auto& animation : animation_)
+    if (currentAnimation_)
     {
-            animation->Update(skeleton_.GetJoints());
-        skeleton_.Update();
-        skinCluster_.Update(skeleton_.GetJoints());
+        currentAnimation_->Update(skeleton_.GetJoints());
+        // アニメーションが終わったらアニメーションを解除
+        if (!currentAnimation_->IsPlaying())
+            currentAnimation_ = nullptr;
     }
+    skeleton_.Update();
+    skinCluster_.Update(skeleton_.GetJoints());
 
 }
 
@@ -111,14 +114,14 @@ Model* Model::CreateFromObj(const std::string& _filePath)
     return model;
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
 {
     lightGroup_->TransferData();
     lightGroup_->QueueCommand(_commandList);
 
     for (auto& mesh : mesh_)
     {
-        if (animation_.empty())
+        if (!_animation)
             mesh->QueueCommand(_commandList);
         else
         {
@@ -131,7 +134,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
     }
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, bool _animation) const
 {
     lightGroup_->TransferData();
     lightGroup_->QueueCommand(_commandList);
@@ -143,6 +146,17 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
+}
+
+void Model::SetAnimation(const std::string& _name,bool _loop)
+{
+    if (animation_.find(_name) == animation_.end())
+    {
+        assert(false && "アニメーションが見つかりません");
+        return;
+    }
+    currentAnimation_ = animation_[_name].get();
+    currentAnimation_->SetLoop(_loop);
 }
 
 void Model::SetUVTransform(const Vector2& _transform, uint32_t _index)
@@ -196,9 +210,12 @@ Vector3 Model::GetMax(size_t _index) const
 
 Matrix4x4 Model::GetAnimationMatrix() const
 {
-    if (animation_.empty())
+    if (!currentAnimation_)
         return MakeIdentity4x4();
-    return animation_[0]->GetLocalMatrix();
+    // TODO : SetAnimetion関数作成 名前を引数で受け取りそのアニメーションをcurrentAnimetionにセット ↓とupdateでそれを使う
+    return currentAnimation_->GetLocalMatrix();
+
+
 }
 
 void Model::LoadFile(const std::string& _filepath)
@@ -317,11 +334,11 @@ void Model::LoadAnimation(const aiScene* _scene)
     if (_scene->mNumAnimations == 0)
         return;
 
-    animation_.resize(_scene->mNumAnimations);
     for (uint32_t animationIndex = 0; animationIndex < _scene->mNumAnimations; ++animationIndex)
     {
-        animation_[animationIndex] = std::make_unique<ModelAnimation>();
-        animation_[animationIndex]->ReadAnimation(_scene->mAnimations[animationIndex]);
+        std::string name = _scene->mAnimations[animationIndex]->mName.C_Str();
+        animation_[name] = std::make_unique<ModelAnimation>();
+        animation_[name]->ReadAnimation(_scene->mAnimations[animationIndex]);
     }
 }
 

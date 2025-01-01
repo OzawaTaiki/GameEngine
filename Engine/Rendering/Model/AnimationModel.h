@@ -19,6 +19,8 @@ public:
     void Update();
     void Draw(const Camera* _camera, const Vector4& _color);
 
+    void SetAnimation(const std::string& _name);
+
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
     Quaternion rotate_ = { 0,0,0,1 };

@@ -38,22 +38,32 @@ VertexShaderOutput main(VertexShaderInput _input)
     output.worldPosition = mul(skinned.position, World).xyz;
     output.texcoord = _input.texcoord;
     output.normal = normalize(mul(skinned.normal, (float3x3) worldInverseTranspose));
-    output.worldPosition = mul(_input.position, World).xyz;
     return output;
 }
 
 Skinned Skinnning(VertexShaderInput _input)
 {
     Skinned skinned;
+
+    int totalWeight = _input.weight.x + _input.weight.y + _input.weight.z + _input.weight.w;
+
+    if (totalWeight == 0)
+    {
+        skinned.position = mul(_input.position, gMatrixPalette[_input.index.x].skeletonSpaceMatrix);
+        skinned.normal = mul(_input.normal, (float3x3) gMatrixPalette[_input.index.x].skeletonSpaceInversedTransposeMatrix);
+        return skinned;
+    }
+
     skinned.position = mul(_input.position, gMatrixPalette[_input.index.x].skeletonSpaceMatrix) * _input.weight.x;
     skinned.position += mul(_input.position, gMatrixPalette[_input.index.y].skeletonSpaceMatrix) * _input.weight.y;
     skinned.position += mul(_input.position, gMatrixPalette[_input.index.z].skeletonSpaceMatrix) * _input.weight.z;
     skinned.position += mul(_input.position, gMatrixPalette[_input.index.w].skeletonSpaceMatrix) * _input.weight.w;
     skinned.position.w = 1.0f;
 
-    skinned.normal=mul(_input.normal,(float3x3)gMatrixPalette[_input.index.x].skeletonSpaceInversedTransposeMatrix)* _input.weight.x;
-    skinned.normal+=mul(_input.normal,(float3x3)gMatrixPalette[_input.index.y].skeletonSpaceInversedTransposeMatrix)* _input.weight.y;
-    skinned.normal+=mul(_input.normal,(float3x3)gMatrixPalette[_input.index.z].skeletonSpaceInversedTransposeMatrix)* _input.weight.z;
+    skinned.normal = mul(_input.normal, (float3x3) gMatrixPalette[_input.index.x].skeletonSpaceInversedTransposeMatrix) * _input.weight.x;
+    skinned.normal += mul(_input.normal, (float3x3) gMatrixPalette[_input.index.y].skeletonSpaceInversedTransposeMatrix) * _input.weight.y;
+    skinned.normal += mul(_input.normal, (float3x3) gMatrixPalette[_input.index.z].skeletonSpaceInversedTransposeMatrix) * _input.weight.z;
+    skinned.normal += mul(_input.normal, (float3x3) gMatrixPalette[_input.index.w].skeletonSpaceInversedTransposeMatrix) * _input.weight.w;
     skinned.normal = normalize(skinned.normal);
 
     return skinned;
