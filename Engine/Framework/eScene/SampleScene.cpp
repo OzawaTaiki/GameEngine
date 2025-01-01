@@ -48,7 +48,6 @@ void SampleScene::Update()
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
-#endif // _DEBUG
 
     if(ImGui::Button("rotate"))
     {
@@ -66,6 +65,7 @@ void SampleScene::Update()
     {
         aModel_->ToIdle(1.0f);
     }
+#endif // _DEBUG
 
 
     plane_->Update();
