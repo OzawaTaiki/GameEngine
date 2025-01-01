@@ -25,7 +25,10 @@ public:
 
     void ReadAnimation(const aiAnimation* _animation);
 
+    void SetLoop(bool _loop) { isLoop_ = _loop; }
+
     Matrix4x4 GetLocalMatrix() const { return localMatrix_; }
+    bool IsPlaying() const { return isPlaying_; }
 
 private:
     template <typename T>
@@ -56,7 +59,10 @@ private:
 
     Animation animation_;
     Matrix4x4 localMatrix_;
-    float animetionTImer_ = 0.0f;
+    float animetionTimer_ = 0.0f;
+
+    bool isLoop_ = false;
+    bool isPlaying_ = false;
 
     Vector3 CalculateValue(const AnimationCurve<Vector3>& _curve, float _time);
     Quaternion CalculateValue(const AnimationCurve<Quaternion>& _curve, float _time);
