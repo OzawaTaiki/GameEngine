@@ -19,6 +19,10 @@ public:
     void Update();
     void Draw(const Camera* _camera, const Vector4& _color);
 
+    void SetAnimation(const std::string& _name, bool _isLoop = false);
+    void StopAnimation() { model_->StopAnimation(); }
+    void ToIdle(float _timeToIdle) { model_->ToIdle(_timeToIdle); }
+
     Vector3 GetMin() const { return model_->GetMin(); }
     Vector3 GetMax() const { return model_->GetMax(); }
 

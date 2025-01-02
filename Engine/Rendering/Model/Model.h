@@ -37,10 +37,13 @@ public:
 
     static Model* CreateFromObj(const std::string& _filePath);
 
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }
+    void SetAnimation(const std::string& _name, bool _loop = false);
+    void StopAnimation() { currentAnimation_ = nullptr; }
+    void ToIdle(float _timeToIdle);
 
     void SetUVTransform(const Vector2& _transform,uint32_t _index);
     void SetUVScale(const Vector2& _scale, uint32_t _index);
@@ -63,7 +66,8 @@ private:
 
     std::vector<std::unique_ptr<Mesh>> mesh_ = {};
     std::vector<std::unique_ptr<Material>> material_ = {};
-    std::vector<std::unique_ptr<ModelAnimation>> animation_ = {};
+    std::map<std::string,std::unique_ptr<ModelAnimation>> animation_ = {};
+    ModelAnimation* currentAnimation_ = nullptr;
     Node node_ = {};
     Skeleton skeleton_ = {};
     SkinCluster skinCluster_ = {};

@@ -3,6 +3,7 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Quaternion.h>
 #include <Physics/Math/Matrix4x4.h>
+#include <Physics/Math/QuaternionTransform.h>
 
 #include <vector>
 #include <map>
@@ -24,8 +25,12 @@ public:
     void Draw();
 
     void ReadAnimation(const aiAnimation* _animation);
+    void ToIdle(float _timeToIdle);
+
+    void SetLoop(bool _loop) { isLoop_ = _loop; }
 
     Matrix4x4 GetLocalMatrix() const { return localMatrix_; }
+    bool IsPlaying() const { return isPlaying_; }
 
 private:
     template <typename T>
@@ -56,7 +61,14 @@ private:
 
     Animation animation_;
     Matrix4x4 localMatrix_;
-    float animetionTImer_ = 0.0f;
+    float animetionTimer_ = 0.0f;
+
+    bool isLoop_ = false;
+    bool isPlaying_ = false;
+    bool toIdle_ = false;
+    float timeToIdle_ = 0.0f;
+    // idle状態になる前のアニメーションの状態
+    QuaternionTransform beforeIdleTransform_ = {};
 
     Vector3 CalculateValue(const AnimationCurve<Vector3>& _curve, float _time);
     Quaternion CalculateValue(const AnimationCurve<Quaternion>& _curve, float _time);
