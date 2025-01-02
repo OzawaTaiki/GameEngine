@@ -3,6 +3,8 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 
+#include <json.hpp>
+
 #ifdef _DEBUG
 #include <string>
 #endif // _DEBUG
@@ -42,6 +44,9 @@ public:
     Quaternion operator/ (float _f) const;
     Quaternion operator+ (const Quaternion& _q) const;
     Quaternion operator* (const Quaternion& _q) const;
+
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Quaternion, x, y, z, w);
 
 #ifdef _DEBUG
     void ShowData(const std::string& _label, bool _newWindow = true) const;
