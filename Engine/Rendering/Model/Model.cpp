@@ -28,7 +28,10 @@ void Model::Update()
         currentAnimation_->Update(skeleton_.GetJoints());
         // アニメーションが終わったらアニメーションを解除
         if (!currentAnimation_->IsPlaying())
+        {
+            preAnimation_ = currentAnimation_;
             currentAnimation_ = nullptr;
+        }
     }
     skeleton_.Update();
     skinCluster_.Update(skeleton_.GetJoints());
@@ -165,6 +168,11 @@ void Model::ToIdle(float _timeToIdle)
     {
         currentAnimation_->ToIdle(_timeToIdle);
     }
+    else if(preAnimation_)
+    {
+        currentAnimation_ = preAnimation_;
+        currentAnimation_->ToIdle(_timeToIdle);
+    }
 }
 
 void Model::SetUVTransform(const Vector2& _transform, uint32_t _index)
@@ -213,16 +221,6 @@ Vector3 Model::GetMax(size_t _index) const
     }
     else
         return mesh_[_index]->GetMax();
-
-}
-
-Matrix4x4 Model::GetAnimationMatrix() const
-{
-    if (!currentAnimation_)
-        return MakeIdentity4x4();
-    // TODO : SetAnimetion関数作成 名前を引数で受け取りそのアニメーションをcurrentAnimetionにセット ↓とupdateでそれを使う
-    return currentAnimation_->GetLocalMatrix();
-
 
 }
 

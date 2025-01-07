@@ -88,6 +88,37 @@ Quaternion Quaternion::Inverse() const
     return Conjugate() / (x * x + y * y + z * z + w * w);
 }
 
+Quaternion Quaternion::FromToRotation(const Vector3& _from, const Vector3& _to)
+{
+    Vector3 fromNorm = _from.Normalize();
+    Vector3 toNorm = _to.Normalize();
+
+    float dot = fromNorm.Dot(toNorm);
+
+    if (dot > 0.99999f)
+    {
+        // 同じ方向
+        return Quaternion(0, 0, 0, 1);
+    }
+    else if (dot < -0.99999f)
+    {
+        // 正反対
+        Vector3 axis = Vector3(1, 0, 0).Cross(fromNorm);
+        if (axis.Dot(axis) < 0.001f)
+            axis = Vector3(0, 1, 0).Cross(fromNorm);
+        axis = axis.Normalize();
+        return Quaternion(axis.x, axis.y, axis.z, 0.0f);
+    }
+
+    Vector3 axis = fromNorm.Cross(toNorm).Normalize();
+
+    float angle = std::acos(dot);
+
+    float sinHalf = std::sinf(angle / 2.0f);
+
+    return Quaternion(axis.x * sinHalf, axis.y * sinHalf, axis.z * sinHalf, std::cosf(angle / 2.0f));
+}
+
 Quaternion Quaternion::operator-() const
 {
     return Quaternion(-x, -y, -z, -w);

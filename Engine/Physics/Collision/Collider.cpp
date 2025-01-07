@@ -181,5 +181,6 @@ void Collider::SetReferencePoint(const Vector3& _referencePoint)
 
 void Collider::RegsterCollider()
 {
+    Update();
     CollisionManager::GetInstance()->RegisterCollider(this);
 }

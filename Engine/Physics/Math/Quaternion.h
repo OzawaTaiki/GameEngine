@@ -37,6 +37,8 @@ public:
     // 逆クォータニオン
     Quaternion Inverse() const;
 
+    static Quaternion FromToRotation(const Vector3& _from, const Vector3& _to);
+
 
     ///****演算子オーバロード****///
     Quaternion operator-() const;

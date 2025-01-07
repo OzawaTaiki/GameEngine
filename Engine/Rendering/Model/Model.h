@@ -55,9 +55,10 @@ public:
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;
 
-    Matrix4x4 GetAnimationMatrix()const;
-    Matrix4x4 GetNodeMatrix()const { return node_.GetLocalMatrix(); }
-
+    //Matrix4x4 GetAnimationMatrix()const;
+    //Matrix4x4 GetNodeMatrix()const { return node_.GetLocalMatrix(); }
+    Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return skeleton_.GetSkeletonSpaceMatrix(_index); }
+    bool IsAllAnimationEnd() { return currentAnimation_ == nullptr || !currentAnimation_->IsPlaying(); }
 
     static const std::string defaultDirpath_;
 private:
@@ -68,6 +69,7 @@ private:
     std::vector<std::unique_ptr<Material>> material_ = {};
     std::map<std::string,std::unique_ptr<ModelAnimation>> animation_ = {};
     ModelAnimation* currentAnimation_ = nullptr;
+    ModelAnimation* preAnimation_= nullptr;
     Node node_ = {};
     Skeleton skeleton_ = {};
     SkinCluster skinCluster_ = {};

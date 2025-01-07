@@ -24,6 +24,7 @@ public:
     void SetTransform(const QuaternionTransform& _transform) { transform_ = _transform; }
     Matrix4x4 GetSkeletonSpaceMatrix() const { return SkeletonSpcaceMatrix_; }
     QuaternionTransform GetTransform() const { return transform_; }
+    QuaternionTransform GetIdleTransform() const { return idleTransform_; }
 
     std::string name_ = {};
     int32_t index_ = 0;
@@ -33,6 +34,8 @@ private:
     Matrix4x4 SkeletonSpcaceMatrix_ = {};
     std::vector<int32_t> children_ = {};
     std::optional<int32_t> parentIndex_ = {};
+
+    QuaternionTransform idleTransform_ = {};
 
 
 };

@@ -5,6 +5,7 @@
 #include <numbers>
 #include <Physics/Math/VectorFunction.h>
 #include <Physics/Math/MatrixFunction.h>
+
 LineDrawer* LineDrawer::GetInstance()
 {
     static LineDrawer instance;
