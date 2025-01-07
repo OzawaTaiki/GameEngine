@@ -21,10 +21,11 @@ void ObjectModel::Initialize(const std::string& _filePath, const std::string& _n
     objectColor_->Initialize();
 }
 
-void ObjectModel::Update()
+void ObjectModel::Update(const bool _showImgui)
 {
 #ifdef _DEBUG
-    ImGui();
+    if(_showImgui)
+        ImGui();
 #endif // _DEBUG
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;

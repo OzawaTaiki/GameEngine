@@ -13,7 +13,7 @@ public:
     ~ObjectModel() = default;
 
     void Initialize(const std::string& _filePath, const std::string& _name);
-    void Update();
+    void Update(const bool _showImgui = true);
     void Draw(const Camera* _camera ,const Vector4& _color);
 
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
