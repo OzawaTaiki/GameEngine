@@ -328,7 +328,7 @@ Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
         dot = -dot;
 	}
 	if (dot > 1.0f - 1e-6f)
-	{		
+	{
 		return Lerp(q0, _q2, _t);
 	}
     float theta = std::acosf(dot);
@@ -342,7 +342,7 @@ Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
 
 float Lerp(float _a, float _b, float _t)
 {
-    return _a + (_b - _a) * _t;		
+    return _a + (_b - _a) * _t;
 }
 
 Vector2 Lerp(const Vector2& _v1, const Vector2& _v2, float _t)

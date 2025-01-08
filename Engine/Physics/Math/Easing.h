@@ -8,6 +8,41 @@ class Easing
 {
 public:
 
+    enum class EasingFunc
+    {
+        Linear,
+        EaseInsine,
+        EaseInQuad,
+        EaseInCubic,
+        EaseInQuart,
+        EaseInQuint,
+        EaseInExpo,
+        EaseInCirc,
+        EaseInBack,
+        EaseInElastic,
+        EaseInBounce,
+        EaseOutSine,
+        EaseOutQuad,
+        EaseOutCubic,
+        EaseOutQuart,
+        EaseOutQuint,
+        EaseOutExpo,
+        EaseOutCirc,
+        EaseOutBack,
+        EaseOutElastic,
+        EaseOutBounce,
+        EaseInOutSine,
+        EaseInOutQuad,
+        EaseInOutCubic,
+        EaseInOutQuart,
+        EaseInOutQuint,
+        EaseInOutExpo,
+        EaseInOutCirc,
+        EaseInOutBack,
+        EaseInOutElastic,
+        EaseInOutBounce
+    };
+
     // 定量
     static float Linear(float _t);
 
@@ -51,7 +86,6 @@ public:
 
     static std::function<float(float)> SelectFuncPtr(int _funcNum);
     static int SelectEasingFunc();
-
 
 private:
     static const char* easingFuncs[];

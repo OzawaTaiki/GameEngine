@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "Collider.h"
 #include "CollisionManager.h"
 #include <Rendering/LineDrawer/LineDrawer.h>
@@ -86,6 +88,8 @@ void Collider::SetShape(float _radius)
     default:
         break;
     }
+
+    preSize_ = _radius * 1.1f;
 }
 
 void Collider::SetShape(const Vector3& _min, const Vector3& _max)
@@ -107,6 +111,13 @@ void Collider::SetShape(const Vector3& _min, const Vector3& _max)
     default:
         break;
     }
+
+    Vector3 size = (_max - _min) * 1.1f;
+
+    float min = std::min(size.x, std::min(size.y, size.z));
+    float max = std::max(size.x, std::max(size.y, size.z));
+    // 少し大きめに半径を設定する
+    preSize_ = max - min;
 }
 
 
@@ -122,7 +133,8 @@ void Collider::OnCollision(const Collider* _other)
 void Collider::SetAtrribute(const std::string& _atrribute)
 {
     atrribute_ = CollisionManager::GetInstance()->GetAtttibute(_atrribute);
-    name_ = _atrribute;
+    if (name_.empty())
+        name_ = _atrribute;
 }
 
 void Collider::SetMask(const std::string& _atrribute)
@@ -181,5 +193,6 @@ void Collider::SetReferencePoint(const Vector3& _referencePoint)
 
 void Collider::RegsterCollider()
 {
+    Update();
     CollisionManager::GetInstance()->RegisterCollider(this);
 }

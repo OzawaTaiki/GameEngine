@@ -22,6 +22,16 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void StopAnimation() { model_->StopAnimation(); }
     void ToIdle(float _timeToIdle) { model_->ToIdle(_timeToIdle); }
+    bool IsAnimationEnd() { return model_->IsAllAnimationEnd(); }
+
+    Vector3 GetMin() const { return model_->GetMin(); }
+    Vector3 GetMax() const { return model_->GetMax(); }
+    Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0) const { return model_->GetSkeletonSpaceMatrix(_index); }
+
+    const WorldTransform* GetWorldTransform() { return &worldTransform_; }
+
+    void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
+    void SetModel(const std::string& _filePath) { model_ = Model::CreateFromObj(_filePath); }
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };

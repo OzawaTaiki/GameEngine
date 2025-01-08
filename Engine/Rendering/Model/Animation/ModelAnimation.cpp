@@ -24,13 +24,9 @@ void ModelAnimation::Update(std::vector<Joint>& _joints)
             animetionTimer_ = 0.0f;
             toIdle_ = false;
             isPlaying_ = false;
-            QuaternionTransform transform = {};
-            transform.translate = Vector3(0, 0, 0);
-            transform.rotation = Quaternion(0, 0, 0, 1);
-            transform.scale = Vector3(1, 1, 1);
             for (Joint& joint : _joints)
             {
-                joint.SetTransform(transform);
+                joint.SetTransform(joint.GetIdleTransform());
             }
             return;
         }
@@ -39,9 +35,11 @@ void ModelAnimation::Update(std::vector<Joint>& _joints)
         {
             float t = animetionTimer_ / timeToIdle_;
             QuaternionTransform transform = {};
-            transform.translate = Lerp(joint.GetTransform().translate, Vector3(0, 0, 0), t);
-            transform.rotation = Slerp(joint.GetTransform().rotation, Quaternion(0, 0, 0, 1), t);
-            transform.scale = Lerp(joint.GetTransform().scale, Vector3(1, 1, 1), t);
+            QuaternionTransform idleTransform = joint.GetIdleTransform();
+            transform.translate = Lerp(joint.GetTransform().translate, idleTransform.translate, t);
+            transform.rotation = Slerp(joint.GetTransform().rotation, idleTransform.rotation, t);
+            transform.scale = Lerp(joint.GetTransform().scale, idleTransform.scale, t);
+
             joint.SetTransform(transform);
         }
         return;

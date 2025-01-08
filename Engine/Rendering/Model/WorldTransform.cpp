@@ -17,7 +17,7 @@ void WorldTransform::Initialize()
 
 void WorldTransform::UpdateData()
 {
-    matWorld_ = MakeAffineMatrix(scale_, rotate_, transform_);
+    matWorld_ = MakeAffineMatrix(scale_, quaternion_, transform_);
     if (parent_)
     {
         matWorld_ *= parent_->matWorld_;

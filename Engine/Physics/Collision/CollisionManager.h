@@ -29,6 +29,9 @@ public:
 
 private:
 
+    // 衝突判定を行う前の事前チェック
+    bool PreCheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
+
     // 衝突判定を行う
     void CheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
 
