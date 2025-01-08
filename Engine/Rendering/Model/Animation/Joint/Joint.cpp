@@ -44,6 +44,7 @@ int32_t Joint::CreateJoint(const Node& _node, const std::optional<int32_t>& _par
     joint.localMatrix_ = _node.GetLocalMatrix();
     joint.SkeletonSpcaceMatrix_ = MakeIdentity4x4();
     joint.transform_ = _node.transform_;
+    joint.idleTransform_ = joint.transform_;
     joint.index_ = static_cast<int32_t>(_joints.size());
     joint.parentIndex_ = _parent;
 

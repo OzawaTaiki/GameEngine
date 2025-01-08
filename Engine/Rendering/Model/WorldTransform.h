@@ -2,6 +2,7 @@
 
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Matrix4x4.h>
+#include <Physics/Math/Quaternion.h>
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -30,20 +31,10 @@ public:
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
     Vector3 transform_ = { 1.0f,1.0f ,1.0f };
+    Quaternion quaternion_ = { 0,0,0,1 };
     Matrix4x4 matWorld_ = {};
 
     const WorldTransform* parent_ = nullptr;
-
-    // 自転
-    // UpdateMatrix
-    //
-    // 公転 アンカー基準で回転させる
-    // アンカー座標 pos 回転rotををせっと
-    // transform(pos,world)*matRot  アンカーでの回転を適用
-    // transform(-pos, world)       元の位置に戻す（たぶん
-    //
-    // 親の行列適用
-
 
 private:
 

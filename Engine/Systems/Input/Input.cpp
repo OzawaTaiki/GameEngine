@@ -135,7 +135,7 @@ Vector2 Input::GetMousePosition() const
 
     return result;
 }
-void Input::GetMove(Vector3& _move, float _spped) const
+void Input::GetMove(Vector3& _move, float _speed) const
 {
     _move = { 0,0,0 };
     if (keys_[DIK_W])
@@ -153,7 +153,7 @@ void Input::GetMove(Vector3& _move, float _spped) const
     if (keys_[DIK_LCONTROL])
         _move.y -= 1.0f;
 
-    _move *= _spped;
+    _move = _move.Normalize() * _speed;
 }
 
 void Input::GetRotate(Vector3& _rot, float _sensi) const

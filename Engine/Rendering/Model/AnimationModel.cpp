@@ -21,6 +21,11 @@ void AnimationModel::Update()
 
     model_->Update();
 
+    worldTransform_.transform_ = translate_;
+    worldTransform_.scale_ = scale_;
+    worldTransform_.quaternion_ = rotate_;
+
+
     worldTransform_.UpdateData(/*{ model_->GetNodeMatrix(),model_->GetAnimationMatrix()}*/);
 }
 
@@ -35,8 +40,8 @@ void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, true);// BVB IBV MTL2 TEX4 LIGHT567
-    
-    model_->DrawSkeleton(worldTransform_.matWorld_);
+
+    //model_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)

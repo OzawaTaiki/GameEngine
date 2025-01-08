@@ -65,6 +65,11 @@ public:
     // 判定属性を設定する
     // _atrribute->自信の属性
     void SetAtrribute(const std::string& _atrribute);
+
+    // 固有の名前を設定する
+    // _id->固有の名前
+    void SetId(const std::string& _id) { id_ = _id; }
+
     // 判定マスクを設定する
     // _atrribute->当たらない属性
     void SetMask(const std::string& _atrribute);
@@ -82,9 +87,11 @@ public:
     // 判定属性を取得する
     uint32_t GetMask()const { return mask_; }
     // 判定マスクを取得する
-    uint32_t GetAtrribute_()const { return atrribute_; }
+    uint32_t GetAtrribute()const { return atrribute_; }
 
     std::string GetName()const { return name_; }
+
+    std::string GetId()const { return id_; }
 
     void NotHit() { preIsHit_ = isHit_; isHit_ = false; }
 
@@ -97,14 +104,16 @@ public:
     // 衝突から離れた瞬間
     bool IsCollisionExit()const { return !isHit_ && preIsHit_; }
 
+    float GetPreSize()const { return preSize_; }
+
     void RegsterCollider();
 
 private:
 
     // 衝突判定の形状とそのデータ
     std::variant<Sphere, AABB, OBB> shape_;
-    // 衝突判定のサイズ
-    Vector3 size_ = {};
+    // 事前衝突判定のサイズ
+    float preSize_= {};
 
     bool isHit_ = false;
     bool preIsHit_ = false;
@@ -114,6 +123,7 @@ private:
     uint32_t mask_ = 0x1;
 
     std::string name_ = "";
+    std::string id_ = "";
 
     std::function<Matrix4x4(void)> fGetWorldMatrix_ = nullptr;
     std::function<void(const Collider*)> fOnCollision_ = nullptr;

@@ -40,8 +40,8 @@ void CollisionManager::CheckAllCollision()
         for (auto itB = std::next(itA); itB != colliders_.end(); itB++)
         {
             (*itB)->NotHit();
-            if ((*itA)->GetMask() & (*itB)->GetAtrribute_() &&
-                (*itB)->GetMask() & (*itA)->GetAtrribute_())
+            if ((*itA)->GetMask() & (*itB)->GetAtrribute() &&
+                (*itB)->GetMask() & (*itA)->GetAtrribute())
             {
                 CheckCollisionPair(*itA, *itB);
             }
@@ -49,8 +49,28 @@ void CollisionManager::CheckAllCollision()
     }
 }
 
+bool CollisionManager::PreCheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
+{
+    Sphere a;
+    a.center = _colliderA->GetWorldMatrix().GetTranslate();
+    a.radius = _colliderA->GetPreSize();
+
+    Sphere b;
+    b.center = _colliderB->GetWorldMatrix().GetTranslate();
+    b.radius = _colliderB->GetPreSize();
+
+    if (IsCollision(a, b))
+        return true;
+    else
+        return false;
+
+}
+
 void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
 {
+    if (!PreCheckCollisionPair(_colliderA, _colliderB))
+        return;
+
     switch (_colliderA->GetBoundingBox())
     {
     case Collider::BoundingBox::Sphere_3D:
