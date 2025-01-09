@@ -270,6 +270,12 @@
     <ClCompile Include="Systems\JsonBinder\JsonHub.cpp">
       <Filter>Systems\JsonBinder</Filter>
     </ClCompile>
+    <ClCompile Include="Systems\Time\GameTime.cpp">
+      <Filter>Systems\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Time\GameTimeChannel.cpp">
+      <Filter>Systems\Time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -507,6 +513,12 @@
     </ClInclude>
     <ClInclude Include="Systems\JsonBinder\JsonHub.h">
       <Filter>Systems\JsonBinder</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Time\GameTime.h">
+      <Filter>Systems\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Time\GameTimeChannel.h">
+      <Filter>Systems\Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "WorldTransform.h"
 #include "ObjectColor.h"
 #include <Framework/Camera/Camera.h>
+#include <Systems/Time/GameTime.h>
 
 #include <string>
 
@@ -33,6 +34,8 @@ public:
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
     void SetModel(const std::string& _filePath) { model_ = Model::CreateFromObj(_filePath); }
 
+    void SetTimeChannel(const std::string& _channel) { timeChannel = _channel; }
+
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
     Quaternion rotate_ = { 0,0,0,1 };
@@ -43,6 +46,9 @@ private:
     WorldTransform worldTransform_;
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;
     Model* model_ = nullptr;
+
+    std::string timeChannel = "default";
+    GameTime* gameTime_ = nullptr;
 
 #ifdef _DEBUG
     void ImGui();

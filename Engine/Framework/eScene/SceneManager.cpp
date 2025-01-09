@@ -86,6 +86,11 @@ void SceneManager::ImGui()
     ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
     ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime<double>() * 1000.0);
 
+    bool isFixed = Time::IsDeltaTimeFixed();
+    if(ImGui::Checkbox("Fixed DeltaTime", &isFixed))
+        Time::SetDeltaTimeFixed(isFixed);
+
+
     for (auto& scene : scenes_)
     {
         strcpy_s(comboLabel, scene.first.c_str());

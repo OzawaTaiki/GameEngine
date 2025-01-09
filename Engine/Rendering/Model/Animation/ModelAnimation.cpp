@@ -12,10 +12,10 @@ void ModelAnimation::Initialize()
     localMatrix_ = MakeIdentity4x4();
 }
 
-void ModelAnimation::Update(std::vector<Joint>& _joints)
+void ModelAnimation::Update(std::vector<Joint>& _joints, float _deltaTime)
 {
     isPlaying_ = true;
-    animetionTimer_ += 1.0f / 60.0f;
+    animetionTimer_ += _deltaTime;
 
     if (toIdle_)
     {

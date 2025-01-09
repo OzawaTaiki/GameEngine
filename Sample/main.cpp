@@ -16,7 +16,6 @@
 #include "Framework/eScene/SceneManager.h"
 #include "Framework/eScene/SampleScene.h"
 #include "Framework/eScene/ParticleTestScene.h"
-#include "App/EssentialScene.h"
 /*---------------*/
 
 
@@ -62,10 +61,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	SceneManager::RegisterScene("Sample", SampleScene::Create);
     SceneManager::RegisterScene("ParticleTest", ParticleTestScene::Create);
-    SceneManager::RegisterScene("Essential", EssentialScene::Create);
 
 
-	SceneManager::GetInstance()->Initialize("Essential");
+	SceneManager::GetInstance()->Initialize("Sample");
 
 	Time::Initialize();
 

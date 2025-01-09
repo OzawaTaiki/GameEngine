@@ -21,7 +21,7 @@ public:
     ~ModelAnimation() = default;
 
     void Initialize();
-    void Update(std::vector<Joint>& _joints);
+    void Update(std::vector<Joint>& _joints,float _deltaTime);
     void Draw();
 
     void ReadAnimation(const aiAnimation* _animation);

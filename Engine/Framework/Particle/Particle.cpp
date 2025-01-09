@@ -33,10 +33,9 @@ void Particle::Initialize(const ParticleInitParam& _param)
     t_ = 0;
 }
 
-void Particle::Update()
+void Particle::Update(float _deltaTime)
 {
-    const float kDeltaTime = 1.0f / 60.0f;
-    currentTime_ += kDeltaTime;
+    currentTime_ += _deltaTime;
 
     if (currentTime_ >= lifeTime_ && !isInfiniteLife_)
     {
@@ -63,10 +62,10 @@ void Particle::Update()
     velocity_ += acceleration_ * currentTime_;
 
     if (deceleration_ != 0)
-        velocity_ -= velocity_ * deceleration_ * kDeltaTime;
+        velocity_ -= velocity_ * deceleration_ * _deltaTime;
 
 
-    translate_ += velocity_ * kDeltaTime;
+    translate_ += velocity_ * _deltaTime;
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 

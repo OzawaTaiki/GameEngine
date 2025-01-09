@@ -32,6 +32,8 @@ void ParticleManager::Initialize()
    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Particle");
    assert(rootSignature.has_value());
    rootsignature_ = rootSignature.value();
+
+   gameTime_ = GameTime::GetInstance();
 }
 
 
@@ -45,9 +47,11 @@ void ParticleManager::Update(const Vector3& _cRotate)
     for (auto& [name, group] : groups_)
     {
         group.instanceNum = 0;
+        std::string timeChannel = group.emitterPtr->GetTimeChannel();
+        float deltaTime = gameTime_->GetChannel(timeChannel).GetDeltaTime<float>();
         for (auto it = group.particles.begin(); it != group.particles.end();)
         {
-            it->Update();
+            it->Update(deltaTime);
             if (!it->IsAlive())
             {
                 it = group.particles.erase(it);
@@ -209,6 +213,21 @@ void ParticleManager::AddParticleToGroup(const std::string& _groupName, const st
     {
         AddParticleToGroup(_groupName, particle);
     }
+}
+
+void ParticleManager::SetAllGroupTimeChannel(const std::string& _channel)
+{
+    for (auto& [name, group] : groups_)
+    {
+        group.emitterPtr->SetTimeChannel(_channel);
+    }
+}
+
+void ParticleManager::SetGroupTimeChannel(const std::string& _groupName, const std::string& _channel)
+{
+    if (!groups_.contains(_groupName))
+        throw std::runtime_error("not find particleGroup! name:" + '\"' + _groupName + '\"');
+    groups_[_groupName].emitterPtr->SetTimeChannel(_channel);
 }
 
 

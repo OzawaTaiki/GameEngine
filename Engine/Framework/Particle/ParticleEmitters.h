@@ -6,6 +6,7 @@
 #include <Physics/Math/Matrix4x4.h>
 #include <Systems/JsonBinder/JsonBinder.h>
 #include <Framework/Particle/ParticleInitParam.h>
+#include <Systems/Time/GameTime.h>
 
 #include <string>
 #include <array>
@@ -66,7 +67,7 @@ public:
     ~ParticleEmitter() = default;
 
 
-    void Setting(const std::string& _name);
+    void Initialize(const std::string& _name);
 
     void Update();
     void Draw() const;
@@ -97,6 +98,9 @@ public:
     std::string GetName() const { return name_; }
     std::string GetModelPath() const { return useModelPath_; }
 
+
+    std::string GetTimeChannel() const { return timeChannel_; }
+    void SetTimeChannel(const std::string& _name) { timeChannel_ = _name; }
 
     void Save()const;
     bool ShowDebugWinsow();
@@ -166,6 +170,9 @@ private:
 
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
+
+    std::string timeChannel_ = "default";
+    GameTime* gameTime_ = nullptr;
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;      //
 

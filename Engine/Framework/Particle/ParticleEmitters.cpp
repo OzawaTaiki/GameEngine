@@ -11,7 +11,7 @@
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <ResourceManagement/TextureManager/TextureManager.h>
 
-void ParticleEmitter::Setting(const std::string& _name)
+void ParticleEmitter::Initialize(const std::string& _name)
 {
     name_ = _name;
 
@@ -62,6 +62,7 @@ void ParticleEmitter::Setting(const std::string& _name)
     //parametor_.sizeTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, Vector3{1,1,1} });
     //parametor_.speedTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, 1.0f });
 
+    gameTime_ = GameTime::GetInstance();
 
     uint32_t handle = TextureManager::GetInstance()->Load(useTextruePath_);
     ParticleManager::GetInstance()->CreateParticleGroup(name_, useModelPath_, this, BlendMode::Add, handle);
@@ -80,6 +81,7 @@ void ParticleEmitter::Update()
     else
         position_ = position_ + offset_;
 
+    deltaTime_ = gameTime_->GetChannel(timeChannel_).GetDeltaTime<float>();
     currentTime_ += deltaTime_;
 
     // エミッターの持続時間が経過していたらスキップ
