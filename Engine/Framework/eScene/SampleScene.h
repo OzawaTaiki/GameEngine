@@ -8,6 +8,7 @@
 #include <Framework/Particle/ParticleManager.h>
 #include <Rendering/LineDrawer/LineDrawer.h>
 #include <Systems/Input/Input.h>
+#include <Systems/Time/GameTime.h>
 
 #include <memory>
 
@@ -39,6 +40,9 @@ private:
     std::unique_ptr<ObjectModel> oModel_ = nullptr;
 
     std::unique_ptr<ObjectModel> plane_ = nullptr;
+
+    GameTime* gameTime_;
+
 
 #ifdef _DEBUG
     void ImGui();

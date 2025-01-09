@@ -2,6 +2,7 @@
 #include <Rendering/Model/Model.h>
 #include "Particle.h"
 #include <Core/DirectX/BlendMode.h>
+#include <Systems/Time/GameTime.h>
 
 #include <unordered_map>
 #include <d3d12.h>
@@ -30,6 +31,10 @@ public:
     void AddParticleToGroup(const std::string& _groupName, const Particle& _particles);
     void AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles);
 
+    void SetAllGroupTimeChannel(const std::string& _channel);
+    void SetGroupTimeChannel(const std::string& _groupName, const std::string& _channel);
+
+
 private:
 
     static const uint32_t kGroupMaxInstance;
@@ -55,6 +60,9 @@ private:
     void PreDraw();
 
     std::unordered_map <std::string, Group> groups_;
+
+    GameTime* gameTime_ = nullptr;
+
 
     std::map<BlendMode,ID3D12PipelineState*> pipelineState_;
     ID3D12RootSignature* rootsignature_;

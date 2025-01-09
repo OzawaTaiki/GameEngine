@@ -19,6 +19,7 @@ void ObjectModel::Initialize(const std::string& _filePath, const std::string& _n
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
+
 }
 
 void ObjectModel::Update(const bool _showImgui)

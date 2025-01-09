@@ -10,6 +10,8 @@ void AnimationModel::Initialize(const std::string& _filePath)
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
+
+    gameTime_ = GameTime::GetInstance();
 }
 
 void AnimationModel::Update()
@@ -19,7 +21,7 @@ void AnimationModel::Update()
 #endif // _DEBUG
 
 
-    model_->Update();
+    model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
 
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;

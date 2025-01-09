@@ -39,10 +39,14 @@ void SampleScene::Initialize()
     oModel_ = std::make_unique<ObjectModel>();
     oModel_->Initialize("AnimatedCube/AnimatedCube.gltf", "c");
 
+    gameTime_ = GameTime::GetInstance();
+
 }
 
 void SampleScene::Update()
 {
+    gameTime_->Update();
+
     // シーン関連更新
 #ifdef _DEBUG
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
@@ -65,7 +69,17 @@ void SampleScene::Update()
     {
         aModel_->ToIdle(1.0f);
     }
+
+    if (ImGui::Button("slow"))
+    {
+        gameTime_->GetChannel("default").SetGameSpeed(0.5f);
+    }
+    if (ImGui::Button("normal"))
+    {
+        gameTime_->GetChannel("default").SetGameSpeed(1.0f);
+    }
 #endif // _DEBUG
+
 
 
     plane_->Update();

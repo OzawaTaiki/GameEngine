@@ -14,7 +14,7 @@ public:
     ~Particle() = default;
 
     void Initialize(const ParticleInitParam& _param);
-    void Update();
+    void Update(float _deltaTime);
     void Draw();
 
     bool IsAlive() const { return isAlive_; }

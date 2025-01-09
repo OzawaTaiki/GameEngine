@@ -21,11 +21,11 @@ void Model::Initialize()
 
 }
 
-void Model::Update()
+void Model::Update(float _deltaTime)
 {
     if (currentAnimation_)
     {
-        currentAnimation_->Update(skeleton_.GetJoints());
+        currentAnimation_->Update(skeleton_.GetJoints(), _deltaTime);
         // アニメーションが終わったらアニメーションを解除
         if (!currentAnimation_->IsPlaying())
         {

@@ -29,10 +29,12 @@ void Effect::Initialize(const std::string& _name)
     for (std::string emitterName : emitterNames_)
     {
         emitters_.emplace_back(std::make_unique<ParticleEmitter>());
-        emitters_.back()->Setting(emitterName);
+        emitters_.back()->Initialize(emitterName);
     }
 
     isActive_ = false;
+
+    gameTime_ = GameTime::GetInstance();
 }
 
 void Effect::Update()
@@ -43,7 +45,7 @@ void Effect::Update()
         return;
     }
 
-    elapsedTime_ += 1.0f / 60.0f;
+    elapsedTime_ += gameTime_->GetChannel(timeChannel_).GetDeltaTime<float>();
     //elapsedTime_ += Time::GetDeltaTime<float>();
 
     // isActive_制御用
@@ -87,7 +89,7 @@ void Effect::AddEmitter(const std::string& _name)
 
     emitters_.emplace_back(std::make_unique<ParticleEmitter>());
 
-    emitters_.back()->Setting(_name);
+    emitters_.back()->Initialize(_name);
 }
 
 std::list<ParticleEmitter*> Effect::GetEmitters() const
@@ -175,6 +177,16 @@ void Effect::DebugShowForEmitterCreate()
         }
     }
 #endif // _DEBUG
+}
+
+void Effect::SetTimeChannel(const std::string& _channel)
+{
+    timeChannel_ = _channel;
+
+    for (auto& emitter : emitters_)
+    {
+        emitter->SetTimeChannel(_channel);
+    }
 }
 
 

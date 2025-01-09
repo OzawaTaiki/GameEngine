@@ -27,7 +27,7 @@ class Model
 {
 public:
     void Initialize();
-    void Update();
+    void Update(float _deltaTime);
     void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
     void Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color);
 

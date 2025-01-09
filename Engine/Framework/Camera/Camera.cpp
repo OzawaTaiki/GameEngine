@@ -13,6 +13,8 @@ void Camera::Initialize()
 {
     Map();
     UpdateMatrix();
+
+    gameTime_ = GameTime::GetInstance();
 }
 
 void Camera::Update(bool _showImGui)
@@ -114,7 +116,7 @@ void Camera::QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) cons
 
 void Camera::UpdateShake()
 {
-    shakeTimer_ += 1.0f / 60.0f;
+    shakeTimer_ += gameTime_->GetChannel(timeChannel_).GetDeltaTime<float>();
     if (shakeTimer_ >= shakeTime_)
     {
         shaking_ = false;

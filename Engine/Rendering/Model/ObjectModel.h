@@ -27,7 +27,7 @@ public:
     void UpdateUVTransform();
 
     Vector3 GetMin()const { return model_->GetMin(); }
-    Vector3 GetMax()const { return model_->GetMax(); } 
+    Vector3 GetMax()const { return model_->GetMax(); }
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
@@ -39,6 +39,7 @@ public:
     Vector2 uvTransform_ = { 0,0 };
     Vector2 uvScale_ = { 1,1 };
     float uvRotation_ = 0;
+
 
 
 private:

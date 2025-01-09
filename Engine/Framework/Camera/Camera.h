@@ -2,6 +2,7 @@
 
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Matrix4x4.h>
+#include <Systems/Time/GameTime.h>
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -45,6 +46,8 @@ public:
 
     void QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index)const;
 
+    void SetTimeChannel(const std::string& _name) { timeChannel_ = _name; }
+
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
@@ -67,6 +70,9 @@ private:
     Vector2 shakeRangeMin_ = { 0.0f,0.0f };
     Vector2 shakeRangeMax_ = { 0.0f,0.0f };
     Vector3 shakeOffset_ = { 0.0f,0.0f,0.0f };
+
+    std::string timeChannel_ = "default";
+    GameTime* gameTime_ = nullptr;
 
     void UpdateShake();
 

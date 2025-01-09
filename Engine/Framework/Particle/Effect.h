@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Framework/Particle/ParticleEmitters.h>
+#include <Systems/Time/GameTime.h>
 #include <Systems/JsonBinder/JsonBinder.h>
 #include <string>
 #include <vector>
@@ -29,6 +30,8 @@ public:
 
     void DebugShowForEmitterCreate();
 
+    void SetTimeChannel(const std::string& _channel);
+
     void Save()const;
 private:
     void Reset();
@@ -46,6 +49,9 @@ private:
     float                           elapsedTime_;       // 経過時間
     bool                            isLoop_;            // ループするか
     bool                            isActive_;          // アクティブか
+
+    std::string                     timeChannel_    = "default";
+    GameTime* gameTime_ = nullptr;
 
     std::unique_ptr<JsonBinder>     jsonBinder_ = nullptr;  // 設定ファイル
     //std::unique_ptr<Config> config_ = nullptr;
