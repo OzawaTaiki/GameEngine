@@ -148,7 +148,7 @@ void PSOManager::CreatePSOForModel()
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[8] = {};
+    D3D12_ROOT_PARAMETER rootParameters[6] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -176,20 +176,25 @@ void PSOManager::CreatePSOForModel()
     rootParameters[4].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
     rootParameters[4].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
 
-    //directinalLight
+    // LightGroup
     rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[5].Descriptor.ShaderRegister = 3;
 
-    //pointLight
-    rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[6].Descriptor.ShaderRegister = 4;
+    ////directinalLight
+    //rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    //rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    //rootParameters[5].Descriptor.ShaderRegister = 3;
 
-    //spotlight
-    rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[7].Descriptor.ShaderRegister = 5;
+    ////pointLight
+    //rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    //rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    //rootParameters[6].Descriptor.ShaderRegister = 4;
+
+    ////spotlight
+    //rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    //rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    //rootParameters[7].Descriptor.ShaderRegister = 5;
 
 
     descriptionRootSignature.pParameters = rootParameters;
