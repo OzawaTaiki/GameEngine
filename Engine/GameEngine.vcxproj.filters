@@ -162,9 +162,6 @@
     <ClCompile Include="Physics\Math\VectorFunction.cpp">
       <Filter>Physics\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\Light\DirectionalLight.cpp">
-      <Filter>Rendering\Light</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\Light\LightGroup.cpp">
       <Filter>Rendering\Light</Filter>
     </ClCompile>
@@ -275,6 +272,12 @@
     </ClCompile>
     <ClCompile Include="Systems\Time\GameTimeChannel.cpp">
       <Filter>Systems\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Light\DirectionalLight.cpp">
+      <Filter>Rendering\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Light\LightingSystem.cpp">
+      <Filter>Rendering\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,9 +406,6 @@
     <ClInclude Include="Physics\Math\VectorFunction.h">
       <Filter>Physics\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\Light\DirectionalLight.h">
-      <Filter>Rendering\Light</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\Light\LightGroup.h">
       <Filter>Rendering\Light</Filter>
     </ClInclude>
@@ -519,6 +519,12 @@
     </ClInclude>
     <ClInclude Include="Systems\Time\GameTimeChannel.h">
       <Filter>Systems\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Light\DirectionalLight.h">
+      <Filter>Rendering\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Light\LightingSystem.h">
+      <Filter>Rendering\Light</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

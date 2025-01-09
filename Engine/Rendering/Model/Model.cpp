@@ -59,7 +59,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4, _textureHandle);
         // ライトたち
-        lightGroup_->TransferData();
+    LightingSystem::GetInstance()->QueueCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -86,8 +86,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4);
         // ライトたち
-        lightGroup_->TransferData();
-        lightGroup_->QueueCommand(commandList);
+        LightingSystem::GetInstance()->QueueCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -119,8 +118,7 @@ Model* Model::CreateFromObj(const std::string& _filePath)
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
 {
-    lightGroup_->TransferData();
-    lightGroup_->QueueCommand(_commandList);
+    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
 
     for (auto& mesh : mesh_)
     {
@@ -139,8 +137,8 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _a
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, bool _animation) const
 {
-    lightGroup_->TransferData();
-    lightGroup_->QueueCommand(_commandList);
+    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
+
 
     for (auto& mesh : mesh_)
     {

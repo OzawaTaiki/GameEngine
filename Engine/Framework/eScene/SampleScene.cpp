@@ -41,6 +41,9 @@ void SampleScene::Initialize()
 
     gameTime_ = GameTime::GetInstance();
 
+    lights_ = std::make_unique<LightGroup>();
+    lights_->Initialize();
+
 }
 
 void SampleScene::Update()
@@ -77,6 +80,23 @@ void SampleScene::Update()
     if (ImGui::Button("normal"))
     {
         gameTime_->GetChannel("default").SetGameSpeed(1.0f);
+    }
+
+    if (ImGui::Button("Add PL"))
+    {
+        PointLight light = {};
+        lights_->AddPointLight(light);
+    }
+
+    if (ImGui::Button("Add SL"))
+    {
+        SpotLight light = {};
+        lights_->AddSpotLight(light);
+    }
+
+    if (ImGui::Button("Set"))
+    {
+        LightingSystem::GetInstance()->SetLightGroup(lights_.get());
     }
 #endif // _DEBUG
 

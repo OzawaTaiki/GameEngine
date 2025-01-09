@@ -1,16 +1,17 @@
-#include "Core/WinApp/WinApp.h"
-#include "Core/DirectX/DXCommon.h"
-#include "Systems/Input/Input.h"
-#include "ResourceManagement/TextureManager/TextureManager.h"
-#include "Rendering/Model/ModelManager.h"
-#include "Rendering/Sprite/Sprite.h"
-#include "Rendering/LineDrawer/LineDrawer.h"
-#include "ResourceManagement/SRVManager.h"
-#include "Core/DirectX/PSOManager.h"
-#include "UI/ImGuiManager/ImGuiManager.h"
-#include "Framework/Particle/ParticleManager.h"
-#include "Systems/Utility/RandomGenerator.h"
-#include "Systems/Time/Time.h"
+#include <Core/WinApp/WinApp.h>
+#include <Core/DirectX/DXCommon.h>
+#include <Systems/Input/Input.h>
+#include <ResourceManagement/TextureManager/TextureManager.h>
+#include <Rendering/Model/ModelManager.h>
+#include <Rendering/Sprite/Sprite.h>
+#include <Rendering/LineDrawer/LineDrawer.h>
+#include <Rendering/Light/LightingSystem.h>
+#include <ResourceManagement/SRVManager.h>
+#include <Core/DirectX/PSOManager.h>
+#include <UI/ImGuiManager/ImGuiManager.h>
+#include <Framework/Particle/ParticleManager.h>
+#include <Systems/Utility/RandomGenerator.h>
+#include <Systems/Time/Time.h>
 
 /*-----シーン-----*/
 #include "Framework/eScene/SceneManager.h"
@@ -32,6 +33,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	srvManager->Initialize();
 	PSOManager::GetInstance()->Initialize();
 
+    LightingSystem::GetInstance()->Initialize();
 
 	std::unique_ptr<ImGuiManager> imguiManager = std::make_unique <ImGuiManager>();
 	imguiManager->Initialize();

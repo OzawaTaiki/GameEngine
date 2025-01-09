@@ -10,7 +10,7 @@
 #include <Rendering/Model/Animation/Node/Node.h>
 #include <Rendering/Model/Animation/Skeleton/Skeleton.h>
 #include <Rendering/Model/Animation/SkinCluster/SkinCluster.h>
-#include <Rendering/Light/LightGroup.h>
+#include <Rendering/Light/LightingSystem.h>
 
 #include <vector>
 #include <string>
