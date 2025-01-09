@@ -4,15 +4,12 @@
 
 void LightGroup::Initialize()
 {
-    commandList_ = DXCommon::GetInstance()->GetCommandList();
-
-    directoinalLight_ = std::make_unique<DirectionalLight>();
-    pointLight_ = std::make_unique<PointLight>();
-    spotLight_ = std::make_unique<SpotLight>();
-
-    directoinalLight_->Initialize();
-    pointLight_->Initialize();
-    spotLight_->Initialize();
+    directionalLight_ = {
+        .color = {1.0f, 1.0f, 1.0f, 1.0f},
+        .direction = {0.0f, -1.0f, 0.0f},
+        .intensity = 1.0f,
+        .isHalf = 1
+    };
 }
 
 void LightGroup::Update()
@@ -23,20 +20,64 @@ void LightGroup::Draw()
 {
 }
 
-void LightGroup::TransferData() const
+void LightGroup::SetDirectionalLight(const DirectionalLight& _light)
 {
-    directoinalLight_->TransferData();
-    pointLight_->TransferData();
-    spotLight_->TransferData();
+    directionalLight_ = _light;
+    dirty_ = true;
 }
 
-void LightGroup::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
+void LightGroup::AddPointLight(const PointLight& _light)
 {
-    // Dライト
-    commandList_->SetGraphicsRootConstantBufferView(5, directoinalLight_->GetResource()->GetGPUVirtualAddress());
-    // Pライト
-    commandList_->SetGraphicsRootConstantBufferView(6, pointLight_->GetResource()->GetGPUVirtualAddress());
-    // Ｓライト
-    commandList_->SetGraphicsRootConstantBufferView(7, spotLight_->GetResource()->GetGPUVirtualAddress());
+    if (pointLights_.size() >= MAX_POINT_LIGHT)
+        return;
+
+    pointLights_.push_back(_light);
+    dirty_ = true;
+}
+
+void LightGroup::AddSpotLight(const SpotLight& _light)
+{
+    if (spotLights.size() >= MAX_SPOT_LIGHT)
+        return;
+    spotLights.push_back(_light);
+    dirty_ = true;
+}
+
+LightGroup::LightTransferData LightGroup::GetLightData()
+{
+    LightTransferData data;
+
+    data.directionalLight = directionalLight_;
+
+    data.numPointLight = static_cast<uint32_t>(pointLights_.size());
+    data.numSpotLight = static_cast<uint32_t>(spotLights.size());
+
+    for (size_t i = 0; i < pointLights_.size(); i++)
+    {
+        data.pointLights[i] = pointLights_[i];
+    }
+
+    for (size_t i = 0; i < spotLights.size(); i++)
+    {
+        data.spotLights[i] = spotLights[i];
+    }
+
+    dirty_ = false;
+
+    return data;
+}
+
+LightGroup::LightTransferData LightGroup::GetDefaultLightData()
+{
+    LightTransferData data;
+    data.directionalLight = {
+        .color = {1.0f, 1.0f, 1.0f, 1.0f},
+        .direction = {0.0f, -1.0f, 0.0f},
+        .intensity = 1.0f,
+        .isHalf = 1
+    };
+    data.numPointLight = 0;
+    data.numSpotLight = 0;
+    return data;
 
 }
