@@ -165,12 +165,6 @@
     <ClCompile Include="Rendering\Light\LightGroup.cpp">
       <Filter>Rendering\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\Light\PointLight.cpp">
-      <Filter>Rendering\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\Light\SpotLight.cpp">
-      <Filter>Rendering\Light</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\LineDrawer\LineDrawer.cpp">
       <Filter>Rendering\LineDrawer</Filter>
     </ClCompile>
@@ -272,9 +266,6 @@
     </ClCompile>
     <ClCompile Include="Systems\Time\GameTimeChannel.cpp">
       <Filter>Systems\Time</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\Light\DirectionalLight.cpp">
-      <Filter>Rendering\Light</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Light\LightingSystem.cpp">
       <Filter>Rendering\Light</Filter>
@@ -409,12 +400,6 @@
     <ClInclude Include="Rendering\Light\LightGroup.h">
       <Filter>Rendering\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\Light\PointLight.h">
-      <Filter>Rendering\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\Light\SpotLight.h">
-      <Filter>Rendering\Light</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\LineDrawer\LineDrawer.h">
       <Filter>Rendering\LineDrawer</Filter>
     </ClInclude>
@@ -519,9 +504,6 @@
     </ClInclude>
     <ClInclude Include="Systems\Time\GameTimeChannel.h">
       <Filter>Systems\Time</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\Light\DirectionalLight.h">
-      <Filter>Rendering\Light</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Light\LightingSystem.h">
       <Filter>Rendering\Light</Filter>

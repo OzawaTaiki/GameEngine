@@ -78,7 +78,7 @@ struct SpotLight
         = std::cosf(std::numbers::pi_v<float> / 3.0f);
     float falloutStartAngle             // 開始角度
         = std::cosf(std::numbers::pi_v<float> / 3.0f);
-    uint32_t isHalf;
+    uint32_t isHalf = 1;
 };
 
 /**
@@ -120,19 +120,36 @@ public:
     void Draw();
 
     void SetDirectionalLight(const DirectionalLight& _light);
-    void AddPointLight(const PointLight& _light);
-    void AddSpotLight(const SpotLight& _light);
+    void AddPointLight(const PointLight& _light, const std::string& _name = "");
+    void AddSpotLight(const SpotLight& _light, const std::string& _name = "");
+
+    void DeletePointLight(const std::string& _name);
+    void DeleteSpotLight(const std::string& _name);
 
     LightTransferData GetLightData();
+
+    void DrawDebugWindow();
 
 
 private:
 
+    template<typename T>
+    struct NamedLight {
+        T light = {};
+        std::string name = "";
+        bool select = false;
+    };
+
+    size_t pointLightCount_ = 0;
+    size_t spotLightCount_ = 0;
+
+    std::list<NamedLight<PointLight>> selectablePointLights_;
+    std::list<NamedLight<SpotLight>> selectableSpotLights_;
 
     bool dirty_ = false;    // 更新が必要か
 
     DirectionalLight directionalLight_;
-    std::vector<PointLight> pointLights_;
-    std::vector<SpotLight> spotLights;
 
+    char addPointLightName_[128] = {};
+    char addSpotLightName_[128] = {};
 };
