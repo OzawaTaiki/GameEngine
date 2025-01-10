@@ -156,11 +156,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Physics\Math\Vector2.cpp" />
     <ClCompile Include="Physics\Math\Vector3.cpp" />
     <ClCompile Include="Physics\Math\VectorFunction.cpp" />
-    <ClCompile Include="Rendering\Light\DirectionalLight.cpp" />
     <ClCompile Include="Rendering\Light\LightGroup.cpp" />
     <ClCompile Include="Rendering\Light\LightingSystem.cpp" />
-    <ClCompile Include="Rendering\Light\PointLight.cpp" />
-    <ClCompile Include="Rendering\Light\SpotLight.cpp" />
     <ClCompile Include="Rendering\LineDrawer\LineDrawer.cpp" />
     <ClCompile Include="Rendering\Model\Animation\Joint\Joint.cpp" />
     <ClCompile Include="Rendering\Model\Animation\ModelAnimation.cpp" />
@@ -225,11 +222,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Physics\Math\Vector3.h" />
     <ClInclude Include="Physics\Math\Vector4.h" />
     <ClInclude Include="Physics\Math\VectorFunction.h" />
-    <ClInclude Include="Rendering\Light\DirectionalLight.h" />
     <ClInclude Include="Rendering\Light\LightGroup.h" />
     <ClInclude Include="Rendering\Light\LightingSystem.h" />
-    <ClInclude Include="Rendering\Light\PointLight.h" />
-    <ClInclude Include="Rendering\Light\SpotLight.h" />
     <ClInclude Include="Rendering\LineDrawer\LineDrawer.h" />
     <ClInclude Include="Rendering\Model\Animation\Joint\Joint.h" />
     <ClInclude Include="Rendering\Model\Animation\ModelAnimation.h" />

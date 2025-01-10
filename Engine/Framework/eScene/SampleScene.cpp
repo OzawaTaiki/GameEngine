@@ -98,8 +98,10 @@ void SampleScene::Update()
     {
         LightingSystem::GetInstance()->SetLightGroup(lights_.get());
     }
-#endif // _DEBUG
 
+    lights_->DrawDebugWindow();
+#endif // _DEBUG
+    LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
 
     plane_->Update();
