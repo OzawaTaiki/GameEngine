@@ -1,0 +1,138 @@
+#pragma once
+
+#include <Physics/Math/Vector3.h>
+#include <Physics/Math/Vector4.h>
+
+#include <cstdint>
+#include <array>
+#include <vector>
+#include <numbers>
+#include <cmath>
+#include <memory>
+
+/**
+* @brief 指向性ライト
+* @param color		        ライトの色
+* @param direction	        ライトの向き
+* @param intendity	        輝度
+* @param useHalfLambert	    ハーフランバートを使うか
+*/
+struct DirectionalLight
+{
+    Vector4 color = {1,1,1,1};		// ライトの色
+
+    Vector3 direction = { 0,-1,0 };	// ライトの向き
+    float intensity = 1.0f;	        // 輝度
+
+    uint32_t isHalf = 1;            // ハーフランバートを使うか
+    float pad[3] = {};
+};
+
+/**
+* @brief 点光源
+* @param color		        ライトの色
+* @param position_	        ライトの位置
+* @param intensity	        輝度
+* @param radius	            ライトの影響半径
+* @param decay		        減衰率
+* @param isHalf	            ハーフランバートを使うか
+*/
+struct PointLight
+{
+    Vector4 color = { 1,1,1,1 };	// ライトの色
+
+    Vector3 position = { 0,1,0 };	// ライトの位置
+    float intensity = 1.0f;	        // 輝度
+
+    float radius = 5.0f;	        // ライトの影響半径
+    float decay = 0.5f;	            // 減衰率
+    uint32_t isHalf = 1;            // ハーフランバートを使うか
+    float pad = {};
+};
+
+
+/**
+* @brief スポットライト
+* @param color		        ライトの色
+* @param position		    ライトの位置
+* @param intensity		    輝度
+* @param direction		    ライトの向き
+* @param distance		    有効範囲
+* @param decay			    減衰率
+* @param cosAngle		    角度
+* @param falloutStartAngle	開始角度
+* @param isHalf			    ハーフランバートを使うか
+*/
+struct SpotLight
+{
+    Vector4 color = { 1,1,1,1 };		//ライトの色
+
+    Vector3 position = { 1,1,0 };       //ライトの位置
+    float intensity = 4.0f;	            //輝度
+
+    Vector3 direction = { -1,-1,0 };    //ライトの向き
+    float distance = 7.0f;              //有効範囲
+
+    float decay = 2.0f;	                // 減衰率
+    float cosAngle                      // 角度
+        = std::cosf(std::numbers::pi_v<float> / 3.0f);
+    float falloutStartAngle             // 開始角度
+        = std::cosf(std::numbers::pi_v<float> / 3.0f);
+    uint32_t isHalf;
+};
+
+/**
+* @brief ライトグループ
+*/
+class LightGroup
+{
+private:// 定数
+    static constexpr size_t MAX_DIRECTIONAL_LIGHT = 1;
+    static constexpr size_t MAX_POINT_LIGHT = 32;
+    static constexpr size_t MAX_SPOT_LIGHT = 16;
+
+
+public:
+    // 転送用の構造体
+    struct LightTransferData
+    {
+        DirectionalLight directionalLight;
+
+        std::array<PointLight, MAX_POINT_LIGHT> pointLights;
+
+        std::array<SpotLight, MAX_SPOT_LIGHT> spotLights;
+
+        uint32_t numPointLight;
+        uint32_t numSpotLight;
+        uint32_t pad[2];
+    };
+
+
+public:
+
+    static LightTransferData GetDefaultLightData();
+
+    LightGroup() = default;
+    ~LightGroup() = default;
+
+    void Initialize();
+    void Update();
+    void Draw();
+
+    void SetDirectionalLight(const DirectionalLight& _light);
+    void AddPointLight(const PointLight& _light);
+    void AddSpotLight(const SpotLight& _light);
+
+    LightTransferData GetLightData();
+
+
+private:
+
+
+    bool dirty_ = false;    // 更新が必要か
+
+    DirectionalLight directionalLight_;
+    std::vector<PointLight> pointLights_;
+    std::vector<SpotLight> spotLights;
+
+};

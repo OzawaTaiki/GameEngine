@@ -1,22 +1,21 @@
-#include "Core/WinApp/WinApp.h"
-#include "Core/DirectX/DXCommon.h"
-#include "Input/Input.h"
-#include "TextureManager/TextureManager.h"
-#include "Model/ModelManager.h"
-#include "Sprite/Sprite.h"
-#include "LineDrawer/LineDrawer.h"
-#include "Render/SRVManager.h"
-#include "Render/PSOManager.h"
-#include "ImGuiManager/ImGuiManager.h"
-#include "Particle/ParticleManager.h"
-#include "Utility/RandomGenerator.h"
-#include "Utility/ConfigManager.h"
-#include "Utility/Time.h"
+#include <Core/WinApp/WinApp.h>
+#include <Core/DirectX/DXCommon.h>
+#include <Systems/Input/Input.h>
+#include <ResourceManagement/TextureManager/TextureManager.h>
+#include <Rendering/Model/ModelManager.h>
+#include <Rendering/Sprite/Sprite.h>
+#include <Rendering/LineDrawer/LineDrawer.h>
+#include <ResourceManagement/SRVManager.h>
+#include <Core/DirectX/PSOManager.h>
+#include <UI/ImGuiManager/ImGuiManager.h>
+#include <Framework/Particle/ParticleManager.h>
+#include <Systems/Utility/RandomGenerator.h>
+#include <Systems/Config/ConfigManager.h>
+#include <Systems/Time/Time.h>
 
 /*-----シーン-----*/
-#include "eScene/SceneManager.h"
-//#include "Scene/GameScene.h"
-//#include "Scene/TitleScene.h"
+#include <Framework/eScene/SceneManager.h>
+#include <Framework/eScene/ParticleTestScene.h>
 /*---------------*/
 
 
@@ -40,9 +39,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager* particle = ParticleManager::GetInstance();
 	particle->Initialize();
 
-	ConfigManager::GetInstance()->Initialize();
-	ConfigManager::GetInstance()->LoadData();
-
 	TextureManager::GetInstance()->Initialize();
 	TextureManager::GetInstance()->Load("white.png");
 	TextureManager::GetInstance()->Load("cube.jpg");
@@ -60,7 +56,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//SceneManager::RegisterScene("title", TitleScene::Create);
 	//SceneManager::RegisterScene("game", GameScene::Create);
-	SceneManager::GetInstance()->Initialize("title");
+#ifdef _DEBUG
+	SceneManager::RegisterScene("particle", ParticleTestScene::Create);
+#endif // _DEBUG
+
+	SceneManager::GetInstance()->Initialize("particle");
 
     Time::Initialize();
 
