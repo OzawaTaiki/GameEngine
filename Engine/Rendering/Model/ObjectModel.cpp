@@ -34,7 +34,7 @@ void ObjectModel::Update(const bool _showImgui)
         worldTransform_.quaternion_ = quaternion_;
     else
         worldTransform_.rotate_ = rotate_;
-    worldTransform_.UpdateData();
+    worldTransform_.UpdateData(useQuaternion_);
     UpdateUVTransform();
 }
 
