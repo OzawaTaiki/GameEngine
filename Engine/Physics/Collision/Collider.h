@@ -108,7 +108,10 @@ public:
 
     void RegsterCollider();
 
+    void* GetOwner() const { return owner_; }
+    void SetOwner(void* _owner) { owner_ = _owner; }
 private:
+    void* owner_ = nullptr;
 
     // 衝突判定の形状とそのデータ
     std::variant<Sphere, AABB, OBB> shape_;
