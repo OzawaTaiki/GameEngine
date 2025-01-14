@@ -146,19 +146,33 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12Resource* _texture, const DirectX::ScratchImage& _mipImages)
 {
-	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(dxCommon_->GetDevice(), _mipImages.GetImages(), _mipImages.GetImageCount(), _mipImages.GetMetadata(), subresources);
-	uint64_t intermediateSize = GetRequiredIntermediateSize(_texture, 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(static_cast<uint32_t>(intermediateSize));
-	UpdateSubresources(dxCommon_->GetCommandList(), _texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
-	//Tetureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = _texture;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-	return intermediateResource;
+	try {
+		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+		DirectX::PrepareUpload(dxCommon_->GetDevice(), _mipImages.GetImages(), _mipImages.GetImageCount(), _mipImages.GetMetadata(), subresources);
+		uint64_t intermediateSize = GetRequiredIntermediateSize(_texture, 0, UINT(subresources.size()));
+		Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(static_cast<uint32_t>(intermediateSize));
+
+
+
+		UpdateSubresources(dxCommon_->GetCommandList(), _texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+
+
+		//Tetureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = _texture;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+		dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+
+
+
+		return intermediateResource;
+	}
+	catch (const std::exception& e) {
+		OutputDebugStringA(e.what());
+		throw;
+	}
 }
