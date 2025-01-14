@@ -17,6 +17,10 @@ void ImGuiManager::Initialize()
     DXCommon* dx = DXCommon::GetInstance();
 
     ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 
@@ -65,6 +69,7 @@ void ImGuiManager::Draw()
 #endif // _DEBUG
 
 }
+
 
 void ImGuiManager::Finalize()
 {
