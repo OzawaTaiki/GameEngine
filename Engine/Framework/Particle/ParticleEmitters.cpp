@@ -378,6 +378,13 @@ Particle ParticleEmitter::GenerateParticleData()
 }
 
 
+std::string ParticleEmitter::GetTimeChannel()
+{
+    if (timeChannel_.empty())
+        timeChannel_ = "default";
+    return timeChannel_;
+}
+
 void ParticleEmitter::Save() const
 {
     jsonBinder_->SetFolderPath();

@@ -20,6 +20,8 @@ public:
 
 private:
 
+    std::string group_ = "";
+
 
 };
 

@@ -99,7 +99,7 @@ public:
     std::string GetModelPath() const { return useModelPath_; }
 
 
-    std::string GetTimeChannel() const { return timeChannel_; }
+    std::string GetTimeChannel();
     void SetTimeChannel(const std::string& _name) { timeChannel_ = _name; }
 
     void Save()const;
