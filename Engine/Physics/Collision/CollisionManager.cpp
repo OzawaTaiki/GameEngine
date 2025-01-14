@@ -68,8 +68,8 @@ bool CollisionManager::PreCheckCollisionPair(Collider* _colliderA, Collider* _co
 
 void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
 {
-    if (!PreCheckCollisionPair(_colliderA, _colliderB))
-        return;
+  /*  if (!PreCheckCollisionPair(_colliderA, _colliderB))
+        return;*/
 
     switch (_colliderA->GetBoundingBox())
     {
