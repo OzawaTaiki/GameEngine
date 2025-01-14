@@ -83,6 +83,11 @@ void JsonLoader::OutPutJsonFile(const std::string& _groupName)
     // 拡張子の有無
     if (filePath_.find(".json") == std::string::npos)
         filePath_ = filePath_ + ".json";
+
+    std::filesystem::path path(folderPath_);
+    if (!std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
     // ファイルを開く
     std::ofstream outputFile(filePath_);
 

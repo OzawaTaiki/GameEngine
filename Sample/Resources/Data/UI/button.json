@@ -1,0 +1,20 @@
+{
+    "button": {
+        "buttonanchor": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "buttonisActive": 257,
+        "buttonisVisible": 1,
+        "buttonlabel": "button",
+        "buttonpos": {
+            "x": 365.0,
+            "y": 129.0
+        },
+        "buttonsize": {
+            "x": 54.0,
+            "y": 204.0
+        },
+        "buttontextureName": "white.png"
+    }
+}
