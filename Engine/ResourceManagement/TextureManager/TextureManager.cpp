@@ -147,15 +147,19 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12Resource* _texture, const DirectX::ScratchImage& _mipImages)
 {
 	try {
+
+        ID3D12Device* device = dxCommon_->GetDevice();
+        ID3D12GraphicsCommandList* commandList = dxCommon_->GetLoadCommandList();
+        ID3D12CommandAllocator* allocator = dxCommon_->GetLoadCommandAllocator();
+        ID3D12CommandQueue* queue = dxCommon_->GetCommandQueue();
+
+
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 		DirectX::PrepareUpload(dxCommon_->GetDevice(), _mipImages.GetImages(), _mipImages.GetImageCount(), _mipImages.GetMetadata(), subresources);
 		uint64_t intermediateSize = GetRequiredIntermediateSize(_texture, 0, UINT(subresources.size()));
 		Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(static_cast<uint32_t>(intermediateSize));
 
-
-
-		UpdateSubresources(dxCommon_->GetCommandList(), _texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
-
+		UpdateSubresources(commandList, _texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
 
 		//Tetureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 		D3D12_RESOURCE_BARRIER barrier{};
@@ -165,8 +169,21 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+		commandList->ResourceBarrier(1, &barrier);
 
+		HRESULT hr = S_FALSE;
+		hr = commandList->Close();
+        assert(SUCCEEDED(hr));
+
+        ID3D12CommandList* commandLists[] = { commandList };
+		queue->ExecuteCommandLists(1, commandLists);
+        dxCommon_->WaitForGPU();
+
+        //次のフレーム用のコマンドリストを準備
+        hr = allocator->Reset();
+        assert(SUCCEEDED(hr));
+        hr = commandList->Reset(allocator, nullptr);
+        assert(SUCCEEDED(hr));
 
 
 		return intermediateResource;
