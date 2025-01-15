@@ -111,6 +111,10 @@ void SampleScene::Update()
     aModel_->Update();
     oModel_->Update();
     button_->Update();
+    if (button_->IsPressed())
+    {
+        SceneManager::GetInstance()->ReserveScene("Title");
+    }
 
     if (enableDebugCamera_)
     {

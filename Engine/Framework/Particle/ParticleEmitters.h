@@ -156,8 +156,6 @@ private:
     //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
     // 保留
 
-    // TODO:これが原因で終了時に例外が発生する
-    //std::vector <uint32_t>  billboardAxes_ = { };        // ビルボードの軸
     Vector3  billboardAxes_ = { };        // ビルボードの軸
 
     float                   delayTime_;                     // 発生までの遅延時間

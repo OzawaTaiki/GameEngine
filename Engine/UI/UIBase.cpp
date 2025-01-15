@@ -12,13 +12,13 @@ void UIBase::Initialize(const std::string& _label)
     jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
     JsonHub::GetInstance()->SetDirectoryPathFromRoot("Resources/Data/UI/");
 
-    jsonBinder_->RegisterVariable( label_+"pos", &position_);
-    jsonBinder_->RegisterVariable( label_+"size", &size_);
-    jsonBinder_->RegisterVariable( label_+"anchor", &anchor_);
-    jsonBinder_->RegisterVariable( label_+"isActive", reinterpret_cast<uint32_t*>(&isActive_));
-    jsonBinder_->RegisterVariable( label_+"isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
-    jsonBinder_->RegisterVariable( label_+"textureName", &textureName_);
-    jsonBinder_->RegisterVariable( label_+"label", &label_);
+    jsonBinder_->RegisterVariable(label_+"_pos", &position_);
+    jsonBinder_->RegisterVariable(label_+"_size", &size_);
+    jsonBinder_->RegisterVariable(label_+"_anchor", &anchor_);
+    jsonBinder_->RegisterVariable(label_+"_isActive", reinterpret_cast<uint32_t*>(&isActive_));
+    jsonBinder_->RegisterVariable(label_+"_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
+    jsonBinder_->RegisterVariable(label_+"_textureName", &textureName_);
+    jsonBinder_->RegisterVariable(label_+"_label", &label_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
