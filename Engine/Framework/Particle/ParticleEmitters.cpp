@@ -354,13 +354,6 @@ Particle ParticleEmitter::GenerateParticleData()
     param.size = random->GetUniformVec3(setting_.size.value.min, setting_.size.value.max);
 
 
-    //param.alphaTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.color.w });
-    //param.colorTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.color.xyz() });
-    //param.rotateTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.rotate });
-    //param.sizeTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.size });
-    //param.speedTransition.keys.emplace_front(TransitionKeyFrame{ 0.0f, param.speed });
-
-
     if (isLengthScalingEnabled_)
     {
         param.sizeTransition.isChange = false;
@@ -411,46 +404,6 @@ bool ParticleEmitter::ShowDebugWinsow()
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 0.5f));
 
         DisPlayEmitterParameters();
-       /* if (ImGui::TreeNodeEx("Emitter", ImGuiTreeNodeFlags_Framed))
-        {
-            ImGui::Combo("shape", reinterpret_cast<int*>(&shape_), shapeCombo, 4);
-            ImGui::Combo("direction", reinterpret_cast<int*>(&particleDirection_), directionCombo, 3);
-
-
-            ImGui::SeparatorText("Emitter");
-            if (shape_ == EmitterShape::Box)
-                ImGui::DragFloat3("size", &size_.x, 0.01f);
-            else if (shape_ == EmitterShape::Shpere || shape_ == EmitterShape::Circle)
-                ImGui::DragFloat("radius", &radius_, 0.01f);
-
-            ImGui::DragFloat3("position", &position_.x, 0.01f);
-            ImGui::DragFloat3("offset", &offset_.x, 0.01f);
-
-            ImGui::DragInt("countPerEmit", reinterpret_cast<int*>(&countPerEmit_), 1, 0);
-            if (ImGui::DragInt("emitPerSec", reinterpret_cast<int*>(&emitPerSec_), 1, 0))
-                emitTime_ = 1.0f / static_cast<float>(emitPerSec_);
-            ImGui::InputInt("maxParticles", reinterpret_cast<int*>(&maxParticles_), 1);
-            ImGui::InputInt("emitRepeatCount", reinterpret_cast<int*>(&emitRepeatCount_), 1);
-            ImGui::DragFloat("delayTime", &delayTime_, 0.01f);
-            ImGui::DragFloat("duration", &duration_, 0.01f);
-
-            ImGui::DragFloat("fadeStartRatio", &fadeStartRatio_, 0.01f, 0, 1);
-
-            DisplayFlags();
-
-            ImGui::SeparatorText("use path");
-            ImGui::InputText("Model", name_buffer_, 256);
-            useModelPath_ = name_buffer_;
-            if (ImGui::Button("Model Set"))
-                ParticleManager::GetInstance()->SetGroupModel(name_, useModelPath_);
-
-            ImGui::InputText("Texture", texture_buffer_, 256);
-            useTextruePath_ = texture_buffer_;
-            if (ImGui::Button("Texture Set"))
-                ParticleManager::GetInstance()->SetGroupTexture(name_, TextureManager::GetInstance()->Load(useTextruePath_));
-
-            ImGui::TreePop();
-        }*/
 
         if (ImGui::TreeNodeEx("Particle_Init", ImGuiTreeNodeFlags_Framed))
         {
@@ -458,6 +411,7 @@ bool ParticleEmitter::ShowDebugWinsow()
 
             DisplayLifeTimeParameters();
             DisplaySizeParameters();
+            DisplayRotateParameters();
             DisplayDirectionParameters();
             DisplaySpeedParameters();
             DisplayAccelerationParameters();
@@ -569,6 +523,27 @@ void ParticleEmitter::DisPlayEmitterParameters()
             ImGui::SeparatorText("");
             ImGui::TreePop();
         }
+
+        if (ImGui::TreeNodeEx("Billboard", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Checkbox("Enable", &isEnableBillboard_);
+            ImGui::Checkbox("LengthScaling", &isLengthScalingEnabled_);
+            bool axes[3] = { billboardAxes_.x != 0,billboardAxes_.y != 0,billboardAxes_.z != 0 };
+            ImGui::Checkbox("X", &axes[0]);            ImGui::SameLine();
+            ImGui::Checkbox("Y", &axes[1]);            ImGui::SameLine();
+            ImGui::Checkbox("Z", &axes[2]);
+
+            for (int i = 0; i < 3; ++i)
+            {
+                if (axes[i] != (billboardAxes_[i] != 0))
+                {
+                    billboardAxes_[i] = axes[i] ? 1 : 0;
+                }
+            }
+            ImGui::TreePop();
+
+        }
+
         ImGui::TreePop();
         ImGui::PopStyleColor();
     }
@@ -737,6 +712,115 @@ void ParticleEmitter::DisplaySizeParameters()
         }
         ImGui::TreePop();
     }
+#endif // _DEBUG
+
+}
+
+void ParticleEmitter::DisplayRotateParameters()
+{
+#ifdef _DEBUG
+
+    float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
+    ImGui::PushID("Rotate");
+    if (ImGui::TreeNodeEx("Rotate", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Columns(2, "rotatechec", false);
+        if (ImGui::Checkbox("Fixed", &setting_.rotate.fixed))
+            setting_.rotate.random = false;
+        if (ImGui::Checkbox("Random", &setting_.rotate.random))
+            setting_.rotate.fixed = false;
+        ImGui::NextColumn();
+        ImGui::Checkbox("Change", &parametor_.rotateTransition.isChange);
+        ImGui::Columns(1);
+        ImGui::SeparatorText("");
+        ImGui::PushItemWidth(width * 4);
+        ImGui::Text("Start Parameter");
+        if (setting_.rotate.fixed)
+        {
+            ImGui::DragFloat3("Fix", &setting_.rotate.value.min.x, 0.01f);
+            setting_.rotate.value.max = setting_.rotate.value.min;
+            ImGui::BeginDisabled(true);
+            ImGui::DragFloat3("Disabled", &setting_.rotate.value.max.x);
+            ImGui::EndDisabled();
+        }
+        else
+        {
+            ImGui::DragFloat3("Min", &setting_.rotate.value.min.x, 0.01f);
+            ImGui::DragFloat3("Max", &setting_.rotate.value.max.x, 0.01f);
+        }
+        if (parametor_.rotateTransition.isChange)
+        {
+            ImGui::SeparatorText("ChangeParameter");
+            ImGui::DragFloat("Time", &addRotate_.time, 0.01f, 0.01f, 0.99f);
+            ImGui::DragFloat3("Rotate", &addRotate_.value.x, 0.01f);
+            addRotate_.easingFuncNum = Easing::SelectEasingFunc();
+            if (ImGui::Button("Save"))
+            {
+                addRotate_.time = std::clamp(addRotate_.time, 0.01f, 0.99f);
+                if (parametor_.rotateTransition.keys.empty())
+                {
+                    parametor_.rotateTransition.keys.emplace_back(addRotate_);
+                }
+                else
+                {
+                    auto it = parametor_.rotateTransition.keys.begin();
+                    for (; it != parametor_.rotateTransition.keys.end(); ++it)
+                    {
+                        if (it->time >= addRotate_.time)
+                        {
+                            break;
+                        }
+                    }
+                    parametor_.rotateTransition.keys.insert(it, addRotate_);
+                }
+                addRotate_ = {};
+            }
+            if (parametor_.rotateTransition.keys.size() != 0)
+            {
+                ImGui::SeparatorText("ChangeParameterList");
+                static int selectedRotateKey_ = 0;
+                int32_t index = 0;
+                for (auto it = parametor_.rotateTransition.keys.begin(); it != parametor_.rotateTransition.keys.end();)
+                {
+                    std::string str =
+                        "Time:" + std::to_string(it->time) + "##" +
+                        std::to_string(std::distance(parametor_.rotateTransition.keys.begin(), it));
+                    if (ImGui::Selectable(str.c_str(), selectedRotateKey_ == index))
+                        selectedRotateKey_ = index;
+                    if (ImGui::BeginPopupContextItem())
+                    {
+                        selectedRotateKey_ = index;
+                        ImGui::Text("Time:%f", it->time);
+                        ImGui::Text("Rotate:%f,%f,%f", it->value.x, it->value.y, it->value.z);
+                        ImGui::Text("Func:%s", Easing::GetEasingFuncName(it->easingFuncNum).c_str());
+                        if (ImGui::Button("Delete"))
+                        {
+                            it = parametor_.rotateTransition.keys.erase(it);
+                            ImGui::CloseCurrentPopup();
+                            ImGui::EndPopup();
+                            continue;
+                        }
+                        if (ImGui::Button("Edit"))
+                        {
+                            addRotate_ = *it;
+                            it = parametor_.rotateTransition.keys.erase(it);
+                            ImGui::CloseCurrentPopup();
+                            ImGui::EndPopup();
+                            continue;
+                        }
+                        ImGui::EndPopup();
+                    }
+                    ++it;
+                    ++index;
+                }
+            }
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+
+
+
 #endif // _DEBUG
 
 }

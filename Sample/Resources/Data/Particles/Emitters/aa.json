@@ -26,15 +26,25 @@
             "keys": [
                 {
                     "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": 1.0
+                    "time": 0.009999999776482582,
+                    "value": 0.23999999463558197
+                },
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.7099999785423279,
+                    "value": 0.0
+                },
+                {
+                    "easingFuncNum": 0,
+                    "time": 0.9900000095367432,
+                    "value": 0.0
                 }
             ]
         },
         "billBoardAxes": {
-            "x": 1.0,
+            "x": 0.0,
             "y": 1.0,
-            "z": 1.0
+            "z": 0.0
         },
         "color": {
             "w": 1.0,
@@ -44,78 +54,23 @@
         },
         "colorTransition": {
             "isChange": true,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.05999999865889549,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.550000011920929,
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.1921568661928177,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.8799999952316284,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.8799999952316284,
-                    "value": {
-                        "x": 0.5568627715110779,
-                        "y": 0.23529411852359772,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.949999988079071,
-                    "value": {
-                        "x": 0.42352941632270813,
-                        "y": 0.0,
-                        "z": 1.0
-                    }
-                }
-            ]
+            "keys": []
         },
         "color_fixed": 1,
         "color_max": {
-            "w": 1.0,
+            "w": 0.3607843220233917,
             "x": 1.0,
-            "y": 0.0,
-            "z": 0.0
+            "y": 1.0,
+            "z": 0.9843137264251709
         },
         "color_min": {
-            "w": 1.0,
+            "w": 0.3607843220233917,
             "x": 1.0,
-            "y": 0.0,
-            "z": 0.0
+            "y": 1.0,
+            "z": 0.9843137264251709
         },
         "color_random": 256,
-        "countPerEmit": 1,
+        "countPerEmit": 4,
         "delayTime": 0.0,
         "direction": {
             "x": 0.0,
@@ -140,21 +95,21 @@
         "emitRepeatCount": 1,
         "isInfiniteLife": 0,
         "lifeTime": 1.0,
-        "lifeTime_fixed": 1,
-        "lifeTime_max": 1.0,
-        "lifeTime_min": 1.0,
+        "lifeTime_fixed": 3774873601,
+        "lifeTime_max": 0.28999999165534973,
+        "lifeTime_min": 0.28999999165534973,
         "lifeTime_random": 256,
-        "loop": 0,
+        "loop": 256,
         "maxParticles": 0,
-        "modelPath": "plane/plane.gltf",
+        "modelPath": "",
         "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
         },
         "position": {
-            "x": 0.0,
-            "y": 0.0,
+            "x": 1.2899999618530273,
+            "y": 2.359999895095825,
             "z": 0.0
         },
         "radius": 1.0,
@@ -165,78 +120,80 @@
         },
         "rotateTransition": {
             "isChange": false,
+            "keys": []
+        },
+        "rotate_fixed": 0,
+        "rotate_max": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.5199999809265137
+        },
+        "rotate_min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.430000066757202
+        },
+        "rotate_random": 1,
+        "shape": 0,
+        "size": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "sizeTransition": {
+            "isChange": true,
             "keys": [
                 {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
+                    "easingFuncNum": 24,
+                    "time": 0.009999999776482582,
                     "value": {
-                        "x": 0.0,
-                        "y": 0.0,
+                        "x": 0.12999999523162842,
+                        "y": 0.009999999776482582,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "easingFuncNum": 24,
+                    "time": 0.10999999940395355,
+                    "value": {
+                        "x": 0.38999998569488525,
+                        "y": 0.019999999552965164,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "easingFuncNum": 24,
+                    "time": 0.9900000095367432,
+                    "value": {
+                        "x": 0.7799999713897705,
+                        "y": 0.009999999776482582,
                         "z": 0.0
                     }
                 }
             ]
         },
-        "rotate_fixed": 1,
-        "rotate_max": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-        },
-        "rotate_min": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-        },
-        "rotate_random": 256,
-        "shape": 0,
-        "size": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-        },
-        "sizeTransition": {
-            "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                }
-            ]
-        },
-        "size_fixed": 1,
+        "size_fixed": 855638016,
         "size_max": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 0.8500000238418579,
+            "y": 0.019999999552965164,
             "z": 1.0
         },
         "size_min": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 0.3499999940395355,
+            "y": 0.019999999552965164,
             "z": 1.0
         },
-        "size_random": 256,
+        "size_random": 0,
         "speed": 0.0,
         "speedTransition": {
             "isChange": false,
-            "keys": [
-                {
-                    "easingFuncNum": 0,
-                    "time": 0.0,
-                    "value": 1.0
-                }
-            ]
+            "keys": []
         },
         "spped_fixed": 1,
-        "spped_max": 1.0,
+        "spped_max": 0.0,
         "spped_min": 0.0,
         "spped_random": 256,
-        "texturePath": "particle/circle.png",
-        "useBillboard": 0
+        "texturePath": "white.png",
+        "useBillboard": 1
     }
 }

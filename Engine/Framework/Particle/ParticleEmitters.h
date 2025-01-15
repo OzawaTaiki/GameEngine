@@ -183,6 +183,7 @@ private:
 
     void DisplayLifeTimeParameters();
     void DisplaySizeParameters();
+    void DisplayRotateParameters();
     void DisplaySpeedParameters();
     void DisplayDirectionParameters();
     void DisplayAccelerationParameters();
