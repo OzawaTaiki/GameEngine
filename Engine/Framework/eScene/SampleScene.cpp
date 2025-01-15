@@ -4,6 +4,7 @@
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Rendering/Sprite/Sprite.h>
 #include <Rendering/Model/ModelManager.h>
+#include <Rendering/Primitive/Ring.h>
 
 
 std::unique_ptr<BaseScene>SampleScene::Create()
@@ -46,6 +47,7 @@ void SampleScene::Initialize()
 
     button_ = std::make_unique<UIButton>();
     button_->Initialize("button");
+
 
 }
 
@@ -113,7 +115,7 @@ void SampleScene::Update()
     button_->Update();
     if (button_->IsPressed())
     {
-        SceneManager::GetInstance()->ReserveScene("Title");
+        SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }
 
     if (enableDebugCamera_)
@@ -129,6 +131,12 @@ void SampleScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
+
+    Ring ring(1.0f, 2.0f, 128, { true,true,true });
+    ring.Generate();
+    ring.Draw();
+
+
 
 }
 
