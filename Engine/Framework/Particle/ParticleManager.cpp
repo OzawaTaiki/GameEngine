@@ -30,6 +30,15 @@ void ParticleManager::ClearGroup()
     groups_.clear();
 }
 
+void ParticleManager::ClearGroup(const std::string& _groupName)
+{
+    if (groups_.contains(_groupName))
+    {
+        groups_[_groupName].particles.clear();
+        groups_.erase(_groupName);
+    }
+}
+
 void ParticleManager::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
@@ -51,13 +60,20 @@ void ParticleManager::Update(const Vector3& _cRotate)
     // billBordはshaderで計算したい
 
     Vector3 cRotate = {};
+    Vector3 pRotate = {};
     Matrix4x4 billboradMat = Matrix4x4::Identity();
 
     for (auto& [name, group] : groups_)
     {
         group.instanceNum = 0;
-        std::string timeChannel = group.emitterPtr->GetTimeChannel();
+        std::string timeChannel{};
+        if (group.emitterPtr)
+            group.emitterPtr->GetTimeChannel();
+        else
+            timeChannel = "default";
+
         float deltaTime = gameTime_->GetChannel(timeChannel).GetDeltaTime<float>();
+
         for (auto it = group.particles.begin(); it != group.particles.end();)
         {
             it->Update(deltaTime);
@@ -76,6 +92,10 @@ void ParticleManager::Update(const Vector3& _cRotate)
                     {
                         cRotate[index] = _cRotate[index];
                     }
+                    else
+                    {
+                        //pRotate[index] = it->GetRotation()[index];
+                    }
                 }
                 billboradMat = MakeAffineMatrix({ 1,1,1 }, cRotate, { 0,0,0 });
                 //billboradMat = Inverse(billboradMat);
@@ -85,7 +105,7 @@ void ParticleManager::Update(const Vector3& _cRotate)
                     mat = mat * billboradMat;
                 if (group.emitterPtr->ShouldFaceDirection())
                     mat = mat * it->GetDirectionMatrix();
-                //mat = mat * MakeRotateMatrix(it->GetRotation());
+                mat = mat * MakeRotateMatrix(it->GetRotation());
                 mat = mat * MakeTranslateMatrix(it->GetPosition());
                 group.constMap[group.instanceNum].matWorld = mat;
             }

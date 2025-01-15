@@ -69,11 +69,11 @@ private:
 template<typename T>
 void JsonLoader::GetValue(std::string _gName, std::string _vName, T& _v)
 {
-    if (!values_.contains(_gName))
+    if (!values_.contains(_gName) && !jsonData_.contains(_gName))
         return;
 
     if ((!values_[_gName].contains(_vName) ||
-        values_[_gName][_vName].empty()) ||
+        values_[_gName][_vName].empty()) &&
         (!jsonData_[_gName].contains(_vName) ||
         jsonData_[_gName][_vName].empty()))
     {
