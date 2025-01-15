@@ -30,6 +30,15 @@ void ParticleManager::ClearGroup()
     groups_.clear();
 }
 
+void ParticleManager::ClearGroup(const std::string& _groupName)
+{
+    if (groups_.contains(_groupName))
+    {
+        groups_[_groupName].particles.clear();
+        groups_.erase(_groupName);
+    }
+}
+
 void ParticleManager::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();

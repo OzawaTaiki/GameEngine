@@ -1,5 +1,6 @@
 #include "Effect.h"
 #include <Systems/Time/Time.h>
+#include <Framework/Particle/ParticleManager.h>
 
 Effect::~Effect()
 {
@@ -169,6 +170,7 @@ void Effect::DebugShowForEmitterCreate()
             {
                 if (ImGui::Button("Exclusion"))
                 {
+                    ParticleManager::GetInstance()->ClearGroup(emitter->GetName());
                     ExclusionEmitter(emitter->GetName());
                     emitters_.remove(emitter);
                     break;

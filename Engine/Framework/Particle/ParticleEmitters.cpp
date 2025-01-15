@@ -537,7 +537,7 @@ void ParticleEmitter::DisPlayEmitterParameters()
             {
                 if (axes[i] != (billboardAxes_[i] != 0))
                 {
-                    billboardAxes_[i] = axes[i] ? 1 : 0;
+                    billboardAxes_[i] = axes[i] ? 1.f : 0.f;
                 }
             }
             ImGui::TreePop();

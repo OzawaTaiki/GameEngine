@@ -19,6 +19,7 @@ public:
     ~ParticleManager();
 
     void ClearGroup();
+    void ClearGroup(const std::string& _groupName);
 
     void Initialize();
     void Update(const Vector3& _cRotate);
