@@ -18,6 +18,8 @@ public:
     ParticleManager() = default;
     ~ParticleManager();
 
+    void ClearGroup();
+
     void Initialize();
     void Update(const Vector3& _cRotate);
     void Draw(const Camera* _camera);

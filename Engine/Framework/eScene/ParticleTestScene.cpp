@@ -15,6 +15,7 @@ std::unique_ptr<BaseScene>ParticleTestScene::Create()
 
 ParticleTestScene::~ParticleTestScene()
 {
+    ParticleManager::GetInstance()->ClearGroup();
 }
 
 void ParticleTestScene::Initialize()

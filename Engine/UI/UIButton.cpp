@@ -20,10 +20,23 @@ void UIButton::Draw()
     UIBase::Draw();
 }
 
-bool UIButton::IsClicked() const
+bool UIButton::IsPressed() const
 {
     if (IsMousePointerInside() &&
         Input::GetInstance()->IsMouseTriggered(0))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool UIButton::IsPressed(PadButton _button) const
+{
+    // TODO:
+    // ボタンが選択されているか
+
+    if (Input::GetInstance()->IsPadTriggered(_button))
     {
         return true;
     }

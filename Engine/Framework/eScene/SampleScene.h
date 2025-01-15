@@ -9,6 +9,7 @@
 #include <Rendering/LineDrawer/LineDrawer.h>
 #include <Systems/Input/Input.h>
 #include <Systems/Time/GameTime.h>
+#include <UI/UIButton.h>
 
 #include <memory>
 
@@ -42,6 +43,8 @@ private:
     std::unique_ptr<ObjectModel> plane_ = nullptr;
 
     std::unique_ptr<LightGroup> lights_;
+
+    std::unique_ptr<UIButton> button_ = nullptr;
 
     GameTime* gameTime_;
 

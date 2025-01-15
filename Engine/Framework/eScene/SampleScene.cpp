@@ -44,6 +44,9 @@ void SampleScene::Initialize()
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
+    button_ = std::make_unique<UIButton>();
+    button_->Initialize("button");
+
 }
 
 void SampleScene::Update()
@@ -107,6 +110,11 @@ void SampleScene::Update()
     plane_->Update();
     aModel_->Update();
     oModel_->Update();
+    button_->Update();
+    if (button_->IsPressed())
+    {
+        SceneManager::GetInstance()->ReserveScene("Title");
+    }
 
     if (enableDebugCamera_)
     {
@@ -135,6 +143,7 @@ void SampleScene::Draw()
     aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     Sprite::PreDraw();
+    button_->Draw();
 
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);

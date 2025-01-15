@@ -3,7 +3,7 @@
         "EmitDirection": [
             2
         ],
-        "LengthScaling": 1044381696,
+        "LengthScaling": 0,
         "acceleration": {
             "x": 0.0,
             "y": 0.0,
@@ -32,9 +32,9 @@
             ]
         },
         "billBoardAxes": {
-            "x":1.0,
-            "y":1.0,
-            "z":1.0
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
         },
         "color": {
             "w": 1.0,
@@ -237,6 +237,6 @@
         "spped_min": 0.0,
         "spped_random": 256,
         "texturePath": "particle/circle.png",
-        "useBillboard": 1073741824
+        "useBillboard": 0
     }
 }

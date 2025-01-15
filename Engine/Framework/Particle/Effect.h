@@ -12,8 +12,6 @@ class Effect
 {
 public:
     Effect() = default;
-    // TODO :emitterの解放周りでエラーが出る
-    // 所有権がどこにあるか明確にする
     ~Effect();
 
     void Initialize(const std::string& _name);

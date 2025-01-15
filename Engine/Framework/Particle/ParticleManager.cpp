@@ -21,6 +21,15 @@ ParticleManager::~ParticleManager()
     groups_.clear();
 }
 
+void ParticleManager::ClearGroup()
+{
+    for (auto& [name, group] : groups_)
+    {
+        group.particles.clear();
+    }
+    groups_.clear();
+}
+
 void ParticleManager::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
