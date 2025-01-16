@@ -27,13 +27,16 @@ void Ring::Generate()
     vertices_.clear();
     indices_.clear();
 
+    if (divide_ < 3)
+        divide_ = 3;
+
     // 頂点ごとの角度
     float kDivideAngle = std::numbers::pi_v<float> *2.0f / divide_;
     // 一頂点ごとのUV座標の割合
     float kDivideUV = 1.0f / divide_;
 
     // 頂点の計算　頂点の数 ＝ 分割数
-    for (uint32_t index = 0; index < divide_; ++index)
+    for (int32_t index = 0; index < divide_; ++index)
     {
         // 外側の頂点
         Mesh::VertexData outerVertex;
@@ -42,13 +45,13 @@ void Ring::Generate()
 
         float angle = kDivideAngle * static_cast<float>(index);
 
-        outerVertex.position = Vector3(std::cosf(angle) * outerRadius_, std::sinf(angle) * outerRadius_, 0.0f);
-        outerVertex.normal = Vector3(0.0f, 0.0f, -1.0f);
+        outerVertex.position = Vector4(std::cosf(angle) * outerRadius_, std::sinf(angle) * outerRadius_, 0.0f,1.0f);
+        outerVertex.normal = Vector3(0.0f, 0.0f, 1.0f);
         outerVertex.texcoord = { kDivideUV * static_cast<float>(index),1.0f };
 
 
-        innerVertex.position = Vector3(std::cosf(angle) * innerRadius_, std::sinf(angle) * innerRadius_, 0.0f);
-        innerVertex.normal = Vector3(0.0f, 0.0f, -1.0f);
+        innerVertex.position = Vector4(std::cosf(angle) * innerRadius_, std::sinf(angle) * innerRadius_, 0.0f, 1.0f);
+        innerVertex.normal = Vector3(0.0f, 0.0f, 1.0f);
         innerVertex.texcoord = { kDivideUV * static_cast<float>(index),0.0f };
 
         vertices_.push_back(outerVertex);
@@ -56,7 +59,7 @@ void Ring::Generate()
     }
 
     // インデックスの計算
-    for (uint32_t index = 0; index < divide_ * 2; index += 2)
+    for (int32_t index = 0; index < divide_ * 2; index += 2)
     {
         //  021 123 243 345 465...
         indices_.push_back((index + 2) % (divide_ * 2));
@@ -77,15 +80,18 @@ void Ring::Update()
 #ifdef _DEBUG
 
     ImGui::Begin("Ring");
-    ImGui::DragFloat("innerRadius", &innerRadius_);
-    ImGui::DragFloat("outerRadius", &outerRadius_);
-    ImGui::DragInt("divide", reinterpret_cast<int*>(&divide_));
+    if(ImGui::DragFloat("innerRadius", &innerRadius_,0.01f))
+        Generate();
+    if(ImGui::DragFloat("outerRadius", &outerRadius_, 0.01f))
+        Generate();
+    if (ImGui::DragInt("divide", reinterpret_cast<int*>(&divide_)))
+        Generate();
     ImGui::Checkbox("billboardX", &billboard_[0]);
     ImGui::Checkbox("billboardY", &billboard_[1]);
     ImGui::Checkbox("billboardZ", &billboard_[2]);
-    ImGui::DragFloat3("scale", &scale_.x);
-    ImGui::DragFloat3("rotation", &rotation_.x);
-    ImGui::DragFloat3("translate", &translate_.x);
+    ImGui::DragFloat3("scale", &scale_.x, 0.01f);
+    ImGui::DragFloat3("rotation", &rotation_.x, 0.01f);
+    ImGui::DragFloat3("translate", &translate_.x, 0.01f);
     ImGui::Checkbox("useQuaternion", &useQuaternion_);
     ImGui::End();
 

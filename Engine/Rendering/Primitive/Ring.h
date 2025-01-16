@@ -54,7 +54,7 @@ private:
     // 外側の半径
     float outerRadius_ = 0.0f;
     // 円周の分割数
-    uint32_t divide_ = 0;
+    int32_t divide_ = 0;
     // ビルボード有効フラグ
     std::array<bool, 3> billboard_ = {};
 

@@ -38,7 +38,7 @@ void SampleScene::Initialize()
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("AnimatedCube/AnimatedCube.gltf", "c");
+    oModel_->Initialize("testRing.gltf", "c");
 
     gameTime_ = GameTime::GetInstance();
 
@@ -143,10 +143,10 @@ void SampleScene::Draw()
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
     //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
-    //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ModelManager::GetInstance()->PreDrawForAnimationModel();
-    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ring_->Draw(SceneCamera_, { 1,1,1,1 });
     ring_->Draw();
