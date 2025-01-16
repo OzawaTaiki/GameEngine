@@ -17,7 +17,7 @@ public:
 
     void Initialize();
 
-    void UpdateData();
+    void UpdateData(bool _useQuaternion = false);
     void UpdateData(const std::initializer_list<Matrix4x4>& _mat);
     void TransferData();
 

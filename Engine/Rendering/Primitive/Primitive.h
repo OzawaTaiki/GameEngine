@@ -3,6 +3,8 @@
 #include <Physics/Math/Vector2.h>
 #include <Physics/Math/Vector3.h>
 
+#include <Rendering/Model/Mesh.h>
+
 #include <vector>
 #include <cstdint>
 
@@ -17,14 +19,8 @@ public:
     virtual void Generate() = 0;
 
 protected:
-    struct Vertex
-    {
-        Vector3 position;
-        Vector3 normal;
-        Vector2 uv;
-    };
 
-    std::vector<Vertex> vertices_;
+    std::vector<Mesh::VertexData> vertices_;
     std::vector<uint32_t> indices_;
 };
 

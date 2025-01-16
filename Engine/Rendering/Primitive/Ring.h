@@ -1,8 +1,16 @@
 #pragma once
 
 #include <Rendering/Primitive/Primitive.h>
-
+#include <Physics/Math/Vector3.h>
+#include <Physics/Math/Vector4.h>
+#include <Physics/Math/quaternion.h>
+#include <Rendering/Model/WorldTransform.h>
+#include <Rendering/Model/Mesh.h>
+#include <Rendering/Model/Material.h>
+#include <Rendering/Model/ObjectColor.h>
 #include <array>
+
+class Camera;
 
 class Ring : public Primitive
 {
@@ -12,7 +20,32 @@ public:
 
     void Generate() override;
 
+    void Update();
+
     void Draw();
+    void Draw(const Camera& _camera, const Vector4& _color = { 1,1,1,1 });
+
+
+    //============ setter ============
+
+    void SetInnerRadius(float _radius) { innerRadius_ = _radius; }
+    void SetOuterRadius(float _radius) { outerRadius_ = _radius; }
+    void SetDivide(uint32_t _divide) { divide_ = _divide; }
+    void SetBillboard(std::array<bool, 3> _billboard) { billboard_ = _billboard; }
+    void SetUseQuaternion(bool _useQuaternion) { useQuaternion_ = _useQuaternion; }
+    void SetTexture(const std::string& _path);
+    void SetTexture(const uint32_t _handle) { textureHandle_ = _handle; }
+
+    //================================
+
+    // スケール
+    Vector3 scale_ = {};
+    // 回転
+    Vector3 rotation_ = {};
+    // 回転
+    Quaternion quternion_ = {};
+    // 位置
+    Vector3 translate_ = {};
 
 private:
 
@@ -22,9 +55,21 @@ private:
     float outerRadius_ = 0.0f;
     // 円周の分割数
     uint32_t divide_ = 0;
+    // ビルボード有効フラグ
+    std::array<bool, 3> billboard_ = {};
 
-    std::array<bool, 3> billboard_ = false;
+    // クォータニオンを使用するか
+    bool useQuaternion_ = true;
+    // ワールド変換行列
+    WorldTransform worldTransform = {};
 
+    uint32_t textureHandle_ = 0;
+    // メッシュ
+    Mesh mesh_ = {};
+    // マテリアル
+    Material material_ = {};
+    // オブジェクトカラー
+    ObjectColor objectColor_ = {};
 
 
 };

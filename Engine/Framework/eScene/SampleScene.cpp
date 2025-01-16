@@ -4,7 +4,6 @@
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Rendering/Sprite/Sprite.h>
 #include <Rendering/Model/ModelManager.h>
-#include <Rendering/Primitive/Ring.h>
 
 
 std::unique_ptr<BaseScene>SampleScene::Create()
@@ -14,6 +13,7 @@ std::unique_ptr<BaseScene>SampleScene::Create()
 
 SampleScene::~SampleScene()
 {
+    delete ring_;
 }
 
 void SampleScene::Initialize()
@@ -48,7 +48,8 @@ void SampleScene::Initialize()
     button_ = std::make_unique<UIButton>();
     button_->Initialize("button");
 
-
+    ring_ = new Ring(1, 2, 16, { true,true,true });
+    ring_->Generate();
 }
 
 void SampleScene::Update()
@@ -131,10 +132,7 @@ void SampleScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
-
-    Ring ring(1.0f, 2.0f, 128, { true,true,true });
-    ring.Generate();
-    ring.Draw();
+    ring_->Update();
 
 
 
@@ -150,9 +148,11 @@ void SampleScene::Draw()
     ModelManager::GetInstance()->PreDrawForAnimationModel();
     aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
+    ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    ring_->Draw();
+
     Sprite::PreDraw();
     button_->Draw();
-
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
     lineDrawer_->Draw();

@@ -10,6 +10,7 @@
 #include <Systems/Input/Input.h>
 #include <Systems/Time/GameTime.h>
 #include <UI/UIButton.h>
+#include <Rendering/Primitive/Ring.h>
 
 #include <memory>
 
@@ -48,6 +49,7 @@ private:
 
     GameTime* gameTime_;
 
+    Ring* ring_;
 
 #ifdef _DEBUG
     void ImGui();

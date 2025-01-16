@@ -1,5 +1,9 @@
 #include "Ring.h"
 #include <Rendering/LineDrawer/LineDrawer.h>
+#include <ResourceManagement/TextureManager/TextureManager.h>
+#include <Core/DirectX/DXCommon.h>
+#include <Rendering/Model/ModelManager.h>
+#include <Rendering/Light/LightingSystem.h>
 
 #include <numbers>
 
@@ -7,8 +11,15 @@ Ring::Ring(float _innerRadius, float _outerRadius, uint32_t _divide, std::array<
     innerRadius_(_innerRadius),
     outerRadius_(_outerRadius),
     divide_(_divide),
-    billboard_(_billboard)
+    billboard_(_billboard),
+    scale_({ 1,1,1 }),
+    rotation_({ 0,0,0 }),
+    quternion_({ 0,0,0,1 }),
+    translate_({ 0,0,0 })
 {
+    objectColor_.Initialize();
+    material_.Initialize("");
+    worldTransform.Initialize();
 }
 
 void Ring::Generate()
@@ -25,20 +36,20 @@ void Ring::Generate()
     for (uint32_t index = 0; index < divide_; ++index)
     {
         // 外側の頂点
-        Vertex outerVertex;
+        Mesh::VertexData outerVertex;
         // 内側の頂点
-        Vertex innerVertex;
+        Mesh::VertexData innerVertex;
 
         float angle = kDivideAngle * static_cast<float>(index);
 
         outerVertex.position = Vector3(std::cosf(angle) * outerRadius_, std::sinf(angle) * outerRadius_, 0.0f);
         outerVertex.normal = Vector3(0.0f, 0.0f, -1.0f);
-        outerVertex.uv = { kDivideUV * static_cast<float>(index),1.0f };
+        outerVertex.texcoord = { kDivideUV * static_cast<float>(index),1.0f };
 
 
         innerVertex.position = Vector3(std::cosf(angle) * innerRadius_, std::sinf(angle) * innerRadius_, 0.0f);
         innerVertex.normal = Vector3(0.0f, 0.0f, -1.0f);
-        innerVertex.uv = { kDivideUV * static_cast<float>(index),0.0f };
+        innerVertex.texcoord = { kDivideUV * static_cast<float>(index),0.0f };
 
         vertices_.push_back(outerVertex);
         vertices_.push_back(innerVertex);
@@ -52,30 +63,78 @@ void Ring::Generate()
         indices_.push_back((index + 0) % (divide_ * 2));
         indices_.push_back((index + 1) % (divide_ * 2));
 
-        indices_.push_back((index + 1) % (divide_ * 2));
-        indices_.push_back((index + 2) % (divide_ * 2));
         indices_.push_back((index + 3) % (divide_ * 2));
+        indices_.push_back((index + 2) % (divide_ * 2));
+        indices_.push_back((index + 1) % (divide_ * 2));
     }
 
+    mesh_.Initialize(vertices_, indices_);
 
+}
+
+void Ring::Update()
+{
+#ifdef _DEBUG
+
+    ImGui::Begin("Ring");
+    ImGui::DragFloat("innerRadius", &innerRadius_);
+    ImGui::DragFloat("outerRadius", &outerRadius_);
+    ImGui::DragInt("divide", reinterpret_cast<int*>(&divide_));
+    ImGui::Checkbox("billboardX", &billboard_[0]);
+    ImGui::Checkbox("billboardY", &billboard_[1]);
+    ImGui::Checkbox("billboardZ", &billboard_[2]);
+    ImGui::DragFloat3("scale", &scale_.x);
+    ImGui::DragFloat3("rotation", &rotation_.x);
+    ImGui::DragFloat3("translate", &translate_.x);
+    ImGui::Checkbox("useQuaternion", &useQuaternion_);
+    ImGui::End();
+
+
+#endif
+
+    worldTransform.transform_ = translate_;
+    worldTransform.scale_ = scale_;
+    if (useQuaternion_)
+        worldTransform.quaternion_ = quternion_;
+    else
+        worldTransform.rotate_ = rotation_;
+
+    worldTransform.UpdateData(useQuaternion_);
 }
 
 void Ring::Draw()
 {
-    static uint32_t count= 1;
-
     for (uint32_t index = 0; index < indices_.size(); index += 3)
     {
         uint32_t index0 = indices_[index + 0];
         uint32_t index1 = indices_[index + 1];
         uint32_t index2 = indices_[index + 2];
 
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index0].position, vertices_[index1].position);
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index1].position, vertices_[index2].position);
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index2].position, vertices_[index0].position);
-
+        LineDrawer::GetInstance()->RegisterPoint(vertices_[index0].position.xyz(), vertices_[index1].position.xyz());
+        LineDrawer::GetInstance()->RegisterPoint(vertices_[index1].position.xyz(), vertices_[index2].position.xyz());
+        LineDrawer::GetInstance()->RegisterPoint(vertices_[index2].position.xyz(), vertices_[index0].position.xyz());
     }
+}
 
-    count += 3;
+void Ring::Draw(const Camera& _camera, const Vector4& _color)
+{
+    ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
+    ModelManager::GetInstance()->PreDrawForObjectModel();
 
+    mesh_.QueueCommand(commandList);
+    _camera.QueueCommand(commandList, 0);//
+    worldTransform.QueueCommand(commandList, 1);//
+    material_.MaterialQueueCommand(commandList, 2);//
+    objectColor_.SetColor(_color);
+    objectColor_.QueueCommand(commandList, 3);//
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(2));//
+    LightingSystem::GetInstance()->QueueCommand(commandList,5);//
+
+    commandList->DrawIndexedInstanced(mesh_.GetIndexNum(), 1, 0, 0, 0);
+
+}
+
+void Ring::SetTexture(const std::string& _path)
+{
+    textureHandle_ = TextureManager::GetInstance()->Load(_path);
 }
