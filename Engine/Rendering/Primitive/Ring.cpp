@@ -15,7 +15,8 @@ Ring::Ring(float _innerRadius, float _outerRadius, uint32_t _divide, std::array<
     scale_({ 1,1,1 }),
     rotation_({ 0,0,0 }),
     quternion_({ 0,0,0,1 }),
-    translate_({ 0,0,0 })
+    translate_({ 0,0,0 }),
+    textureHandle_(2)
 {
     objectColor_.Initialize();
     material_.Initialize("");
@@ -133,7 +134,7 @@ void Ring::Draw(const Camera& _camera, const Vector4& _color)
     material_.MaterialQueueCommand(commandList, 2);//
     objectColor_.SetColor(_color);
     objectColor_.QueueCommand(commandList, 3);//
-    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(2));//
+    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
     LightingSystem::GetInstance()->QueueCommand(commandList,5);//
 
     commandList->DrawIndexedInstanced(mesh_.GetIndexNum(), 1, 0, 0, 0);

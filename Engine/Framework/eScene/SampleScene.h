@@ -11,6 +11,7 @@
 #include <Systems/Time/GameTime.h>
 #include <UI/UIButton.h>
 #include <Rendering/Primitive/Ring.h>
+#include <Rendering/Primitive/Ellipse.h>
 
 #include <memory>
 
@@ -50,6 +51,10 @@ private:
     GameTime* gameTime_;
 
     Ring* ring_;
+
+    EllipseModel* ellipse_;
+
+
 
 #ifdef _DEBUG
     void ImGui();
