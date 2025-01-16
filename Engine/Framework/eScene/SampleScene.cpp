@@ -13,6 +13,7 @@ std::unique_ptr<BaseScene>SampleScene::Create()
 
 SampleScene::~SampleScene()
 {
+    delete ring_;
 }
 
 void SampleScene::Initialize()
@@ -37,7 +38,7 @@ void SampleScene::Initialize()
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("AnimatedCube/AnimatedCube.gltf", "c");
+    oModel_->Initialize("testRing.gltf", "c");
 
     gameTime_ = GameTime::GetInstance();
 
@@ -47,6 +48,8 @@ void SampleScene::Initialize()
     button_ = std::make_unique<UIButton>();
     button_->Initialize("button");
 
+    ring_ = new Ring(1, 2, 16, { true,true,true });
+    ring_->Generate();
 }
 
 void SampleScene::Update()
@@ -113,7 +116,7 @@ void SampleScene::Update()
     button_->Update();
     if (button_->IsPressed())
     {
-        SceneManager::GetInstance()->ReserveScene("Title");
+        SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }
 
     if (enableDebugCamera_)
@@ -129,6 +132,9 @@ void SampleScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
+    ring_->Update();
+
+
 
 }
 
@@ -137,14 +143,16 @@ void SampleScene::Draw()
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
     //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
-    //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ModelManager::GetInstance()->PreDrawForAnimationModel();
-    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+
+    ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    ring_->Draw();
 
     Sprite::PreDraw();
     button_->Draw();
-
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
     lineDrawer_->Draw();

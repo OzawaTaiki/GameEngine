@@ -28,6 +28,14 @@ void Mesh::Initialize()
     indices_.clear();
 }
 
+void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i)
+{
+    dxCommon = DXCommon::GetInstance();
+    vertices_ = _v;
+    indices_ = _i;
+    TransferData();
+}
+
 void Mesh::TransferData()
 {
     InitializeReources();
