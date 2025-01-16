@@ -14,6 +14,7 @@ std::unique_ptr<BaseScene>SampleScene::Create()
 SampleScene::~SampleScene()
 {
     delete ring_;
+    delete ellipse_;
 }
 
 void SampleScene::Initialize()
@@ -38,7 +39,7 @@ void SampleScene::Initialize()
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("testRing.gltf", "c");
+    oModel_->Initialize("AnimSample/AnimSample.gltf", "c");
 
     gameTime_ = GameTime::GetInstance();
 
@@ -50,6 +51,10 @@ void SampleScene::Initialize()
 
     ring_ = new Ring(1, 2, 16, { true,true,true });
     ring_->Generate();
+
+    ellipse_ = new EllipseModel(1,6);
+    ellipse_->Generate();
+
 }
 
 void SampleScene::Update()
@@ -133,6 +138,7 @@ void SampleScene::Update()
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
     ring_->Update();
+    ellipse_->Update();
 
 
 
@@ -143,13 +149,16 @@ void SampleScene::Draw()
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
     //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
-    oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ModelManager::GetInstance()->PreDrawForAnimationModel();
     //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    ring_->Draw(SceneCamera_, { 1,1,1,1 });
-    ring_->Draw();
+    //ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    //ring_->Draw();
+
+    //ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
+    //ellipse_->Draw();
 
     Sprite::PreDraw();
     button_->Draw();

@@ -172,6 +172,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Rendering\Model\ObjectColor.cpp" />
     <ClCompile Include="Rendering\Model\ObjectModel.cpp" />
     <ClCompile Include="Rendering\Model\WorldTransform.cpp" />
+    <ClCompile Include="Rendering\Primitive\Ellipse.cpp" />
     <ClCompile Include="Rendering\Primitive\Ring.cpp" />
     <ClCompile Include="Rendering\Sprite\Sprite.cpp" />
     <ClCompile Include="Rendering\Sprite\SpriteManager.cpp" />
@@ -239,6 +240,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Rendering\Model\ObjectColor.h" />
     <ClInclude Include="Rendering\Model\ObjectModel.h" />
     <ClInclude Include="Rendering\Model\WorldTransform.h" />
+    <ClInclude Include="Rendering\Primitive\Ellipse.h" />
     <ClInclude Include="Rendering\Primitive\Primitive.h" />
     <ClInclude Include="Rendering\Primitive\Ring.h" />
     <ClInclude Include="Rendering\Sprite\Sprite.h" />
