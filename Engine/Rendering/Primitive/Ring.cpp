@@ -37,7 +37,7 @@ void Ring::Generate()
     float kDivideUV = 1.0f / divide_;
 
     // 頂点の計算　頂点の数 ＝ 分割数
-    for (int32_t index = 0; index < divide_; ++index)
+    for (int32_t index = 0; index <= divide_; ++index)
     {
         // 外側の頂点
         Mesh::VertexData outerVertex;
@@ -63,13 +63,13 @@ void Ring::Generate()
     for (int32_t index = 0; index < divide_ * 2; index += 2)
     {
         //  021 123 243 345 465...
-        indices_.push_back((index + 2) % (divide_ * 2));
-        indices_.push_back((index + 0) % (divide_ * 2));
-        indices_.push_back((index + 1) % (divide_ * 2));
+        indices_.push_back((index + 2));
+        indices_.push_back((index + 0));
+        indices_.push_back((index + 1));
 
-        indices_.push_back((index + 3) % (divide_ * 2));
-        indices_.push_back((index + 2) % (divide_ * 2));
-        indices_.push_back((index + 1) % (divide_ * 2));
+        indices_.push_back((index + 3));
+        indices_.push_back((index + 2));
+        indices_.push_back((index + 1));
     }
 
     mesh_.Initialize(vertices_, indices_);

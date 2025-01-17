@@ -20,10 +20,10 @@ public:
 
     void Generate() override;
 
-    void Update();
+    void Update() override;
 
-    void Draw();
-    void Draw(const Camera& _camera, const Vector4& _color = { 1,1,1,1 });
+    void Draw() override;
+    void Draw(const Camera& _camera, const Vector4& _color = { 1,1,1,1 }) override;
 
 
     //============ setter ============
