@@ -15,6 +15,7 @@ SampleScene::~SampleScene()
 {
     delete ring_;
     delete ellipse_;
+    delete cylinder_;
 }
 
 void SampleScene::Initialize()
@@ -39,7 +40,7 @@ void SampleScene::Initialize()
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("AnimSample/AnimSample.gltf", "c");
+    oModel_->Initialize("Cylinder.gltf", "c");
 
     gameTime_ = GameTime::GetInstance();
 
@@ -54,6 +55,9 @@ void SampleScene::Initialize()
 
     ellipse_ = new EllipseModel(1,6);
     ellipse_->Generate();
+
+    cylinder_ = new Cylinder(1, 1, 2, 8, true, true);
+    cylinder_->Generate();
 
 }
 
@@ -139,6 +143,7 @@ void SampleScene::Update()
     }
     ring_->Update();
     ellipse_->Update();
+    cylinder_->Update();
 
 
 
@@ -154,14 +159,17 @@ void SampleScene::Draw()
     ModelManager::GetInstance()->PreDrawForAnimationModel();
     //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    //ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    ring_->Draw(SceneCamera_, { 1,1,1,1 });
     //ring_->Draw();
 
-    //ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
+    ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
     //ellipse_->Draw();
 
+    cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
+    //cylinder_->Draw();
+
     Sprite::PreDraw();
-    button_->Draw();
+    //button_->Draw();
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
     lineDrawer_->Draw();

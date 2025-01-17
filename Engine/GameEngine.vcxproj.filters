@@ -279,6 +279,9 @@
     <ClCompile Include="Rendering\Primitive\Ellipse.cpp">
       <Filter>Rendering\Primitive</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\Primitive\Cylinder.cpp">
+      <Filter>Rendering\Primitive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -524,6 +527,9 @@
       <Filter>Rendering\Primitive</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Primitive\Ellipse.h">
+      <Filter>Rendering\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Primitive\Cylinder.h">
       <Filter>Rendering\Primitive</Filter>
     </ClInclude>
   </ItemGroup>

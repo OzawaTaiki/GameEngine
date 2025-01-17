@@ -12,6 +12,7 @@
 #include <UI/UIButton.h>
 #include <Rendering/Primitive/Ring.h>
 #include <Rendering/Primitive/Ellipse.h>
+#include <Rendering/Primitive/Cylinder.h>
 
 #include <memory>
 
@@ -53,6 +54,8 @@ private:
     Ring* ring_;
 
     EllipseModel* ellipse_;
+
+    Cylinder* cylinder_;
 
 
 
