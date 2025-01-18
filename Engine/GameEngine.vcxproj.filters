@@ -94,6 +94,9 @@
     <Filter Include="Systems\JsonBinder">
       <UniqueIdentifier>{c8199b99-d1b1-4844-8499-8cec8159eac0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Primitive">
+      <UniqueIdentifier>{f6ca89c4-8916-4e52-a39e-94df81fcb8df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DirectX\D3DResourceLeakChecker.cpp">
@@ -269,6 +272,15 @@
     </ClCompile>
     <ClCompile Include="Rendering\Light\LightingSystem.cpp">
       <Filter>Rendering\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Primitive\Ring.cpp">
+      <Filter>Rendering\Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Primitive\Ellipse.cpp">
+      <Filter>Rendering\Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Primitive\Cylinder.cpp">
+      <Filter>Rendering\Primitive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -507,6 +519,18 @@
     </ClInclude>
     <ClInclude Include="Rendering\Light\LightingSystem.h">
       <Filter>Rendering\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Primitive\Ring.h">
+      <Filter>Rendering\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Primitive\Primitive.h">
+      <Filter>Rendering\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Primitive\Ellipse.h">
+      <Filter>Rendering\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Primitive\Cylinder.h">
+      <Filter>Rendering\Primitive</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

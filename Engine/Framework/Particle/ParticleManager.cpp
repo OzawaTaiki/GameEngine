@@ -57,8 +57,6 @@ void ParticleManager::Initialize()
 
 void ParticleManager::Update(const Vector3& _cRotate)
 {
-    // billBordはshaderで計算したい
-
     Vector3 cRotate = {};
     Vector3 pRotate = {};
     Matrix4x4 billboradMat = Matrix4x4::Identity();
@@ -92,13 +90,8 @@ void ParticleManager::Update(const Vector3& _cRotate)
                     {
                         cRotate[index] = _cRotate[index];
                     }
-                    else
-                    {
-                        //pRotate[index] = it->GetRotation()[index];
-                    }
                 }
                 billboradMat = MakeAffineMatrix({ 1,1,1 }, cRotate, { 0,0,0 });
-                //billboradMat = Inverse(billboradMat);
 
                 Matrix4x4 mat = MakeScaleMatrix(it->GetScale());
                 if (group.emitterPtr->EnableBillboard())

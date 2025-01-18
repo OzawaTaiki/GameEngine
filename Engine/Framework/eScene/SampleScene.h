@@ -10,6 +10,9 @@
 #include <Systems/Input/Input.h>
 #include <Systems/Time/GameTime.h>
 #include <UI/UIButton.h>
+#include <Rendering/Primitive/Ring.h>
+#include <Rendering/Primitive/Ellipse.h>
+#include <Rendering/Primitive/Cylinder.h>
 
 #include <memory>
 
@@ -47,6 +50,13 @@ private:
     std::unique_ptr<UIButton> button_ = nullptr;
 
     GameTime* gameTime_;
+
+    Ring* ring_;
+
+    EllipseModel* ellipse_;
+
+    Cylinder* cylinder_;
+
 
 
 #ifdef _DEBUG
