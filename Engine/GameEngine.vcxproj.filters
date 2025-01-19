@@ -97,6 +97,9 @@
     <Filter Include="Rendering\Primitive">
       <UniqueIdentifier>{f6ca89c4-8916-4e52-a39e-94df81fcb8df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\UVTransform">
+      <UniqueIdentifier>{11822056-8e2f-4755-bd4f-3868eca7841f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DirectX\D3DResourceLeakChecker.cpp">
@@ -282,10 +285,12 @@
     <ClCompile Include="Rendering\Primitive\Cylinder.cpp">
       <Filter>Rendering\Primitive</Filter>
     </ClCompile>
-    <ClCompile Include="UVTransform.h">
-      <Filter>Physics</Filter>
+    <ClCompile Include="Systems\UVTransform\UVTransform.cpp">
+      <Filter>Systems\UVTransform</Filter>
     </ClCompile>
-    <ClCompile Include="UVTransform.cpp" />
+    <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp">
+      <Filter>Systems\UVTransform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -535,6 +540,18 @@
     </ClInclude>
     <ClInclude Include="Rendering\Primitive\Cylinder.h">
       <Filter>Rendering\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="IUVAnimation.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\UVTransform\UVTransform.h">
+      <Filter>Systems\UVTransform</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\UVTransform\IUVAnimation.h">
+      <Filter>Systems\UVTransform</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h">
+      <Filter>Systems\UVTransform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

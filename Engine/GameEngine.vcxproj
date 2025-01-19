@@ -189,12 +189,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Systems\Utility\Debug.cpp" />
     <ClCompile Include="Systems\Utility\JsonLoader.cpp" />
     <ClCompile Include="Systems\Utility\RandomGenerator.cpp" />
+    <ClCompile Include="Systems\UVTransform\UVTransform.cpp" />
+    <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="UI\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="UI\UIBase.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UISprite.cpp" />
-    <ClCompile Include="UVTransform.cpp" />
-    <ClCompile Include="UVTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\DirectX\BlendMode.h" />
@@ -261,10 +261,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Systems\Utility\Debug.h" />
     <ClInclude Include="Systems\Utility\JsonLoader.h" />
     <ClInclude Include="Systems\Utility\RandomGenerator.h" />
+    <ClInclude Include="Systems\UVTransform\IUVAnimation.h" />
+    <ClInclude Include="Systems\UVTransform\UVTransform.h" />
+    <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="UI\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="UI\UIBase.h" />
     <ClInclude Include="UI\UIButton.h" />
     <ClInclude Include="UI\UISprite.h" />
+    <ClInclude Include="IUVAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">
