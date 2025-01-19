@@ -282,6 +282,10 @@
     <ClCompile Include="Rendering\Primitive\Cylinder.cpp">
       <Filter>Rendering\Primitive</Filter>
     </ClCompile>
+    <ClCompile Include="UVTransform.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="UVTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">

@@ -193,6 +193,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="UI\UIBase.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UISprite.cpp" />
+    <ClCompile Include="UVTransform.cpp" />
+    <ClCompile Include="UVTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\DirectX\BlendMode.h" />
