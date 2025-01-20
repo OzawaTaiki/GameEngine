@@ -191,6 +191,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Systems\Utility\Debug.cpp" />
     <ClCompile Include="Systems\Utility\JsonLoader.cpp" />
     <ClCompile Include="Systems\Utility\RandomGenerator.cpp" />
+    <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Systems\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="UI\ImGuiManager\ImGuiManager.cpp" />
@@ -266,6 +267,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Systems\Utility\JsonLoader.h" />
     <ClInclude Include="Systems\Utility\RandomGenerator.h" />
     <ClInclude Include="Systems\UVTransform\IUVAnimation.h" />
+    <ClInclude Include="Systems\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Systems\UVTransform\UVTransform.h" />
     <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="UI\ImGuiManager\ImGuiManager.h" />

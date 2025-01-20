@@ -293,6 +293,7 @@
     </ClCompile>
     <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -557,5 +558,8 @@
     </ClInclude>
     <ClInclude Include="MyGame.h" />
     <ClInclude Include="Framework.h" />
+    <ClInclude Include="Systems\UVTransform\SpriteSheetAnimetion.h">
+      <Filter>Systems\UVTransform</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
