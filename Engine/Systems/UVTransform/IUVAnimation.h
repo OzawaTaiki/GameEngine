@@ -48,13 +48,13 @@ public:
     /// 再生時間を設定する
     /// </summary>
     /// <param name="duration"></param>
-    virtual void SetDuration(float duration) = 0;
+    virtual void SetDuration(float _duration) = 0;
 
     /// <summary>
     /// ループ再生するかどうかを設定する
     /// </summary>
     /// <param name="looping"></param>
-    virtual void SetLooping(bool looping) = 0;
+    virtual void SetLooping(bool _looping) = 0;
 
     /// <summary>
     /// アニメーション再生完了時のコールバックを設定する

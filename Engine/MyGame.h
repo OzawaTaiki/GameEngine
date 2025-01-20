@@ -2,8 +2,6 @@
 
 #include <Framework.h>
 
-
-
 class MyGame : public Framework
 {
 public:
