@@ -274,7 +274,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="UI\UIBase.h" />
     <ClInclude Include="UI\UIButton.h" />
     <ClInclude Include="UI\UISprite.h" />
-    <ClInclude Include="IUVAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">

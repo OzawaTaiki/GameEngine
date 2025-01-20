@@ -28,7 +28,7 @@ void SampleScene::Initialize()
 
     plane_ = std::make_unique<ObjectModel>();
     plane_->Initialize("Tile/Tile.gltf", "Ground");
-    plane_->uvScale_ = { 100,100 };
+    plane_->GetUVTransform().SetScale(Vector2(100, 100));
 
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->Initialize();
@@ -58,6 +58,18 @@ void SampleScene::Initialize()
 
     cylinder_ = new Cylinder(1, 1, 2, 8, true, true);
     cylinder_->Generate();
+
+    //uvTransformAnimetion_.AddTransform(&aModel_->GetUVTransform());
+    //uvTransformAnimetion_.SetDuration(1.0f);
+    //uvTransformAnimetion_.SetRotationSpeed(0.1f);
+    //uvTransformAnimetion_.SetLooping(true);
+
+    spriteSheetAnimetion_.AddTransform(&aModel_->GetUVTransform());
+    spriteSheetAnimetion_.SetDuration(1.0f);
+    spriteSheetAnimetion_.SetLooping(true);
+    spriteSheetAnimetion_.SetSheetNumX(8);
+    spriteSheetAnimetion_.SetSheetNumY(8);
+    spriteSheetAnimetion_.SetSheetNum(64);
 
 }
 
@@ -92,9 +104,15 @@ void SampleScene::Update()
     {
         gameTime_->GetChannel("default").SetGameSpeed(0.5f);
     }
+    ImGui::SameLine();
     if (ImGui::Button("normal"))
     {
         gameTime_->GetChannel("default").SetGameSpeed(1.0f);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("fast"))
+    {
+        gameTime_->GetChannel("default").SetGameSpeed(2.0f);
     }
 
     if (ImGui::Button("Add PL"))
@@ -114,11 +132,17 @@ void SampleScene::Update()
         LightingSystem::GetInstance()->SetLightGroup(lights_.get());
     }
 
+    if (ImGui::Button("Play"))
+    {
+        spriteSheetAnimetion_.Play();
+    }
+
     lights_->DrawDebugWindow();
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
 
+    spriteSheetAnimetion_.Update(gameTime_->GetUnScaleDeltaTime_float());
     plane_->Update();
     aModel_->Update();
     oModel_->Update();
@@ -157,15 +181,15 @@ void SampleScene::Draw()
     //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ModelManager::GetInstance()->PreDrawForAnimationModel();
-    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    //ring_->Draw(SceneCamera_, { 1,1,1,1 });
     //ring_->Draw();
 
-    ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
+    //ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
     //ellipse_->Draw();
 
-    cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
+    //cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
     //cylinder_->Draw();
 
     Sprite::PreDraw();

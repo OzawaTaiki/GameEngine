@@ -293,7 +293,9 @@
     </ClCompile>
     <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="Framework.cpp" />
-    <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp" />
+    <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp">
+      <Filter>Systems\UVTransform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -543,9 +545,6 @@
     </ClInclude>
     <ClInclude Include="Rendering\Primitive\Cylinder.h">
       <Filter>Rendering\Primitive</Filter>
-    </ClInclude>
-    <ClInclude Include="IUVAnimation.h">
-      <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Systems\UVTransform\UVTransform.h">
       <Filter>Systems\UVTransform</Filter>

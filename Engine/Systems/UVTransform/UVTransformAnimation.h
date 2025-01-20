@@ -78,6 +78,24 @@ public:
     /// <returns></returns>
     float GetProgress() const override;
 
+    /// <summary>
+    /// スクロール速度を設定
+    /// </summary>
+    /// <param name="_speed"></param>
+    void SetScrollSpeed(const Vector2& _speed) { scrollSpeed_ = _speed; }
+
+    /// <summary>
+    /// スケール速度を設定
+    /// </summary>
+    /// <param name="_speed"></param>
+    void SetScaleSpeed(const Vector2& _speed) { scaleSpeed_ = _speed; }
+
+    /// <summary>
+    /// 回転速度を設定
+    /// </summary>
+    /// <param name="_speed"></param>
+    void SetRotationSpeed(float _speed) { rotationSpeed_ = _speed; }
+
 private:
 
     std::vector<UVTransform*> transforms_;
