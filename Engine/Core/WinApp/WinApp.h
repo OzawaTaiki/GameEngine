@@ -20,13 +20,13 @@ public: // メンバ関数
 	void Initilize(const wchar_t* _title = L"GameEngine",
 				   UINT _style = WS_OVERLAPPEDWINDOW,
 				   uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_);
-	void Filalze();
+	void Finalize() const;
 
 	bool ProcessMessage();
 
 	//アクセッサ
-	HWND GetHwnd() { return hwnd_; }
-	HINSTANCE GetHInstance() { return wndClass_.hInstance; }
+	HWND GetHwnd() const { return hwnd_; }
+	HINSTANCE GetHInstance()  const { return wndClass_.hInstance; }
 private: // メンバ変数
 	// ウィンドウクラス
 	WNDCLASS wndClass_{};

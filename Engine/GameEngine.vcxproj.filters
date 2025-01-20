@@ -291,6 +291,8 @@
     <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp">
       <Filter>Systems\UVTransform</Filter>
     </ClCompile>
+    <ClCompile Include="MyGame.cpp" />
+    <ClCompile Include="Framework.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -553,5 +555,7 @@
     <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h">
       <Filter>Systems\UVTransform</Filter>
     </ClInclude>
+    <ClInclude Include="MyGame.h" />
+    <ClInclude Include="Framework.h" />
   </ItemGroup>
 </Project>
