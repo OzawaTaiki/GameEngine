@@ -2,6 +2,8 @@
 
 #include <Systems/UVTransform/IUVAnimation.h>
 
+#include <Physics/Math/Vector2.h>
+
 
 /// <summary>
 /// 連番画像を使用したアニメーションを制御するクラス
