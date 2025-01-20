@@ -172,7 +172,7 @@ void SampleScene::Draw()
     //button_->Draw();
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
-    lineDrawer_->Draw();
+    //lineDrawer_->Draw();
 
 }
 
