@@ -120,8 +120,8 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
     {
         float rad = index * kEvery;
         float nextRad = (index + 1) * kEvery;
-        Vector3 spos = _center + Vector3{ std::cos(rad) * _radius, std::sin(rad) * _radius, 0.0f };
-        Vector3 epos = _center + Vector3{ std::cos(nextRad) * _radius, std::sin(nextRad) * _radius, 0.0f };
+        Vector3 spos = _center + Vector3{ std::cosf(rad) * _radius, 0.0f,std::sinf(rad) * _radius };
+        Vector3 epos = _center + Vector3{ std::cosf(nextRad) * _radius, 0.0f,std::sinf(nextRad) * _radius };
         RegisterPoint(spos, epos);
     }
 }
