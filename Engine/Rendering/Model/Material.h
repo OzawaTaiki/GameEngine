@@ -4,6 +4,8 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Matrix4x4.h>
 
+#include <Systems/UVTransform/UVTransform.h>
+
 #include <cstdint>
 
 #include <d3d12.h>
@@ -15,9 +17,6 @@ class Material
 public:
 
     /// uvTransform
-    Vector2         transform_                      = {0.0f, 0.0f};         // 移動
-    Vector2         scale_                          = { 1.0f, 1.0f };       // スケール
-    float           rotation_                       = 0.0f;                 // 回転
 
     float           shiness_                        = 40.0f;                //
 
@@ -28,6 +27,8 @@ public:
     uint32_t GetTexturehandle() const { return textureHandle_; }
     ID3D12Resource* GetResource() { return resorces_.Get(); }
 
+    UVTransform& GetUVTransform() { return uvTransform_; }
+
 
     void TransferData();
     void MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index) const;
@@ -35,6 +36,8 @@ public:
     void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index,uint32_t _textureHandle) const;
 
 private:
+
+    UVTransform     uvTransform_ = {};
 
     std::string     name_                           = {};
     std::string     texturePath_                    = {};

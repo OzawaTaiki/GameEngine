@@ -35,7 +35,6 @@ void ObjectModel::Update(const bool _showImgui)
     else
         worldTransform_.rotate_ = rotate_;
     worldTransform_.UpdateData();
-    UpdateUVTransform();
 }
 
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
@@ -59,9 +58,6 @@ void ObjectModel::SetModel(const std::string& _filePath)
 
 void ObjectModel::UpdateUVTransform()
 {
-    model_->SetUVTransform(uvTransform_, 0);
-    model_->SetUVScale(uvScale_, 0);
-    model_->SetUVRotation(uvRotation_, 0);
 }
 
 #ifdef _DEBUG

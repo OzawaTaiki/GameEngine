@@ -139,11 +139,13 @@ float SpriteSheetAnimation::GetProgress() const
 void SpriteSheetAnimation::SetSheetNumX(uint32_t _sheetNumX)
 {
     sheetNumX_ = _sheetNumX;
+    sheetSize_ = Vector2(1.0f / static_cast<float>(sheetNumX_), 1.0f / static_cast<float>(sheetNumY_));
 }
 
 void SpriteSheetAnimation::SetSheetNumY(uint32_t _sheetNumY)
 {
     sheetNumY_ = _sheetNumY;
+    sheetSize_ = Vector2(1.0f / static_cast<float>(sheetNumX_), 1.0f / static_cast<float>(sheetNumY_));
 }
 
 void SpriteSheetAnimation::SetSheetNum(uint32_t _sheetNum)

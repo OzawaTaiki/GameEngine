@@ -13,6 +13,8 @@
 #include <Rendering/Primitive/Ring.h>
 #include <Rendering/Primitive/Ellipse.h>
 #include <Rendering/Primitive/Cylinder.h>
+#include <Systems/UVTransform/SpriteSheetAnimetion.h>
+#include <Systems/UVTransform/UVTransformAnimation.h>
 
 #include <memory>
 
@@ -56,6 +58,10 @@ private:
     EllipseModel* ellipse_;
 
     Cylinder* cylinder_;
+
+    UVTransformAnimation uvTransformAnimetion_;
+
+    SpriteSheetAnimation spriteSheetAnimetion_;
 
 
 

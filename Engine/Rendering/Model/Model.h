@@ -45,9 +45,7 @@ public:
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
 
-    void SetUVTransform(const Vector2& _transform,uint32_t _index);
-    void SetUVScale(const Vector2& _scale, uint32_t _index);
-    void SetUVRotation(float _rotation, uint32_t _index);
+    UVTransform& GetUVTransform(uint32_t _index = 0) { return material_[_index]->GetUVTransform(); }
 
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }

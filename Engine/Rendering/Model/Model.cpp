@@ -36,6 +36,9 @@ void Model::Update(float _deltaTime)
     skeleton_.Update();
     skinCluster_.Update(skeleton_.GetJoints());
 
+    for (auto& material : material_)
+    {
+    }
 }
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
@@ -52,6 +55,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32
         // トランスフォーム
         commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
         // マテリアル
+        material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(commandList, 2);
         // カラー
         _color->QueueCommand(commandList, 3);
@@ -79,6 +83,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         // トランスフォーム
         commandList->SetGraphicsRootConstantBufferView(1, _transform.GetResource()->GetGPUVirtualAddress());
         // マテリアル
+        material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(commandList, 2);
         // カラー
         _color->QueueCommand(commandList, 3);
@@ -129,6 +134,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _a
             mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
             skinCluster_.QueueCommand(_commandList);
         }
+        material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
@@ -143,6 +149,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     for (auto& mesh : mesh_)
     {
         mesh->QueueCommand(_commandList);
+        material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
@@ -171,24 +178,6 @@ void Model::ToIdle(float _timeToIdle)
         currentAnimation_ = preAnimation_;
         currentAnimation_->ToIdle(_timeToIdle);
     }
-}
-
-void Model::SetUVTransform(const Vector2& _transform, uint32_t _index)
-{
-    material_[_index]->transform_ = _transform;
-    material_[_index]->TransferData();
-}
-
-void Model::SetUVScale(const Vector2& _scale, uint32_t _index)
-{
-    material_[_index]->scale_ = _scale;
-    material_[_index]->TransferData();
-}
-
-void Model::SetUVRotation(float _rotation, uint32_t _index)
-{
-    material_[_index]->rotation_ = _rotation;
-    material_[_index]->TransferData();
 }
 
 Vector3 Model::GetMin(size_t _index) const

@@ -10,9 +10,10 @@ void Material::Initialize(const std::string& _texturepath)
 	resorces_ = dxCommon->CreateBufferResource(sizeof(DataForGPU));
 	resorces_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
 
-	transform_ = { 0.0f,0.0f };
-	scale_ = { 1.0f,1.0f };
-	rotation_ = 0.0f;
+	uvTransform_.SetOffset(Vector2(0.0f, 0.0f));
+	uvTransform_.SetScale(Vector2(1.0f, 1.0f));
+	uvTransform_.SetRotation(0.0f);
+
 
 	shiness_ = 40.0f;
 
@@ -35,10 +36,7 @@ void Material::LoadTexture()
 
 void Material::TransferData()
 {
-	Vector3 trans = { transform_,0.0f };
-	Vector3 scale = { scale_,1.0f };
-	Vector3 rotate = { 0.0f,0.0f ,rotation_ };
-	Matrix4x4 affine = MakeAffineMatrix(scale, rotate, trans);
+	Matrix4x4 affine = uvTransform_.GetMatrix();
 
 	constMap_->uvTransform = affine;
 	constMap_->shininess = shiness_;
