@@ -59,17 +59,18 @@ void SampleScene::Initialize()
     cylinder_ = new Cylinder(1, 1, 2, 8, true, true);
     cylinder_->Generate();
 
-    //uvTransformAnimetion_.AddTransform(&aModel_->GetUVTransform());
-    //uvTransformAnimetion_.SetDuration(1.0f);
+    uvTransformAnimetion_.AddTransform(&plane_->GetUVTransform());
+    uvTransformAnimetion_.SetDuration(1.0f);
     //uvTransformAnimetion_.SetRotationSpeed(0.1f);
-    //uvTransformAnimetion_.SetLooping(true);
+    uvTransformAnimetion_.SetScrollSpeed({ 0.1f,0.1f });
+    uvTransformAnimetion_.SetLooping(true);
 
-    spriteSheetAnimetion_.AddTransform(&aModel_->GetUVTransform());
-    spriteSheetAnimetion_.SetDuration(1.0f);
-    spriteSheetAnimetion_.SetLooping(true);
-    spriteSheetAnimetion_.SetSheetNumX(8);
-    spriteSheetAnimetion_.SetSheetNumY(8);
-    spriteSheetAnimetion_.SetSheetNum(64);
+    //spriteSheetAnimetion_.AddTransform(&aModel_->GetUVTransform());
+    //spriteSheetAnimetion_.SetDuration(1.0f);
+    //spriteSheetAnimetion_.SetLooping(true);
+    //spriteSheetAnimetion_.SetSheetNumX(8);
+    //spriteSheetAnimetion_.SetSheetNumY(8);
+    //spriteSheetAnimetion_.SetSheetNum(64);
 
 }
 
@@ -134,15 +135,16 @@ void SampleScene::Update()
 
     if (ImGui::Button("Play"))
     {
-        spriteSheetAnimetion_.Play();
+        //spriteSheetAnimetion_.Play();
+        uvTransformAnimetion_.Play();
     }
 
     lights_->DrawDebugWindow();
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
-
-    spriteSheetAnimetion_.Update(gameTime_->GetUnScaleDeltaTime_float());
+    uvTransformAnimetion_.Update(gameTime_->GetChannel("default").GetDeltaTime<float>());
+    //spriteSheetAnimetion_.Update(gameTime_->GetChannel("default").GetDeltaTime<float>());
     plane_->Update();
     aModel_->Update();
     oModel_->Update();
@@ -177,19 +179,19 @@ void SampleScene::Draw()
 {
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
-    //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
     //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ModelManager::GetInstance()->PreDrawForAnimationModel();
-    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    //ring_->Draw(SceneCamera_, { 1,1,1,1 });
+    ring_->Draw(SceneCamera_, { 1,1,1,1 });
     //ring_->Draw();
 
-    //ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
+    ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
     //ellipse_->Draw();
 
-    //cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
+    cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
     //cylinder_->Draw();
 
     Sprite::PreDraw();
