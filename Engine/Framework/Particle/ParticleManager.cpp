@@ -1,6 +1,5 @@
 #include "ParticleManager.h"
 #include <Core/DirectX/DXCommon.h>
-#include <Core/DirectX/PSOManager.h>
 #include <ResourceManagement/SRVManager.h>
 #include <ResourceManagement/TextureManager/TextureManager.h>
 #include <Framework/Camera/Camera.h>
@@ -43,11 +42,13 @@ void ParticleManager::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
 
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle",BlendMode::Add);
+    PSOFlags psoFlags = PSOFlags::Type_Particle | PSOFlags::Blend_Add | PSOFlags::Cull_Back;
+
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags);
     assert(pso.has_value());
     pipelineState_[BlendMode::Add] = pso.value();
 
-   auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Particle");
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags);
    assert(rootSignature.has_value());
    rootsignature_ = rootSignature.value();
 
@@ -173,13 +174,63 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
 
     group.blendMode = _blendMode;
 
+    group.psoFlags = PSOFlags::Type_Particle | PSOFlags::Cull_Back | GetBlendMode(_blendMode);
     if (!pipelineState_.contains(_blendMode))
     {
-        auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Particle", _blendMode);
+
+        auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(group.psoFlags);
         assert(pso.has_value());
         pipelineState_[_blendMode] = pso.value();
     }
 
+}
+
+void ParticleManager::CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, PSOFlags _flags, uint32_t _textureHandle)
+{
+    if (groups_.contains(_groupName))
+        return;
+
+    std::string groupName = _groupName;
+    if (!_emitterPtr)
+        groupName += "NoEmitter";
+
+    Group& group = groups_[groupName];
+    group.model = Model::CreateFromObj(_modelPath);
+    if (_textureHandle == UINT32_MAX)
+        group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
+    else
+        group.textureHandle = _textureHandle;
+
+    group.srvIndex = srvManager_->Allocate();
+    group.resource = DXCommon::GetInstance()->CreateBufferResource(sizeof(constantBufferData) * kGroupMaxInstance);
+    group.resource->Map(0, nullptr, reinterpret_cast<void**>(&group.constMap));
+
+    srvManager_->CreateSRVForStructureBuffer(group.srvIndex, group.resource.Get(), kGroupMaxInstance, sizeof(constantBufferData));
+
+    group.instanceNum = 0;
+
+    if (!_emitterPtr)
+    {
+        group.emitterPtr = nullptr;
+    }
+    else
+    {
+        group.emitterPtr = _emitterPtr;
+    }
+
+    if (IsValidPSOFlags(_flags))
+        group.psoFlags = _flags;
+    else
+        assert("PSOFlagsが無効です" && false);
+
+    BlendMode blendMode = GetBlendMode(_flags);
+
+    if (!pipelineState_.contains(blendMode))
+    {
+        auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(group.psoFlags);
+        assert(pso.has_value());
+        pipelineState_[blendMode] = pso.value();
+    }
 }
 
 void ParticleManager::DeleteParticleGroup(const std::string& _groupName)

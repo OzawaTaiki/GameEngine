@@ -4,10 +4,13 @@
 #include <Physics/Math/Vector3.h>
 #include <Physics/Math/Vector4.h>
 #include <Physics/Math/Matrix4x4.h>
+#include <Core/DirectX/PSOManager.h>
 
 #include <d3d12.h>
 #include <wrl.h>
 #include <array>
+
+
 class LineDrawer
 {
 public:
@@ -26,6 +29,8 @@ public:
 
 private:
     void TransferData();
+
+    PSOFlags psoFlags_;
 
     const uint32_t kMaxNum = 4096u * 8u;
     uint32_t index = 0u;

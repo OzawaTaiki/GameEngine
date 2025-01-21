@@ -1,5 +1,4 @@
 #include "LineDrawer.h"
-#include <Core/DirectX/PSOManager.h>
 #include <Core/DirectX/DXCommon.h>
 #include <cassert>
 #include <numbers>
@@ -14,17 +13,19 @@ LineDrawer* LineDrawer::GetInstance()
 
 void LineDrawer::Initialize()
 {
+    psoFlags_ = PSOFlags::Type_LineDrawer | PSOFlags::Blend_Normal | PSOFlags::Cull_None;
+
     index = 0u;
     color_ = { 0.0f,0.0f,0.0f,1.0f };
 
     /// PSOを取得
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("LineDrawer", BlendMode::Normal);
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
     graphicsPipelineState_ = pso.value();
 
     /// RootSingnatureを取得
-    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("LineDrawer");
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_);
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_ = rootSignature.value();
