@@ -25,37 +25,39 @@ void PSOManager::Initialize()
     assert(SUCCEEDED(hr));
 
 
-    CreatePSOForModel();
-    CreatePSOForAnimationModel();
-    CreatePSOForSprite();
-    CreatePSOForLineDrawer();
-    CreatePSOForParticle();
+    CreatePSOForModel(PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back);
+    CreatePSOForAnimationModel(PSOFlags::Type_AnimationModel | PSOFlags::Blend_Normal | PSOFlags::Cull_Back);
+    CreatePSOForSprite(PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back);
+    CreatePSOForLineDrawer(PSOFlags::Type_LineDrawer | PSOFlags::Blend_Normal | PSOFlags::Cull_None);
+    CreatePSOForParticle(PSOFlags::Type_Particle | PSOFlags::Blend_Add | PSOFlags::Cull_Back);
 }
 
-std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(const std::string& _key, BlendMode _mode)
+std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags _flag)
 {
-    size_t index = static_cast<size_t>(_mode);
+    size_t index = static_cast<size_t>(_flag);
     // 要素があるか確認
-    auto it = graphicsPipelineStates_.find(_key);
+    auto it = graphicsPipelineStates_.find(index);
     // あったらそれを返す
     if (it != graphicsPipelineStates_.end())
-        return graphicsPipelineStates_[_key][index].Get();
+        return graphicsPipelineStates_[index].Get();
     // なかったらnullを返す
     else
         return std::nullopt;
 }
 
-std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(const std::string& _key)
+std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(PSOFlags _flag)
 {
+    size_t type = GetType(_flag);
     // 要素があるか確認
-    auto it = rootSignatures_.find(_key);
+    auto it = rootSignatures_.find(type);
     // あったらそれを返す
     if (it != rootSignatures_.end())
-        return rootSignatures_[_key].Get();
+        return rootSignatures_[type].Get();
     // なかったらnullを返す
     else
         return std::nullopt;
 }
+
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
     const std::wstring& _filePath,
@@ -119,10 +121,13 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
  	return shaderBlob;
 }
 
-void PSOManager::CreatePSOForModel()
+void PSOManager::CreatePSOForModel(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
+    size_t type = GetType(_flags);
+
+#pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
@@ -133,6 +138,8 @@ void PSOManager::CreatePSOForModel()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+
+#pragma endregion
 
 #pragma region RootSignature
 
@@ -181,22 +188,6 @@ void PSOManager::CreatePSOForModel()
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[5].Descriptor.ShaderRegister = 3;
 
-    ////directinalLight
-    //rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    //rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    //rootParameters[5].Descriptor.ShaderRegister = 3;
-
-    ////pointLight
-    //rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    //rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    //rootParameters[6].Descriptor.ShaderRegister = 4;
-
-    ////spotlight
-    //rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    //rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    //rootParameters[7].Descriptor.ShaderRegister = 5;
-
-
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
 
@@ -209,14 +200,15 @@ void PSOManager::CreatePSOForModel()
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr))
     {
-    	Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-    	assert(false);
+        Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        assert(false);
     }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Model"]));
-       assert(SUCCEEDED(hr));
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
+    assert(SUCCEEDED(hr));
 
 #pragma endregion
 
+#pragma region DepthStencilState
     //DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     //Depthの機能を有効にする
@@ -225,9 +217,9 @@ void PSOManager::CreatePSOForModel()
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     //比較関数はLessEqeul つまり近ければ描画される
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+#pragma endregion
 
-
-
+#pragma region InputLayout
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -248,27 +240,35 @@ void PSOManager::CreatePSOForModel()
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
     inputLayoutDesc.NumElements = _countof(inputElementDescs);
+#pragma endregion
 
-
+#pragma region Shader
     /// shaderをコンパイルする
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Object3d.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
     Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Object3d.PS.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
+#pragma endregion
 
+#pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
+    blendDesc = GetBlendDesc(_flags);
+#pragma endregion
+
+#pragma region RasterizerState
 
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    //裏面(時計回り)を表示しない
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+    rasterizerDesc = GetRasterizerDesc(_flags);
+
     //三角形を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+#pragma endregion
 
     // PSOを生成する
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_["Model"].Get();                                      // RootSignature
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                         // RootSignature
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
     graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
@@ -284,23 +284,25 @@ void PSOManager::CreatePSOForModel()
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
-    for (uint32_t i = 0; i < static_cast<uint32_t>(BlendMode::ModeNum); ++i)
-    {
-        BlendMode currentMode = static_cast<BlendMode>(i);
-        graphicsPipelineStateDesc.BlendState = GetBlendDesc(currentMode);                                                               // BlendState
 
-        hr = dxCommon_->GetDevice()->
-            CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-                                        IID_PPV_ARGS(graphicsPipelineStates_["Model"][static_cast<size_t>(i)].GetAddressOf()));
-        assert(SUCCEEDED(hr));
-    }
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
+
+    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+
 }
 
-void PSOManager::CreatePSOForAnimationModel()
+void PSOManager::CreatePSOForAnimationModel(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
+    size_t type = GetType(_flags);
+
+#pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
@@ -311,6 +313,7 @@ void PSOManager::CreatePSOForAnimationModel()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+#pragma endregion
 
 #pragma region RootSignature
 
@@ -395,11 +398,13 @@ void PSOManager::CreatePSOForAnimationModel()
         Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["AnimationModel"]));
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
     assert(SUCCEEDED(hr));
 
 #pragma endregion
 
+#pragma region DepthStencilState
     //DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     //Depthの機能を有効にする
@@ -408,9 +413,9 @@ void PSOManager::CreatePSOForAnimationModel()
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     //比較関数はLessEqeul つまり近ければ描画される
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+#pragma endregion
 
-
-
+#pragma region InputLayout
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[5] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -431,7 +436,7 @@ void PSOManager::CreatePSOForAnimationModel()
 
     inputElementDescs[3].SemanticName = "WEIGHT";
     inputElementDescs[3].SemanticIndex = 0;
-    inputElementDescs[3].Format= DXGI_FORMAT_R32G32B32A32_FLOAT;
+    inputElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
     inputElementDescs[3].InputSlot = 1;
     inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
@@ -444,27 +449,36 @@ void PSOManager::CreatePSOForAnimationModel()
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
     inputLayoutDesc.NumElements = _countof(inputElementDescs);
+#pragma endregion
 
-
+#pragma region Shader
     /// shaderをコンパイルする
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"SkinningObject3d.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
     Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Object3d.PS.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
+#pragma endregion
 
+#pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
 
+    blendDesc = GetBlendDesc(_flags);
+#pragma endregion
+
+#pragma region RasterizerState
+
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    //裏面(時計回り)を表示しない
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-    //三角形を塗りつぶす
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+    rasterizerDesc = GetRasterizerDesc(_flags);
+
+#pragma endregion
+
 
     // PSOを生成する
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_["AnimationModel"].Get();                                      // RootSignature
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                      // RootSignature
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
     graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
@@ -480,23 +494,25 @@ void PSOManager::CreatePSOForAnimationModel()
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
-    for (uint32_t i = 0; i < static_cast<uint32_t>(BlendMode::ModeNum); ++i)
-    {
-        BlendMode currentMode = static_cast<BlendMode>(i);
-        graphicsPipelineStateDesc.BlendState = GetBlendDesc(currentMode);                                                               // BlendState
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
 
-        hr = dxCommon_->GetDevice()->
-            CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-                                        IID_PPV_ARGS(graphicsPipelineStates_["AnimationModel"][static_cast<size_t>(i)].GetAddressOf()));
-        assert(SUCCEEDED(hr));
-    }
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
+
+    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+
 }
 
-void PSOManager::CreatePSOForSprite()
+void PSOManager::CreatePSOForSprite(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
+    size_t type = GetType(_flags);
+
+#pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
@@ -507,6 +523,7 @@ void PSOManager::CreatePSOForSprite()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+#pragma endregion
 
 #pragma region RootSignature
 
@@ -557,16 +574,20 @@ void PSOManager::CreatePSOForSprite()
         Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Sprite"]));
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
     assert(SUCCEEDED(hr));
 
 #pragma endregion
 
+#pragma region DepthStencilState
     //DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     //Depthの機能を有効にする
     depthStencilDesc.DepthEnable = false;
+#pragma endregion
 
+#pragma region InputLayout
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -582,34 +603,32 @@ void PSOManager::CreatePSOForSprite()
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
     inputLayoutDesc.NumElements = _countof(inputElementDescs);
+#pragma endregion
 
-
+#pragma region Shader
     /// shaderをコンパイルする
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ComplieShader(L"Sprite.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
     Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = ComplieShader(L"Sprite.PS.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
+#pragma endregion
 
+#pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
-    //すべての色要素を書き込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+    blendDesc = GetBlendDesc(_flags);
+#pragma endregion
 
+#pragma region RasterizerState
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    rasterizerDesc = GetRasterizerDesc(_flags);
+
+#pragma endregion
 
     // PSOを生成する
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_["Sprite"].Get();                                     // RootSignature
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                         // RootSignature
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
     graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
@@ -625,23 +644,25 @@ void PSOManager::CreatePSOForSprite()
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
-    for (uint32_t i = 0; i < static_cast<uint32_t>(BlendMode::ModeNum); ++i)
-    {
-        BlendMode currentMode = static_cast<BlendMode>(i);
-        graphicsPipelineStateDesc.BlendState = GetBlendDesc(currentMode);                                                               // BlendState
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
 
-        hr = dxCommon_->GetDevice()->
-            CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-                                        IID_PPV_ARGS(graphicsPipelineStates_["Sprite"][static_cast<size_t>(i)].GetAddressOf()));
-        assert(SUCCEEDED(hr));
-    }
+    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+
 }
 
-void PSOManager::CreatePSOForLineDrawer()
+void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
+    size_t type = GetType(_flags);
+
+#pragma region Sampler
+    //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
@@ -652,6 +673,8 @@ void PSOManager::CreatePSOForLineDrawer()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // PixelShaderで使う
+#pragma endregion
+
 #pragma region RootSignature
 
     /// RootSignatrueを生成する
@@ -681,19 +704,22 @@ void PSOManager::CreatePSOForLineDrawer()
         Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["LineDrawer"]));
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
     assert(SUCCEEDED(hr));
 
 #pragma endregion
 
+#pragma region DepthStencilState
     //DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     depthStencilDesc.DepthEnable = true;
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
     depthStencilDesc.StencilEnable = false;
+#pragma endregion
 
-
+#pragma region InputLayout
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -701,31 +727,35 @@ void PSOManager::CreatePSOForLineDrawer()
     inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
     inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
-
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
     inputLayoutDesc.NumElements = _countof(inputElementDescs);
+#pragma endregion
 
+#pragma region Shader
     /// shaderをコンパイルする
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ComplieShader(L"LineDrawer.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
     Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = ComplieShader(L"LineDrawer.PS.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
+#pragma endregion
 
+#pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
     //すべての色要素を書き込む
-    blendDesc = GetBlendDesc(BlendMode::Normal);
+    blendDesc = GetBlendDesc(_flags);
+#pragma endregion
 
+#pragma region RasterizerState
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    rasterizerDesc.DepthClipEnable = true;
+    rasterizerDesc = GetRasterizerDesc(_flags);
+#pragma endregion
 
     // PSOを生成する
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_["LineDrawer"].Get();                                 // RootSignature
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                         // RootSignature
     graphicsPipelineStateDesc.BlendState = blendDesc;                                                               // BlendState
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
@@ -742,17 +772,24 @@ void PSOManager::CreatePSOForLineDrawer()
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
-    hr = dxCommon_->GetDevice()->
-        CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-                                    IID_PPV_ARGS(graphicsPipelineStates_["LineDrawer"][static_cast<size_t>(BlendMode::Normal)].GetAddressOf()));
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
+
+    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+
 }
 
-void PSOManager::CreatePSOForParticle()
+void PSOManager::CreatePSOForParticle(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
+    size_t type = GetType(_flags);
+
+#pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
@@ -763,6 +800,7 @@ void PSOManager::CreatePSOForParticle()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+#pragma endregion
 
 #pragma region RootSignature
 
@@ -820,21 +858,24 @@ void PSOManager::CreatePSOForParticle()
         Utils::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_["Particle"]));
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
     assert(SUCCEEDED(hr));
 
 #pragma endregion
 
+#pragma region DepthStencilState
     //DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     //Depthの機能を有効にする
     depthStencilDesc.DepthEnable = true;
-    //書き込みします
+    //書き込みしない
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     //比較関数はLessEqeul つまり近ければ描画される
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+#pragma endregion
 
-
+#pragma region InputLayout
     /// InputLayoutの設定を行う
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -855,27 +896,31 @@ void PSOManager::CreatePSOForParticle()
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
     inputLayoutDesc.NumElements = _countof(inputElementDescs);
+#pragma endregion
 
-
+#pragma region Shader
     /// shaderをコンパイルする
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Particle.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
     Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Particle.PS.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
+#pragma endregion
 
+#pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
+    blendDesc = GetBlendDesc(_flags);
+#pragma endregion
 
+#pragma region RasterizerState
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    //裏面(時計回り)を表示しない
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-    //三角形を塗りつぶす
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    rasterizerDesc = GetRasterizerDesc(_flags);
+#pragma endregion
 
     // PSOを生成する
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_["Particle"].Get();                                   // RootSignature
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                   // RootSignature
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
     graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
@@ -891,46 +936,46 @@ void PSOManager::CreatePSOForParticle()
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
-    for (uint32_t i = 0; i < static_cast<uint32_t>(BlendMode::ModeNum); ++i)
-    {
-        BlendMode currentMode = static_cast<BlendMode>(i);
-        graphicsPipelineStateDesc.BlendState = GetBlendDesc(currentMode);                                                               // BlendState
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
 
-        hr = dxCommon_->GetDevice()->
-            CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-                                        IID_PPV_ARGS(graphicsPipelineStates_["Particle"][static_cast<size_t>(i)].GetAddressOf()));
-        assert(SUCCEEDED(hr));
-    }
+    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+
 }
 
-D3D12_BLEND_DESC PSOManager::GetBlendDesc(BlendMode _mode)
+D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
 {
     D3D12_BLEND_DESC blendDesc{};
 
-    switch (_mode)
+    PSOFlags mode = GetBlendMode(_flag);
+
+    switch (mode)
     {
-    case BlendMode::Normal:
+    case PSOFlags::Blend_Normal:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
         break;
-    case BlendMode::Add:
+    case PSOFlags::Blend_Add:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case BlendMode::Sub:
+    case PSOFlags::Blend_Sub:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case BlendMode::Multiply:
+    case PSOFlags::Blend_Multiply:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
         break;
-    case BlendMode::Screen:
+    case PSOFlags::Blend_Screen:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
@@ -938,6 +983,7 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(BlendMode _mode)
     default:
         break;
     }
+
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blendDesc.RenderTarget[0].BlendEnable = TRUE;
     blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
@@ -945,5 +991,185 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(BlendMode _mode)
     blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
     return blendDesc;
+}
+
+D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
+{
+    if (!IsSingleBitSetInMask(_flag, CullMask))
+    {
+        assert("Cullが複数設定されています" && false);
+    }
+
+    D3D12_RASTERIZER_DESC rasterizerDesc{};
+
+    if (HasFlag(_flag, PSOFlags::Cull_None))
+    {
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    }
+    else if (HasFlag(_flag, PSOFlags::Cull_Back))
+    {
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    }
+    else if (HasFlag(_flag, PSOFlags::Cull_Front))
+    {
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    }
+
+    return rasterizerDesc;
+}
+
+
+size_t PSOManager::GetType(PSOFlags _flag)
+{
+    if(!IsSingleBitSetInMask(_flag,TypeMask))
+    {
+        assert("Typeが複数設定されています" && false);
+    }
+
+    if (HasFlag(_flag, PSOFlags::Type_Model))
+    {
+        return static_cast<size_t>(PSOFlags::Type_Model);
+    }
+    else if (HasFlag(_flag, PSOFlags::Type_AnimationModel))
+    {
+        return static_cast<size_t>(PSOFlags::Type_AnimationModel);
+    }
+    else if (HasFlag(_flag, PSOFlags::Type_Sprite))
+    {
+        return static_cast<size_t>(PSOFlags::Type_Sprite);
+    }
+    else if (HasFlag(_flag, PSOFlags::Type_LineDrawer))
+    {
+        return static_cast<size_t>(PSOFlags::Type_LineDrawer);
+    }
+    else if (HasFlag(_flag, PSOFlags::Type_Particle))
+    {
+        return static_cast<size_t>(PSOFlags::Type_Particle);
+    }
+
+    assert("Typeが設定されていません" && false);
+    return 0;
+
+}
+
+PSOFlags PSOManager::GetBlendMode(PSOFlags _flag)
+{
+    if (!IsSingleBitSetInMask(_flag, BlendMask))
+    {
+        assert("BlendModeが複数設定されています" && false);
+        return PSOFlags::Blend_Normal;
+    }
+
+    if (HasFlag(_flag, PSOFlags::Blend_Normal))
+    {
+        return  PSOFlags::Blend_Normal;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Add))
+    {
+        return  PSOFlags::Blend_Add;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Sub))
+    {
+        return  PSOFlags::Blend_Sub;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Multiply))
+    {
+        return  PSOFlags::Blend_Multiply;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Screen))
+    {
+        return  PSOFlags::Blend_Screen;
+    }
+
+    // デフォルトはNormal
+    return  PSOFlags::Blend_Normal;
+}
+
+PSOFlags SetBlendMode(PSOFlags _flag, PSOFlags _mode)
+{
+    if (!IsSingleBitSetInMask(_flag, BlendMask))
+    {
+        assert(false);
+    }
+
+    PSOFlags flag = _flag;
+
+    flag &= ~(PSOFlags::Blend_Normal | PSOFlags::Blend_Add | PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen);
+    flag |= _mode;
+
+    return flag;
+}
+
+PSOFlags GetBlendMode(BlendMode _mode)
+{
+    switch (_mode)
+    {
+    case BlendMode::Normal:
+        return PSOFlags::Blend_Normal;
+    case BlendMode::Add:
+        return PSOFlags::Blend_Add;
+    case BlendMode::Sub:
+        return PSOFlags::Blend_Sub;
+    case BlendMode::Multiply:
+        return PSOFlags::Blend_Multiply;
+    case BlendMode::Screen:
+        return PSOFlags::Blend_Screen;
+    default:
+        return PSOFlags::Blend_Normal;
+    }
+}
+
+BlendMode GetBlendMode(PSOFlags _flag)
+{
+    if (!IsSingleBitSetInMask(_flag, BlendMask))
+    {
+        assert(false);
+    }
+    if (HasFlag(_flag, PSOFlags::Blend_Normal))
+    {
+        return BlendMode::Normal;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Add))
+    {
+        return BlendMode::Add;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Sub))
+    {
+        return BlendMode::Sub;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Multiply))
+    {
+        return BlendMode::Multiply;
+    }
+    else if (HasFlag(_flag, PSOFlags::Blend_Screen))
+    {
+        return BlendMode::Screen;
+    }
+    return BlendMode::Normal;
+}
+
+
+bool IsValidPSOFlags(PSOFlags _flags)
+{
+    // Type, Blend, Cullのビットがそれぞれ一つだけセットされているか確認
+    bool isTypeValid = IsSingleBitSetInMask(_flags, TypeMask);
+    bool isBlendValid = IsSingleBitSetInMask(_flags, BlendMask);
+    bool isCullValid = IsSingleBitSetInMask(_flags, CullMask);
+
+    return isTypeValid && isBlendValid && isCullValid;
+}
+
+bool IsSingleBitSetInMask(PSOFlags _flags, PSOFlags _mask)
+{
+    size_t maskedFlag = static_cast<size_t>(_flags & _mask);
+    return (maskedFlag != 0) && ((maskedFlag & (maskedFlag - 1)) == 0);
+}
+
+bool HasFlag(PSOFlags _flag, PSOFlags _checkFlag)
+{
+    return (_flag & _checkFlag) == _checkFlag;
 }
 

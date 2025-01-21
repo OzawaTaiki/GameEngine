@@ -20,7 +20,6 @@ public:
     void PreDrawForObjectModel() const;
     void PreDrawForAnimationModel() const;
 
-    void SetBlendMode(BlendMode _mode) { blendMode_ = _mode; };
 
     Model* FindSameModel(const std::string& _name);
 private:
@@ -30,7 +29,7 @@ private:
     std::array <ID3D12RootSignature*, 2> rootSignature_ = {};
     std::array <ID3D12PipelineState*, 2> graphicsPipelineState_ = {};
 
-    BlendMode blendMode_ = {};
+    std::array<PSOFlags, 2> psoFlags_ = {};
 
 
     ModelManager() = default;

@@ -31,7 +31,7 @@ private:
     ID3D12RootSignature* rootSignature_ = nullptr;
     ID3D12PipelineState* graphicsPipelineState_ = nullptr;
 
-    BlendMode blendMode_ = {};
+    PSOFlags psoFlags_ = {};
 
 
     SpriteManager() = default;
