@@ -18,6 +18,10 @@ void TextureManager::Initialize()
     assert(dxCommon_);
 
 	srvManager_ = SRVManager::GetInstance();
+
+    Load("white.png");
+    Load("cube.jpg");
+    Load("uvChecker.png");
 }
 
 void TextureManager::Update()

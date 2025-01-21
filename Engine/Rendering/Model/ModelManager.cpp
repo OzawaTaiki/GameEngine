@@ -12,29 +12,30 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Initialize()
 {
-    blendMode_ = BlendMode::Normal;
+    psoFlags_[0] = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
+    psoFlags_[1] = PSOFlags::Type_AnimationModel | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
 
 
     /// PSOを取得
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject("Model", blendMode_);
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[0]);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
     graphicsPipelineState_[0] = pso.value();
 
     /// RootSingnatureを取得
-    auto rootSignature = PSOManager::GetInstance()->GetRootSignature("Model");
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[0]);
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_[0] = rootSignature.value();
 
     /// PSOを取得
-    pso = PSOManager::GetInstance()->GetPipeLineStateObject("AnimationModel", blendMode_);
+    pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[1]);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
     graphicsPipelineState_ [1] = pso.value();
 
     /// RootSingnatureを取得
-    rootSignature = PSOManager::GetInstance()->GetRootSignature("AnimationModel");
+    rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[1]);
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_[1] = rootSignature.value();

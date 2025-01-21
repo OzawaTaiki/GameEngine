@@ -3,6 +3,7 @@
 #include "Particle.h"
 #include <Core/DirectX/BlendMode.h>
 #include <Systems/Time/GameTime.h>
+#include <Core/DirectX/PSOManager.h>
 
 #include <unordered_map>
 #include <d3d12.h>
@@ -18,11 +19,15 @@ public:
     ParticleManager() = default;
     ~ParticleManager();
 
+    void ClearGroup();
+    void ClearGroup(const std::string& _groupName);
+
     void Initialize();
     void Update(const Vector3& _cRotate);
     void Draw(const Camera* _camera);
 
     void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, BlendMode _blendMode = BlendMode::Add, uint32_t _textureHandle = UINT32_MAX);
+    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, PSOFlags _flags, uint32_t _textureHandle = UINT32_MAX);
     void DeleteParticleGroup(const std::string& _groupName);
 
     void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
@@ -55,6 +60,7 @@ private:
         uint32_t instanceNum;
         ParticleEmitter* emitterPtr;
         BlendMode blendMode;
+        PSOFlags psoFlags;
     };
 
     void PreDraw();

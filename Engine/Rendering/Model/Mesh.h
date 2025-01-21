@@ -16,7 +16,20 @@ class DXCommon;
 class Mesh
 {
 public:
+
+    struct VertexData
+    {
+        Vector4 position;
+        Vector2 texcoord;
+        Vector3 normal;
+
+        bool operator==(const VertexData& _obj) const {
+            return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;
+        }
+    };
+
     void Initialize();
+    void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i);
     //void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/models/");
 
     void TransferData();
@@ -38,16 +51,6 @@ public:
     void SetMin(const Vector3& _min) { min = _min; }
     void SetMax(const Vector3& _max) { max = _max; }
 
-    struct VertexData
-    {
-        Vector4 position;
-        Vector2 texcoord;
-        Vector3 normal;
-
-        bool operator==(const VertexData& _obj) const {
-            return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;
-        }
-    };
     std::vector<VertexData>                     vertices_ = {};                   // データ格納用
     std::vector<uint32_t>                       indices_ = {};                   // データ格納用
 private:

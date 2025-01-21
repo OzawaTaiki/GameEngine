@@ -9,6 +9,12 @@
 #include <Rendering/LineDrawer/LineDrawer.h>
 #include <Systems/Input/Input.h>
 #include <Systems/Time/GameTime.h>
+#include <UI/UIButton.h>
+#include <Rendering/Primitive/Ring.h>
+#include <Rendering/Primitive/Ellipse.h>
+#include <Rendering/Primitive/Cylinder.h>
+#include <Systems/UVTransform/SpriteSheetAnimetion.h>
+#include <Systems/UVTransform/UVTransformAnimation.h>
 
 #include <memory>
 
@@ -43,7 +49,20 @@ private:
 
     std::unique_ptr<LightGroup> lights_;
 
+    std::unique_ptr<UIButton> button_ = nullptr;
+
     GameTime* gameTime_;
+
+    Ring* ring_;
+
+    EllipseModel* ellipse_;
+
+    Cylinder* cylinder_;
+
+    UVTransformAnimation uvTransformAnimetion_;
+
+    SpriteSheetAnimation spriteSheetAnimetion_;
+
 
 
 #ifdef _DEBUG

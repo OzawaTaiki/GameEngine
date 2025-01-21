@@ -99,7 +99,7 @@ public:
     std::string GetModelPath() const { return useModelPath_; }
 
 
-    std::string GetTimeChannel() const { return timeChannel_; }
+    std::string GetTimeChannel();
     void SetTimeChannel(const std::string& _name) { timeChannel_ = _name; }
 
     void Save()const;
@@ -156,8 +156,6 @@ private:
     //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
     // 保留
 
-    // TODO:これが原因で終了時に例外が発生する
-    //std::vector <uint32_t>  billboardAxes_ = { };        // ビルボードの軸
     Vector3  billboardAxes_ = { };        // ビルボードの軸
 
     float                   delayTime_;                     // 発生までの遅延時間
@@ -185,6 +183,7 @@ private:
 
     void DisplayLifeTimeParameters();
     void DisplaySizeParameters();
+    void DisplayRotateParameters();
     void DisplaySpeedParameters();
     void DisplayDirectionParameters();
     void DisplayAccelerationParameters();

@@ -26,6 +26,7 @@ public:
 
     void UpdateUVTransform();
 
+    UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     Vector3 GetMin()const { return model_->GetMin(); }
     Vector3 GetMax()const { return model_->GetMax(); }
 
@@ -36,9 +37,6 @@ public:
     Quaternion quaternion_ = { 0,0,0,1 };
     bool useQuaternion_ = false;
 
-    Vector2 uvTransform_ = { 0,0 };
-    Vector2 uvScale_ = { 1,1 };
-    float uvRotation_ = 0;
 
 
 

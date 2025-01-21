@@ -136,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Core\DirectX\DXCommon.cpp" />
     <ClCompile Include="Core\DirectX\PSOManager.cpp" />
     <ClCompile Include="Core\WinApp\WinApp.cpp" />
+    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Framework\Camera\Camera.cpp" />
     <ClCompile Include="Framework\Camera\DebugCamera.cpp" />
     <ClCompile Include="Framework\eScene\ParticleTestScene.cpp" />
@@ -145,6 +146,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Framework\Particle\Particle.cpp" />
     <ClCompile Include="Framework\Particle\ParticleEmitters.cpp" />
     <ClCompile Include="Framework\Particle\ParticleManager.cpp" />
+    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Physics\Collision\CollisionManager.cpp" />
     <ClCompile Include="Physics\Collision\Shapes.cpp" />
@@ -172,6 +174,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Rendering\Model\ObjectColor.cpp" />
     <ClCompile Include="Rendering\Model\ObjectModel.cpp" />
     <ClCompile Include="Rendering\Model\WorldTransform.cpp" />
+    <ClCompile Include="Rendering\Primitive\Cylinder.cpp" />
+    <ClCompile Include="Rendering\Primitive\Ellipse.cpp" />
+    <ClCompile Include="Rendering\Primitive\Ring.cpp" />
     <ClCompile Include="Rendering\Sprite\Sprite.cpp" />
     <ClCompile Include="Rendering\Sprite\SpriteManager.cpp" />
     <ClCompile Include="ResourceManagement\SRVManager.cpp" />
@@ -186,6 +191,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Systems\Utility\Debug.cpp" />
     <ClCompile Include="Systems\Utility\JsonLoader.cpp" />
     <ClCompile Include="Systems\Utility\RandomGenerator.cpp" />
+    <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp" />
+    <ClCompile Include="Systems\UVTransform\UVTransform.cpp" />
+    <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="UI\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="UI\UIBase.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
@@ -197,6 +205,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Core\DirectX\DXCommon.h" />
     <ClInclude Include="Core\DirectX\PSOManager.h" />
     <ClInclude Include="Core\WinApp\WinApp.h" />
+    <ClInclude Include="Framework.h" />
     <ClInclude Include="Framework\Camera\Camera.h" />
     <ClInclude Include="Framework\Camera\DebugCamera.h" />
     <ClInclude Include="Framework\eScene\BaseScene.h" />
@@ -208,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Framework\Particle\ParticleEmitters.h" />
     <ClInclude Include="Framework\Particle\ParticleInitParam.h" />
     <ClInclude Include="Framework\Particle\ParticleManager.h" />
+    <ClInclude Include="MyGame.h" />
     <ClInclude Include="Physics\Collision\Collider.h" />
     <ClInclude Include="Physics\Collision\CollisionManager.h" />
     <ClInclude Include="Physics\Collision\Shapes.h" />
@@ -238,6 +248,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Rendering\Model\ObjectColor.h" />
     <ClInclude Include="Rendering\Model\ObjectModel.h" />
     <ClInclude Include="Rendering\Model\WorldTransform.h" />
+    <ClInclude Include="Rendering\Primitive\Cylinder.h" />
+    <ClInclude Include="Rendering\Primitive\Ellipse.h" />
+    <ClInclude Include="Rendering\Primitive\Primitive.h" />
+    <ClInclude Include="Rendering\Primitive\Ring.h" />
     <ClInclude Include="Rendering\Sprite\Sprite.h" />
     <ClInclude Include="Rendering\Sprite\SpriteManager.h" />
     <ClInclude Include="ResourceManagement\SRVManager.h" />
@@ -252,6 +266,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Systems\Utility\Debug.h" />
     <ClInclude Include="Systems\Utility\JsonLoader.h" />
     <ClInclude Include="Systems\Utility\RandomGenerator.h" />
+    <ClInclude Include="Systems\UVTransform\IUVAnimation.h" />
+    <ClInclude Include="Systems\UVTransform\SpriteSheetAnimetion.h" />
+    <ClInclude Include="Systems\UVTransform\UVTransform.h" />
+    <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="UI\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="UI\UIBase.h" />
     <ClInclude Include="UI\UIButton.h" />

@@ -3,20 +3,22 @@
 #include <Systems/Input/Input.h>
 #include <ResourceManagement/TextureManager/TextureManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
+#include <Systems/JsonBinder/JsonHub.h>
 
 void UIBase::Initialize(const std::string& _label)
 {
     label_ = _label;
 
-    /*config_ = std::make_unique<Config>();
+    jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
+    JsonHub::GetInstance()->SetDirectoryPathFromRoot("Resources/Data/UI/");
 
-    config_->SetVariable( label_+"pos", &position_);
-    config_->SetVariable( label_+"size", &size_);
-    config_->SetVariable( label_+"anchor", &anchor_);
-    config_->SetVariable( label_+"isActive", reinterpret_cast<uint32_t*>(&isActive_));
-    config_->SetVariable( label_+"isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
-    config_->SetVariable( label_+"textureName", &textureName_);
-    config_->SetVariable( label_+"label", &label_);*/
+    jsonBinder_->RegisterVariable(label_+"_pos", &position_);
+    jsonBinder_->RegisterVariable(label_+"_size", &size_);
+    jsonBinder_->RegisterVariable(label_+"_anchor", &anchor_);
+    jsonBinder_->RegisterVariable(label_+"_isActive", reinterpret_cast<uint32_t*>(&isActive_));
+    jsonBinder_->RegisterVariable(label_+"_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
+    jsonBinder_->RegisterVariable(label_+"_textureName", &textureName_);
+    jsonBinder_->RegisterVariable(label_+"_label", &label_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
@@ -92,13 +94,18 @@ void UIBase::ImGui()
             textureName_ = buf;
         }
 
-        if (ImGui::Button("save"))
+        if (ImGui::Button("Apply"))
         {
             //ConfigManager::GetInstance()->SaveData("UI");
             textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
             sprite_->SetTextureHandle(textureHandle_);
         }
         ImGui::EndTabItem();
+
+        if (ImGui::Button("Save"))
+        {
+            jsonBinder_->Save();
+        }
     }
     ImGui::EndTabBar();
 

@@ -59,9 +59,6 @@ void ObjectModel::SetModel(const std::string& _filePath)
 
 void ObjectModel::UpdateUVTransform()
 {
-    model_->SetUVTransform(uvTransform_, 0);
-    model_->SetUVScale(uvScale_, 0);
-    model_->SetUVRotation(uvRotation_, 0);
 }
 
 #ifdef _DEBUG
