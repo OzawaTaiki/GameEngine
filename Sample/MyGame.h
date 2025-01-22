@@ -2,11 +2,11 @@
 
 #include <Framework.h>
 
-class MyGame : public Framework
+class Sample : public Framework
 {
 public:
-    MyGame() = default;
-    ~MyGame() = default;
+    Sample() = default;
+    ~Sample() = default;
 
     void Initialize() override;
     void Update() override;

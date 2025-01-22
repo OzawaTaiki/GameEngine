@@ -3,7 +3,7 @@
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    Framework* game = new MyGame;
+    Framework* game = new Sample;
 
     game->Run();
 
