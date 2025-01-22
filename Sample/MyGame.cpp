@@ -1,7 +1,7 @@
 #include "MyGame.h"
 
-#include <Framework/eScene/SampleScene.h>
-#include <Framework/eScene/ParticleTestScene.h>
+#include "SampleScene.h"
+#include <Features/Scene/ParticleTestScene.h>
 #include "SceneFactory.h"
 
 void Sample::Initialize()

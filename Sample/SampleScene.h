@@ -1,20 +1,20 @@
 #pragma once
-#include <Framework/eScene/BaseScene.h>
-#include <Framework/Camera/Camera.h>
-#include <Framework/Camera/DebugCamera.h>
-#include <Rendering/Model/ObjectModel.h>
-#include <Rendering/Model/AnimationModel.h>
+#include <Features/Scene/Interface/BaseScene.h>
+#include <Features/Camera/Camera/Camera.h>
+#include <Features/Camera/DebugCamera/DebugCamera.h>
+#include <Features/Model/ObjectModel.h>
+#include <Features/Model/AnimationModel.h>
 
-#include <Framework/Particle/ParticleManager.h>
-#include <Rendering/LineDrawer/LineDrawer.h>
-#include <Systems/Input/Input.h>
-#include <Systems/Time/GameTime.h>
-#include <UI/UIButton.h>
-#include <Rendering/Primitive/Ring.h>
-#include <Rendering/Primitive/Ellipse.h>
-#include <Rendering/Primitive/Cylinder.h>
-#include <Systems/UVTransform/SpriteSheetAnimetion.h>
-#include <Systems/UVTransform/UVTransformAnimation.h>
+#include <Features/Effect/Manager/ParticleManager.h>
+#include <Features/LineDrawer/LineDrawer.h>
+#include <System/Input/Input.h>
+#include <System/Time/GameTime.h>
+#include <Features/UI/UIButton.h>
+#include <Features/Model/Primitive/Ring.h>
+#include <Features/Model/Primitive/Ellipse.h>
+#include <Features/Model/Primitive/Cylinder.h>
+#include <Features/UVTransform/SpriteSheetAnimetion.h>
+#include <Features/UVTransform/UVTransformAnimation.h>
 
 #include <memory>
 

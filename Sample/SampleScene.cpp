@@ -1,9 +1,9 @@
 #include "SampleScene.h"
 
-#include <Framework/eScene/SceneManager.h>
-#include <UI/ImGuiManager/ImGuiManager.h>
-#include <Rendering/Sprite/Sprite.h>
-#include <Rendering/Model/ModelManager.h>
+#include <Features/Scene/Manager/SceneManager.h>
+#include <Debug/ImGuiManager.h>
+#include <Features/Sprite/Sprite.h>
+#include <Features/Model/Manager/ModelManager.h>
 
 
 SampleScene::~SampleScene()
@@ -144,7 +144,7 @@ void SampleScene::Update()
     aModel_->Update();
     oModel_->Update();
     button_->Update();
-    if (button_->IsPressed())
+    if (button_->IsPressed()||input_->IsKeyTriggered(DIK_TAB))
     {
         SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }

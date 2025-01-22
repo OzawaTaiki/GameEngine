@@ -105,7 +105,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
+    <None Include=".editorconfig">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyGame.h" />
