@@ -55,7 +55,6 @@ void Framework::Initialize()
     input_ = Input::GetInstance();
     input_->Initilize(winApp_);
 
-    JsonHub::GetInstance()->Initialize("Resources/Data/");
 
     Time::Initialize();
 
@@ -74,15 +73,8 @@ void Framework::Update()
     // フレーム始め
     imguiManager_->Begin();
 
-    collisionManager_->ResetColliderList();
-
-    //========== 更新処理 =========
-
-    sceneManager_->Update();
-    //particleManager_->Update(); TODO ; 引数のカメラの回転をなんとかしたい
-    collisionManager_->CheckAllCollision();
-
-    //=============================
+    Time::Update();
+    input_->Update();
 }
 
 void Framework::PreDraw()
@@ -93,13 +85,10 @@ void Framework::PreDraw()
 
 void Framework::PostDraw()
 {
-    lineDrawer_->Draw();
-
     imguiManager_->End();
     imguiManager_->Draw();
 
     dxCommon_->PostDraw();
-    sceneManager_->ChangeScene();
 }
 
 void Framework::Finalize()

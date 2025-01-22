@@ -1,6 +1,6 @@
 #include "SampleScene.h"
 
-#include "SceneManager.h"
+#include <Framework/eScene/SceneManager.h>
 #include <UI/ImGuiManager/ImGuiManager.h>
 #include <Rendering/Sprite/Sprite.h>
 #include <Rendering/Model/ModelManager.h>

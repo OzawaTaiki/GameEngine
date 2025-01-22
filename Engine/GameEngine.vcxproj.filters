@@ -117,9 +117,6 @@
     <ClCompile Include="Framework\eScene\ParticleTestScene.cpp">
       <Filter>Framework\eScene</Filter>
     </ClCompile>
-    <ClCompile Include="Framework\eScene\SampleScene.cpp">
-      <Filter>Framework\eScene</Filter>
-    </ClCompile>
     <ClCompile Include="Framework\eScene\SceneManager.cpp">
       <Filter>Framework\eScene</Filter>
     </ClCompile>
@@ -291,7 +288,6 @@
     <ClCompile Include="Systems\UVTransform\UVTransformAnimation.cpp">
       <Filter>Systems\UVTransform</Filter>
     </ClCompile>
-    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp">
       <Filter>Systems\UVTransform</Filter>
@@ -358,9 +354,6 @@
       <Filter>Framework\eScene</Filter>
     </ClInclude>
     <ClInclude Include="Framework\eScene\ParticleTestScene.h">
-      <Filter>Framework\eScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework\eScene\SampleScene.h">
       <Filter>Framework\eScene</Filter>
     </ClInclude>
     <ClInclude Include="Framework\eScene\SceneManager.h">
@@ -555,10 +548,10 @@
     <ClInclude Include="Systems\UVTransform\UVTransformAnimation.h">
       <Filter>Systems\UVTransform</Filter>
     </ClInclude>
-    <ClInclude Include="MyGame.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Systems\UVTransform\SpriteSheetAnimetion.h">
       <Filter>Systems\UVTransform</Filter>
     </ClInclude>
+    <ClInclude Include="ISceneFactory.h" />
   </ItemGroup>
 </Project>

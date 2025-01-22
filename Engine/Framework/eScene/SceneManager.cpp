@@ -11,23 +11,27 @@ SceneManager* SceneManager::GetInstance()
 
 SceneManager::~SceneManager()
 {
-    scenes_.clear();
+    //scenes_.clear();
     //currentScene_.reset();
 }
+//
+//void SceneManager::RegisterScene(const std::string& _name, SceneFactory _scene)
+//{
+//    auto instance = GetInstance();
+//    //instance->scenes_[_name] = _scene;
+//}
 
-void SceneManager::RegisterScene(const std::string& _name, SceneFactory _scene)
+void SceneManager::SetSceneFactory(ISceneFactory* _sceneFactory)
 {
-    auto instance = GetInstance();
-    instance->scenes_[_name] = _scene;
+    if (_sceneFactory != nullptr)
+    {
+        sceneFactory_ = _sceneFactory;
+    }
 }
 
 void SceneManager::Initialize(const std::string& _name)
 {
-    assert(scenes_.size() > 0);
-    auto it = scenes_.find(_name);
-    assert(it != scenes_.end());
-
-    currentScene_ = it->second();
+    currentScene_ = sceneFactory_->CreateScene(_name);
     currentSceneName_ = _name;
 
     nextSceneName_ = "empty";
@@ -36,11 +40,11 @@ void SceneManager::Initialize(const std::string& _name)
 
 void SceneManager::Update()
 {
-    Time::Update();
+    assert(sceneFactory_ != nullptr);
+
 #ifdef _DEBUG
     ImGui();
 #endif // _DEBUG
-    Input::GetInstance()->Update();
     currentScene_->Update();
 }
 
@@ -53,9 +57,9 @@ void SceneManager::ReserveScene(const std::string& _name)
 {
     auto instance = GetInstance();
 
-    assert(instance->scenes_.find(_name) != instance->scenes_.end());
     instance->nextSceneName_ = _name;
 }
+
 
 void SceneManager::ChangeScene()
 {
@@ -69,7 +73,7 @@ void SceneManager::ChangeScene()
 
     instance->currentScene_.reset();
 
-    instance->currentScene_ = instance->scenes_[instance->nextSceneName_]();
+    instance->currentScene_ = instance->sceneFactory_->CreateScene(instance->nextSceneName_);
     instance->currentScene_->Initialize();
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
@@ -80,7 +84,7 @@ void SceneManager::ChangeScene()
 #include <imgui.h>
 void SceneManager::ImGui()
 {
-    char comboLabel[128];
+    //char comboLabel[128];
 
     ImGui::Begin("SceneManager");
     ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
@@ -91,15 +95,15 @@ void SceneManager::ImGui()
         Time::SetDeltaTimeFixed(isFixed);
 
 
-    for (auto& scene : scenes_)
-    {
-        strcpy_s(comboLabel, scene.first.c_str());
-        if (ImGui::Button(comboLabel))
-        {
-            ReserveScene(scene.first);
-            break;
-        }
-    }
+    //for (auto& scene : scenes_)
+    //{
+    //    strcpy_s(comboLabel, scene.first.c_str());
+    //    if (ImGui::Button(comboLabel))
+    //    {
+    //        ReserveScene(scene.first);
+    //        break;
+    //    }
+    //}
 
     ImGui::Text("Current Scene : %s", currentSceneName_.c_str());
 

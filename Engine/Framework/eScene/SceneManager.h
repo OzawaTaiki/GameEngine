@@ -1,12 +1,13 @@
 #pragma once
 #include "BaseScene.h"
+#include <ISceneFactory.h>
+
 #include <iostream>
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <memory>
 
-using SceneFactory = std::unique_ptr<BaseScene>(*)();
 
 class SceneManager
 {
@@ -19,7 +20,10 @@ public:
     // _name : シーンの名前
     // _scene : シーンの生成関数
     // 例 : SceneManager::RegisterScene("game", Game::Create);
-    static void RegisterScene(const std::string& _name, SceneFactory _scene);
+    //static void RegisterScene(const std::string& _name, SceneFactory _scene);
+
+    // シーンファクトリの設定
+    void SetSceneFactory(ISceneFactory* _sceneFactory);
 
     // 初期化
     // _name : 初期化するシーンの名前
@@ -37,10 +41,12 @@ public:
     static void ChangeScene();
 
 private:
-    //ConfigManager* configManager_;
+    ISceneFactory* sceneFactory_ = nullptr;
 
     // シーンのリスト
-    std::unordered_map<std::string, SceneFactory>   scenes_ = {};
+    //std::unordered_map<std::string, SceneFactory>   scenes_ = {};
+    //SceneFactory nextScene_ = nullptr;
+
     // 現在のシーン
     std::unique_ptr<BaseScene> currentScene_ = nullptr;
 
