@@ -144,7 +144,7 @@ void SampleScene::Update()
     aModel_->Update();
     oModel_->Update();
     button_->Update();
-    if (button_->IsPressed())
+    if (button_->IsPressed()||input_->IsKeyTriggered(DIK_TAB))
     {
         SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }

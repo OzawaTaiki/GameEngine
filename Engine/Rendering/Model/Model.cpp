@@ -214,7 +214,7 @@ Vector3 Model::GetMax(size_t _index) const
 void Model::LoadFile(const std::string& _filepath)
 {
     auto start = std::chrono::high_resolution_clock::now();
-    Utils::Log("load start\nfilepath:" + defaultDirpath_ + _filepath + "\n");
+    Debug::Log("load start\nfilepath:" + defaultDirpath_ + _filepath + "\n");
     name_ = _filepath;
 
     Assimp::Importer importer;
@@ -235,8 +235,8 @@ void Model::LoadFile(const std::string& _filepath)
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::string str = std::to_string(duration);
-    Utils::Log("Load finish \ntime :" + str + "ms\n");
-    //Utils::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size()) + "\n");
+    Debug::Log("Load finish \ntime :" + str + "ms\n");
+    //Debug::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size()) + "\n");
 
 }
 

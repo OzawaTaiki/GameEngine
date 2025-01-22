@@ -39,7 +39,7 @@ void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
     }
     else
     {
-        //Utils::Log("Begin Load :" + _filepath + "\n");
+        //Debug::Log("Begin Load :" + _filepath + "\n");
 
         if (inputFile.peek() != std::ifstream::traits_type::eof())
         {
@@ -60,7 +60,7 @@ void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
             }
         }
         inputFile.close();
-        //Utils::Log("End Load   :" + filePath_ + "\n");
+        //Debug::Log("End Load   :" + filePath_ + "\n");
 
     }
 }

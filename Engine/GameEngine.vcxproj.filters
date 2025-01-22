@@ -292,6 +292,9 @@
     <ClCompile Include="Systems\UVTransform\SpriteSheetAnimetion.cpp">
       <Filter>Systems\UVTransform</Filter>
     </ClCompile>
+    <ClCompile Include="Systems\Utility\ConvertString.cpp">
+      <Filter>Systems\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -553,5 +556,8 @@
       <Filter>Systems\UVTransform</Filter>
     </ClInclude>
     <ClInclude Include="ISceneFactory.h" />
+    <ClInclude Include="Systems\Utility\ConvertString.h">
+      <Filter>Systems\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

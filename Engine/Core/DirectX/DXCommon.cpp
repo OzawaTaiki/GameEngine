@@ -2,6 +2,7 @@
 
 #include "Core/WinApp/WinApp.h"
 #include "Systems/Utility/Debug.h"
+#include "Systems/Utility/ConvertString.h"
 #include "Core/DirectX/PSOManager.h"
 
 #include <d3d12.h>
@@ -206,7 +207,7 @@ void DXCommon::CreateDevice()
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
 			//採用したアダプタの情報をログに出力。wstringの方なので注意。
-			Utils::Log(Utils::ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
+			Debug::Log(ConvertString(std::format(L"\nUse Adapater:{}\n", adapterDesc.Description)));
 			break;
 		}
 		//ソフトウェアアダプタの場合は見なかったことにする
@@ -232,14 +233,14 @@ void DXCommon::CreateDevice()
 		if (SUCCEEDED(hresult))
 		{
 			//生成で来たのでログの出力を行ってループを抜ける
-			Utils::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
+			Debug::Log(std::format("\nFeatureLevel : {}\n", featureLvelStrings[i]));
 			break;
 		}
 	}
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
 	//初期化完了のログ
-	Utils::Log("Complete create D3D12Device\n");
+	Debug::Log("Complete create D3D12Device\n");
 
 #ifdef _DEBUG
 

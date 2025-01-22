@@ -186,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Systems\Time\GameTime.cpp" />
     <ClCompile Include="Systems\Time\GameTimeChannel.cpp" />
     <ClCompile Include="Systems\Time\Time.cpp" />
+    <ClCompile Include="Systems\Utility\ConvertString.cpp" />
     <ClCompile Include="Systems\Utility\Debug.cpp" />
     <ClCompile Include="Systems\Utility\JsonLoader.cpp" />
     <ClCompile Include="Systems\Utility\RandomGenerator.cpp" />
@@ -260,6 +261,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Systems\Time\GameTime.h" />
     <ClInclude Include="Systems\Time\GameTimeChannel.h" />
     <ClInclude Include="Systems\Time\Time.h" />
+    <ClInclude Include="Systems\Utility\ConvertString.h" />
     <ClInclude Include="Systems\Utility\Debug.h" />
     <ClInclude Include="Systems\Utility\JsonLoader.h" />
     <ClInclude Include="Systems\Utility\RandomGenerator.h" />

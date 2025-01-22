@@ -1,6 +1,7 @@
 #include "TextureManager.h"
 #include <Core/DirectX/DXCommon.h>
 #include <Systems/Utility/Debug.h>
+#include <Systems/Utility/ConvertString.h>
 #include <ResourceManagement/SRVManager.h>
 
 #include <cassert>
@@ -98,7 +99,7 @@ std::optional<uint32_t>  TextureManager::IsTextureLoaded(const std::string& _fil
 DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 {
 	DirectX::ScratchImage image{};
-	std::wstring filePathw = Utils::ConvertString(_filepath);
+	std::wstring filePathw = ConvertString(_filepath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 

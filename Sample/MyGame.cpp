@@ -1,6 +1,6 @@
 #include "MyGame.h"
 
-#include <Framework/eScene/SampleScene.h>
+#include "SampleScene.h"
 #include <Framework/eScene/ParticleTestScene.h>
 #include "SceneFactory.h"
 
