@@ -17,9 +17,6 @@
 class ParticleTestScene : public BaseScene
 {
 public:
-
-    static std::unique_ptr<BaseScene> Create();
-
      ~ParticleTestScene() override;
 
     void Initialize() override;
