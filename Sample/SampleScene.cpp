@@ -1,9 +1,9 @@
 #include "SampleScene.h"
 
-#include <Framework/eScene/SceneManager.h>
-#include <UI/ImGuiManager/ImGuiManager.h>
-#include <Rendering/Sprite/Sprite.h>
-#include <Rendering/Model/ModelManager.h>
+#include <Features/Scene/Manager/SceneManager.h>
+#include <Debug/ImGuiManager.h>
+#include <Features/Sprite/Sprite.h>
+#include <Features/Model/Manager/ModelManager.h>
 
 
 SampleScene::~SampleScene()

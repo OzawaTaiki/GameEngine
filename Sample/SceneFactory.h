@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ISceneFactory.h>
+#include <Features/Scene/ISceneFactory.h>
 
 class SceneFactory : public ISceneFactory
 {
