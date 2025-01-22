@@ -6,11 +6,6 @@
 #include <Rendering/Model/ModelManager.h>
 
 
-std::unique_ptr<BaseScene>SampleScene::Create()
-{
-    return std::make_unique<SampleScene>();
-}
-
 SampleScene::~SampleScene()
 {
     delete ring_;

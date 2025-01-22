@@ -22,8 +22,6 @@ class SampleScene : public BaseScene
 {
 public:
 
-    static std::unique_ptr<BaseScene> Create();
-
      ~SampleScene() override;
 
     void Initialize() override;

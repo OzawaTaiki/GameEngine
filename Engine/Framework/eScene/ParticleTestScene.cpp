@@ -8,11 +8,6 @@
 #include <Systems/Input/Input.h>
 #include <Rendering/Sprite/Sprite.h>
 
-std::unique_ptr<BaseScene>ParticleTestScene::Create()
-{
-    return std::make_unique<ParticleTestScene>();
-}
-
 ParticleTestScene::~ParticleTestScene()
 {
     ParticleManager::GetInstance()->ClearGroup();
