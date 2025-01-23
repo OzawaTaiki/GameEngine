@@ -1,7 +1,9 @@
 #include "SceneManager.h"
 #include <Systems/Input/Input.h>
 #include <Systems/Time/Time.h>
+#include <Systems/Time/GameTime.h>
 #include <cassert>
+
 
 SceneManager* SceneManager::GetInstance()
 {
@@ -37,6 +39,8 @@ void SceneManager::Initialize(const std::string& _name)
 void SceneManager::Update()
 {
     Time::Update();
+    GameTime::GetInstance()->Update();
+
 #ifdef _DEBUG
     ImGui();
 #endif // _DEBUG
