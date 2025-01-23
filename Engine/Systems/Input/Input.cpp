@@ -70,6 +70,7 @@ void Input::Update()
 
     preXInputState_ = xInputState_;
     XInputGetState(0, &xInputState_);
+    UpdatePadLRTrigger();
 
 #ifdef _DEBUG
     ImGui();
@@ -163,22 +164,64 @@ void Input::GetRotate(Vector3& _rot, float _sensi) const
 }
 bool Input::IsPadTriggered(PadButton _button) const
 {
-    if (xInputState_.Gamepad.wButtons & static_cast<WORD>(_button) && !(preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button)))
-        return true;
+    if (_button == PadButton::iPad_LT)
+    {
+        if (leftTrigger_.isTriggered && !leftTrigger_.preIsTriggered)
+            return true;
+    }
+    else if (_button == PadButton::iPad_RT)
+    {
+        if (rightTrigger_.isTriggered && !rightTrigger_.preIsTriggered)
+            return true;
+    }
+    else
+    {
+        if (xInputState_.Gamepad.wButtons & static_cast<WORD>(_button) && !(preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button)))
+            return true;
+    }
+
     return false;
-}
+};
 
 bool Input::IsPadPressed(PadButton _button) const
 {
-    if (xInputState_.Gamepad.wButtons & static_cast<WORD>(_button) && preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button))
-        return true;
+    if (_button == PadButton::iPad_LT)
+    {
+        if (leftTrigger_.isTriggered)
+            return true;
+    }
+    else if (_button == PadButton::iPad_RT)
+    {
+        if (rightTrigger_.isTriggered)
+            return true;
+    }
+    else
+    {
+        if (xInputState_.Gamepad.wButtons & static_cast<WORD>(_button) && preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button))
+            return true;
+    }
+
     return false;
 }
 
 bool Input::IsPadReleased(PadButton _button) const
 {
-    if (!(xInputState_.Gamepad.wButtons & static_cast<WORD>(_button)) && preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button))
-        return true;
+    if (_button == PadButton::iPad_LT)
+    {
+        if (!leftTrigger_.isTriggered && leftTrigger_.preIsTriggered)
+            return true;
+    }
+    else if (_button == PadButton::iPad_RT)
+    {
+        if (!rightTrigger_.isTriggered && rightTrigger_.preIsTriggered)
+            return true;
+    }
+    else
+    {
+        if (!(xInputState_.Gamepad.wButtons & static_cast<WORD>(_button)) && preXInputState_.Gamepad.wButtons & static_cast<WORD>(_button))
+            return true;
+    }
+
     return false;
 }
 
@@ -251,10 +294,40 @@ Vector2 Input::GetPadRightStick() const
     return Vector2();
 }
 
-void Input::SetDeadZone(float _deadZone)
+void Input::SetStickDeadZone(float _deadZone)
 {
     deadZone_ = _deadZone;
 }
+
+void Input::SetTriggerDeadZone(float _deadZone)
+{
+    leftTrigger_.deadZone = _deadZone;
+    rightTrigger_.deadZone = _deadZone;
+}
+
+void Input::UpdatePadLRTrigger()
+{
+    leftTrigger_.preIsTriggered = leftTrigger_.isTriggered;
+    leftTrigger_.isTriggered = false;
+    leftTrigger_.value = 0;
+
+    if (xInputState_.Gamepad.bLeftTrigger > leftTrigger_.deadZone)
+    {
+        leftTrigger_.value = static_cast<float>(xInputState_.Gamepad.bLeftTrigger) / 255.0f;
+        leftTrigger_.isTriggered = true;
+    }
+
+    rightTrigger_.preIsTriggered = rightTrigger_.isTriggered;
+    rightTrigger_.isTriggered = false;
+    rightTrigger_.value = 0;
+
+    if (xInputState_.Gamepad.bRightTrigger > rightTrigger_.deadZone)
+    {
+        rightTrigger_.value = static_cast<float>(xInputState_.Gamepad.bRightTrigger) / 255.0f;
+        rightTrigger_.isTriggered = true;
+    }
+}
+
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -266,6 +339,7 @@ void Input::ImGui()
 
     ImGui::Text("Left Stick : %f %f", GetPadLeftStick().x, GetPadLeftStick().y);
     ImGui::Text("Right Stick : %f %f", GetPadRightStick().x, GetPadRightStick().y);
+
 
     ImGui::SliderFloat("Dead Zone", &deadZone_, 0.0f, 1.0f);
 
