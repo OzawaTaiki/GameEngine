@@ -120,8 +120,11 @@ public:
     void Draw();
 
     void SetDirectionalLight(const DirectionalLight& _light);
-    void AddPointLight(const PointLight& _light, const std::string& _name = "");
-    void AddSpotLight(const SpotLight& _light, const std::string& _name = "");
+    void AddPointLight(const PointLight& _light, const std::string& _name = "", Vector3* _parent = nullptr);
+    void AddSpotLight(const SpotLight& _light, const std::string& _name = "", Vector3* _parent = nullptr);
+
+    PointLight& GetPointLight(const std::string& _name);
+    SpotLight& GetSpotLight(const std::string& _name);
 
     void DeletePointLight(const std::string& _name);
     void DeleteSpotLight(const std::string& _name);
@@ -138,6 +141,7 @@ private:
         T light = {};
         std::string name = "";
         bool select = false;
+        Vector3* parent = nullptr;
     };
 
     size_t pointLightCount_ = 0;
