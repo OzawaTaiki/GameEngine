@@ -49,6 +49,19 @@ void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
     //model_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
+void AnimationModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    ModelManager::GetInstance()->PreDrawForAnimationModel();
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    model_->QueueCommandAndDraw(commandList, _textureHandle, true);// BVB IBV MTL2 TEX4 LIGHT567
+}
+
 void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)
 {
     model_->SetAnimation(_name,_isLoop);

@@ -58,6 +58,10 @@ void Framework::Initialize()
 
     Time::Initialize();
 
+    gameTime_ = GameTime::GetInstance();
+    gameTime_->Initialize();
+
+
     sceneManager_ = SceneManager::GetInstance();
 
     collisionManager_ = CollisionManager::GetInstance();
@@ -74,6 +78,8 @@ void Framework::Update()
     imguiManager_->Begin();
 
     Time::Update();
+    gameTime_->Update();
+
     input_->Update();
 }
 

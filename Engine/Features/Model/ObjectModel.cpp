@@ -48,6 +48,19 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 
 }
 
+void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    ModelManager::GetInstance()->PreDrawForObjectModel();
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+}
+
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromObj(_filePath);

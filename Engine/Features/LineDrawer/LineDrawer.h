@@ -26,6 +26,7 @@ public:
     void DrawOBB(const Matrix4x4& _affineMat);
     void DrawOBB(const std::array <Vector3, 8>& _vertices);
     void DrawSphere(const Matrix4x4& _affineMat);
+    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal);
 
 private:
     void TransferData();
