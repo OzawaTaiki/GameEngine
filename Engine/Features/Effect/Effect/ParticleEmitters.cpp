@@ -134,8 +134,6 @@ void ParticleEmitter::Draw() const
     case EmitterShape::Circle:
         // TODO : 円の描画
         {
-        Matrix4x4 affine = MakeAffineMatrix({ radius_ }, rotate_, position_);
-        LineDrawer::GetInstance()->DrawCircle(affine);
         }
         break;
     case EmitterShape::None:
