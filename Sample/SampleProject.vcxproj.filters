@@ -13,21 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Scene">
+    <Filter Include="Essential">
+      <UniqueIdentifier>{35122821-d01c-454c-96aa-437eeeeb157c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Essential\Framework">
+      <UniqueIdentifier>{fcc7b30e-bcce-4842-a127-0cdbda2f4eb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Essential\SceneFactory">
+      <UniqueIdentifier>{39b60f53-c8f1-4fcd-9b22-a97e97e8ca10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Essential\Scene">
       <UniqueIdentifier>{83677a5a-35df-4955-b6d3-9b4dab5ef035}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="MyGame.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="SampleScene.cpp">
+      <Filter>Essential\Scene</Filter>
     </ClCompile>
     <ClCompile Include="SceneFactory.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Essential\SceneFactory</Filter>
     </ClCompile>
-    <ClCompile Include="SampleScene.cpp">
+    <ClCompile Include="SampleFramework.cpp">
+      <Filter>Essential\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,14 +44,14 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyGame.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="SampleScene.h">
+      <Filter>Essential\Scene</Filter>
     </ClInclude>
     <ClInclude Include="SceneFactory.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Essential\SceneFactory</Filter>
     </ClInclude>
-    <ClInclude Include="SampleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="SampleFramework.h">
+      <Filter>Essential\Framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

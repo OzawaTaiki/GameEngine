@@ -4,6 +4,7 @@
 #include <Debug/ImGuiManager.h>
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
+#include <Core/DXCommon/TextureManager/TextureManager.h>
 
 
 SampleScene::~SampleScene()
@@ -18,9 +19,6 @@ void SampleScene::Initialize()
     SceneCamera_.UpdateMatrix();
     debugCamera_.Initialize();
 
-    plane_ = std::make_unique<ObjectModel>();
-    plane_->Initialize("Tile/Tile.gltf", "Ground");
-    plane_->GetUVTransform().SetScale(Vector2(100, 100));
 
     lineDrawer_ = LineDrawer::GetInstance();
     lineDrawer_->Initialize();
@@ -28,17 +26,18 @@ void SampleScene::Initialize()
 
     input_ = Input::GetInstance();
 
+    oModel_ = std::make_unique<ObjectModel>();
+    oModel_->Initialize("Plane/Plane.gltf","model");
+    oModel_->translate_.x = 3;
+
     aModel_ = std::make_unique<AnimationModel>();
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
-    oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("Cylinder.gltf", "c");
+    uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
+    sprite_ = Sprite::Create(textureHandle);
 
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
-
-    button_ = std::make_unique<UIButton>();
-    button_->Initialize("button");
 
 }
 
@@ -55,12 +54,11 @@ void SampleScene::Update()
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
 
-    plane_->Update();
-    aModel_->Update();
     oModel_->Update();
-    button_->Update();
+    aModel_->Update();
+    sprite_->Update();
 
-    if (button_->IsPressed()||input_->IsKeyTriggered(DIK_TAB))
+    if (input_->IsKeyTriggered(DIK_TAB))
     {
         SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }
@@ -84,17 +82,17 @@ void SampleScene::Update()
 void SampleScene::Draw()
 {
 
-    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
-    //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
-
+    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     Sprite::PreDraw();
+    sprite_->Draw();
+
+
     //button_->Draw();
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
-    //lineDrawer_->Draw();
 
 }
 

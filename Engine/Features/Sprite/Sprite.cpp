@@ -74,6 +74,7 @@ Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
     Sprite* sprite = SpriteManager::GetInstance()->Create();
     sprite->textureHandle_ = _textureHandle;
     sprite->anchor_ = _anchor;
+    sprite->Initialize();
 
     return sprite;
 }

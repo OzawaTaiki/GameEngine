@@ -41,13 +41,13 @@ private:
     ParticleManager* particleManager_ = nullptr;
 
     std::unique_ptr<AnimationModel> aModel_ = nullptr;
-    std::unique_ptr<ObjectModel> oModel_ = nullptr;
 
-    std::unique_ptr<ObjectModel> plane_ = nullptr;
+    std::unique_ptr<ObjectModel> oModel_= nullptr;
+
+    Sprite* sprite_ = nullptr;
 
     std::unique_ptr<LightGroup> lights_;
 
-    std::unique_ptr<UIButton> button_ = nullptr;
 
 
 #ifdef _DEBUG

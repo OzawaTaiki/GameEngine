@@ -1,10 +1,10 @@
-#include "MyGame.h"
+#include "SampleFramework.h"
 
 #include "SampleScene.h"
 #include <Features/Scene/ParticleTestScene.h>
 #include "SceneFactory.h"
 
-void Sample::Initialize()
+void SampleFramework::Initialize()
 {
     Framework::Initialize();
 
@@ -18,7 +18,7 @@ void Sample::Initialize()
     sceneManager_->Initialize("Sample");
 }
 
-void Sample::Update()
+void SampleFramework::Update()
 {
     Framework::Update();
 
@@ -33,7 +33,7 @@ void Sample::Update()
     //=============================
 }
 
-void Sample::Draw()
+void SampleFramework::Draw()
 {
     Framework::PreDraw();
 
@@ -51,7 +51,7 @@ void Sample::Draw()
 
 }
 
-void Sample::Finalize()
+void SampleFramework::Finalize()
 {
     Framework::Finalize();
 }
