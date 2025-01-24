@@ -25,10 +25,13 @@ void AnimationModel::Update()
 
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
-    worldTransform_.quaternion_ = rotate_;
 
+    if (useQuaternion_)
+        worldTransform_.quaternion_ = quaternion_;
+    else
+        worldTransform_.rotate_ = euler_;
 
-    worldTransform_.UpdateData(/*{ model_->GetNodeMatrix(),model_->GetAnimationMatrix()}*/);
+    worldTransform_.UpdateData(useQuaternion_);
 }
 
 void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)

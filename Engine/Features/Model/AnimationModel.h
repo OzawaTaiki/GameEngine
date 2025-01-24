@@ -39,7 +39,11 @@ public:
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
-    Quaternion rotate_ = { 0,0,0,1 };
+    // オイラー
+    Vector3 euler_ = { 0,0,0 };
+    // クォータニオン
+    Quaternion quaternion_ = { 0,0,0,1 };
+    bool useQuaternion_ = false;
 
 
 private:

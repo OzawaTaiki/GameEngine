@@ -30,7 +30,7 @@ void ObjectModel::Update(const bool _showImgui)
     if (useQuaternion_)
         worldTransform_.quaternion_ = quaternion_;
     else
-        worldTransform_.rotate_ = rotate_;
+        worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData();
 }
 
@@ -65,7 +65,7 @@ void ObjectModel::ImGui()
     ImGui::SeparatorText(name_.c_str());
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
-    ImGui::DragFloat3("Rotate", &rotate_.x, 0.01f);
+    ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
     ImGui::PopID();
 }
 #endif // _DEBUG

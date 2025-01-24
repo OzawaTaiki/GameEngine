@@ -32,7 +32,7 @@ public:
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
-    Vector3 rotate_ = { 0,0,0 };
+    Vector3 euler_ = { 0,0,0 };
 
     Quaternion quaternion_ = { 0,0,0,1 };
     bool useQuaternion_ = false;
