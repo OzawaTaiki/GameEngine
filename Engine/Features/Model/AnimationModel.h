@@ -19,6 +19,7 @@ public:
     void Initialize(const std::string& _filePath);
     void Update();
     void Draw(const Camera* _camera, const Vector4& _color);
+    void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
 
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void StopAnimation() { model_->StopAnimation(); }
@@ -39,7 +40,11 @@ public:
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
-    Quaternion rotate_ = { 0,0,0,1 };
+    // オイラー
+    Vector3 euler_ = { 0,0,0 };
+    // クォータニオン
+    Quaternion quaternion_ = { 0,0,0,1 };
+    bool useQuaternion_ = false;
 
 
 private:

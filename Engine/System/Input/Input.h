@@ -22,16 +22,19 @@ enum class PadButton
 	iPad_Down	= XINPUT_GAMEPAD_DPAD_DOWN,			// ↓
     iPad_Left	= XINPUT_GAMEPAD_DPAD_LEFT,			// ←
     iPad_Right	= XINPUT_GAMEPAD_DPAD_RIGHT,		// →
+    iPad_Start	= XINPUT_GAMEPAD_START,				// Start
+    iPad_Back	= XINPUT_GAMEPAD_BACK,				// Back
+    iPad_LS		= XINPUT_GAMEPAD_LEFT_THUMB,		// LS
+    iPad_RS		= XINPUT_GAMEPAD_RIGHT_THUMB,		// RS
+    iPad_LB     = XINPUT_GAMEPAD_LEFT_SHOULDER,		// LB
+    iPad_RB     = XINPUT_GAMEPAD_RIGHT_SHOULDER,	// RB
+    iPad_LT     = 0x0400,                           // LT
+    iPad_RT     = 0x0800,                           // RT
     iPad_A		= XINPUT_GAMEPAD_A,					// A
     iPad_B		= XINPUT_GAMEPAD_B,					// B
     iPad_X		= XINPUT_GAMEPAD_X,					// X
     iPad_Y		= XINPUT_GAMEPAD_Y,					// Y
-    iPad_LB		= XINPUT_GAMEPAD_LEFT_SHOULDER,		// LB
-    iPad_RB		= XINPUT_GAMEPAD_RIGHT_SHOULDER,	// RB
-    iPad_LS		= XINPUT_GAMEPAD_LEFT_THUMB,		// LS
-    iPad_RS		= XINPUT_GAMEPAD_RIGHT_THUMB,		// RS
-    iPad_Start	= XINPUT_GAMEPAD_START,				// Start
-    iPad_Back	= XINPUT_GAMEPAD_BACK,				// Back
+
 
 
 	iPad_Max       // ボタン数
@@ -77,7 +80,17 @@ public:
     // 戻り値 : パッドの右スティックの値
     Vector2 GetPadRightStick() const;
 
-    void SetDeadZone(float _deadZone);
+    /// <summary>
+    /// スティックのデッドゾーンを設定
+    /// </summary>
+    /// <param name="_deadZone">: 0 ~ 1 </param>
+    void SetStickDeadZone(float _deadZone);
+
+    /// <summary>
+    /// LT RT のデッドゾーンを設定
+    /// </summary>
+    /// <param name="_deadZone">: 0 ~ 1 </param>
+    void SetTriggerDeadZone(float _deadZone);
 
     bool IsControllerConnected() {
         XINPUT_STATE state; ZeroMemory(&state, sizeof(XINPUT_STATE));
@@ -98,8 +111,21 @@ private:
 	DIMOUSESTATE mouse_ = {};
 	DIMOUSESTATE preMouse_ = {};
 
+    struct PadLRTrgger
+    {
+        bool isTriggered = false;
+        bool preIsTriggered = false;
+        float value = 0.0f;
+        float deadZone = 0.1f;
+    };
+
+    // LRTriggerのデータ
+    void UpdatePadLRTrigger();
+
     _XINPUT_STATE xInputState_ = {};
     _XINPUT_STATE preXInputState_ = {};
+    PadLRTrgger leftTrigger_;
+    PadLRTrgger rightTrigger_;
     float currentVibrateTime_ = 0.0f;
     float vibrateTimeMax_ = 0.0f;
     float deadZone_ = 0.1f;

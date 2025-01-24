@@ -31,7 +31,7 @@ void LightGroup::SetDirectionalLight(const DirectionalLight& _light)
     dirty_ = true;
 }
 
-void LightGroup::AddPointLight(const PointLight& _light, const std::string& _name)
+void LightGroup::AddPointLight(const PointLight& _light, const std::string& _name, Vector3* _parent)
 {
     if (selectablePointLights_.size() >= MAX_POINT_LIGHT)
         return;
@@ -83,10 +83,15 @@ void LightGroup::AddPointLight(const PointLight& _light, const std::string& _nam
 
     pl.select = false;
 
+    if (_parent)
+    {
+        pl.parent = _parent;
+    }
+
     dirty_ = true;
 }
 
-void LightGroup::AddSpotLight(const SpotLight& _light, const std::string& _name)
+void LightGroup::AddSpotLight(const SpotLight& _light, const std::string& _name, Vector3* _parent)
 {
     if (selectableSpotLights_.size() >= MAX_SPOT_LIGHT)
         return;
@@ -138,7 +143,37 @@ void LightGroup::AddSpotLight(const SpotLight& _light, const std::string& _name)
 
     sl.select = false;
 
+    if (_parent)
+    {
+        sl.parent = _parent;
+    }
+
     dirty_ = true;
+}
+
+PointLight& LightGroup::GetPointLight(const std::string& _name)
+{
+    for (auto& light : selectablePointLights_)
+    {
+        if (light.name == _name)
+        {
+            return light.light;
+        }
+    }
+
+    return selectablePointLights_.front().light;
+}
+
+SpotLight& LightGroup::GetSpotLight(const std::string& _name)
+{
+    for (auto& light : selectableSpotLights_)
+    {
+        if (light.name == _name)
+        {
+            return light.light;
+        }
+    }
+    return selectableSpotLights_.front().light;
 }
 
 void LightGroup::DeletePointLight(const std::string& _name)
@@ -181,13 +216,23 @@ LightGroup::LightTransferData LightGroup::GetLightData()
     size_t i = 0;
     for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
     {
-        data.pointLights[i++] = it->light;
+        data.pointLights[i] = it->light;
+        if (it->parent)
+        {
+            data.pointLights[i].position += *it->parent;
+        }
+        i++;
     }
 
     i = 0;
     for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
     {
-        data.spotLights[i++] = it->light;
+        data.spotLights[i] = it->light;
+        if (it->parent)
+        {
+            data.spotLights[i].position += *it->parent;
+        }
+        i++;
     }
 
     dirty_ = false;

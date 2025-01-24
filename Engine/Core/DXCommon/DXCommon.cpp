@@ -119,6 +119,19 @@ void DXCommon::PostDraw()
 	swapChain_->Present(1, 0);			//	画面が切り替わる
 
 	/// GPUにSignalを送る
+	WaitForGPU();
+
+	UpdateFixFPS();
+
+	//次のフレーム用のコマンドリストを準備
+	hr = commandAllocator_->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}
+
+void DXCommon::WaitForGPU()
+{
 	//Fenceの値の更新
 	fenceValue_++;
 	//GPUがここまでたどり着いたときに，Fenceの値を指定した値に代入するようにSignalを送る
@@ -133,14 +146,6 @@ void DXCommon::PostDraw()
 		//イベント待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
-
-	UpdateFixFPS();
-
-	//次のフレーム用のコマンドリストを準備
-	hr = commandAllocator_->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
-	assert(SUCCEEDED(hr));
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _sizeInBytes)
@@ -288,6 +293,14 @@ void DXCommon::InitializeCommand()
 	/// コマンドキューを生成
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	hresult = device_->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
+	assert(SUCCEEDED(hresult));
+
+
+	// ロード用
+	hresult = device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&loadCommandAllocator_));
+	assert(SUCCEEDED(hresult));
+
+	hresult = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, loadCommandAllocator_.Get(), nullptr, IID_PPV_ARGS(&loadCommanList_));
 	assert(SUCCEEDED(hresult));
 }
 

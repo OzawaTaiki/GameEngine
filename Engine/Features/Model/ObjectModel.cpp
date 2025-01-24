@@ -4,9 +4,6 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Collision/Manager/CollisionManager.h>
 
-// TODO : ライトを独立させる
-// ライトをstructureにして，ライトの数だけ配列を作る
-
 void ObjectModel::Initialize(const std::string& _filePath, const std::string& _name)
 {
     model_ = Model::CreateFromObj(_filePath);
@@ -33,7 +30,7 @@ void ObjectModel::Update(const bool _showImgui)
     if (useQuaternion_)
         worldTransform_.quaternion_ = quaternion_;
     else
-        worldTransform_.rotate_ = rotate_;
+        worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData();
 }
 
@@ -49,6 +46,19 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
 
+}
+
+void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    ModelManager::GetInstance()->PreDrawForObjectModel();
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)
@@ -68,7 +78,7 @@ void ObjectModel::ImGui()
     ImGui::SeparatorText(name_.c_str());
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
-    ImGui::DragFloat3("Rotate", &rotate_.x, 0.01f);
+    ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
     ImGui::PopID();
 }
 #endif // _DEBUG

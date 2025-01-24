@@ -73,7 +73,7 @@ void Camera::TransferData()
 
 void Camera::UpdateMatrix()
 {
-    matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_);
+    matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_ + shakeOffset_);
     matView_ = Inverse(matWorld_);
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
     matViewProjection_ = matView_ * matProjection_;

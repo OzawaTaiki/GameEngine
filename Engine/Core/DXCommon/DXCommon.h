@@ -22,7 +22,13 @@ public:
 	void PreDraw();
 	void PostDraw();
 
+    void WaitForGPU();
+
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
+	ID3D12GraphicsCommandList* GetLoadCommandList() { return loadCommanList_.Get(); }
+
+	ID3D12CommandQueue* GetCommandQueue() { return commandQueue_.Get(); }
+	ID3D12CommandAllocator* GetLoadCommandAllocator() { return loadCommandAllocator_.Get(); }
 	ID3D12Device* GetDevice() { return device_.Get(); }
 
 	size_t GetBackBufferSize() const { return swapChainDesc_.BufferCount; }
@@ -61,7 +67,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> loadCommandAllocator_;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> loadCommanList_;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
 

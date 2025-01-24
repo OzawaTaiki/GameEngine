@@ -27,13 +27,6 @@ public:
     // マスクを取得する
     uint32_t GetMask(const std::string& _atrribute);
 
-private:
-
-    // 衝突判定を行う前の事前チェック
-    bool PreCheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
-
-    // 衝突判定を行う
-    void CheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
 
     bool IsCollision(const Sphere& _sphere1, const Sphere& _sphere2);
 
@@ -46,6 +39,14 @@ private:
     bool IsCollision(const AABB& _aabb, const OBB& _obb);
 
     bool IsCollision(const OBB& _obb1, const OBB& _obb2);
+
+private:
+
+    // 衝突判定を行う前の事前チェック
+    bool PreCheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
+
+    // 衝突判定を行う
+    void CheckCollisionPair(Collider* _colliderA, Collider* _colliderB);
 
     void CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max);
 

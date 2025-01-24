@@ -43,6 +43,7 @@ protected:
     Input*                  input_                  = nullptr;//
     SceneManager*           sceneManager_           = nullptr;//
     CollisionManager*       collisionManager_       = nullptr;//
+    GameTime*               gameTime_               = nullptr;//
 
 
     bool endRequest_ = false;

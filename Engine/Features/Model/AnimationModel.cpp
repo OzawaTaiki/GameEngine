@@ -25,10 +25,13 @@ void AnimationModel::Update()
 
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
-    worldTransform_.quaternion_ = rotate_;
 
+    if (useQuaternion_)
+        worldTransform_.quaternion_ = quaternion_;
+    else
+        worldTransform_.rotate_ = euler_;
 
-    worldTransform_.UpdateData(/*{ model_->GetNodeMatrix(),model_->GetAnimationMatrix()}*/);
+    worldTransform_.UpdateData(useQuaternion_);
 }
 
 void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
@@ -44,6 +47,19 @@ void AnimationModel::Draw(const Camera* _camera, const Vector4& _color)
     model_->QueueCommandAndDraw(commandList, true);// BVB IBV MTL2 TEX4 LIGHT567
 
     //model_->DrawSkeleton(worldTransform_.matWorld_);
+}
+
+void AnimationModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    ModelManager::GetInstance()->PreDrawForAnimationModel();
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    model_->QueueCommandAndDraw(commandList, _textureHandle, true);// BVB IBV MTL2 TEX4 LIGHT567
 }
 
 void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)

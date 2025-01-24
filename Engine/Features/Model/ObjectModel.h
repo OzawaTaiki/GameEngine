@@ -15,7 +15,7 @@ public:
     void Initialize(const std::string& _filePath, const std::string& _name);
     void Update(const bool _showImgui = true);
     void Draw(const Camera* _camera ,const Vector4& _color);
-
+    void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
 
 
@@ -32,7 +32,7 @@ public:
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
-    Vector3 rotate_ = { 0,0,0 };
+    Vector3 euler_ = { 0,0,0 };
 
     Quaternion quaternion_ = { 0,0,0,1 };
     bool useQuaternion_ = false;

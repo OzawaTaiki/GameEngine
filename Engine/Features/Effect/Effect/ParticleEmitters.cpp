@@ -133,6 +133,8 @@ void ParticleEmitter::Draw() const
         break;
     case EmitterShape::Circle:
         // TODO : 円の描画
+        {
+        }
         break;
     case EmitterShape::None:
         break;

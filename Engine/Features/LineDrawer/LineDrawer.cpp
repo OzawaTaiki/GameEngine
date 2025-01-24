@@ -114,6 +114,18 @@ void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
     }
 }
 
+void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal)
+{
+    const float kEvery = std::numbers::pi_v<float> *2.0f / _segmentCount;
+    for (uint32_t index = 0; index < _segmentCount; ++index)
+    {
+        float rad = index * kEvery;
+        float nextRad = (index + 1) * kEvery;
+        Vector3 spos = _center + Vector3{ std::cos(rad) * _radius, 0.0f, std::sin(rad) * _radius };
+        Vector3 epos = _center + Vector3{ std::cos(nextRad) * _radius, 0.0f, std::sin(nextRad) * _radius };
+        RegisterPoint(spos, epos);
+    }
+}
 
 void LineDrawer::TransferData()
 {

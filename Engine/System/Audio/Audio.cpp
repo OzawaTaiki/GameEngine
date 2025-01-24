@@ -87,7 +87,6 @@ uint32_t Audio::SoundLoadWave(const std::string& _filename)
 
 void Audio::SoundUnLoad(SoundData* _soundData)
 {
-    //TODO: サウンド再生チェック
     delete[] _soundData->pBuffer;
 
     _soundData->pBuffer = 0;
