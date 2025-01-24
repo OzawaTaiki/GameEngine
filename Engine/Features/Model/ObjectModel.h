@@ -13,7 +13,7 @@ public:
     ~ObjectModel() = default;
 
     void Initialize(const std::string& _filePath, const std::string& _name="");
-    void Update(const bool _showImgui = true);
+    void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
@@ -38,6 +38,9 @@ public:
     bool useQuaternion_ = false;
 
 
+#ifdef _DEBUG
+    void ImGui();
+#endif // _DEBUG
 
 
 private:
@@ -47,9 +50,6 @@ private:
     Model* model_ = nullptr;
     std::string name_ = "";
 
-#ifdef _DEBUG
-    void ImGui();
-#endif // _DEBUG
 
 
 };

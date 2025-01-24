@@ -16,9 +16,6 @@ void AnimationModel::Initialize(const std::string& _filePath)
 
 void AnimationModel::Update()
 {
-#ifdef _DEBUG
-    //ImGui();
-#endif // _DEBUG
 
 
     model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());

@@ -19,12 +19,8 @@ void ObjectModel::Initialize(const std::string& _filePath, const std::string& _n
 
 }
 
-void ObjectModel::Update(const bool _showImgui)
+void ObjectModel::Update()
 {
-#ifdef _DEBUG
-    //if(_showImgui)
-        //ImGui();
-#endif // _DEBUG
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
