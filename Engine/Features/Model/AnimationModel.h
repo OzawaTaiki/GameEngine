@@ -47,6 +47,9 @@ public:
     bool useQuaternion_ = false;
 
 
+#ifdef _DEBUG
+    void ImGui();
+#endif // _DEBUG
 private:
 
     WorldTransform worldTransform_;
@@ -56,8 +59,5 @@ private:
     std::string timeChannel = "default";
     GameTime* gameTime_ = nullptr;
 
-#ifdef _DEBUG
-    void ImGui();
-#endif // _DEBUG
 
 };
