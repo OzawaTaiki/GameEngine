@@ -8,9 +8,6 @@
 
 SampleScene::~SampleScene()
 {
-    delete ring_;
-    delete ellipse_;
-    delete cylinder_;
 }
 
 void SampleScene::Initialize()
@@ -37,113 +34,32 @@ void SampleScene::Initialize()
     oModel_ = std::make_unique<ObjectModel>();
     oModel_->Initialize("Cylinder.gltf", "c");
 
-    gameTime_ = GameTime::GetInstance();
-
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
     button_ = std::make_unique<UIButton>();
     button_->Initialize("button");
 
-    ring_ = new Ring(1, 2, 16, { true,true,true });
-    ring_->Generate();
-
-    ellipse_ = new EllipseModel(1,6);
-    ellipse_->Generate();
-
-    cylinder_ = new Cylinder(1, 1, 2, 8, true, true);
-    cylinder_->Generate();
-
-    uvTransformAnimetion_.AddTransform(&plane_->GetUVTransform());
-    uvTransformAnimetion_.SetDuration(1.0f);
-    //uvTransformAnimetion_.SetRotationSpeed(0.1f);
-    uvTransformAnimetion_.SetScrollSpeed({ 0.1f,0.1f });
-    uvTransformAnimetion_.SetLooping(true);
-
-    //spriteSheetAnimetion_.AddTransform(&aModel_->GetUVTransform());
-    //spriteSheetAnimetion_.SetDuration(1.0f);
-    //spriteSheetAnimetion_.SetLooping(true);
-    //spriteSheetAnimetion_.SetSheetNumX(8);
-    //spriteSheetAnimetion_.SetSheetNumY(8);
-    //spriteSheetAnimetion_.SetSheetNum(64);
-
 }
 
 void SampleScene::Update()
 {
-    gameTime_->Update();
-
     // シーン関連更新
 #ifdef _DEBUG
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
 
-    if(ImGui::Button("rotate"))
-    {
-        aModel_->SetAnimation("RotateAnim");
-    }
-    if (ImGui::Button("scale"))
-    {
-        aModel_->SetAnimation("ScaleAnim",true);
-    }
-    if (ImGui::Button("stop"))
-    {
-        aModel_->StopAnimation();
-    }
-    if (ImGui::Button("idle"))
-    {
-        aModel_->ToIdle(1.0f);
-    }
-
-    if (ImGui::Button("slow"))
-    {
-        gameTime_->GetChannel("default").SetGameSpeed(0.5f);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("normal"))
-    {
-        gameTime_->GetChannel("default").SetGameSpeed(1.0f);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("fast"))
-    {
-        gameTime_->GetChannel("default").SetGameSpeed(2.0f);
-    }
-
-    if (ImGui::Button("Add PL"))
-    {
-        PointLight light = {};
-        lights_->AddPointLight(light);
-    }
-
-    if (ImGui::Button("Add SL"))
-    {
-        SpotLight light = {};
-        lights_->AddSpotLight(light);
-    }
-
-    if (ImGui::Button("Set"))
-    {
-        LightingSystem::GetInstance()->SetLightGroup(lights_.get());
-    }
-
-    if (ImGui::Button("Play"))
-    {
-        //spriteSheetAnimetion_.Play();
-        uvTransformAnimetion_.Play();
-    }
-
     lights_->DrawDebugWindow();
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
-    uvTransformAnimetion_.Update(gameTime_->GetChannel("default").GetDeltaTime<float>());
-    //spriteSheetAnimetion_.Update(gameTime_->GetChannel("default").GetDeltaTime<float>());
+
     plane_->Update();
     aModel_->Update();
     oModel_->Update();
     button_->Update();
+
     if (button_->IsPressed()||input_->IsKeyTriggered(DIK_TAB))
     {
         SceneManager::GetInstance()->ReserveScene("ParticleTest");
@@ -162,32 +78,17 @@ void SampleScene::Update()
         SceneCamera_.UpdateMatrix();
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
-    ring_->Update();
-    ellipse_->Update();
-    cylinder_->Update();
-
-
 
 }
 
 void SampleScene::Draw()
 {
 
-    ModelManager::GetInstance()->PreDrawForObjectModel();
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
     //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    ModelManager::GetInstance()->PreDrawForAnimationModel();
     //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    ring_->Draw(SceneCamera_, { 1,1,1,1 });
-    //ring_->Draw();
-
-    ellipse_->Draw(SceneCamera_, { 1,1,1,1 });
-    //ellipse_->Draw();
-
-    cylinder_->Draw(SceneCamera_, { 1,1,1,1 });
-    //cylinder_->Draw();
 
     Sprite::PreDraw();
     //button_->Draw();

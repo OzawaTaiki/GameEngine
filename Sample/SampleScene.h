@@ -49,19 +49,6 @@ private:
 
     std::unique_ptr<UIButton> button_ = nullptr;
 
-    GameTime* gameTime_;
-
-    Ring* ring_;
-
-    EllipseModel* ellipse_;
-
-    Cylinder* cylinder_;
-
-    UVTransformAnimation uvTransformAnimetion_;
-
-    SpriteSheetAnimation spriteSheetAnimetion_;
-
-
 
 #ifdef _DEBUG
     void ImGui();

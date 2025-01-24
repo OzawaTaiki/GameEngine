@@ -4,9 +4,6 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Collision/Manager/CollisionManager.h>
 
-// TODO : ライトを独立させる
-// ライトをstructureにして，ライトの数だけ配列を作る
-
 void ObjectModel::Initialize(const std::string& _filePath, const std::string& _name)
 {
     model_ = Model::CreateFromObj(_filePath);
