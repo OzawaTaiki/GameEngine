@@ -1,8 +1,8 @@
 #include "SampleFramework.h"
 
-#include "SampleScene.h"
+#include <src/Scene/SampleScene.h>
+#include <src/Factory/SceneFactory.h>
 #include <Features/Scene/ParticleTestScene.h>
-#include "SceneFactory.h"
 
 void SampleFramework::Initialize()
 {

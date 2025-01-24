@@ -27,16 +27,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SampleScene.cpp">
-      <Filter>Essential\Scene</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SceneFactory.cpp">
-      <Filter>Essential\SceneFactory</Filter>
-    </ClCompile>
-    <ClCompile Include="SampleFramework.cpp">
+    <ClCompile Include="src\Framework\SampleFramework.cpp">
       <Filter>Essential\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\Scene\SampleScene.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Factory\SceneFactory.cpp">
+      <Filter>Essential\SceneFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\FeatureScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,14 +47,17 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SampleScene.h">
+    <ClInclude Include="src\Framework\SampleFramework.h">
+      <Filter>Essential\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\FeatureScene.h">
       <Filter>Essential\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="SceneFactory.h">
-      <Filter>Essential\SceneFactory</Filter>
+    <ClInclude Include="src\Scene\SampleScene.h">
+      <Filter>Essential\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="SampleFramework.h">
-      <Filter>Essential\Framework</Filter>
+    <ClInclude Include="src\Factory\SceneFactory.h">
+      <Filter>Essential\SceneFactory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #include "SceneFactory.h"
 
-#include "SampleScene.h"
+#include <src/Scene/SampleScene.h>
+#include <src/Scene/FeatureScene.h>
+
 #include <Features/Scene/ParticleTestScene.h>
 
 std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
