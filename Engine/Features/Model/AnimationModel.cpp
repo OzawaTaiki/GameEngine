@@ -17,7 +17,7 @@ void AnimationModel::Initialize(const std::string& _filePath)
 void AnimationModel::Update()
 {
 #ifdef _DEBUG
-    ImGui();
+    //ImGui();
 #endif // _DEBUG
 
 

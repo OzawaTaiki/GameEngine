@@ -2,11 +2,11 @@
 
 #include <Framework/Framework.h>
 
-class Sample : public Framework
+class SampleFramework : public Framework
 {
 public:
-    Sample() = default;
-    ~Sample() = default;
+    SampleFramework() = default;
+    ~SampleFramework() = default;
 
     void Initialize() override;
     void Update() override;
