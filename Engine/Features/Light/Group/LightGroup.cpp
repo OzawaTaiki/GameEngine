@@ -15,6 +15,9 @@ void LightGroup::Initialize()
         .intensity = 1.0f,
         .isHalf = 1
     };
+
+    selectablePointLights_.clear();
+    selectableSpotLights_.clear();
 }
 
 void LightGroup::Update()
@@ -210,29 +213,39 @@ LightGroup::LightTransferData LightGroup::GetLightData()
 
     data.directionalLight = directionalLight_;
 
-    data.numPointLight = static_cast<uint32_t>(selectablePointLights_.size());
-    data.numSpotLight = static_cast<uint32_t>(selectableSpotLights_.size());
+    if(!enableDirectionalLight_)
+        data.directionalLight.intensity = 0;
+
+
 
     size_t i = 0;
-    for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
+    if(enablePointLight_)
     {
-        data.pointLights[i] = it->light;
-        if (it->parent)
+        data.numPointLight = static_cast<uint32_t>(selectablePointLights_.size());
+        for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
         {
-            data.pointLights[i].position += *it->parent;
+            data.pointLights[i] = it->light;
+            if (it->parent)
+            {
+                data.pointLights[i].position += *it->parent;
+            }
+            i++;
         }
-        i++;
     }
 
-    i = 0;
-    for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
+    if(enableSpotLight_)
     {
-        data.spotLights[i] = it->light;
-        if (it->parent)
+        i = 0;
+        data.numSpotLight = static_cast<uint32_t>(selectableSpotLights_.size());
+        for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
         {
-            data.spotLights[i].position += *it->parent;
+            data.spotLights[i] = it->light;
+            if (it->parent)
+            {
+                data.spotLights[i].position += *it->parent;
+            }
+            i++;
         }
-        i++;
     }
 
     dirty_ = false;
@@ -246,6 +259,11 @@ void LightGroup::DrawDebugWindow()
 
     ImGui::Begin("LightGroup");
 
+    ImGui::Checkbox("DirectionalLight", &enableDirectionalLight_);
+    ImGui::Checkbox("PointLight", &enablePointLight_);
+    ImGui::Checkbox("SpotLight", &enableSpotLight_);
+
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.18f, 0.22f, 0.58f, 0.71f));
     if(ImGui::CollapsingHeader("Directional Light"))
     {
         ImGui::ColorEdit4("Color", &directionalLight_.color.x);
@@ -384,6 +402,7 @@ void LightGroup::DrawDebugWindow()
         ImGui::EndTabBar();
     }
     ImGui::PopID();
+    ImGui::PopStyleColor();
 
     ImGui::End();
 #endif // _DEBUG
