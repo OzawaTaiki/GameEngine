@@ -95,7 +95,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Factory\SceneFactory.cpp" />
     <ClCompile Include="src\Framework\SampleFramework.cpp" />
-    <ClCompile Include="src\Scene\FeatureScene.cpp" />
+    <ClCompile Include="src\Scene\EssentialScene.cpp" />
+    <ClCompile Include="src\Scene\LightScene.cpp" />
     <ClCompile Include="src\Scene\SampleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +115,8 @@
   <ItemGroup>
     <ClInclude Include="src\Factory\SceneFactory.h" />
     <ClInclude Include="src\Framework\SampleFramework.h" />
-    <ClInclude Include="src\Scene\FeatureScene.h" />
+    <ClInclude Include="src\Scene\EssentialScene.h" />
+    <ClInclude Include="src\Scene\LightScene.h" />
     <ClInclude Include="src\Scene\SampleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

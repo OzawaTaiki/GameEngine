@@ -19,12 +19,12 @@
 
 #include <memory>
 
-class FeatureScene : public BaseScene
+class EssentialScene : public BaseScene
 {
 
 public:
 
-    ~FeatureScene() override;
+    ~EssentialScene() override;
 
     void Initialize() override;
     void Update() override;

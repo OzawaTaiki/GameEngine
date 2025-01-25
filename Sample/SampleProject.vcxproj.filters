@@ -39,8 +39,11 @@
     <ClCompile Include="src\Factory\SceneFactory.cpp">
       <Filter>Essential\SceneFactory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\FeatureScene.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Scene\EssentialScene.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\LightScene.cpp">
+      <Filter>Essential\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,7 +53,7 @@
     <ClInclude Include="src\Framework\SampleFramework.h">
       <Filter>Essential\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\FeatureScene.h">
+    <ClInclude Include="src\Scene\EssentialScene.h">
       <Filter>Essential\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\SampleScene.h">
@@ -58,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="src\Factory\SceneFactory.h">
       <Filter>Essential\SceneFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\LightScene.h">
+      <Filter>Essential\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-#include "FeatureScene.h"
+#include "EssentialScene.h"
 
 #include <Features/Scene/Manager/SceneManager.h>
 #include <Debug/ImGuiManager.h>
@@ -7,11 +7,11 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
 
-FeatureScene::~FeatureScene()
+EssentialScene::~EssentialScene()
 {
 }
 
-void FeatureScene::Initialize()
+void EssentialScene::Initialize()
 {
     SceneCamera_.Initialize();
     SceneCamera_.translate_ = { 0,5,-20 };
@@ -38,7 +38,7 @@ void FeatureScene::Initialize()
 
 }
 
-void FeatureScene::Update()
+void EssentialScene::Update()
 {
     // シーン関連更新
 #ifdef _DEBUG
@@ -76,7 +76,7 @@ void FeatureScene::Update()
 
 }
 
-void FeatureScene::Draw()
+void EssentialScene::Draw()
 {
 
     sphere_->Draw(&SceneCamera_, sphereTexture_, { 1,1,1,1 });
