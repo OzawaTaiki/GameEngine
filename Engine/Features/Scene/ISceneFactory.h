@@ -14,4 +14,6 @@ public:
     virtual ~ISceneFactory() = default;
 
     virtual std::unique_ptr<BaseScene> CreateScene(const std::string& _name) = 0;
+
+    virtual std::string ShowDebugWindow() = 0;
 };

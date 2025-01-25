@@ -94,16 +94,12 @@ void SceneManager::ImGui()
     if(ImGui::Checkbox("Fixed DeltaTime", &isFixed))
         Time::SetDeltaTimeFixed(isFixed);
 
+    std::string name = sceneFactory_->ShowDebugWindow();
+    if (!name.empty())
+    {
+        ReserveScene(name);
+    }
 
-    //for (auto& scene : scenes_)
-    //{
-    //    strcpy_s(comboLabel, scene.first.c_str());
-    //    if (ImGui::Button(comboLabel))
-    //    {
-    //        ReserveScene(scene.first);
-    //        break;
-    //    }
-    //}
 
     ImGui::Text("Current Scene : %s", currentSceneName_.c_str());
 
