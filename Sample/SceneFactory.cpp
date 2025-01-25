@@ -18,3 +18,24 @@ std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
 
     return nullptr;
 }
+
+std::string SceneFactory::ShowDebugWindow()
+{
+#ifdef _DEBUG
+
+    ImGui::SeparatorText("Scene Factory");
+
+    if (ImGui::Button("Sample"))
+    {
+        return "Sample";
+    }
+    if (ImGui::Button("ParticleTest"))
+    {
+        return "ParticleTest";
+    }
+
+
+#endif // _DEBUG
+    return "";
+
+}
