@@ -123,6 +123,10 @@ public:
     void AddPointLight(const PointLight& _light, const std::string& _name = "", Vector3* _parent = nullptr);
     void AddSpotLight(const SpotLight& _light, const std::string& _name = "", Vector3* _parent = nullptr);
 
+    void SetEnableDirectionalLight(bool _enable) { enableDirectionalLight_ = _enable; }
+    void SetEnablePointLight(bool _enable) { enablePointLight_ = _enable; }
+    void SetEnableSpotLight(bool _enable) { enableSpotLight_ = _enable; }
+
     PointLight& GetPointLight(const std::string& _name);
     SpotLight& GetSpotLight(const std::string& _name);
 
@@ -151,6 +155,10 @@ private:
     std::list<NamedLight<SpotLight>> selectableSpotLights_;
 
     bool dirty_ = false;    // 更新が必要か
+
+    bool enableDirectionalLight_ = true;
+    bool enablePointLight_ = true;
+    bool enableSpotLight_ = true;
 
     DirectionalLight directionalLight_;
 
