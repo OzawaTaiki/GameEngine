@@ -1,4 +1,4 @@
-#include "SampleScene.h"
+#include "AnimationNodeMisc.h"
 
 #include <Features/Scene/Manager/SceneManager.h>
 #include <Debug/ImGuiManager.h>
@@ -7,11 +7,11 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
 
-SampleScene::~SampleScene()
+AnimationNodeMisc::~AnimationNodeMisc()
 {
 }
 
-void SampleScene::Initialize()
+void AnimationNodeMisc::Initialize()
 {
     SceneCamera_.Initialize();
     SceneCamera_.translate_ = { 0,5,-20 };
@@ -27,15 +27,15 @@ void SampleScene::Initialize()
     input_ = Input::GetInstance();
 
     oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("Plane/Plane.gltf","model");
+    oModel_->Initialize("Plane/Plane.gltf", "model");
     oModel_->translate_.x = 3;
 
     aModel_ = std::make_unique<AnimationModel>();
     //aModel_->Initialize("AnimSample/AnimSample.gltf");
-    aModel_->Initialize("Animation_Node/Animation_Node_00.gltf");
-    aModel_->LoadAnimation("Animation_Node/Animation_Node_01.gltf");
-    aModel_->LoadAnimation("Animation_Node/Animation_Node_02.gltf");
-    aModel_->LoadAnimation("Animation_Node/Animation_Node_03.gltf");
+    aModel_->Initialize("Animation_NodeMisc/Animation_NodeMisc_00.gltf");
+    aModel_->LoadAnimation("Animation_NodeMisc/Animation_NodeMisc_01.gltf");
+    aModel_->LoadAnimation("Animation_NodeMisc/Animation_NodeMisc_02.gltf");
+    aModel_->LoadAnimation("Animation_NodeMisc/Animation_NodeMisc_03.gltf");
 
 
     //aModel_->SetAnimation("animation0", true);
@@ -48,7 +48,7 @@ void SampleScene::Initialize()
 
 }
 
-void SampleScene::Update()
+void AnimationNodeMisc::Update()
 {
     // シーン関連更新
 #ifdef _DEBUG
@@ -56,7 +56,7 @@ void SampleScene::Update()
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
 
-    if(ImGui::Button("00_View"))
+    if (ImGui::Button("00_View"))
     {
         aModel_->SetAnimation("animation0", true);
     }
@@ -104,7 +104,7 @@ void SampleScene::Update()
 
 }
 
-void SampleScene::Draw()
+void AnimationNodeMisc::Draw()
 {
 
     //oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
@@ -123,7 +123,7 @@ void SampleScene::Draw()
 
 #ifdef _DEBUG
 #include <imgui.h>
-void SampleScene::ImGui()
+void AnimationNodeMisc::ImGui()
 {
 
 }

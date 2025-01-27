@@ -45,6 +45,12 @@
     <ClCompile Include="src\Scene\LightScene.cpp">
       <Filter>Essential\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\LoadPlaneScene.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\AnimationNodeMisc.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -63,6 +69,12 @@
       <Filter>Essential\SceneFactory</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\LightScene.h">
+      <Filter>Essential\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\LoadPlaneScene.h">
+      <Filter>Essential\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\AnimationNodeMisc.h">
       <Filter>Essential\Scene</Filter>
     </ClInclude>
   </ItemGroup>

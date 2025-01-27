@@ -15,7 +15,7 @@ void SampleFramework::Initialize()
     sceneManager_->SetSceneFactory(new SceneFactory());
 
     // 最初のシーンで初期化
-    sceneManager_->Initialize("Feature");
+    sceneManager_->Initialize("Essential");
 }
 
 void SampleFramework::Update()
