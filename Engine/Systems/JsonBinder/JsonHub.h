@@ -88,6 +88,8 @@ public:
     template<typename T>
     void SetJsonValue(const std::string& _groupName, const std::string& _variableName, const std::list<T>& _value);
 
+    void LoadFile(const std::string& _filepath);
+
     void SetRootDirectoryPath(const std::string& _rootDirectoryPath) { rootDirectoryPath_ = _rootDirectoryPath; }
     void SetDirectoryPathFromRoot(const std::string& _directoryPathFromRoot) { jsonLoader_->SetFolderPath(_directoryPathFromRoot); }
 

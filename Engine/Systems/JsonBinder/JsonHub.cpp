@@ -22,6 +22,11 @@ void JsonHub::Save(const std::string& _groupName)
 }
 
 
+void JsonHub::LoadFile(const std::string& _filepath)
+{
+    jsonLoader_->LoadJson(_filepath);
+}
+
 void JsonHub::LoadRootDirectory()
 {
     LoadFilesRecursively(rootDirectoryPath_);
