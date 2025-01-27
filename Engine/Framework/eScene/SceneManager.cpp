@@ -82,7 +82,7 @@ void SceneManager::ReserveScene(const std::string& _name)
     assert(instance->scenes_.find(_name) != instance->scenes_.end());
     instance->nextSceneName_ = _name;
 
-    if (instance->transition_ != nullptr)
+    if (instance->transition_ != nullptr && !instance->isTransition_)
     {
         instance->transition_->Start();
         instance->isTransition_ = true;
