@@ -16,8 +16,6 @@ void AnimationModel::Initialize(const std::string& _filePath)
 
 void AnimationModel::Update()
 {
-
-
     model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
 
     worldTransform_.transform_ = translate_;

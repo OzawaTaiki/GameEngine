@@ -10,6 +10,7 @@
 #include <Debug/Debug.h>
 
 #include <cassert>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -180,6 +181,14 @@ void Model::ToIdle(float _timeToIdle)
     }
 }
 
+void Model::LoadAnimation(const std::string& _filePath)
+{
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+    assert(scene->HasAnimations());
+    LoadAnimation(scene, defaultDirpath_ + _filePath);
+}
+
 Vector3 Model::GetMin(size_t _index) const
 {
     if (_index == -1)
@@ -224,7 +233,8 @@ void Model::LoadFile(const std::string& _filepath)
 
     LoadMesh(scene);
     LoadMaterial(scene);
-    LoadAnimation(scene);
+
+    LoadAnimation(scene, filepath);
     LoadNode(scene);
     CreateSkeleton();
 
@@ -255,8 +265,8 @@ void Model::LoadMesh(const aiScene* _scene)
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
         {
             Mesh::VertexData vertex = {};
-            vertex.position = { -mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, mesh->mVertices[vertexIndex].z, 1.0f };
-            vertex.normal = { -mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, mesh->mNormals[vertexIndex].z };
+            vertex.position = { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, -mesh->mVertices[vertexIndex].z, 1.0f };
+            vertex.normal = { mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, -mesh->mNormals[vertexIndex].z };
             vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
 
             pMesh->vertices_.push_back(vertex);
@@ -322,15 +332,23 @@ void Model::LoadMaterial(const aiScene* _scene)
     }
 }
 
-void Model::LoadAnimation(const aiScene* _scene)
+void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath)
 {
     if (_scene->mNumAnimations == 0)
         return;
 
+
     for (uint32_t animationIndex = 0; animationIndex < _scene->mNumAnimations; ++animationIndex)
     {
         std::string name = _scene->mAnimations[animationIndex]->mName.C_Str();
+
+        if (name.empty())
+        {
+            name = "animation" + std::to_string(animationIndex + animation_.size());
+        }
+
         animation_[name] = std::make_unique<ModelAnimation>();
+        animation_[name]->ReadSampler(_filepath);
         animation_[name]->ReadAnimation(_scene->mAnimations[animationIndex]);
     }
 }
