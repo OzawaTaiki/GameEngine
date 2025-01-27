@@ -45,12 +45,34 @@ void SceneManager::Update()
     ImGui();
 #endif // _DEBUG
     Input::GetInstance()->Update();
+
     currentScene_->Update();
+    if (isTransition_)
+    {
+        transition_->Update();
+        if (transition_->IsEnd())
+        {
+            isTransition_ = false;
+        }
+    }
 }
 
 void SceneManager::Draw()
 {
     currentScene_->Draw();
+    if (isTransition_)
+    {
+        transition_->Draw();
+    }
+}
+
+void SceneManager::SetTransition(std::unique_ptr<ISceneTransition> _transition)
+{
+    if (_transition != nullptr)
+    {
+        transition_ = std::move(_transition);
+        transition_->Initialize();
+    }
 }
 
 void SceneManager::ReserveScene(const std::string& _name)
@@ -59,6 +81,12 @@ void SceneManager::ReserveScene(const std::string& _name)
 
     assert(instance->scenes_.find(_name) != instance->scenes_.end());
     instance->nextSceneName_ = _name;
+
+    if (instance->transition_ != nullptr)
+    {
+        instance->transition_->Start();
+        instance->isTransition_ = true;
+    }
 }
 
 void SceneManager::ChangeScene()
@@ -70,6 +98,15 @@ void SceneManager::ChangeScene()
     {
         return;
     }
+
+    if (instance->transition_ != nullptr)
+    {
+        if (!instance->transition_->CanSwitch())
+        {
+            return;
+        }
+    }
+
 
     instance->currentScene_.reset();
 

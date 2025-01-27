@@ -560,5 +560,6 @@
     <ClInclude Include="Systems\UVTransform\SpriteSheetAnimetion.h">
       <Filter>Systems\UVTransform</Filter>
     </ClInclude>
+    <ClInclude Include="ISceneTransition.h" />
   </ItemGroup>
 </Project>

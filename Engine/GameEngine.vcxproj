@@ -217,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Framework\Particle\ParticleEmitters.h" />
     <ClInclude Include="Framework\Particle\ParticleInitParam.h" />
     <ClInclude Include="Framework\Particle\ParticleManager.h" />
+    <ClInclude Include="ISceneTransition.h" />
     <ClInclude Include="MyGame.h" />
     <ClInclude Include="Physics\Collision\Collider.h" />
     <ClInclude Include="Physics\Collision\CollisionManager.h" />

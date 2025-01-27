@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseScene.h"
+#include <ISceneTransition.h>
 #include <iostream>
 #include <cstdint>
 #include <string>
@@ -29,6 +30,8 @@ public:
     // 描画
     void Draw();
 
+    void SetTransition(std::unique_ptr<ISceneTransition> _transition);
+
     // シーンの予約
     // _name : 予約するシーンの名前
     static void ReserveScene(const std::string& _name);
@@ -43,6 +46,9 @@ private:
     std::unordered_map<std::string, SceneFactory>   scenes_ = {};
     // 現在のシーン
     std::unique_ptr<BaseScene> currentScene_ = nullptr;
+
+    std::unique_ptr<ISceneTransition> transition_ = nullptr;
+    bool isTransition_ = false;
 
     // 現在のシーン名
     std::string currentSceneName_ = {};
