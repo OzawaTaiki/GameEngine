@@ -25,6 +25,8 @@ public:
     void Draw();
 
     void ReadAnimation(const aiAnimation* _animation);
+    void ReadSampler(const std::string& _filepath);
+
     void ToIdle(float _timeToIdle);
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
@@ -52,6 +54,7 @@ private:
         AnimationCurve<Vector3> translate;
         AnimationCurve<Quaternion> rotation;
         AnimationCurve<Vector3> scale;
+        std::string interpolation;
     };
     struct Animation
     {
@@ -59,9 +62,23 @@ private:
         std::map<std::string, NodeAnimation> nodeAnimations;
     };
 
+
     Animation animation_;
     Matrix4x4 localMatrix_;
     float animetionTimer_ = 0.0f;
+
+
+    struct Sampler
+    {
+        uint32_t input;
+        uint32_t output;
+        std::string interpolation;
+    };
+
+    std::vector<Sampler> samplers_;
+    // チャンネルとサンプラーの対応
+    std::map<uint32_t, uint32_t> channelToSampler_;
+
 
     bool isLoop_ = false;
     bool isPlaying_ = false;
@@ -70,7 +87,10 @@ private:
     // idle状態になる前のアニメーションの状態
     QuaternionTransform beforeIdleTransform_ = {};
 
-    Vector3 CalculateValue(const AnimationCurve<Vector3>& _curve, float _time);
-    Quaternion CalculateValue(const AnimationCurve<Quaternion>& _curve, float _time);
+    Vector3 CalculateValue_Linear(const AnimationCurve<Vector3>& _curve, float _time);
+    Quaternion CalculateValue_Linear(const AnimationCurve<Quaternion>& _curve, float _time);
+
+    Vector3 CalculateValue_Step(const AnimationCurve<Vector3>& _curve, float _time);
+    Quaternion CalculateValue_Step(const AnimationCurve<Quaternion>& _curve, float _time);
 
 };

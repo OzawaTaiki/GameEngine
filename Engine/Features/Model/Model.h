@@ -45,6 +45,8 @@ public:
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
 
+    void LoadAnimation(const std::string& _filePath);
+
     UVTransform& GetUVTransform(uint32_t _index = 0) { return material_[_index]->GetUVTransform(); }
 
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
@@ -78,7 +80,7 @@ private:
     void LoadFile(const std::string& _filepath);
     void LoadMesh(const aiScene* _scene);
     void LoadMaterial(const aiScene* _scene);
-    void LoadAnimation(const aiScene* _scene);
+    void LoadAnimation(const aiScene* _scene, const std::string& _filepath);
     void LoadNode(const aiScene* _scene);
     void CreateSkeleton();
     void CreateSkinCluster(const aiMesh* _mesh);

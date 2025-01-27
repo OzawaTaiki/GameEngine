@@ -32,6 +32,8 @@ public:
 
     const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
+    void LoadAnimation(const std::string& _filePath) { model_->LoadAnimation(_filePath); }
+
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
     void SetModel(const std::string& _filePath) { model_ = Model::CreateFromObj(_filePath); }
