@@ -18,15 +18,20 @@ void UIBase::Initialize(const std::string& _label)
     jsonBinder_->RegisterVariable(label_+"_isActive", reinterpret_cast<uint32_t*>(&isActive_));
     jsonBinder_->RegisterVariable(label_+"_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
     jsonBinder_->RegisterVariable(label_+"_textureName", &textureName_);
+    jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_+"_label", &label_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
 
-    textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
+    textureHandle_ = TextureManager::GetInstance()->Load(textureName_, directoryPath_);
     sprite_ = Sprite::Create(textureHandle_);
     sprite_->Initialize();
     sprite_->translate_ = position_;
+
+    if (size_.x == 0 && size_.y == 0)
+        size_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
+
     sprite_->SetSize(size_);
     sprite_->SetAnchor(anchor_);
 }
@@ -87,17 +92,30 @@ void UIBase::ImGui()
         ImGui::Checkbox("isActive", &isActive_);
         ImGui::Checkbox("isVisible", &isVisible_);
 
-        char buf[255];
-        strcpy_s(buf, textureName_.c_str());
-        if (ImGui::InputText("textureName", buf, 255))
+        char buf1[255];
+        strcpy_s(buf1, directoryPath_.c_str());
+        if (ImGui::InputText("directoryPath", buf1, 255))
         {
-            textureName_ = buf;
+            directoryPath_ = buf1;
+        }
+
+        char buf2[255];
+        strcpy_s(buf2, textureName_.c_str());
+        if (ImGui::InputText("textureName", buf2, 255))
+        {
+            textureName_ = buf2;
         }
 
         if (ImGui::Button("Apply"))
         {
+            // さいごに"/"がついていない場合はつける
+            if (directoryPath_.back() != '/')
+            {
+                directoryPath_ += "/";
+            }
+
             //ConfigManager::GetInstance()->SaveData("UI");
-            textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
+            textureHandle_ = TextureManager::GetInstance()->Load(textureName_, directoryPath_);
             sprite_->SetTextureHandle(textureHandle_);
         }
         ImGui::EndTabItem();

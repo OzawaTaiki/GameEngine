@@ -50,6 +50,7 @@ protected:
 
     std::string label_ = "";
     std::string textureName_ = "";
+    std::string directoryPath_ = "Resources/images/";
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
 
