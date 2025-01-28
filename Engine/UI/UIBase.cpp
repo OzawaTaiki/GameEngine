@@ -45,6 +45,7 @@ void UIBase::Draw()
     sprite_->translate_ = position_;
     sprite_->SetSize(size_);
     sprite_->SetAnchor(anchor_);
+    sprite_->SetTextureHandle(textureHandle_);
     sprite_->Draw();
 }
 

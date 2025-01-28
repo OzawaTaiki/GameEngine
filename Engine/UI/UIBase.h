@@ -30,7 +30,7 @@ public:
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
 
 
-    void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle; }
+    void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle;  }
     void SetTextureName(const std::string& _textureName) { textureName_ = _textureName; }
     void SetTextureNameAndLoad(const std::string& _textureName);
 
