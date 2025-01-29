@@ -1,4 +1,4 @@
-#include "WinApp.h"
+#include <Core/WinApp/WinApp.h>
 #include <cassert>
 
 #ifdef _DEBUG
@@ -79,7 +79,7 @@ void WinApp::Initilize(const wchar_t* _title, UINT _style, uint32_t _width, uint
 	timeBeginPeriod(1);
 }
 
-void WinApp::Filalze()
+void WinApp::Finalize() const
 {
 	CloseWindow(hwnd_);
 	CoUninitialize();

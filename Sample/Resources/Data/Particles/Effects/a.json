@@ -2,8 +2,7 @@
     "a": {
         "emitters": [
             "aa",
-            "aaa",
-            "aaaa"
+            "aaa"
         ],
         "loop": 0
     }
