@@ -23,7 +23,7 @@ struct AABB
     Matrix4x4 worldMat;
 
     AABB() = default;
-    AABB(const float* _min, const float* _max) : referencePoint{ 0.0f }, center{ 0.0f }, vertices{ 0.0f }
+    AABB(const float* _min, const float* _max) : referencePoint{ 0.0f }, center{ 0.0f }, vertices{ 0.0f }, worldMat{ Matrix4x4::Identity() }
     {
         localMin = _min;
         localMax = _max;

@@ -28,6 +28,7 @@ public:
     void ReadSampler(const std::string& _filepath);
 
     void ToIdle(float _timeToIdle);
+    void Reset();
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
 
