@@ -31,10 +31,10 @@ public:
     void Reset();
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
-    void Reset();
 
     Matrix4x4 GetLocalMatrix() const { return localMatrix_; }
     bool IsPlaying() const { return isPlaying_; }
+    bool IsIdle() const { return !toIdle_ && !isPlaying_; }
 
 private:
     template <typename T>

@@ -167,6 +167,7 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
     currentAnimation_ = animation_[_name].get();
     currentAnimation_->SetLoop(_loop);
     currentAnimation_->Reset();
+    
 }
 
 void Model::ToIdle(float _timeToIdle)
