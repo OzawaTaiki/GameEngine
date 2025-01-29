@@ -106,7 +106,7 @@ void ModelAnimation::ReadAnimation(const aiAnimation* _animation)
 {
     animation_.duration = static_cast<float> (_animation->mDuration / _animation->mTicksPerSecond);
 
-    for (int32_t channelIndex = 0; channelIndex < _animation->mNumChannels; ++channelIndex)
+    for (uint32_t channelIndex = 0; channelIndex < _animation->mNumChannels; ++channelIndex)
     {
         aiNodeAnim* aiNodeAnimation = _animation->mChannels[channelIndex];
         NodeAnimation& nodeAnimation = animation_.nodeAnimations[aiNodeAnimation->mNodeName.C_Str()];
@@ -116,7 +116,7 @@ void ModelAnimation::ReadAnimation(const aiAnimation* _animation)
 
         nodeAnimation.interpolation = interpolation;
 
-        for (int32_t keyframeIndex = 0; keyframeIndex < aiNodeAnimation->mNumPositionKeys; ++keyframeIndex)
+        for (uint32_t keyframeIndex = 0; keyframeIndex < aiNodeAnimation->mNumPositionKeys; ++keyframeIndex)
         {
             aiVectorKey& aiKeyframe = aiNodeAnimation->mPositionKeys[keyframeIndex];
             KeyframeVector3 keyframe;
@@ -133,7 +133,7 @@ void ModelAnimation::ReadAnimation(const aiAnimation* _animation)
             keyframe.value = Quaternion(aiKeyframe.mValue.x, -aiKeyframe.mValue.y, -aiKeyframe.mValue.z, aiKeyframe.mValue.w).Normalize();
             nodeAnimation.rotation.keyframes.push_back(keyframe);
         }
-        for (int32_t keyframeIndex = 0; keyframeIndex < aiNodeAnimation->mNumScalingKeys; ++keyframeIndex)
+        for (uint32_t keyframeIndex = 0; keyframeIndex < aiNodeAnimation->mNumScalingKeys; ++keyframeIndex)
         {
             aiVectorKey& aiKeyframe = aiNodeAnimation->mScalingKeys[keyframeIndex];
             KeyframeVector3 keyframe;
@@ -209,6 +209,13 @@ void ModelAnimation::ToIdle(float _timeToIdle)
     timeToIdle_ = _timeToIdle;
 }
 
+void ModelAnimation::Reset()
+{
+    animetionTimer_ = 0.0f;
+    isPlaying_ = false;
+    toIdle_ = false;
+    timeToIdle_ = 0.0f;
+}
 
 Vector3 ModelAnimation::CalculateValue_Linear(const AnimationCurve<Vector3>& _curve, float _time)
 {
