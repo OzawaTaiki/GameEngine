@@ -124,6 +124,14 @@ void ModelAnimation::ToIdle(float _timeToIdle)
     timeToIdle_ = _timeToIdle;
 }
 
+void ModelAnimation::Reset()
+{
+    animetionTimer_ = 0.0f;
+    isPlaying_ = false;
+    toIdle_ = false;
+    timeToIdle_ = 0.0f;
+}
+
 
 Vector3 ModelAnimation::CalculateValue(const AnimationCurve<Vector3>& _curve, float _time)
 {

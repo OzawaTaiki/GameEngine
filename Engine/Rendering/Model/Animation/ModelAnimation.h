@@ -28,6 +28,7 @@ public:
     void ToIdle(float _timeToIdle);
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
+    void Reset();
 
     Matrix4x4 GetLocalMatrix() const { return localMatrix_; }
     bool IsPlaying() const { return isPlaying_; }
