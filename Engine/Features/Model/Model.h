@@ -59,6 +59,7 @@ public:
     //Matrix4x4 GetNodeMatrix()const { return node_.GetLocalMatrix(); }
     Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return skeleton_.GetSkeletonSpaceMatrix(_index); }
     bool IsAllAnimationEnd() { return currentAnimation_ == nullptr || !currentAnimation_->IsPlaying(); }
+    bool IsIdle() { return currentAnimation_ == nullptr || currentAnimation_->IsIdle(); }
 
     static const std::string defaultDirpath_;
 private:
