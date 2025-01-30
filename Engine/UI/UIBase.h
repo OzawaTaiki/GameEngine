@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Physics/Math/Vector2.h>
+#include <Physics/Math/Vector4.h>
+
 #include <Rendering/Sprite/Sprite.h>
 
 #include <Systems/JsonBinder/JsonBinder.h>
@@ -21,7 +23,7 @@ public:
 
     bool IsVisible() const { return isVisible_; }
     void SetVisible(bool _isVisible) { isVisible_ = _isVisible; }
-
+    void SetColor(const Vector4& _color) { color_ = _color; }
     bool IsMousePointerInside() const;
     bool IsPointInside(const Vector2& _point) const;
 
@@ -41,12 +43,16 @@ protected:
     Vector2 position_ = { 0,0 };
     Vector2 size_ = { 0,0 };
 
+    float rotate_ = 0.0f;
+
     Vector2 anchor_ = { 0,0 };
 
     bool isActive_ = true;
     bool isVisible_ = true;
 
     uint32_t textureHandle_ = 0;
+
+    Vector4 color_ = { 1,1,1,1 };
 
     std::string label_ = "";
     std::string textureName_ = "";

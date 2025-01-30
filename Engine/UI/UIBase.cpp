@@ -14,9 +14,11 @@ void UIBase::Initialize(const std::string& _label)
 
     jsonBinder_->RegisterVariable(label_+"_pos", &position_);
     jsonBinder_->RegisterVariable(label_+"_size", &size_);
+    jsonBinder_->RegisterVariable(label_ + "_rotate", &rotate_);
     jsonBinder_->RegisterVariable(label_+"_anchor", &anchor_);
     jsonBinder_->RegisterVariable(label_+"_isActive", reinterpret_cast<uint32_t*>(&isActive_));
     jsonBinder_->RegisterVariable(label_+"_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
+    jsonBinder_->RegisterVariable(label_ + "_color", &color_);
     jsonBinder_->RegisterVariable(label_+"_textureName", &textureName_);
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_+"_label", &label_);
@@ -33,6 +35,7 @@ void UIBase::Initialize(const std::string& _label)
         size_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
 
     sprite_->SetSize(size_);
+    sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
 }
 
@@ -44,9 +47,10 @@ void UIBase::Draw()
     }
     sprite_->translate_ = position_;
     sprite_->SetSize(size_);
+    sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
     sprite_->SetTextureHandle(textureHandle_);
-    sprite_->Draw();
+    sprite_->Draw(color_);
 }
 
 bool UIBase::IsMousePointerInside() const
@@ -89,9 +93,11 @@ void UIBase::ImGui()
     {
         ImGui::DragFloat2("position", &position_.x, 1.0f);
         ImGui::DragFloat2("size", &size_.x, 1.0f);
+        ImGui::DragFloat("rotate", &rotate_, 0.01f);
         ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
         ImGui::Checkbox("isActive", &isActive_);
         ImGui::Checkbox("isVisible", &isVisible_);
+        ImGui::ColorEdit4("color", &color_.x);
 
         char buf1[255];
         strcpy_s(buf1, directoryPath_.c_str());
