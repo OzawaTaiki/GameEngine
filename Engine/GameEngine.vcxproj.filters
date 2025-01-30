@@ -225,7 +225,7 @@
     <ClCompile Include="ResourceManagement\TextureManager\TextureManager.cpp">
       <Filter>ResourceManagement\TextureManager</Filter>
     </ClCompile>
-    <ClCompile Include="Systems\Audio\Audio.cpp">
+    <ClCompile Include="Systems\Audio\AudioSystem.cpp">
       <Filter>Systems\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Systems\Input\Input.cpp">
@@ -480,7 +480,7 @@
     <ClInclude Include="ResourceManagement\TextureManager\TextureManager.h">
       <Filter>ResourceManagement\TextureManager</Filter>
     </ClInclude>
-    <ClInclude Include="Systems\Audio\Audio.h">
+    <ClInclude Include="Systems\Audio\AudioSystem.h">
       <Filter>Systems\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Systems\Input\Input.h">

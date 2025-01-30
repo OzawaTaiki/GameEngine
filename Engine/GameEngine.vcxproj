@@ -182,7 +182,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Rendering\Sprite\SpriteManager.cpp" />
     <ClCompile Include="ResourceManagement\SRVManager.cpp" />
     <ClCompile Include="ResourceManagement\TextureManager\TextureManager.cpp" />
-    <ClCompile Include="Systems\Audio\Audio.cpp" />
+    <ClCompile Include="Systems\Audio\AudioSystem.cpp" />
     <ClCompile Include="Systems\Input\Input.cpp" />
     <ClCompile Include="Systems\JsonBinder\JsonBinder.cpp" />
     <ClCompile Include="Systems\JsonBinder\JsonHub.cpp" />
@@ -258,7 +258,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Rendering\Sprite\SpriteManager.h" />
     <ClInclude Include="ResourceManagement\SRVManager.h" />
     <ClInclude Include="ResourceManagement\TextureManager\TextureManager.h" />
-    <ClInclude Include="Systems\Audio\Audio.h" />
+    <ClInclude Include="Systems\Audio\AudioSystem.h" />
     <ClInclude Include="Systems\Input\Input.h" />
     <ClInclude Include="Systems\JsonBinder\JsonBinder.h" />
     <ClInclude Include="Systems\JsonBinder\JsonHub.h" />

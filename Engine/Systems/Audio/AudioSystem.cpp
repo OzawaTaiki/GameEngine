@@ -1,7 +1,13 @@
-#include "Audio.h"
+#include "AudioSystem.h"
 #include <cassert>
 
-Audio::~Audio()
+AudioSystem* AudioSystem::GetInstance()
+{
+    static AudioSystem instance;
+    return &instance;
+}
+
+AudioSystem::~AudioSystem()
 {
     xAudio2_.Reset();
 
@@ -10,7 +16,7 @@ Audio::~Audio()
     sounds_.clear();
 }
 
-void Audio::Initialize()
+void AudioSystem::Initialize()
 {
     HRESULT hresult = S_FALSE;
 
@@ -21,13 +27,13 @@ void Audio::Initialize()
     hresult = xAudio2_->CreateMasteringVoice(&masterVoice_);
 }
 
-uint32_t Audio::SoundLoadWave(const std::string& _filename)
+uint32_t AudioSystem::SoundLoadWave(const std::string& _filename, const std::string& _path)
 {
     HRESULT hresult = S_FALSE;
 
     std::ifstream file;
     //waveをバイナリ形式で開く
-    file.open(_filename, std::ios_base::binary);
+    file.open(_path + _filename, std::ios_base::binary);
     if (!file.is_open())
     {
         throw std::runtime_error("Error: File not found - " + _filename);
@@ -35,7 +41,19 @@ uint32_t Audio::SoundLoadWave(const std::string& _filename)
 
     /// riffヘッダーの読み込み
     RiffHeader riff;
-    file.read((char*)&riff, sizeof(riff));
+
+    do
+    {
+        file.read(reinterpret_cast<char*>(&riff), sizeof(riff));
+
+        if (strncmp(riff.chunk.id, "RIFF", 4) == 0||
+            strncmp(riff.chunk.id, "WAVE", 4) == 0)
+            break;
+
+        file.seekg(riff.chunk.size, std::ios_base::cur);
+
+
+    } while (!file.eof());
 
     // riffチェック
     if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
@@ -47,24 +65,36 @@ uint32_t Audio::SoundLoadWave(const std::string& _filename)
     /// formatチャンクの読み込み
     FormatChunk format = {};
 
-    file.read((char*)&format, sizeof(ChunkHeader));
-    if (strncmp(format.chunk.id, "fmt ", 4) != 0)
-        assert(0);
+    do
+    {
+        file.read((char*)&format, sizeof(ChunkHeader));
+
+        if (strncmp(format.chunk.id, "fmt ", 4) == 0)
+            break;
+
+        file.seekg(format.chunk.size, std::ios_base::cur);
+
+    } while (!file.eof());
+
 
     assert(format.chunk.size <= sizeof(format.fmt));
     file.read((char*)&format.fmt, format.chunk.size);
 
     ///DATAチャンクの読み込み
     ChunkHeader data;
-    file.read((char*)&data, sizeof(data));
-    // Junkファイルを見つけた時
-    if (strncmp(data.id, "JUNK", 4) == 0)
+
+
+    do
     {
-        // 読み取り位置をjunkの最後まですすめる
+        file.read((char*)&data, sizeof(data));
+
+        if (strncmp(data.id, "data", 4) == 0)
+            break;
+
         file.seekg(data.size, std::ios_base::cur);
 
-        file.read((char*)&data, sizeof(data));
-    }
+    } while (!file.eof());
+
 
     if (strncmp(data.id, "data", 4) != 0)
         assert(0);
@@ -85,7 +115,7 @@ uint32_t Audio::SoundLoadWave(const std::string& _filename)
     return static_cast<uint32_t>(sounds_.size() - 1);
 }
 
-void Audio::SoundUnLoad(SoundData* _soundData)
+void AudioSystem::SoundUnLoad(SoundData* _soundData)
 {
     //TODO: サウンド再生チェック
     delete[] _soundData->pBuffer;
@@ -95,16 +125,15 @@ void Audio::SoundUnLoad(SoundData* _soundData)
     _soundData->wfex = {};
 }
 
-uint32_t Audio::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool _enableOverlap)
+VoiceHandle AudioSystem::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool _enableOverlap, float _offset)
 {
     // 重複再生が無効なら
     if (!_enableOverlap)
     {
         // 再生フラグを取得
-        uint32_t voicehandle = map_[_soundHandle];
-        if (IsPlaying(voicehandle))
+        if (IsPlaying(map_[_soundHandle]))
         {// 再生されていたらリターン
-            return voicehandle;
+            return map_[_soundHandle];
         }
     }
 
@@ -118,9 +147,12 @@ uint32_t Audio::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool
 
     sourceVoice_.push_back(pSourceVoice);
 
+    uint32_t startSample = static_cast<uint32_t>(_offset * data.wfex.nSamplesPerSec);
+
     XAUDIO2_BUFFER buf{};
     buf.pAudioData = data.pBuffer;
     buf.AudioBytes = data.bufferSize;
+    buf.PlayBegin = startSample;
     buf.Flags = XAUDIO2_END_OF_STREAM;
 
     if (_loop)
@@ -135,28 +167,32 @@ uint32_t Audio::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool
     pSourceVoice->SetVolume(_volume);
 
     uint32_t index = static_cast<uint32_t>(sourceVoice_.size() - 1);
-    map_[_soundHandle] = index;
-    return index;
+    map_[_soundHandle].handle = index;
+    return map_[_soundHandle];
 }
 
-bool Audio::IsPlaying(uint32_t _voiceHandle) const
+bool AudioSystem::IsPlaying(VoiceHandle _voiceHandle) const
 {
     if (sourceVoice_.size()==0||
-        sourceVoice_.size() < _voiceHandle)
+        sourceVoice_.size() < _voiceHandle.handle)
         return false;
 
     XAUDIO2_VOICE_STATE state;
-    sourceVoice_[_voiceHandle]->GetState(&state);
+    sourceVoice_[_voiceHandle.handle]->GetState(&state);
 
     return state.BuffersQueued > 0;
 }
 
-void Audio::SetVolume(uint32_t _voiceHandle, float _volume)
+void AudioSystem::SetVolume(VoiceHandle _voiceHandle, float _volume)
 {
-    sourceVoice_[_voiceHandle]->SetVolume(_volume);
+    sourceVoice_[_voiceHandle.handle]->SetVolume(_volume);
 }
 
-void Audio::SoundStop(uint32_t _voiceHandle)
+void AudioSystem::SoundStop(VoiceHandle _voiceHandle)
 {
-    sourceVoice_[_voiceHandle]->Stop();
+    if (sourceVoice_.size() > _voiceHandle.handle)
+    {
+        if (IsPlaying(_voiceHandle))
+            sourceVoice_[_voiceHandle.handle]->Stop();
+    }
 }

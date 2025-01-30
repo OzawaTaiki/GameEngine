@@ -12,9 +12,28 @@
 #pragma comment (lib,"xaudio2.lib")
 
 
-
-class Audio
+struct VoiceHandle
 {
+    uint32_t handle;
+};
+
+class AudioSystem
+{
+public:
+
+    static AudioSystem* GetInstance();
+
+    ~AudioSystem();
+
+    void Initialize();
+
+    uint32_t SoundLoadWave(const std::string& _filename, const std::string& _path = "Resources/Sounds/");
+    VoiceHandle SoundPlay(uint32_t _soundHandle, float _volume, bool _loop = false, bool _enableOverlap = true, float offset = 0.0f);
+
+    bool IsPlaying(VoiceHandle _voiceHandle) const;
+    void SetVolume(VoiceHandle _voiceHandle, float _volume);
+    void SoundStop(VoiceHandle _voiceHandle);
+
 private:
 
     struct ChunkHeader
@@ -41,17 +60,6 @@ private:
         BYTE* pBuffer;
         unsigned int bufferSize;
     };
-public:
-
-    ~Audio();
-
-    void Initialize();
-
-    uint32_t SoundLoadWave(const std::string& _filename);
-    uint32_t SoundPlay(uint32_t _soundHandle, float _volume, bool _loop = false, bool _enableOverlap = true);
-    bool IsPlaying(uint32_t _voiceHandle) const;
-    void SetVolume(uint32_t _voiceHandle, float _volume);
-    void SoundStop(uint32_t _voiceHandle);
 
     void SoundUnLoad(SoundData* _soundData);
 
@@ -60,7 +68,7 @@ private:
     Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
     IXAudio2MasteringVoice* masterVoice_;
 
-    std::map <uint32_t, uint32_t> map_;
+    std::map <uint32_t, VoiceHandle> map_;
 
     std::vector<SoundData> sounds_;
     std::vector<IXAudio2SourceVoice*> sourceVoice_;
