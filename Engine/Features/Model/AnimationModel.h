@@ -12,8 +12,8 @@ class AnimationModel
 {
 public:
 
-    AnimationModel() = default;
-    ~AnimationModel() = default;
+    AnimationModel(const std::string& _name);
+    ~AnimationModel();
 
 
     void Initialize(const std::string& _filePath);
@@ -62,5 +62,6 @@ private:
     std::string timeChannel = "default";
     GameTime* gameTime_ = nullptr;
 
+    std::string name_ = "";
 
 };

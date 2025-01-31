@@ -7,6 +7,11 @@
 #include <Features/Model/Manager/ModelManager.h>
 #include <Features/Json/JsonHub.h>
 
+#ifdef _DEBUG
+#include <Debug/ImGuiDebugManager.h>
+#endif // _DEBUG
+
+
 
 void Framework::Run()
 {
@@ -65,6 +70,11 @@ void Framework::Initialize()
     sceneManager_ = SceneManager::GetInstance();
 
     collisionManager_ = CollisionManager::GetInstance();
+
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->Initialize();
+#endif 
+
 }
 
 void Framework::Update()
@@ -76,6 +86,7 @@ void Framework::Update()
 
     // フレーム始め
     imguiManager_->Begin();
+    ImGuiDebugManager::GetInstance()->ShowDebugWindow();
 
     Time::Update();
     gameTime_->Update();

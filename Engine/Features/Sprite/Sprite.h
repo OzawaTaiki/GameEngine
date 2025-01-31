@@ -12,8 +12,8 @@ class Sprite
 {
 public:
 
-    Sprite() = default;
-    ~Sprite() = default;
+    Sprite(const std::string& _name );
+    ~Sprite() ;
 
     void Initialize();
     void Update();
@@ -31,7 +31,7 @@ public:
     Vector2 uvScale_ = { 1.0f,1.0f };
     float uvRotate_ = 0.0f;
 
-    static Sprite* Create(uint32_t _textureHandle, const Vector2& _anchor = { 0.5f, 0.5f });
+    static Sprite* Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor = { 0.5f, 0.5f });
     static void StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight);
     static void PreDraw();
 
@@ -84,6 +84,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_ = {};
 
+    std::string name_ = "";
 
 #ifdef _DEBUG
     Vector2 lefttop_ = { 0.0f,0.0f };

@@ -3,6 +3,7 @@
 #include <System/Input/Input.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImGuiManager.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <Features/Json/JsonHub.h>
 
 void UIBase::Initialize(const std::string& _label)
@@ -24,11 +25,13 @@ void UIBase::Initialize(const std::string& _label)
         textureName_ = "white.png";
 
     textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
-    sprite_ = Sprite::Create(textureHandle_);
+    sprite_ = Sprite::Create(_label, textureHandle_);
     sprite_->Initialize();
     sprite_->translate_ = position_;
     sprite_->SetSize(size_);
     sprite_->SetAnchor(anchor_);
+
+    ImGuiDebugManager::GetInstance()->AddDebugWindow(_label, [&]() {ImGui(); });
 }
 
 void UIBase::Draw()
@@ -75,39 +78,36 @@ void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
     sprite_->SetTextureHandle(textureHandle_);
 }
 
-#ifdef _DEBUG
 void UIBase::ImGui()
 {
-    ImGui::BeginTabBar("UI");
-    if (ImGui::BeginTabItem(label_.c_str()))
+#ifdef _DEBUG
+    ImGui::PushID(this);
+    ImGui::DragFloat2("position", &position_.x, 1.0f);
+    ImGui::DragFloat2("size", &size_.x, 1.0f);
+    ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
+    ImGui::Checkbox("isActive", &isActive_);
+    ImGui::Checkbox("isVisible", &isVisible_);
+
+    char buf[255];
+    strcpy_s(buf, textureName_.c_str());
+    if (ImGui::InputText("textureName", buf, 255))
     {
-        ImGui::DragFloat2("position", &position_.x, 1.0f);
-        ImGui::DragFloat2("size", &size_.x, 1.0f);
-        ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
-        ImGui::Checkbox("isActive", &isActive_);
-        ImGui::Checkbox("isVisible", &isVisible_);
-
-        char buf[255];
-        strcpy_s(buf, textureName_.c_str());
-        if (ImGui::InputText("textureName", buf, 255))
-        {
-            textureName_ = buf;
-        }
-
-        if (ImGui::Button("Apply"))
-        {
-            //ConfigManager::GetInstance()->SaveData("UI");
-            textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
-            sprite_->SetTextureHandle(textureHandle_);
-        }
-        ImGui::EndTabItem();
-
-        if (ImGui::Button("Save"))
-        {
-            jsonBinder_->Save();
-        }
+        textureName_ = buf;
     }
-    ImGui::EndTabBar();
+
+    if (ImGui::Button("Apply"))
+    {
+        //ConfigManager::GetInstance()->SaveData("UI");
+        textureHandle_ = TextureManager::GetInstance()->Load(textureName_);
+        sprite_->SetTextureHandle(textureHandle_);
+    }
+    ImGui::EndTabItem();
+
+    if (ImGui::Button("Save"))
+    {
+        jsonBinder_->Save();
+    }
+    ImGui::PopID();
+#endif // _DEBUG
 
 }
-#endif // _DEBUG

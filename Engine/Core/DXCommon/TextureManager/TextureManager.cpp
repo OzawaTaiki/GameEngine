@@ -3,6 +3,7 @@
 #include <Debug/Debug.h>
 #include <Utility/ConvertString/ConvertString.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
+#include <Debug/ImGuiDebugManager.h>
 
 #include <cassert>
 
@@ -23,11 +24,6 @@ void TextureManager::Initialize()
     Load("white.png");
     Load("cube.jpg");
     Load("uvChecker.png");
-}
-
-void TextureManager::Update()
-{
-
 }
 
 uint32_t TextureManager::Load(const std::string& _filepath, const std::string& defaultDirpath_)
@@ -189,4 +185,26 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 	assert(SUCCEEDED(hr));
 
 	return intermediateResource;
+}
+
+TextureManager::TextureManager()
+{
+    ImGuiDebugManager::GetInstance()->AddDebugWindow("TextureManager", [&]() {ImGui(); });
+}
+
+TextureManager::~TextureManager()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("TextureManager");
+}
+
+void TextureManager::ImGui()
+{
+#ifdef _DEBUG
+    ImGui::Begin("TextureManager");
+    for (auto& [key, value] : keys_)
+    {
+        ImGui::Text(key.c_str());
+    }
+    ImGui::End();
+#endif // _DEBUG
 }
