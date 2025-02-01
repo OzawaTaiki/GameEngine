@@ -240,6 +240,8 @@ void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Ve
 
     ImGui::PushID(_label);
 
+    ImGui::Text(_label);
+    ImGui::SameLine();
 
     if (ImGui::Button("Open Editor"))
     {
