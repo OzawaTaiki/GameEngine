@@ -24,6 +24,7 @@ public:
     void StopAnimation() { model_->StopAnimation(); }
     void ToIdle(float _timeToIdle) { model_->ToIdle(_timeToIdle); }
     bool IsAnimationEnd() { return model_->IsAllAnimationEnd(); }
+    void LoadAnimation(const std::string& _filePath) { model_->LoadAnimation(_filePath); }
 
     Vector3 GetMin() const { return model_->GetMin(); }
     Vector3 GetMax() const { return model_->GetMax(); }

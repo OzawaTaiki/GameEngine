@@ -44,6 +44,7 @@ public:
     void SetAnimation(const std::string& _name, bool _loop = false);
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
+    void LoadAnimation(const std::string& _filePath);
 
     UVTransform& GetUVTransform(uint32_t _index = 0) { return material_[_index]->GetUVTransform(); }
 

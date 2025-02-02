@@ -26,6 +26,7 @@ public:
 
     void ReadAnimation(const aiAnimation* _animation);
     void ToIdle(float _timeToIdle);
+    void Reset();
 
     void SetLoop(bool _loop) { isLoop_ = _loop; }
 

@@ -165,6 +165,7 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
     }
     currentAnimation_ = animation_[_name].get();
     currentAnimation_->SetLoop(_loop);
+    currentAnimation_->Reset();
 }
 
 void Model::ToIdle(float _timeToIdle)
@@ -179,6 +180,15 @@ void Model::ToIdle(float _timeToIdle)
         currentAnimation_->ToIdle(_timeToIdle);
     }
 }
+
+void Model::LoadAnimation(const std::string& _filePath)
+{
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+    assert(scene->HasAnimations());
+    LoadAnimation(scene);
+}
+
 
 Vector3 Model::GetMin(size_t _index) const
 {
