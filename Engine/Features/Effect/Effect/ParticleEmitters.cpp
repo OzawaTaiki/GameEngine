@@ -117,6 +117,9 @@ void ParticleEmitter::Draw() const
     return;
 #endif // _DEBUG
 
+    if (!isDraw_)
+        return;
+
     switch (shape_)
     {
     case EmitterShape::Box:
@@ -128,7 +131,7 @@ void ParticleEmitter::Draw() const
     case EmitterShape::Shpere:
         {
             Matrix4x4 affine = MakeAffineMatrix({ radius_ }, rotate_, position_);
-            //LineDrawer::GetInstance()->DrawSphere(affine);
+            LineDrawer::GetInstance()->DrawSphere(affine);
         }
         break;
     case EmitterShape::Circle:
@@ -407,6 +410,8 @@ bool ParticleEmitter::ShowDebugWinsow()
     ImGui::BeginTabBar("Emitter");
     if (ImGui::BeginTabItem(name_.c_str()))
     {
+        ImGui::Checkbox("Draw", &isDraw_);
+
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 0.5f));
 
         DisPlayEmitterParameters();
@@ -530,7 +535,17 @@ void ParticleEmitter::DisPlayEmitterParameters()
 
         if (ImGui::TreeNodeEx("Billboard", ImGuiTreeNodeFlags_Framed))
         {
-            ImGui::Checkbox("Enable", &isEnableBillboard_);
+            if (ImGui::Checkbox("Enable", &isEnableBillboard_))
+            {
+                if (!isEnableBillboard_)
+                {
+                    billboardAxes_ = { 0,0,0 };
+                }
+                else
+                {
+                    billboardAxes_ = { 1,1,1 };
+                }
+            }
             ImGui::BeginDisabled(!isEnableBillboard_);
             bool axes[3] = { billboardAxes_.x != 0,billboardAxes_.y != 0,billboardAxes_.z != 0 };
             ImGui::Checkbox("X", &axes[0]);            ImGui::SameLine();

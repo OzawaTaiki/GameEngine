@@ -171,6 +171,8 @@ private:
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
 
+    bool                   isDraw_ = false;                // 描画するか
+
     std::string timeChannel_ = "default";
     GameTime* gameTime_ = nullptr;
 
