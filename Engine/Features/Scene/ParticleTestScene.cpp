@@ -80,8 +80,8 @@ void ParticleTestScene::Draw()
 
     Sprite::PreDraw();
 
-    for (auto& emitter : emitters_)
-        emitter->Draw();
+    if (selectedEffect_ != effects_.end())
+        selectedEffect_->Draw();
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
     lineDrawer_->Draw();
