@@ -30,6 +30,10 @@ Vector2 Vector2::operator/(const Vector2& _v)const
     return { x / _v.x,y / _v.y };
 }
 
+Vector2 Vector2::operator-()const
+{
+    return { -x,-y };
+}
 
 float Vector2::Length() const
 {
