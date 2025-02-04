@@ -80,6 +80,14 @@ void Effect::Update()
     isActive_ = active;
 }
 
+void Effect::Draw()
+{
+    for (auto& emitter : emitters_)
+    {
+        emitter->Draw();
+    }
+}
+
 void Effect::AddEmitter(const std::string& _name)
 {
     if (emitterNames_.size() < kMaxEmitters)
@@ -103,6 +111,14 @@ std::list<ParticleEmitter*> Effect::GetEmitters() const
     }
 
     return list;
+}
+
+void Effect::SetParentMatrix(const Matrix4x4* _parentMat)
+{
+    for (auto& emitter : emitters_)
+    {
+        emitter->SetWorldMatrix(_parentMat);
+    }
 }
 
 void Effect::SetActive(bool _active)

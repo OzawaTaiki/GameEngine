@@ -117,6 +117,9 @@ void ParticleEmitter::Draw() const
     return;
 #endif // _DEBUG
 
+    if (!isDraw_)
+        return;
+
     switch (shape_)
     {
     case EmitterShape::Box:
@@ -260,7 +263,9 @@ void ParticleEmitter::RegisterEmitterSettings()
 
     jsonBinder_->RegisterVariable("loop", reinterpret_cast<uint32_t*>(&loop_));
     jsonBinder_->RegisterVariable("useBillboard", reinterpret_cast<uint32_t*>(&isEnableBillboard_));
-    jsonBinder_->RegisterVariable("LengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
+    jsonBinder_->RegisterVariable("EnableLengthScaling", reinterpret_cast<uint32_t*>(&isLengthScalingEnabled_));
+    jsonBinder_->RegisterVariable("lengthScaling", &lengthScaling_);
+
 
     jsonBinder_->RegisterVariable("billBoardAxes", &billboardAxes_);
 
@@ -360,6 +365,8 @@ Particle ParticleEmitter::GenerateParticleData()
     {
         param.sizeTransition.isChange = false;
         param.size = setting_.size.value.min;
+        param.size.x *= lengthScaling_;
+        param.size.y /= lengthScaling_;
         //param.currentSize.x += 0.25f * param.speed;
 
         param.directionMatrix = DirectionToDirection({ 1,0,0 }, param.direction);
@@ -403,6 +410,8 @@ bool ParticleEmitter::ShowDebugWinsow()
     ImGui::BeginTabBar("Emitter");
     if (ImGui::BeginTabItem(name_.c_str()))
     {
+        ImGui::Checkbox("Draw", &isDraw_);
+
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.8f, 0.2f, 0.2f, 0.5f));
 
         DisPlayEmitterParameters();
@@ -475,9 +484,7 @@ void ParticleEmitter::DisPlayEmitterParameters()
         if (ImGui::TreeNodeEx("transform", ImGuiTreeNodeFlags_Framed))
         {
             ImGui::DragFloat3("position", &position_.x, 0.01f);
-            ImGui::BeginDisabled(parentMatWorld_ == nullptr);
             ImGui::DragFloat3("offset", &offset_.x, 0.01f);
-            ImGui::EndDisabled();
             ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
             if (shape_ == EmitterShape::Box)
                 ImGui::DragFloat3("size", &size_.x, 0.01f);
@@ -528,13 +535,24 @@ void ParticleEmitter::DisPlayEmitterParameters()
 
         if (ImGui::TreeNodeEx("Billboard", ImGuiTreeNodeFlags_Framed))
         {
-            ImGui::Checkbox("Enable", &isEnableBillboard_);
-            ImGui::Checkbox("LengthScaling", &isLengthScalingEnabled_);
+            if (ImGui::Checkbox("Enable", &isEnableBillboard_))
+            {
+                if (!isEnableBillboard_)
+                {
+                    billboardAxes_ = { 0,0,0 };
+                }
+                else
+                {
+                    billboardAxes_ = { 1,1,1 };
+                }
+            }
+            ImGui::BeginDisabled(!isEnableBillboard_);
             bool axes[3] = { billboardAxes_.x != 0,billboardAxes_.y != 0,billboardAxes_.z != 0 };
             ImGui::Checkbox("X", &axes[0]);            ImGui::SameLine();
             ImGui::Checkbox("Y", &axes[1]);            ImGui::SameLine();
             ImGui::Checkbox("Z", &axes[2]);
 
+            ImGui::EndDisabled();
             for (int i = 0; i < 3; ++i)
             {
                 if (axes[i] != (billboardAxes_[i] != 0))
@@ -544,6 +562,15 @@ void ParticleEmitter::DisPlayEmitterParameters()
             }
             ImGui::TreePop();
 
+        }
+
+        if (ImGui::TreeNodeEx("LengthScaling", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Checkbox("Enable", &isLengthScalingEnabled_);
+            ImGui::BeginDisabled(!isLengthScalingEnabled_);
+            ImGui::DragFloat("LengthScaling", &lengthScaling_, 0.001f);
+            ImGui::EndDisabled();
+            ImGui::TreePop();
         }
 
         ImGui::TreePop();
@@ -950,7 +977,6 @@ void ParticleEmitter::DisplayDirectionParameters()
 {
 #ifdef _DEBUG
 
-
     if (ImGui::TreeNodeEx("Direction", ImGuiTreeNodeFlags_Framed))
     {
         float width = ImGui::GetContentRegionAvail().x / 5.0f; // 利用可能な幅を3等分
@@ -974,6 +1000,8 @@ void ParticleEmitter::DisplayDirectionParameters()
         ImGui::EndDisabled();*/
 
         ImGui::PushID("direction");
+        ImGui::BeginDisabled(particleDirection_ != ParticleDirection::Random);
+
         if(ImGui::Checkbox("Fixed", &setting_.direction.fixed))
         {
             setting_.direction.random = false;
@@ -1010,7 +1038,9 @@ void ParticleEmitter::DisplayDirectionParameters()
             ImGui::DragFloat3("Min", &setting_.direction.value.min.x, 0.01f);
             ImGui::DragFloat3("Max", &setting_.direction.value.max.x, 0.01f);
         }
+        ImGui::EndDisabled();
         ImGui::PopID();
+
 
         ImGui::TreePop();
     }

@@ -72,6 +72,7 @@ void Sprite::Draw(const Vector4& _color)
 Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
 {
     Sprite* sprite = SpriteManager::GetInstance()->Create();
+    sprite->Initialize();
     sprite->textureHandle_ = _textureHandle;
     sprite->anchor_ = _anchor;
     sprite->Initialize();

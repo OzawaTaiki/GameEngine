@@ -670,6 +670,8 @@
     <ClInclude Include="Utility\ConvertString\ConvertString.h">
       <Filter>Utility\ConvertString</Filter>
     </ClInclude>
-    <ClInclude Include="ISceneTransition.h" />
+    <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
+      <Filter>Features\Scene\Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

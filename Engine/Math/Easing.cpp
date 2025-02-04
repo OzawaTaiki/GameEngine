@@ -157,25 +157,25 @@ float Easing::EaseOutSine(float _t)
 
 float Easing::EaseOutQuad(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f - _t;
     return 1.0f - t * t;
 }
 
 float Easing::EaseOutCubic(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f - _t;
     return 1.0f - t * t * t;
 }
 
 float Easing::EaseOutQuart(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f - _t;
     return 1.0f - t * t * t * t;
 }
 
 float Easing::EaseOutQuint(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f - _t;
     return 1.0f - t * t * t * t * t;
 }
 
