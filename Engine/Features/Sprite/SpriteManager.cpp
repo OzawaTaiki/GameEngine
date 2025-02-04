@@ -29,6 +29,8 @@ void SpriteManager::PreDraw()
 {
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     commandList->SetGraphicsRootSignature(rootSignature_);
     commandList->SetPipelineState(graphicsPipelineState_);
 }
