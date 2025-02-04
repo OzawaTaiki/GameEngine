@@ -1,6 +1,7 @@
 #pragma once
 #include <Features/Scene/Interface/BaseScene.h>
 #include <Features/Scene/ISceneFactory.h>
+#include <Features/Scene/Interface/ISceneTransition.h>
 
 #include <iostream>
 #include <cstdint>

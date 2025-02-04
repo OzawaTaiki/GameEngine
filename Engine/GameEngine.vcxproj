@@ -249,6 +249,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Model\Primitive\Ring.h" />
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
     <ClInclude Include="Features\Scene\Interface\BaseScene.h" />
+    <ClInclude Include="Features\Scene\Interface\ISceneTransition.h" />
     <ClInclude Include="Features\Scene\ISceneFactory.h" />
     <ClInclude Include="Features\Scene\Manager\SceneManager.h" />
     <ClInclude Include="Features\Scene\ParticleTestScene.h" />
