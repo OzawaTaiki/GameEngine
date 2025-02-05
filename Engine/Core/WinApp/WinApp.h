@@ -6,8 +6,8 @@ class WinApp
 {
 public: //静的メンバ変数
 	// ウィンドウサイズ
-	static const uint32_t kWindowWidth_ = 1280;		// 横
-	static const uint32_t kWindowHeight_ = 720;		// 縦
+	static uint32_t kWindowWidth_;		// 横
+	static uint32_t kWindowHeight_;		// 縦
 
 	static const wchar_t kWindowClassName[];
 
@@ -18,8 +18,9 @@ public: // 静的メンバ関数
 
 public: // メンバ関数
 	void Initilize(const wchar_t* _title = L"GameEngine",
-				   UINT _style = WS_OVERLAPPEDWINDOW,
-				   uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_);
+		uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_,
+		UINT _style = WS_OVERLAPPEDWINDOW);
+
 	void Finalize() const;
 
 	bool ProcessMessage();

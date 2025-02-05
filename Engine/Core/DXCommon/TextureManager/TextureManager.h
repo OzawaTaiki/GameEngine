@@ -20,7 +20,6 @@ public:
     static TextureManager* GetInstance();
 
     void Initialize();
-    void Update();
 
     uint32_t Load(const std::string& _filepath, const std::string& defaultDirpath_ = "Resources/images/");
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t _textureHandle);
@@ -51,9 +50,11 @@ private:
     std::unordered_map<std::string, uint32_t> keys_ = {};
     std::map<uint32_t, Texture> textures_ = {};
 
-    TextureManager() = default;
-    ~TextureManager() = default;
+    TextureManager();
+    ~TextureManager();
     TextureManager(const TextureManager&) = delete;
     TextureManager operator=(const TextureManager&) = delete;
+
+    void ImGui();
 
 };

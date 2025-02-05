@@ -1,9 +1,10 @@
 #include "UIBase.h"
 
-#include <Systems/Input/Input.h>
-#include <ResourceManagement/TextureManager/TextureManager.h>
-#include <UI/ImGuiManager/ImGuiManager.h>
-#include <Systems/JsonBinder/JsonHub.h>
+#include <System/Input/Input.h>
+#include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Debug/ImGuiManager.h>
+#include <Debug/ImGuiDebugManager.h>
+#include <Features/Json/JsonHub.h>
 
 void UIBase::Initialize(const std::string& _label)
 {
@@ -37,6 +38,8 @@ void UIBase::Initialize(const std::string& _label)
     sprite_->SetSize(size_);
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
+
+    ImGuiDebugManager::GetInstance()->AddDebugWindow(_label, [&]() {ImGui(); });
 }
 
 void UIBase::Draw()
@@ -135,4 +138,6 @@ void UIBase::ImGui()
     ImGui::EndTabBar();
 
 }
+
 #endif // _DEBUG
+

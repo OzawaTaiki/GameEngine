@@ -5,6 +5,7 @@
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Debug/ImguITools.h>
 
 
 SampleScene::~SampleScene()
@@ -26,19 +27,25 @@ void SampleScene::Initialize()
 
     input_ = Input::GetInstance();
 
-    oModel_ = std::make_unique<ObjectModel>();
-    oModel_->Initialize("Plane/Plane.gltf","model");
+    oModel_ = std::make_unique<ObjectModel>("plane");
+    oModel_->Initialize("Plane/Plane.gltf");
     oModel_->translate_.x = 3;
 
-    aModel_ = std::make_unique<AnimationModel>();
+    aModel_ = std::make_unique<AnimationModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
-    sprite_ = Sprite::Create(textureHandle);
+    sprite_ = Sprite::Create("uvChecker", textureHandle);
 
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
+    colors.push_back({ 0,Vector4(1,0,0,1) });
+    colors.push_back({ 1,Vector4(0,0,1,1) });
+    colors.push_back({ 0.5f,Vector4(0,1,0,1) });
+    colors.push_back({ 0.1f,Vector4(0,1,0,1) });
+    colors.push_back({ 0.532f,Vector4(0,1,0,1) });
+    colors.push_back({ 0.12f,Vector4(1,1,0,1) });
 }
 
 void SampleScene::Update()
@@ -48,6 +55,8 @@ void SampleScene::Update()
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
+
+    ImGuiTool::GradientEditor("Ambient", colors);
 
     lights_->DrawDebugWindow();
 #endif // _DEBUG

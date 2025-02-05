@@ -60,8 +60,6 @@ protected:
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
 
-#ifdef _DEBUG
     void ImGui();
-#endif // _DEBUG
 
 };

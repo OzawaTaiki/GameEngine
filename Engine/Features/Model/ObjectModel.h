@@ -9,10 +9,10 @@ class ObjectModel
 {
 public:
 
-    ObjectModel() = default;
-    ~ObjectModel() = default;
+    ObjectModel(const std::string& _name);
+    ~ObjectModel();
 
-    void Initialize(const std::string& _filePath, const std::string& _name="");
+    void Initialize(const std::string& _filePath);
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);

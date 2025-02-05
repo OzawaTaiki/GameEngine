@@ -393,6 +393,11 @@
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp">
       <Filter>Utility\ConvertString</Filter>
     </ClCompile>
+    <ClCompile Include="Debug\ImGuiDebugManager.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\ImguITools.cpp" />
+    <ClCompile Include="Debug\ImGuiHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -669,6 +674,15 @@
     </ClInclude>
     <ClInclude Include="Utility\ConvertString\ConvertString.h">
       <Filter>Utility\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\ImGuiDebugManager.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\ImguITools.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\ImGuiHelper.h">
+      <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
       <Filter>Features\Scene\Interface</Filter>

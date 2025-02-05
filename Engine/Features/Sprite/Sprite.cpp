@@ -6,8 +6,20 @@
 #include <Core/WinApp/WinApp.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+#include <Debug/ImGuiDebugManager.h>
+
 uint32_t Sprite::winWidth_ = 1280;
 uint32_t Sprite::winHeight_ = 720;
+
+Sprite::Sprite(const std::string& _name)
+{
+    name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+}
+
+Sprite::~Sprite()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+}
 
 void Sprite::Initialize()
 {
@@ -69,10 +81,9 @@ void Sprite::Draw(const Vector4& _color)
     commandList->DrawInstanced(6, 1, 0, 0);
 }
 
-Sprite* Sprite::Create(uint32_t _textureHandle, const Vector2& _anchor)
+Sprite* Sprite::Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor)
 {
-    Sprite* sprite = SpriteManager::GetInstance()->Create();
-    sprite->Initialize();
+    Sprite* sprite = SpriteManager::GetInstance()->Create(_name);
     sprite->textureHandle_ = _textureHandle;
     sprite->anchor_ = _anchor;
     sprite->Initialize();
@@ -168,7 +179,7 @@ void Sprite::CalculateMatrix()
 #include <imgui.h>
 void Sprite::ImGui()
 {
-    ImGui::Begin("Sprite");
+    ImGui::PushID(this);
     ImGui::DragFloat2("Translate", &translate_.x);
     ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
     ImGui::DragFloat("Rotate", &rotate_, 0.01f);
@@ -189,6 +200,6 @@ void Sprite::ImGui()
         SetLeftTop(lefttop_);
     }
 
-    ImGui::End();
+    ImGui::PopID();
 }
 #endif // _DEBUG

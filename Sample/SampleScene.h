@@ -47,6 +47,7 @@ private:
     Sprite* sprite_ = nullptr;
 
     std::unique_ptr<LightGroup> lights_;
+    std::list<std::pair<float, Vector4>> colors;
 
 
 

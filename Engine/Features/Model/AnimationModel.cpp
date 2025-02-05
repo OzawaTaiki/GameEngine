@@ -2,6 +2,17 @@
 
 #include <Features/Model/Manager/ModelManager.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Debug/ImGuiDebugManager.h>
+
+AnimationModel::AnimationModel(const std::string& _name)
+{
+    name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+}
+
+AnimationModel::~AnimationModel()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+}
 
 void AnimationModel::Initialize(const std::string& _filePath)
 {
@@ -68,9 +79,13 @@ void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)
 void AnimationModel::ImGui()
 {
     ImGui::PushID(this);
-    ImGui::DragFloat3("Translate", &worldTransform_.transform_.x, 0.01f);
-    ImGui::DragFloat3("Scale", &worldTransform_.scale_.x, 0.01f);
-    ImGui::DragFloat3("Rotate", &worldTransform_.rotate_.x, 0.01f);
+    ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
+    ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
+    if (useQuaternion_)
+        ImGui::DragFloat4("Quaternion", &quaternion_.x, 0.01f);
+    else
+        ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
+    ImGui::Checkbox("UseQuaternion", &useQuaternion_);
     ImGui::PopID();
 }
 #endif // _DEBUG

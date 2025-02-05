@@ -82,8 +82,8 @@ void DXCommon::PreDraw()
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV, 0);
 	commandList_->OMSetRenderTargets(1, &RTVHandles_[backBufferIndex], false, &dsvHandle);
 
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-	commandList_->ClearRenderTargetView(RTVHandles_[backBufferIndex], clearColor, 0, nullptr);
+	//float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+	commandList_->ClearRenderTargetView(RTVHandles_[backBufferIndex], clearColor_, 0, nullptr);
 
 	//指定した深度で画面をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
