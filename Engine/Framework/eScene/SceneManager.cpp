@@ -47,7 +47,7 @@ void SceneManager::Update()
     Input::GetInstance()->Update();
 
     currentScene_->Update();
-    if (isTransition_)
+    if (isTransition_&& currentScene_->IsReady())
     {
         transition_->Update();
         if (transition_->IsEnd())
