@@ -49,7 +49,7 @@ public:
     UVTransform& GetUVTransform(uint32_t _index = 0) { return material_[_index]->GetUVTransform(); }
 
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
-    Material* GetMaterialPtr() { return material_[0].get(); }
+    Material* GetMaterialPtr(uint32_t _index) { return material_[_index].get(); }
 
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;

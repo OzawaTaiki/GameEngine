@@ -22,7 +22,7 @@ public:
 
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
-
+    Material* GetMaterial(uint32_t _index) { return model_->GetMaterialPtr(_index); }
     const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
     void UpdateUVTransform();

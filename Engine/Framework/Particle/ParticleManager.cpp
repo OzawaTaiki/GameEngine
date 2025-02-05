@@ -151,7 +151,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
     Group& group = groups_[groupName];
     group.model = Model::CreateFromObj(_modelPath);
     if (_textureHandle == UINT32_MAX)
-        group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
+        group.textureHandle = group.model->GetMaterialPtr(0)->GetTexturehandle();
     else
         group.textureHandle = _textureHandle;
 
@@ -197,7 +197,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
     Group& group = groups_[groupName];
     group.model = Model::CreateFromObj(_modelPath);
     if (_textureHandle == UINT32_MAX)
-        group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
+        group.textureHandle = group.model->GetMaterialPtr(0)->GetTexturehandle();
     else
         group.textureHandle = _textureHandle;
 
