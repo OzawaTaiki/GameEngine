@@ -25,8 +25,8 @@ void ParticleTestScene::Initialize()
     debugCamera_.Initialize();
 
 
-    plane_ = std::make_unique<ObjectModel>();
-    plane_->Initialize("Tile/Tile.gltf", "Ground");
+    plane_ = std::make_unique<ObjectModel>("Ground");
+    plane_->Initialize("Tile/Tile.gltf");
     plane_->GetUVTransform().SetScale(Vector2(100, 100));
 
     lineDrawer_ = LineDrawer::GetInstance();

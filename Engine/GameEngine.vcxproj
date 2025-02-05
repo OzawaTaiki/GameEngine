@@ -140,7 +140,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Core\DXCommon\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Core\WinApp\WinApp.cpp" />
     <ClCompile Include="Debug\Debug.cpp" />
+    <ClCompile Include="Debug\ImGuiDebugManager.cpp" />
+    <ClCompile Include="Debug\ImGuiHelper.cpp" />
     <ClCompile Include="Debug\ImGuiManager.cpp" />
+    <ClCompile Include="Debug\ImguITools.cpp" />
     <ClCompile Include="Features\Camera\Camera\Camera.cpp" />
     <ClCompile Include="Features\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Features\Collision\Collider\Collider.cpp" />
@@ -211,7 +214,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Core\DXCommon\TextureManager\TextureManager.h" />
     <ClInclude Include="Core\WinApp\WinApp.h" />
     <ClInclude Include="Debug\Debug.h" />
+    <ClInclude Include="Debug\ImGuiDebugManager.h" />
+    <ClInclude Include="Debug\ImGuiHelper.h" />
     <ClInclude Include="Debug\ImGuiManager.h" />
+    <ClInclude Include="Debug\ImguITools.h" />
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
     <ClInclude Include="Features\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Features\Collision\Collider\Collider.h" />

@@ -10,6 +10,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 const wchar_t WinApp::kWindowClassName[] = L"WindowClass";
 
+uint32_t WinApp::kWindowWidth_ = 1280;
+uint32_t WinApp::kWindowHeight_ = 720;
+
 WinApp* WinApp::GetInstance()
 {
     static WinApp instance;
@@ -39,7 +42,7 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::Initilize(const wchar_t* _title, UINT _style, uint32_t _width, uint32_t _height)
+void WinApp::Initilize(const wchar_t* _title, uint32_t _width, uint32_t _height, UINT _style)
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 	assert(SUCCEEDED(hr));
@@ -55,6 +58,8 @@ void WinApp::Initilize(const wchar_t* _title, UINT _style, uint32_t _width, uint
 
 	RegisterClass(&wndClass_);
 
+    kWindowWidth_ = _width;
+    kWindowHeight_ = _height;
 
 	RECT wrc = { 0,0,(LONG)_width,(LONG)_height };
 

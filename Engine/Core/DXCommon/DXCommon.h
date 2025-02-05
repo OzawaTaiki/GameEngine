@@ -33,6 +33,9 @@ public:
 
 	size_t GetBackBufferSize() const { return swapChainDesc_.BufferCount; }
 
+    void SetClearColor(float _r, float _g, float _b, float _a) { clearColor_[0] = _r; clearColor_[1] = _g; clearColor_[2] = _b; clearColor_[3] = _a; }
+    void SetClearColor(float _color[4]) { clearColor_[0] = _color[0]; clearColor_[1] = _color[1]; clearColor_[2] = _color[2]; clearColor_[3] = _color[3]; }
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
@@ -95,6 +98,8 @@ private:
 	D3D12_RESOURCE_BARRIER barrier_{};
 
 	std::chrono::steady_clock::time_point reference_ = {};
+
+    float clearColor_[4] = { 0.4625f,0.925f,0.4625f,1.0f };
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(int32_t _width, int32_t _height);
 

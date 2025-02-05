@@ -35,8 +35,8 @@ void SpriteManager::PreDraw()
     commandList->SetPipelineState(graphicsPipelineState_);
 }
 
-Sprite* SpriteManager::Create()
+Sprite* SpriteManager::Create(const std::string& _name)
 {
-    sprites_.push_back(std::make_unique<Sprite>());
+    sprites_.push_back(std::make_unique<Sprite>(_name));
     return sprites_.back().get();
 }

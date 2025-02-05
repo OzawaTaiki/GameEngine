@@ -3,15 +3,22 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Collision/Manager/CollisionManager.h>
+#include <Debug/ImGuiDebugManager.h>
 
-void ObjectModel::Initialize(const std::string& _filePath, const std::string& _name)
+
+ObjectModel::ObjectModel(const std::string& _name)
+{
+    name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+}
+
+ObjectModel::~ObjectModel()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+}
+
+void ObjectModel::Initialize(const std::string& _filePath)
 {
     model_ = Model::CreateFromObj(_filePath);
-
-    if (_name.empty())
-        name_ = _filePath;
-    else
-        name_ = _name;
 
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
@@ -71,10 +78,14 @@ void ObjectModel::UpdateUVTransform()
 void ObjectModel::ImGui()
 {
     ImGui::PushID(this);
-    ImGui::SeparatorText(name_.c_str());
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
-    ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
+    if (useQuaternion_)
+        ImGui::DragFloat4("Quaternion", &quaternion_.x, 0.01f);
+    else
+        ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
+
+    ImGui::Checkbox("UseQuaternion", &useQuaternion_);
     ImGui::PopID();
 }
 #endif // _DEBUG
