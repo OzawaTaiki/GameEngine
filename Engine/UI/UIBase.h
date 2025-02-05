@@ -36,6 +36,13 @@ public:
     void SetTextureName(const std::string& _textureName) { textureName_ = _textureName; }
     void SetTextureNameAndLoad(const std::string& _textureName);
 
+    Vector2 GetPos() const { return position_; }
+    Vector2 GetSize() const { return size_; }
+    float GetRotate() const { return rotate_; }
+    Vector2 GetAnchor() const { return anchor_; }
+    uint32_t GetTextureHandle() const { return textureHandle_; }
+    Vector4 GetColor() const { return color_; }
+
 
 protected:
     Sprite* sprite_ = nullptr;
