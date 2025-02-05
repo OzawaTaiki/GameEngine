@@ -15,6 +15,7 @@ class Camera;
 class Ring : public Primitive
 {
 public:
+    Ring();
     Ring(float _innerRadius, float _outerRadius, uint32_t _divide = 16, std::array<bool, 3> _billboard = { true,true,true });
     ~Ring() = default;
 
@@ -35,6 +36,7 @@ public:
     void SetUseQuaternion(bool _useQuaternion) { useQuaternion_ = _useQuaternion; }
     void SetTexture(const std::string& _path);
     void SetTexture(const uint32_t _handle) { textureHandle_ = _handle; }
+    void SetParent(const WorldTransform* _parent) { worldTransform.parent_ = _parent; }
 
     //================================
 

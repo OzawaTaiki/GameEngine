@@ -39,6 +39,7 @@ public:
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; CalculateVertex(); }
 
     void SetSize(const Vector2& _size);
+    void SetColor(const Vector4& _color);
 
     void SetUVSize(const Vector2& _size);
     void SetLeftTop(const Vector2& _leftTop);

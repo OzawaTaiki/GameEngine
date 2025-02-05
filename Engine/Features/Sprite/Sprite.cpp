@@ -108,6 +108,11 @@ void Sprite::SetSize(const Vector2& _size)
     scale_ = _size / defaultTextureSize_;
 }
 
+void Sprite::SetColor(const Vector4& _color)
+{
+    color_ = _color;
+}
+
 void Sprite::SetUVSize(const Vector2& _size)
 {
     uvScale_ = _size / defaultTextureSize_;

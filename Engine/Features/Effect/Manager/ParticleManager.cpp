@@ -277,6 +277,9 @@ void ParticleManager::AddParticleToGroup(const std::string& _groupName, const Pa
         CreateParticleGroup(gName, "plane/plane.gltf", nullptr);
     }
 
+    if (groups_[gName].particles.size() >= kGroupMaxInstance)
+        return;
+
     groups_[gName].particles.push_back(_particles);
 }
 

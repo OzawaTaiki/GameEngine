@@ -37,6 +37,7 @@ void ImGuiManager::Initialize()
         srvManager_->GetSRVHeap_()->GetGPUDescriptorHandleForHeapStart()
     );
 
+
 #endif // _DEBUG
 }
 
@@ -46,7 +47,12 @@ void ImGuiManager::Begin()
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),ImGuiDockNodeFlags_PassthruCentralNode);
+
     ImGui::Begin("Engine");
+
+
 #endif // _DEBUG
 }
 
