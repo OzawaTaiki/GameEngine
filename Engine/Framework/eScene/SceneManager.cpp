@@ -60,7 +60,7 @@ void SceneManager::Update()
 void SceneManager::Draw()
 {
     currentScene_->Draw();
-    if (isTransition_)
+    if (isTransition_ && currentScene_->IsReady())
     {
         transition_->Draw();
     }
