@@ -31,6 +31,7 @@ public:
     void SetTimeChannel(const std::string& _channel);
 
     void SetParentMatrix(const Matrix4x4* _mat);
+    void SetTranslate(const Vector3& _pos);
 
     void Save()const;
 private:

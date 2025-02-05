@@ -200,6 +200,14 @@ void Effect::SetParentMatrix(const Matrix4x4* _mat)
     }
 }
 
+void Effect::SetTranslate(const Vector3& _pos)
+{
+    for (auto& emitter : emitters_)
+    {
+        emitter->SetCenter(_pos);
+    }
+}
+
 
 void Effect::Save() const
 {
