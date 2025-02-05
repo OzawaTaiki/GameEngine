@@ -30,6 +30,8 @@ public:
 
     void SetTimeChannel(const std::string& _channel);
 
+    void SetParentMatrix(const Matrix4x4* _mat);
+
     void Save()const;
 private:
     void Reset();
@@ -43,6 +45,7 @@ private:
     std::string                     addEmitterName_;    // 追加するエミッターの名前
     char                            emitterBuf_[256];    // エミッターの名前バッファ
 
+    const Matrix4x4* parentMatWorld_;    // 親のワールド行列
 
     float                           elapsedTime_;       // 経過時間
     bool                            isLoop_;            // ループするか

@@ -191,6 +191,15 @@ void Effect::SetTimeChannel(const std::string& _channel)
     }
 }
 
+void Effect::SetParentMatrix(const Matrix4x4* _mat)
+{
+    parentMatWorld_ = _mat;
+    for (auto& emitter : emitters_)
+    {
+        emitter->SetWorldMatrix(_mat);
+    }
+}
+
 
 void Effect::Save() const
 {
