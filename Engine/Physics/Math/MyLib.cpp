@@ -4,6 +4,54 @@
 #include <numbers>
 #include <limits>
 
+
+float Cross(Vector2 a, Vector2 b)
+{
+	return  a.x * b.y - a.y * b.x;
+}
+
+bool isCross(const Vector2& _a, const Vector2& _b, const Vector2& _c, const Vector2& _d)
+{
+	float e = Cross(_b - _a, _c - _a);
+	float f = Cross(_b - _a, _d - _a);
+	float g = Cross(_d - _c, _a - _c);
+	float h = Cross(_d - _c, _b - _c);
+
+	if(e * f > 0 || g * h > 0)
+		return false;
+
+	return true;
+}
+
+Vector2 getCrossPos(const Vector2& a, const Vector2& b, const Vector2& c, const Vector2 d)
+{
+	if (!isCross(a, b, c, d))
+		return{ 0,0 };
+
+	Vector2 ab = b - a;
+	Vector2 cd = d - c;
+	float g = Cross(ab, cd);
+	if (g == 0)
+		return{ 0,0 };
+
+
+	float e, f;
+
+	e = Cross(c - a, d - c) / g;
+	f = Cross(b - a, a - c) / g;
+
+	if (e < 0 || e>1 || f < 0 || f>1)
+		return{ 0,0 };
+
+
+	Vector2 result;
+
+	result.x = a.x + e * ab.x;
+	result.y = a.y + e * ab.y;
+
+	return result;
+}
+
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix)
 {
 	const float kGridHalfWidth = 2.0f;                                          // Gridの半分の幅

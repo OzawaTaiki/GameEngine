@@ -126,6 +126,13 @@ struct Capsule
 	float radius;
 };
 
+
+float Cross(Vector2 a, Vector2 b);
+
+bool isCross(const Vector2& a, const Vector2& b, const Vector2& c, const Vector2& d);
+
+Vector2 getCrossPos(const Vector2& a, const Vector2& b, const Vector2& c, const Vector2 d);
+
 //グリッドの描画
 void DrawGrid(const Matrix4x4& _viewProjectionMatrix, const Matrix4x4& _viewportMatrix);
 //球体の描画
