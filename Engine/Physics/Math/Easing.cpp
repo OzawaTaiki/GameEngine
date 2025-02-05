@@ -44,6 +44,7 @@ const char* Easing::easingFuncs[] = {
 
 float (*Easing::pEasingFunc[])(float) = {
     &Linear,
+
     &EaseInsine,
     &EaseInQuad,
     &EaseInCubic,
@@ -157,25 +158,25 @@ float Easing::EaseOutSine(float _t)
 
 float Easing::EaseOutQuad(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f-_t;
     return 1.0f - t * t;
 }
 
 float Easing::EaseOutCubic(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f-_t;
     return 1.0f - t * t * t;
 }
 
 float Easing::EaseOutQuart(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f-_t;
     return 1.0f - t * t * t * t;
 }
 
 float Easing::EaseOutQuint(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f-_t;
     return 1.0f - t * t * t * t * t;
 }
 
@@ -190,7 +191,7 @@ float Easing::EaseOutExpo(float _t)
 
 float Easing::EaseOutCirc(float _t)
 {
-    const float t = _t - 1.0f;
+    const float t = 1.0f-_t;
     return std::sqrt(1.0f - t * t);
 }
 
@@ -343,31 +344,28 @@ float Easing::EaseInOutBounce(float _t)
 
 std::string Easing::GetEasingFuncName(int _funcNum)
 {
-#ifdef _DEBUG
-    if (_funcNum < 0 || _funcNum >= IM_ARRAYSIZE(easingFuncs))
-        return "";
+    if (_funcNum < 0 || _funcNum >= funcNum_)
+        return "Linear";
+
     return easingFuncs[_funcNum];
-#endif // _DEBUG
-    return "";
 }
 
 std::function<float(float)> Easing::SelectFuncPtr(int _funcNum)
 {
-#ifdef _DEBUG
-    if (_funcNum < 0 || _funcNum >= IM_ARRAYSIZE(easingFuncs))
+    if (_funcNum < 0 || _funcNum >= funcNum_)
         return &Linear;
-
     return pEasingFunc[_funcNum];
-#endif // _DEBUG
-    return &Linear;
 }
 
-int Easing::SelectEasingFunc()
+void Easing::SelectEasingFunc(int* _val)
 {
 #ifdef _DEBUG
-    static int selectedEasingFunc_ = 0;
-    ImGui::Combo("EasingFunc", &selectedEasingFunc_, easingFuncs, IM_ARRAYSIZE(easingFuncs));
-    return selectedEasingFunc_;
+    static int selectedEasingFunc_ = *_val;
+    if (ImGui::Combo("EasingFunc", &selectedEasingFunc_, easingFuncs, IM_ARRAYSIZE(easingFuncs)))
+    {
+        *_val = selectedEasingFunc_;
+    }
+
 #endif // _DEBUG
-    return 0;
 }
+

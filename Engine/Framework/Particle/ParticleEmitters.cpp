@@ -643,7 +643,7 @@ void ParticleEmitter::DisplaySizeParameters()
             ImGui::DragFloat("Time", &addSize_.time, 0.01f, 0.01f, 0.99f);
             ImGui::DragFloat3("Size", &addSize_.value.x, 0.01f);
 
-            addSize_.easingFuncNum = Easing::SelectEasingFunc();
+            Easing::SelectEasingFunc(&addSize_.easingFuncNum);
 
             if (ImGui::Button("Save"))
             {
@@ -753,7 +753,7 @@ void ParticleEmitter::DisplayRotateParameters()
             ImGui::SeparatorText("ChangeParameter");
             ImGui::DragFloat("Time", &addRotate_.time, 0.01f, 0.01f, 0.99f);
             ImGui::DragFloat3("Rotate", &addRotate_.value.x, 0.01f);
-            addRotate_.easingFuncNum = Easing::SelectEasingFunc();
+            Easing::SelectEasingFunc(&addRotate_.easingFuncNum);
             if (ImGui::Button("Save"))
             {
                 addRotate_.time = std::clamp(addRotate_.time, 0.01f, 0.99f);
@@ -868,7 +868,7 @@ void ParticleEmitter::DisplaySpeedParameters()
             ImGui::DragFloat("Time", &addSpeed_.time, 0.01f, 0.01f, 0.99f);
             ImGui::DragFloat("Speed", &addSpeed_.value, 0.01f);
 
-            addSpeed_.easingFuncNum = Easing::SelectEasingFunc();
+            Easing::SelectEasingFunc(&addSpeed_.easingFuncNum);
 
             if (ImGui::Button("Save"))
             {
