@@ -28,7 +28,7 @@ void UIBase::Initialize(const std::string& _label)
         textureName_ = "white.png";
 
     textureHandle_ = TextureManager::GetInstance()->Load(textureName_, directoryPath_);
-    sprite_ = Sprite::Create(textureHandle_);
+    sprite_ = Sprite::Create(_label, textureHandle_);
     sprite_->Initialize();
     sprite_->translate_ = position_;
 
