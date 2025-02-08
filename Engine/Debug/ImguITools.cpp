@@ -75,6 +75,7 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
     bool isActive = false;
     bool hasChanged = false;
 
+
     // 基準となる座標を計算
     ImVec2 upBasePos = ImVec2(cursorPos.x, cursorPos.y + pentagonSize.y / 2.0f);
     ImVec2 botBasePos = ImVec2(cursorPos.x, rectPos.y + rectSize.y + pentagonSize.y / 2.0f);
@@ -139,7 +140,6 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
                 // pop upを表示
                 ImGui::OpenPopup(popupLabel.c_str());
             }
-
         }
 
         if (ImGui::BeginPopup(popupLabel.c_str()))
@@ -150,6 +150,11 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
                 colVec4 = ImVec4(color.x, color.y, color.z, color.w);
                 colU32 = ImGui::GetColorU32(colVec4);
             }
+            if (ImGui::DragFloat("Time", &time, 0.01f, 0.0f, 1.0f))
+            {
+                hasChanged = true;
+            }
+
             if(ImGui::Button("delete"))
             {
                 it = _colors.erase(it);
@@ -186,28 +191,46 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
         ++it;
     }
 
+    std::string addPopupLabel = "##ColorAdd" + std::to_string(id);
     // 変更がないとき
     if (!hasChanged)
     {
-        // 新しく要素を追加できる
         if (ImGui::IsMouseClicked(1))
         {
-            // マウスの座標を取得
-            ImVec2 mousePos = ImGui::GetMousePos();
-            // 0 - 1で正規化
-            float time = (mousePos.x - cursorPos.x) / rectSize.x;
-            // クランプ
-            if (time < 0)       time = 0;
-            if (time > 1)       time = 1;
-            // 色を追加
-            _colors.push_back({ time, Vector4(1,1,1,1) });
-            hasChanged = true;
+            ImGui::OpenPopup(addPopupLabel.c_str());
         }
-
     }
 
+    if (ImGui::BeginPopup(addPopupLabel.c_str()))
+    {
+        Vector4 color = Vector4(1, 1, 1, 1);
+        //    // 0 - 1で正規化
+        float time = 0.5f;
+        if (time < 0) time = 0;
+        if (time > 1) time = 1;
+
+        if (ImGui::ColorEdit4("Color", &color.x))
+        {
+            // 色を変更
+            ImVec4 colVec4 = ImVec4(color.x, color.y, color.z, color.w);
+            ImU32 colU32 = ImGui::GetColorU32(colVec4);
+        }
+        if (ImGui::DragFloat("Time", &time, 0.01f, 0.0f, 1.0f))
+        {
+            hasChanged = true;
+        }
+        if (ImGui::Button("add"))
+        {
+            _colors.push_back({ time, Vector4(1,1,1,1) });
+            hasChanged = true;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+
     // 値の変更があったときだけソート
-    if (hasChanged)
+    if (hasChanged && ImGui::GetIO().MouseReleased[0])
     {
         // colorsをtimeでソート
         _colors.sort([](const std::pair<float, Vector4>& a, const std::pair<float, Vector4>& b) {return a.first < b.first; });
@@ -216,6 +239,17 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
         _colors.begin()->first = 0;
         _colors.rbegin()->first = 1;
     }
+
+    ImGui::BeginListBox("##ColorList");
+    for (auto it = _colors.begin(); it != _colors.end();++it)
+    {
+        ImGui::PushID(&(*it));
+        ImGui::Text("Time:%f", it->first);
+        ImGui::SameLine();
+        ImGui::ColorButton("Color", ImVec4(it->second.x, it->second.y, it->second.z, it->second.w));
+        ImGui::PopID();
+    }
+    ImGui::EndListBox();
 
     // グラデーションを描画
     for (auto it = gradientRects.begin(); it != gradientRects.end(); ++it)
@@ -232,6 +266,8 @@ void ImGuiTool::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors
             drawlist->AddRectFilledMultiColor(pos, nextPos, it->second, next->second, next->second, it->second);
         }
     }
+
+
 
 }
 
