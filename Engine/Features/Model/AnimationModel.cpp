@@ -74,10 +74,9 @@ void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)
 }
 
 
-#ifdef _DEBUG
-#include <imgui.h>
 void AnimationModel::ImGui()
 {
+#ifdef _DEBUG
     ImGui::PushID(this);
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
@@ -87,5 +86,5 @@ void AnimationModel::ImGui()
         ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
     ImGui::Checkbox("UseQuaternion", &useQuaternion_);
     ImGui::PopID();
-}
 #endif // _DEBUG
+}

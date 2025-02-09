@@ -36,8 +36,9 @@ public:
 
 
 private:
-
+#ifdef _DEBUG
     ImGuiTabBarFlags tabBarFlags_ = ImGuiTabBarFlags_None;
+#endif // _DEBUG
 
     std::map<std::string, std::function<void()>> debugWindows_;
     std::vector<uint8_t> isSelect_;
