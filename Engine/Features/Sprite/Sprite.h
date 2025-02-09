@@ -87,11 +87,9 @@ private:
 
     std::string name_ = "";
 
-#ifdef _DEBUG
     Vector2 lefttop_ = { 0.0f,0.0f };
     Vector2 size_ = { 100.0f,100.0f };
     void ImGui();
-#endif // _DEBUG
 
 
 };

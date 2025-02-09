@@ -175,10 +175,9 @@ void Sprite::CalculateMatrix()
     t = { uvTranslate_,0.0f };
     constMap_->uvTransMat = MakeAffineMatrix(s, r, t);
 }
-#ifdef _DEBUG
-#include <imgui.h>
 void Sprite::ImGui()
 {
+#ifdef _DEBUG
     ImGui::PushID(this);
     ImGui::DragFloat2("Translate", &translate_.x);
     ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
@@ -201,5 +200,5 @@ void Sprite::ImGui()
     }
 
     ImGui::PopID();
-}
 #endif // _DEBUG
+}

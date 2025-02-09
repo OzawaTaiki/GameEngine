@@ -16,6 +16,7 @@ void ImGuiDebugManager::Initialize()
 
 void ImGuiDebugManager::ShowDebugWindow()
 {
+#ifdef _DEBUG
     ImGui::Begin("Debug");
     {
         static bool isSelect[9] = { true };
@@ -115,6 +116,7 @@ void ImGuiDebugManager::ShowDebugWindow()
     }
     ImGui::End();
 
+#endif // _DEBUG
 }
 
 
