@@ -1,6 +1,6 @@
 #include "UIButton.h"
 
-#include <Systems/Input/Input.h>
+#include <System/Input/Input.h>
 
 void UIButton::Initialize(const std::string& _label)
 {

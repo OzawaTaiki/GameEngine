@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Physics/Math/Vector2.h>
-#include <Physics/Math/Vector4.h>
+#include <Math/Vector/Vector2.h>
+#include <Math/Vector/Vector4.h>
 
-#include <Rendering/Sprite/Sprite.h>
+#include <Features/Sprite/Sprite.h>
 
-#include <Systems/JsonBinder/JsonBinder.h>
+#include <Features/Json/JsonBinder.h>
 
 class  UIBase
 {
