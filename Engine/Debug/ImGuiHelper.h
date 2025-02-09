@@ -21,10 +21,12 @@ namespace ImGuiHelper
     void DrawRightPentagon(const ImVec2& _center, const ImVec2& _inscribedRect, float _angle = 0.0f, ImU32 _color = ImU32(0xffffffff));
 
     /// <summary>
-    /// グラデーションエディタを描画する 
+    /// グラデーションエディタを描画する
     /// </summary>
     /// <param name="_colors"> 変更する色のリスト </param>
     void DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors);
+
+
 
     /// <summary>
     /// タイトルバーを描画する

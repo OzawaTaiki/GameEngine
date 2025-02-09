@@ -190,6 +190,12 @@
     <Filter Include="Core\DXCommon\RTV">
       <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Animation">
+      <UniqueIdentifier>{fc8c535f-f4d7-4570-9f9e-79de5a290788}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Animation\Sequence">
+      <UniqueIdentifier>{bb819402-d70d-4f5d-901b-fccac8611e65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -401,6 +407,9 @@
     </ClCompile>
     <ClCompile Include="Debug\ImguITools.cpp" />
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
+    <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp">
+      <Filter>Features\Animation\Sequence</Filter>
+    </ClCompile>
     <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp">
       <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
@@ -710,6 +719,12 @@
     </ClInclude>
     <ClInclude Include="Debug\ImGuiHelper.h">
       <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Animation\Sequence\AnimationSequence .h">
+      <Filter>Features\Animation\Sequence</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h">
+      <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
       <Filter>Features\Scene\Interface</Filter>
