@@ -39,6 +39,7 @@ public:
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; CalculateVertex(); }
 
     void SetSize(const Vector2& _size);
+    void SetColor(const Vector4& _color);
 
     void SetUVSize(const Vector2& _size);
     void SetLeftTop(const Vector2& _leftTop);
@@ -86,11 +87,9 @@ private:
 
     std::string name_ = "";
 
-#ifdef _DEBUG
     Vector2 lefttop_ = { 0.0f,0.0f };
     Vector2 size_ = { 100.0f,100.0f };
     void ImGui();
-#endif // _DEBUG
 
 
 };

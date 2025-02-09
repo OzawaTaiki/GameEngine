@@ -15,12 +15,17 @@ struct Vector2
     Vector2 operator/(float _value)const;
     Vector2 operator/(const Vector2& _v)const;
 
+    Vector2 operator-()const;
+
 	inline bool operator==(const Vector2& _v) const{
 		return x == _v.x && y == _v.y;
 	}
 
-    float Length() const;
     Vector2 Normalize() const;
+    float Length() const;
+    float Dot(const Vector2& _v) const;
+    float Cross(const Vector2& _v) const;
+
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(Vector2, x, y)
 };

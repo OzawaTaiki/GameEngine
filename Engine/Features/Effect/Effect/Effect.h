@@ -16,11 +16,15 @@ public:
 
     void Initialize(const std::string& _name);
     void Update();
+    void Draw();
+
 
     void AddEmitter(const std::string& _name);
 
     std::list<ParticleEmitter*> GetEmitters() const;
     std::string GetName() const { return name_; }
+
+    void SetParentMatrix(const Matrix4x4* _parentMat);
 
     void SetActive(bool _active);
 
@@ -29,6 +33,8 @@ public:
     void DebugShowForEmitterCreate();
 
     void SetTimeChannel(const std::string& _channel);
+
+    bool IsActive() const { return isActive_; }
 
     void Save()const;
 private:

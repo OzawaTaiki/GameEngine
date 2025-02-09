@@ -73,10 +73,10 @@ void ObjectModel::UpdateUVTransform()
 {
 }
 
-#ifdef _DEBUG
-#include <imgui.h>
 void ObjectModel::ImGui()
 {
+#ifdef _DEBUG
+
     ImGui::PushID(this);
     ImGui::DragFloat3("Translate", &translate_.x, 0.01f);
     ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
@@ -87,5 +87,6 @@ void ObjectModel::ImGui()
 
     ImGui::Checkbox("UseQuaternion", &useQuaternion_);
     ImGui::PopID();
-}
+
 #endif // _DEBUG
+}

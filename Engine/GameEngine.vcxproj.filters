@@ -693,6 +693,9 @@
     <ClInclude Include="Debug\ImGuiHelper.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
+      <Filter>Features\Scene\Interface</Filter>
+    </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence .h">
       <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>

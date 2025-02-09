@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Features/UI/UIBase.h>
+#include "UIBase.h"
 
 class UISprite : public UIBase
 {

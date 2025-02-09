@@ -50,9 +50,7 @@ public:
     bool useQuaternion_ = false;
 
 
-#ifdef _DEBUG
     void ImGui();
-#endif // _DEBUG
 private:
 
     WorldTransform worldTransform_;

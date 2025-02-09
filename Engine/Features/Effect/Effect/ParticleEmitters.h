@@ -151,6 +151,8 @@ private:
     bool                    isEnableBillboard_;             // ビルボードを使用するか
     bool                    isLengthScalingEnabled_;        // 方向を向くか
 
+    float                   lengthScaling_ = 2;             // 長さのスケーリング
+
     // 保留
     //    std::array <bool, 3>    lockRotationAxes_;              // 軸を固定するか
     //    Vector3                 lockRotationAxesValue_;         // 固定した軸の値
@@ -168,6 +170,8 @@ private:
 
     bool                    isActive_ = false;              // アクティブか
     bool                    isAlive_ = true;                // まだ生きているか
+
+    bool                   isDraw_ = false;                // 描画するか
 
     std::string timeChannel_ = "default";
     GameTime* gameTime_ = nullptr;

@@ -29,6 +29,7 @@ public:
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     Vector3 GetMin()const { return model_->GetMin(); }
     Vector3 GetMax()const { return model_->GetMax(); }
+    Material* GetMaterial() { return model_->GetMaterialPtr(); }
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
@@ -38,9 +39,7 @@ public:
     bool useQuaternion_ = false;
 
 
-#ifdef _DEBUG
     void ImGui();
-#endif // _DEBUG
 
 
 private:

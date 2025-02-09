@@ -7,9 +7,7 @@
 #include <Features/Model/Manager/ModelManager.h>
 #include <Features/Json/JsonHub.h>
 
-#ifdef _DEBUG
 #include <Debug/ImGuiDebugManager.h>
-#endif // _DEBUG
 
 
 
@@ -73,7 +71,7 @@ void Framework::Initialize()
 
 #ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->Initialize();
-#endif 
+#endif
 
 }
 

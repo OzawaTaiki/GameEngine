@@ -32,7 +32,8 @@ void Collider::Update()
         }
                }, shape_);
 
-
+    preIsHit_ = isHit_;
+    isHit_ = false;
 }
 
 void Collider::Draw()

@@ -7,6 +7,22 @@
 
 #include <numbers>
 
+Ring::Ring() :
+    innerRadius_(0.0f),
+    outerRadius_(0.0f),
+    divide_(16),
+    billboard_({ true,true,true }),
+    scale_({ 1,1,1 }),
+    rotation_({ 0,0,0 }),
+    quternion_({ 0,0,0,1 }),
+    translate_({ 0,0,0 }),
+    textureHandle_(2)
+{
+    objectColor_.Initialize();
+    material_.Initialize("");
+    worldTransform.Initialize();
+}
+
 Ring::Ring(float _innerRadius, float _outerRadius, uint32_t _divide, std::array<bool, 3> _billboard) :
     innerRadius_(_innerRadius),
     outerRadius_(_outerRadius),

@@ -33,7 +33,7 @@ private:
 
     PSOFlags psoFlags_;
 
-    const uint32_t kMaxNum = 4096u * 8u;
+    const uint32_t kMaxNum = 4096u * 24u;
     uint32_t index = 0u;
     Vector4 color_ = { 0,0,0,1 };
     const Camera* cameraptr_=nullptr;
