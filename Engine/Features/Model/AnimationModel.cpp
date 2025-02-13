@@ -73,6 +73,11 @@ void AnimationModel::SetAnimation(const std::string& _name,bool _isLoop)
     model_->SetAnimation(_name,_isLoop);
 }
 
+void AnimationModel::ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop)
+{
+    model_->ChangeAnimation(_name, _blendTime, _isLoop);
+}
+
 
 void AnimationModel::ImGui()
 {

@@ -40,8 +40,8 @@ void SampleScene::Initialize()
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
-    colors.push_back({ 0,Vector4(1,0,0,1) });
-    colors.push_back({ 1,Vector4(0,0,1,1) });
+    colors.push_back({ 0.0f,Vector4(1,0,0,1) });
+    colors.push_back({ 1.0f,Vector4(0,0,1,1) });
     colors.push_back({ 0.5f,Vector4(0,1,0,1) });
     colors.push_back({ 0.1f,Vector4(0,1,0,1) });
     colors.push_back({ 0.532f,Vector4(0,1,0,1) });
@@ -55,6 +55,16 @@ void SampleScene::Update()
     if (Input::GetInstance()->IsKeyTriggered(DIK_RETURN) &&
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
+
+    if (ImGui::Button("rot"))
+    {
+        aModel_->ChangeAnimation("RotateAnim", 0.5f,true);
+    }
+
+    if (ImGui::Button("scale"))
+    {
+        aModel_->ChangeAnimation("ScaleAnim", 0.5f);
+    }
 
     ImGuiTool::GradientEditor("Ambient", colors);
 
