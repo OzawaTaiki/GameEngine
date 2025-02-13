@@ -1,21 +1,37 @@
 #include "SequenceEvent.h"
 
-void SequenceEvent::Update(float _currentTime)
+SequenceEvent::SequenceEvent(const std::string& _label) :
+    label_(_label),
+    isSelect_(false)
 {
-    // 時間が範囲外のときは早期リターン
-    if (_currentTime < startTime_ || _currentTime > startTime_ + duration_)
-    {
-        return;
-    }
+}
 
-
-    // 現在の時間を正規化
-    float normalizedTime = (_currentTime - startTime_) / duration_;
-
-    // イージング処理
-    float t = Easing::SelectFuncPtr(easingType_)(normalizedTime);
-
-    // 値の適用
-
+void SequenceEvent::Update(float _currentTime)
+// t を引数でもらってくるべき
+{
 
 }
+
+void SequenceEvent::AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType)
+{
+    KeyFrame keyFrame;
+    keyFrame.time = _time;
+    keyFrame.value = _value;
+    keyFrame.easingType = _easingType;
+    keyFrame.isSelect = false;
+
+    keyFrames_.push_back(keyFrame);
+}
+
+bool SequenceEvent::ImDragValue()
+{
+    ImGui::PushID(this);
+    bool hasChanged = false;
+
+
+    ImGui::PopID();
+
+    return hasChanged;
+}
+
+
