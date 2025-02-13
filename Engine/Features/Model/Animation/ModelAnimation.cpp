@@ -20,76 +20,128 @@ void ModelAnimation::Update(std::vector<Joint>& _joints, float _deltaTime)
     isPlaying_ = true;
     animetionTimer_ += _deltaTime;
 
-    if (toIdle_)
+    if (state_.isBlending)
     {
-        if (animetionTimer_ >= timeToIdle_)
+        state_.blendTime += _deltaTime;
+        float blendFactor = state_.blendTime / state_.totalBlendTime;
+
+        if (blendFactor >= 1.0f) {
+            state_.isBlending = false;
+        }
+
+        // ブレンド中の補間処理
+        for (Joint& joint : _joints) {
+            if (auto it = animation_.nodeAnimations.find(joint.name_); it != animation_.nodeAnimations.end()) {
+                const NodeAnimation& nodeAnimation = it->second;
+                QuaternionTransform currentTransform = {};
+
+                // 新しいアニメーションの姿勢を計算
+                if (nodeAnimation.interpolation == "LINEAR")
+                {
+                    currentTransform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
+                    currentTransform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
+                    currentTransform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
+                }
+                else if (nodeAnimation.interpolation == "STEP")
+                {
+                    currentTransform.translate = CalculateValue_Step(nodeAnimation.translate, animetionTimer_);
+                    currentTransform.rotation = CalculateValue_Step(nodeAnimation.rotation, animetionTimer_);
+                    currentTransform.scale = CalculateValue_Step(nodeAnimation.scale, animetionTimer_);
+                }
+                else if (nodeAnimation.interpolation == "CUBICSPLINE")
+                {
+                    currentTransform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
+                    currentTransform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
+                    currentTransform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
+                }
+                // 他の補間方法も同様に処理
+
+                // 前のアニメーションの姿勢と新しいアニメーションの姿勢をブレンド
+                if (auto lastPose = state_.lastPose.find(joint.name_); lastPose != state_.lastPose.end()) {
+                    QuaternionTransform blendedTransform;
+                    blendedTransform.translate = Lerp(lastPose->second.translate, currentTransform.translate, blendFactor);
+                    blendedTransform.rotation = Slerp(lastPose->second.rotation, currentTransform.rotation, blendFactor);
+                    blendedTransform.scale = Lerp(lastPose->second.scale, currentTransform.scale, blendFactor);
+
+                    joint.SetTransform(blendedTransform);
+                }
+            }
+        }
+    }
+    else
+    {
+
+        if (toIdle_)
         {
-            animetionTimer_ = 0.0f;
-            toIdle_ = false;
-            isPlaying_ = false;
+            if (animetionTimer_ >= timeToIdle_)
+            {
+                animetionTimer_ = 0.0f;
+                toIdle_ = false;
+                isPlaying_ = false;
+                for (Joint& joint : _joints)
+                {
+                    joint.SetTransform(joint.GetIdleTransform());
+                }
+                return;
+            }
+
             for (Joint& joint : _joints)
             {
-                joint.SetTransform(joint.GetIdleTransform());
+                float t = animetionTimer_ / timeToIdle_;
+                QuaternionTransform transform = {};
+                QuaternionTransform idleTransform = joint.GetIdleTransform();
+                transform.translate = Lerp(joint.GetTransform().translate, idleTransform.translate, t);
+                transform.rotation = Slerp(joint.GetTransform().rotation, idleTransform.rotation, t);
+                transform.scale = Lerp(joint.GetTransform().scale, idleTransform.scale, t);
+
+                joint.SetTransform(transform);
             }
             return;
         }
 
+        // ループしない場合
+        if (!isLoop_)
+        {
+            // 再生時間がアニメーションの尺を超えたら再生を止める
+            if (animetionTimer_ >= animation_.duration)
+            {
+                animetionTimer_ = animation_.duration;
+                isPlaying_ = false;
+            }
+        }
+        else
+            animetionTimer_ = std::fmod(animetionTimer_, animation_.duration);
+
         for (Joint& joint : _joints)
         {
-            float t = animetionTimer_ / timeToIdle_;
-            QuaternionTransform transform = {};
-            QuaternionTransform idleTransform = joint.GetIdleTransform();
-            transform.translate = Lerp(joint.GetTransform().translate, idleTransform.translate, t);
-            transform.rotation = Slerp(joint.GetTransform().rotation, idleTransform.rotation, t);
-            transform.scale = Lerp(joint.GetTransform().scale, idleTransform.scale, t);
-
-            joint.SetTransform(transform);
-        }
-        return;
-    }
-
-    // ループしない場合
-    if (!isLoop_)
-    {
-        // 再生時間がアニメーションの尺を超えたら再生を止める
-        if (animetionTimer_ >= animation_.duration)
-        {
-            animetionTimer_ = animation_.duration;
-            isPlaying_ = false;
-        }
-    }
-    else
-        animetionTimer_ = std::fmod(animetionTimer_, animation_.duration);
-
-    for (Joint& joint : _joints)
-    {
-        if (auto it = animation_.nodeAnimations.find(joint.name_); it != animation_.nodeAnimations.end())
-        {
-            //TODO : 補間処理
-            //it->second.interpolation ごとに補間関数を作成
-            const NodeAnimation& nodeAnimation = it->second;
-            QuaternionTransform transform = {};
-
-            if (nodeAnimation.interpolation == "LINEAR")
+            if (auto it = animation_.nodeAnimations.find(joint.name_); it != animation_.nodeAnimations.end())
             {
-                transform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
-                transform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
-                transform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
-            }
-            else if (nodeAnimation.interpolation == "STEP")
-            {
-                transform.translate = CalculateValue_Step(nodeAnimation.translate, animetionTimer_);
-                transform.rotation = CalculateValue_Step(nodeAnimation.rotation, animetionTimer_);
-                transform.scale = CalculateValue_Step(nodeAnimation.scale, animetionTimer_);
-            }
-            else if (nodeAnimation.interpolation == "CUBICSPLINE")
-            {
-                transform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
-                transform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
-                transform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
-            }
+                //TODO : 補間処理
+                //it->second.interpolation ごとに補間関数を作成
+                const NodeAnimation& nodeAnimation = it->second;
+                QuaternionTransform transform = {};
 
-            joint.SetTransform(transform);
+                if (nodeAnimation.interpolation == "LINEAR")
+                {
+                    transform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
+                    transform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
+                    transform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
+                }
+                else if (nodeAnimation.interpolation == "STEP")
+                {
+                    transform.translate = CalculateValue_Step(nodeAnimation.translate, animetionTimer_);
+                    transform.rotation = CalculateValue_Step(nodeAnimation.rotation, animetionTimer_);
+                    transform.scale = CalculateValue_Step(nodeAnimation.scale, animetionTimer_);
+                }
+                else if (nodeAnimation.interpolation == "CUBICSPLINE")
+                {
+                    transform.translate = CalculateValue_Linear(nodeAnimation.translate, animetionTimer_);
+                    transform.rotation = CalculateValue_Linear(nodeAnimation.rotation, animetionTimer_);
+                    transform.scale = CalculateValue_Linear(nodeAnimation.scale, animetionTimer_);
+                }
+
+                joint.SetTransform(transform);
+            }
         }
     }
 
@@ -216,6 +268,28 @@ void ModelAnimation::Reset()
     toIdle_ = false;
     timeToIdle_ = 0.0f;
 }
+
+void ModelAnimation::ChangeAnimation(const Animation& _animation, float _blendTime)
+{
+    // 現在の各ジョイントの姿勢を保存
+    for (const auto& [nodeName, nodeAnim] : animation_.nodeAnimations) {
+        state_.lastPose[nodeName] = QuaternionTransform{
+            CalculateValue_Linear(nodeAnim.translate, animetionTimer_),
+            CalculateValue_Linear(nodeAnim.rotation, animetionTimer_),
+            CalculateValue_Linear(nodeAnim.scale, animetionTimer_)
+        };
+    }
+
+    // 新しいアニメーションに切り替え
+    animation_ = _animation;
+    animetionTimer_ = 0.0f;
+
+    // ブレンド情報の設定
+    state_.blendTime = 0.0f;
+    state_.totalBlendTime = _blendTime;
+    state_.isBlending = true;
+}
+
 
 Vector3 ModelAnimation::CalculateValue_Linear(const AnimationCurve<Vector3>& _curve, float _time)
 {

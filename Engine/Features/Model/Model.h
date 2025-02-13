@@ -42,6 +42,7 @@ public:
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }
     void SetAnimation(const std::string& _name, bool _loop = false);
+    void ChangeAnimation(const std::string& _name, float _blendTime, bool _loop = false);
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
 
@@ -69,7 +70,7 @@ private:
     std::vector<std::unique_ptr<Mesh>> mesh_ = {};
     std::vector<std::unique_ptr<Material>> material_ = {};
     std::map<std::string,std::unique_ptr<ModelAnimation>> animation_ = {};
-    ModelAnimation* currentAnimation_ = nullptr;
+    std::unique_ptr<ModelAnimation> currentAnimation_ = nullptr;
     ModelAnimation* preAnimation_= nullptr;
     Node node_ = {};
     Skeleton skeleton_ = {};

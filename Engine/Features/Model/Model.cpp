@@ -30,8 +30,7 @@ void Model::Update(float _deltaTime)
         // アニメーションが終わったらアニメーションを解除
         if (!currentAnimation_->IsPlaying())
         {
-            preAnimation_ = currentAnimation_;
-            currentAnimation_ = nullptr;
+            preAnimation_ = currentAnimation_.get();
         }
     }
     skeleton_.Update();
@@ -119,6 +118,10 @@ Model* Model::CreateFromObj(const std::string& _filePath)
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
+
+    model->currentAnimation_ = std::make_unique<ModelAnimation>();
+    model->currentAnimation_->Initialize();
+
     return model;
 }
 
@@ -164,10 +167,24 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
         assert(false && "アニメーションが見つかりません");
         return;
     }
-    currentAnimation_ = animation_[_name].get();
+    currentAnimation_->SetAnimation(animation_[_name]->GetAnimation());
+    //currentAnimation_ = animation_[_name].get();
     currentAnimation_->SetLoop(_loop);
     currentAnimation_->Reset();
-    
+
+}
+
+void Model::ChangeAnimation(const std::string& _name,float _blendTime, bool _loop)
+{
+    if (animation_.find(_name) == animation_.end())
+    {
+        assert(false && "アニメーションが見つかりません");
+        return;
+    }
+    currentAnimation_->ChangeAnimation(animation_[_name]->GetAnimation(), _blendTime);
+    //currentAnimation_ = animation_[_name].get();
+    currentAnimation_->SetLoop(_loop);
+    currentAnimation_->Reset();
 }
 
 void Model::ToIdle(float _timeToIdle)
@@ -178,7 +195,7 @@ void Model::ToIdle(float _timeToIdle)
     }
     else if(preAnimation_)
     {
-        currentAnimation_ = preAnimation_;
+        //currentAnimation_ = preAnimation_;
         currentAnimation_->ToIdle(_timeToIdle);
     }
 }
