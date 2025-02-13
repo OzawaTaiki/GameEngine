@@ -1,6 +1,7 @@
 #include "ImGuiHelper.h"
 
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Features/Animation/Sequence/AnimationSequence.h>
 
 #include <cmath>
 #include <algorithm>
@@ -87,12 +88,6 @@ void ImGuiHelper::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colo
     ImVec2 botBasePos = ImVec2(cursorPos.x, rectPos.y + rectSize.y + pentagonSize.y / 2.0f);
 
 
-    if (ImGui::GetIO().MouseReleased[0])
-    {
-        if (1) {
-
-        }
-    }
     for (auto it = _colors.begin(); it != _colors.end();)
     {
         isActive = false;
@@ -282,9 +277,285 @@ void ImGuiHelper::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colo
             drawlist->AddRectFilledMultiColor(pos, nextPos, it->second, next->second, next->second, it->second);
         }
     }
+}
+
+void ImGuiHelper::TimeLine::Draw(AnimationSequence* _sequence)
+{
+    ImGui::Begin("TimeLine");
+
+    if (_sequence)
+    {
+        static float currentTime = 0;
+
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+        //static float currentTime = 0;
+
+        //ImGui::Text("TimeLine");
+        // シーケンスの時間を取得
+
+        auto sequenceEvents = _sequence->GetSequenceEvents();
+        static ImVec4 defaultColor = ImVec4(1.0f, 1.0f, 1.0f, 0.086f);
+        static ImVec4 hoverColor = ImVec4(1.0f, 1.0f, 1.0f, 0.290f);
+
+        //ImGui::ColorEdit4("defaultColor", &defaultColor.x);
+        //ImGui::ColorEdit4("hoverColor", &hoverColor.x);
+
+        // 時間軸の描画
+        float rectPosXOffset = 100.0f;
+        ImVec2 basePos = ImGui::GetCursorScreenPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 timeAxisRectSize = ImVec2(windowSize.x - 15, 20);
+        ImVec2 timeAxisRectPos = basePos;
+        ImVec2 timeAxisCountStartPos = timeAxisRectPos;
+        timeAxisCountStartPos.x += 100;
+        ImVec2 mousePos = ImGui::GetMousePos();
+        float rangePerSec = 100.0f;
+
+        // 時間軸の背景を描画
+        drawList->AddRectFilled(timeAxisCountStartPos, ImVec2(timeAxisCountStartPos.x + timeAxisRectSize.x, timeAxisCountStartPos.y + timeAxisRectSize.y), ImU32(0x30ffffff));
+
+        // 時間軸のメモリを描画
+        for (int i = 0; i < 10; i++)
+        {
+            ImVec2 lineStartPos = ImVec2(timeAxisCountStartPos.x + rectPosXOffset + i * rectPosXOffset, timeAxisCountStartPos.y);
+            ImVec2 lineEndPos = ImVec2(timeAxisCountStartPos.x + rectPosXOffset + i * rectPosXOffset, timeAxisCountStartPos.y + timeAxisRectSize.y);
+            drawList->AddLine(lineStartPos, lineEndPos, ImU32(0x30ffffff));
+        }
+
+        ImVec2 timeZerpPoint = timeAxisCountStartPos;
+        ImVec2 pentagonSize = ImVec2(11, 15);
+        ImVec2 pentagonPos = timeZerpPoint;
+        pentagonPos.x = timeZerpPoint.x + rangePerSec * currentTime;
+        pentagonPos.y += pentagonSize.y / 2 + 2;
+
+        ImU32 pentagonColorU32 = ImU32(0xb0ffffff);
+
+        ImVec2 pentagonInvisibleButtonPos = pentagonPos;
+        //pentagonInvisibleButtonPos.x
+        ImGui::SetCursorScreenPos(ImVec2(pentagonPos.x - 15/ 2, timeAxisCountStartPos.y));
+        ImGui::InvisibleButton("##TimeAxisPentagon", ImVec2(15, 15));
+
+        if (ImGui::IsItemHovered())
+            pentagonColorU32 = ImU32(0xff0000ff);
+        if (ImGui::IsItemActive())
+        {
+            pentagonColorU32 = ImU32(0xff0000ff);
+            currentTime = (mousePos.x - timeAxisCountStartPos.x) / rangePerSec;
+            currentTime = currentTime < 0 ? 0 : currentTime;
+            pentagonPos.x = timeZerpPoint.x + rangePerSec * currentTime;
+        }
+
+        DrawRightPentagon(pentagonPos, pentagonSize, 0.0f, pentagonColorU32);
+        drawList->AddLine(pentagonPos, ImVec2(pentagonPos.x, pentagonPos.y + windowSize.y), pentagonColorU32);
 
 
 
+
+        //ImGui::Dummy(timeAxisRectSize);
+        ImVec2 OverlapRectPos = ImGui::GetCursorScreenPos();
+        ImGui::SetCursorScreenPos(ImVec2(OverlapRectPos.x, OverlapRectPos.y + 5));
+        OverlapRectPos = ImGui::GetCursorScreenPos();
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));          // 背景を透明に
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 1, 0, 0));   // ホバー時の背景も透明に
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));    // クリック時の背景も透明に
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);            // 枠線をなくす
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+
+        ImGui::Text("OverlapRect");
+        ImGui::SetCursorScreenPos(OverlapRectPos);
+        if (ImGui::Button("##OverlapRect", ImVec2(100, 15)))
+        {
+            if (1)
+            {
+
+            }
+        }
+
+        std::string TreeNodeLabel = _sequence->GetLabel();
+        if (ImGui::TreeNode(TreeNodeLabel.c_str()))
+        {
+
+
+            for (auto& sequenceEvent : sequenceEvents)
+            {
+                std::string l = sequenceEvent->GetLabel();
+                std::list<SequenceEvent::KeyFrame>& keyFrames = sequenceEvent->GetKeyFrames();
+                ImGui::PushID(&sequenceEvent);
+                if (ImGui::IsMouseClicked(0))
+                {
+                    sequenceEvent->SetSelect(false);
+                }
+
+                // ラベルとTimeLine枠を表示
+                ImVec2 rectMinPos = ImGui::GetCursorScreenPos();
+                rectMinPos.x += rectPosXOffset;
+
+                ImVec2 rectSize = ImGui::GetWindowSize();
+                rectSize.y = 20;
+                ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+                ImGui::Text(l.c_str());
+                ImGui::SetCursorScreenPos(cursorPos);
+
+
+                ImU32 color = ImGui::GetColorU32(defaultColor);
+                ImGui::InvisibleButton(sequenceEvent->GetLabel().c_str(), rectSize);
+                if (ImGui::IsItemHovered())
+                {
+                    color = ImGui::GetColorU32(hoverColor);
+                    if (ImGui::IsMouseClicked(0))
+                    {
+                        sequenceEvent->SetSelect(true);
+                    }
+                }
+
+                if (sequenceEvent->IsSelect())
+                {
+                    color = ImGui::GetColorU32(hoverColor);
+                }
+
+                ImGui::SameLine();
+                rectSize.x -= rectPosXOffset + 33;
+                ImVec2 rectMaxPos = ImVec2(rectMinPos.x + rectSize.x, rectMinPos.y + rectSize.y);
+                drawList->AddRectFilled(rectMinPos, rectMaxPos, color);
+                ImGui::Dummy(rectSize);
+                //drawList->AddRectFilled(ImVec2(rectMinPos.x + 100, rectMinPos.y), ImVec2(100, 100), color);
+
+
+                ImVec2 zeroPoint = rectMinPos;
+                int32_t id = 0;
+                for (auto& keyFrame : keyFrames)
+                {
+                    ImGui::Text("Time:%f", keyFrame.time);
+                    ImGui::SameLine();
+                    ImGui::Text("Value:%f", std::get<float>(keyFrame.value));
+
+                    float time = keyFrame.time;
+
+                    float rectLocalPos = rangePerSec * time;
+
+                    ImVec2 markPosition = zeroPoint;
+                    markPosition.x += rectLocalPos;
+                    markPosition.y += 10;
+                    ImU32 markColor = ImU32(0xffffffff);
+
+                    std::string invisibleButtonLabel = "##TimeLine" + l + std::to_string(id);
+                    ImGui::SetCursorScreenPos(ImVec2(markPosition.x - 7, markPosition.y - 7));
+                    ImGui::InvisibleButton(invisibleButtonLabel.c_str(), ImVec2(16, 16));
+
+                    // 重なってるとき赤く
+                    if (ImGui::IsItemHovered())
+                        markColor = ImU32(0xd00000ff);
+                    if (ImGui::IsItemActive())
+                    {
+                        markColor = ImU32(0xd00000ff);
+                        keyFrame.isSelect = true;
+                    }
+                    if (keyFrame.isSelect)
+                    {
+                        markColor = ImU32(0xd00000ff);
+                        if (ImGui::IsMouseDown(0) && !ImGui::IsMouseClicked(0))
+                        {
+
+                            time = (mousePos.x - zeroPoint.x) / rangePerSec;
+                            time = time < 0 ? 0 : time;
+
+                            if (ImGui::IsMouseDown(1))
+                            {
+                                // 0,1刻み
+                                time = std::round(time * 10.0f) / 10.0f;
+                            }
+
+                            keyFrame.time = time;
+
+                            rectLocalPos = rangePerSec * time;
+                            markPosition = zeroPoint;
+                            markPosition.x += rectLocalPos;
+                            markPosition.y += 10;
+                        }
+                    }
+
+                    drawList->AddCircleFilled(markPosition, 7, markColor);
+                    //sequenceEvent->ImDragValue();
+                }
+                ImGui::PopID();
+            }
+
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleVar(2);       // 変更したスタイルを元に戻す
+        ImGui::PopStyleColor(3);    // 変更した3つの色を元に戻す
+        drawList->AddRectFilled(ImVec2(timeAxisCountStartPos.x, OverlapRectPos.y),
+            ImVec2(timeAxisCountStartPos.x + timeAxisRectSize.x, OverlapRectPos.y + windowSize.y),
+            ImU32(0xa0202020));
+        CreateEventButton(_sequence);
+
+        // シーケンスの時間を表示
+        ImGui::Text("CurrentTime:%f", currentTime);
+
+    }
+
+    ImGui::End();
+
+}
+
+void ImGuiHelper::TimeLine::CreateEventButton(AnimationSequence* _sequence)
+{
+
+    static int selectedDataType = 0;
+    static const char* dataTypes[] = { "int32_t", "float", "Vector2", "Vector3", "Vector4", "Quaternion" };
+    static char createEventName[128] = "";
+    static float startTime = 0.0f;
+    static uint32_t easingType = 0;
+
+    if (ImGui::Button("New Events"))
+    {
+        ImGui::OpenPopup("NewEvents");
+    }
+
+    if (ImGui::BeginPopup("NewEvents"))
+    {
+        ImGui::Combo("DataType", &selectedDataType, dataTypes, IM_ARRAYSIZE(dataTypes));
+        ImGui::InputText("Name", createEventName, IM_ARRAYSIZE(createEventName));
+
+        ImGui::InputFloat("StartTime", &startTime);
+        easingType = Easing::SelectEasingFunc();
+        //ImGui::InputScalar("EasingType", ImGuiDataType_U32, &easingType);
+
+        if (ImGui::Button("CerateEvents"))
+        {
+            switch (selectedDataType)
+            {
+            case 0:
+                _sequence->CreateSequenceEvent<int32_t>(createEventName, 0, startTime, easingType);
+                break;
+            case 1:
+                _sequence->CreateSequenceEvent<float>(createEventName, 0.0f, startTime, easingType);
+                break;
+            case 2:
+                _sequence->CreateSequenceEvent<Vector2>(createEventName, Vector2(0, 0), startTime, easingType);
+                break;
+            case 3:
+                _sequence->CreateSequenceEvent<Vector3>(createEventName, Vector3(0, 0, 0), startTime, easingType);
+                break;
+            case 4:
+                _sequence->CreateSequenceEvent<Vector4>(createEventName, Vector4(0, 0, 0, 0), startTime, easingType);
+                break;
+            case 5:
+                _sequence->CreateSequenceEvent<Quaternion>(createEventName, Quaternion(0, 0, 0, 1), startTime, easingType);
+                break;
+            default:
+                break;
+            }
+            strcpy_s(createEventName, "");
+            easingType = 0;
+            startTime = 0.0f;
+            selectedDataType = 0;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void ImGuiHelper::DrawTitleBar(const char* _text, const ImVec4& _color)

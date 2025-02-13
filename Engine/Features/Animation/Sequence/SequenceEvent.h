@@ -13,22 +13,39 @@
 
 class SequenceEvent
 {
+private:
+    using ParameterValue = std::variant<int32_t, float, Vector2, Vector3, Vector4, Quaternion>;
 public:
-    SequenceEvent();
-    ~SequenceEvent();
+
+    struct KeyFrame
+    {
+        float time;
+        ParameterValue value;
+        uint32_t easingType;
+        bool isSelect;
+    };
+
+public:
+    SequenceEvent(const std::string& _label);
+    ~SequenceEvent() = default;
 
     void Update(float _currentTime);
 
+    std::string GetLabel() const { return label_; }
+    void SetSelect(bool _isSelect) { isSelect_ = _isSelect; }
+    bool IsSelect() const { return isSelect_; }
+
+    std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
+    void AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType);
+
+    bool ImDragValue();
+
 private:
-    using ParameterValue = std::variant<int32_t, float, Vector2, Vector3, Vector4, Quaternion>;
 
-    float startTime_;
-    float duration_;
-    ParameterValue value_;
-    uint32_t easingType_;
+    std::string label_;
+    bool isSelect_;
 
 
-
-
+    std::list<KeyFrame> keyFrames_;
 
 };

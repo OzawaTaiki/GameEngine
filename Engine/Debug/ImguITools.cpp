@@ -39,9 +39,21 @@ void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Ve
 
 }
 
-
-void ImGuiTool::TimeLine(const char* _label, std::list<std::pair<float, float>>& _colors)
+void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 {
-}
+    // Nullチェック
+    if (!_sequence)
+    {
+        return;
+    }
 
+    ImGui::PushID(_label);
+
+    ImGuiHelper::TimeLine::Draw(_sequence);
+
+    ImGui::PopID();
+
+
+
+}
 

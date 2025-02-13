@@ -15,6 +15,7 @@
 #include <Features/Model/Primitive/Cylinder.h>
 #include <Features/UVTransform/SpriteSheetAnimetion.h>
 #include <Features/UVTransform/UVTransformAnimation.h>
+#include <Features/Animation/Sequence/AnimationSequence.h>
 
 #include <memory>
 
@@ -49,6 +50,7 @@ private:
     std::unique_ptr<LightGroup> lights_;
     std::list<std::pair<float, Vector4>> colors;
 
+    std::unique_ptr<AnimationSequence> sequence_ = nullptr;
 
 
 #ifdef _DEBUG

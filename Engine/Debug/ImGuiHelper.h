@@ -6,6 +6,7 @@
 
 #include <list>
 
+class AnimationSequence;
 namespace ImGuiHelper
 {
     /// <summary>
@@ -26,6 +27,17 @@ namespace ImGuiHelper
     /// <param name="_colors"> 変更する色のリスト </param>
     void DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colors);
 
+    namespace TimeLine
+    {
+
+        /// <summary>
+        /// タイムラインを描画する
+        /// </summary>
+        /// <param name="_sequence"></param>
+        void Draw(AnimationSequence* _sequence);
+
+        void CreateEventButton(AnimationSequence* _sequence);
+    }
 
 
     /// <summary>

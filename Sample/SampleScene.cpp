@@ -40,12 +40,15 @@ void SampleScene::Initialize()
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
-    colors.push_back({ 0,Vector4(1,0,0,1) });
-    colors.push_back({ 1,Vector4(0,0,1,1) });
+    colors.push_back({ 0.0f,Vector4(1,0,0,1) });
+    colors.push_back({ 1.0f,Vector4(0,0,1,1) });
     colors.push_back({ 0.5f,Vector4(0,1,0,1) });
     colors.push_back({ 0.1f,Vector4(0,1,0,1) });
     colors.push_back({ 0.532f,Vector4(0,1,0,1) });
     colors.push_back({ 0.12f,Vector4(1,1,0,1) });
+
+    sequence_ = std::make_unique<AnimationSequence>("test");
+
 }
 
 void SampleScene::Update()
@@ -56,7 +59,8 @@ void SampleScene::Update()
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
 
-    ImGuiTool::GradientEditor("Ambient", colors);
+    ImGuiTool::TimeLine("TimeLine", sequence_.get());
+    ImGuiTool::GradientEditor("GradientEditor", colors);
 
     lights_->DrawDebugWindow();
 #endif // _DEBUG
