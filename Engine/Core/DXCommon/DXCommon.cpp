@@ -44,6 +44,7 @@ void DXCommon::Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _ba
 	CreateDepthBuffer();
 	CreateDescriptor();
 	InitializeRenderTarget();
+    CreateRenderTexture();
 	InitializeDepthStencilView();
 	CreateFence();
 	InitializeViewport();
@@ -86,7 +87,7 @@ void DXCommon::PreDraw()
 	commandList_->ClearRenderTargetView(RTVHandles_[backBufferIndex], clearColor_, 0, nullptr);
 
 	//指定した深度で画面をクリアする
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	commandList_->RSSetViewports(1, &viewport_);                      // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_);                      // Scissorを設定
@@ -96,22 +97,22 @@ void DXCommon::PreDraw()
 
 void DXCommon::PreDraw1()
 {
-	//これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	////これから書き込むバックバッファのインデックスを取得
+	//UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
-	//trasitionBarrierを貼るコード
-	//今回のバリアはtransition
-	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//Noneにしておく
-	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//バリアを貼る対象のリソース。現在のバックバッファに対して行う
-	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	//遷移前（現在）のResourceState
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	//遷移後のResourceState
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//transitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
+	////trasitionBarrierを貼るコード
+	////今回のバリアはtransition
+	//barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	////Noneにしておく
+	//barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	////バリアを貼る対象のリソース。現在のバックバッファに対して行う
+	//barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+	////遷移前（現在）のResourceState
+	//barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	////遷移後のResourceState
+	//barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	////transitionBarrierを張る
+	//commandList_->ResourceBarrier(1, &barrier_);
 
 
 	//描画先のRTVを設定する
@@ -128,7 +129,7 @@ void DXCommon::PreDraw1()
 	commandList_->ClearRenderTargetView(RTVHandles_[2], rtClearValue_, 0, nullptr);
 
 	//指定した深度で画面をクリアする
-	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	commandList_->RSSetViewports(1, &viewport_);                      // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_);                      // Scissorを設定
@@ -376,7 +377,7 @@ void DXCommon::CreateDescriptor()
 	desriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないのでShaderVisibleはfalse
-	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);              //viewの情報を格納している場所(Discriptor)の束(配列)
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);              //viewの情報を格納している場所(Discriptor)の束(配列)
 
 	////imguiを使うためSRV用のが必要
 	////SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなのでShaderVisivleはtrue
@@ -493,9 +494,14 @@ void DXCommon::InitializeImGui()
 void DXCommon::CreateRenderTexture()
 {
     const Vector4 ClearColor = { 1.0f,0.0f,0.0f,1.0f };
-    renderTextureResource_ = CreateRenderTextureResource( WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM, ClearColor);
+	renderTextureResource_ = CreateRenderTextureResource(WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, ClearColor);
 
+	uint32_t RTVSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
+	RTVHandles_[2] = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	RTVHandles_[2].ptr += RTVSize * 2;
+
+	device_->CreateRenderTargetView(renderTextureResource_.Get(), &rtvDesc_, RTVHandles_[2]);
 
 }
 
@@ -567,13 +573,21 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateRenderTextureResource( ui
     clearValue.Color[2] = _clearColor.z; // 青
     clearValue.Color[3] = _clearColor.w; // アルファ
 
-    device_->CreateCommittedResource(
+	rtClearValue_[0] = _clearColor.x;
+    rtClearValue_[1] = _clearColor.y;
+    rtClearValue_[2] = _clearColor.z;
+    rtClearValue_[3] = _clearColor.w;
+
+
+    HRESULT hr= device_->CreateCommittedResource(
         &heapProperties,					// Heapの設定
         D3D12_HEAP_FLAG_NONE,				// Heapの特別な設定は特になし。
         &resourceDesc,						// Resourceの設定
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // ピクセルシェーダで使う
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
         &clearValue,						// クリア値
         IID_PPV_ARGS(renderTextureResource.GetAddressOf())); // 作成するResourceポインタへのポインタ
+
+	assert(SUCCEEDED(hr));
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = _format;

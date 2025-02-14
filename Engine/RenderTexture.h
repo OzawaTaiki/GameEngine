@@ -15,6 +15,8 @@ public:
 
     void Initialize(uint32_t _width, uint32_t _height, DXGI_FORMAT _format, const Vector4& _clearColor);
 
+    void PreDraw();
+
 
 
 private:

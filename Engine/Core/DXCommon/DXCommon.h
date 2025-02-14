@@ -96,7 +96,7 @@ private:
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};
 
-	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandles_[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandles_[3];
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
 	uint64_t fenceValue_;
