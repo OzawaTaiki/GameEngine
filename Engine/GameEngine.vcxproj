@@ -198,6 +198,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Vector\Vector2.cpp" />
     <ClCompile Include="Math\Vector\Vector3.cpp" />
     <ClCompile Include="Math\Vector\VectorFunction.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="System\Audio\Audio.cpp" />
     <ClCompile Include="System\Input\Input.cpp" />
     <ClCompile Include="System\Time\GameTime.cpp" />
@@ -281,6 +282,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector\Vector3.h" />
     <ClInclude Include="Math\Vector\Vector4.h" />
     <ClInclude Include="Math\Vector\VectorFunction.h" />
+    <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="System\Audio\Audio.h" />
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Time\GameTime.h" />

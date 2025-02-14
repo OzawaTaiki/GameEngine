@@ -398,6 +398,7 @@
     </ClCompile>
     <ClCompile Include="Debug\ImguITools.cpp" />
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -686,6 +687,9 @@
     </ClInclude>
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
       <Filter>Features\Scene\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>Core\DXCommon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

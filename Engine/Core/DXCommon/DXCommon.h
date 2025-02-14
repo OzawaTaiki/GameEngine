@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core/DXCommon/LeakChecker/D3DResourceLeakChecker.h>
-
+#include <Math/Vector/Vector4.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -20,6 +20,7 @@ public:
 	void Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _backBufferHeight);
 
 	void PreDraw();
+	void PreDraw1();
 	void PostDraw();
 
     void WaitForGPU();
@@ -39,6 +40,8 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource( uint32_t _width, uint32_t _height,
+		DXGI_FORMAT _format, const Vector4& _clearColor);
 private:
 
 	void CreateDevice();
@@ -53,6 +56,8 @@ private:
 	void CreateScissorRect();
 	void CreateDXcCompiler();
 	void InitializeImGui();
+    void CreateRenderTexture();
+
 
 	void InitializeFixFPS();
 	void UpdateFixFPS();
@@ -81,6 +86,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
 	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+    float rtClearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
+	
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;

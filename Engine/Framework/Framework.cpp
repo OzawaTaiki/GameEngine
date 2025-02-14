@@ -94,12 +94,13 @@ void Framework::Update()
 
 void Framework::PreDraw()
 {
-    dxCommon_->PreDraw();
+    dxCommon_->PreDraw1();
     srvManager_->PreDraw();
 }
 
 void Framework::PostDraw()
 {
+    dxCommon_->PreDraw();
     imguiManager_->End();
     imguiManager_->Draw();
 
