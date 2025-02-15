@@ -187,6 +187,9 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{5a86c1ea-ecf1-4be9-bddc-a3ce876dd994}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\DXCommon\RTV">
+      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -398,7 +401,12 @@
     </ClCompile>
     <ClCompile Include="Debug\ImguITools.cpp" />
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
-    <ClCompile Include="RenderTexture.cpp" />
+    <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -688,8 +696,11 @@
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
       <Filter>Features\Scene\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTexture.h">
-      <Filter>Core\DXCommon</Filter>
+    <ClInclude Include="Core\DXCommon\RTV\RTVManager.h">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
+      <Filter>Core\DXCommon\RTV</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

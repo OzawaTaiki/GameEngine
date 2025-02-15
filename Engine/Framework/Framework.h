@@ -9,6 +9,7 @@
 #include <System/Input/Input.h>
 #include <Features/Scene/Manager/SceneManager.h>
 #include <Features/Collision/Manager/CollisionManager.h>
+#include <Core/DXCommon/RTV/RTVManager.h>
 
 class Framework
 {
@@ -37,6 +38,7 @@ protected:
     WinApp*                 winApp_                 = nullptr;//
     DXCommon*               dxCommon_               = nullptr;//
     SRVManager*             srvManager_             = nullptr;//
+    RTVManager*             rtvManager_             = nullptr;//
     ImGuiManager*           imguiManager_           = nullptr;//
     ParticleManager*        particleManager_        = nullptr;//
     LineDrawer*             lineDrawer_             = nullptr;//
@@ -44,6 +46,7 @@ protected:
     SceneManager*           sceneManager_           = nullptr;//
     CollisionManager*       collisionManager_       = nullptr;//
     GameTime*               gameTime_               = nullptr;//
+
 
 
     bool endRequest_ = false;
