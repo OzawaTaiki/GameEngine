@@ -436,6 +436,12 @@
     <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.PS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.VS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -449,6 +455,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\FullScreen.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

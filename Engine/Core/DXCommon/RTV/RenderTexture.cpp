@@ -41,3 +41,32 @@ void RenderTexture::SetRenderTexture(uint32_t _dsvHandle) const
 
 }
 
+void RenderTexture::Draw() const
+{
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+    auto srvManager = SRVManager::GetInstance();
+
+    D3D12_RESOURCE_BARRIER barrier_{};
+    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier_.Transition.pResource = renderTextureResource_.Get();
+    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    commandList->ResourceBarrier(1, &barrier_);
+
+
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndex_);
+
+    commandList->SetGraphicsRootDescriptorTable(0, srvHandle);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    commandList->DrawInstanced(3, 1, 0, 0);
+
+    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+    commandList->ResourceBarrier(1, &barrier_);
+}
+

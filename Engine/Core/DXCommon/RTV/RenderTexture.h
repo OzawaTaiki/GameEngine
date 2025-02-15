@@ -31,6 +31,8 @@ public:
 
     void SetRenderTexture(uint32_t _dsvHandle = 0) const;
 
+    void Draw() const;
+
 
 
 private:

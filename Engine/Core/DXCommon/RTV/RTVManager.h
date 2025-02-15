@@ -19,6 +19,8 @@ public:
     static RTVManager* GetInstance();
 
     void Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_t _winHeight);
+    void DrawRenderTexture(const std::string& _name);
+    void DrawRenderTexture(uint32_t _index);
 
 
     void SetRenderTexture(uint32_t _index, uint32_t _dsvHandle);

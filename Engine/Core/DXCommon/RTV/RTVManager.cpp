@@ -1,5 +1,6 @@
 #include "RTVManager.h"
 #include <Core/DXCommon/DXCommon.h>
+#include <Core/DXCommon/PSOManager/PSOManager.h>
 
 const uint32_t RTVManager::kMaxIndex_ = 8;
  uint32_t RTVManager::winWidth_ = 0;
@@ -37,7 +38,7 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-    
+
     for (size_t i = 0; i < backBufferCount_; i++)
     {
         auto sr = dxcommon_->GetSwapChainResource(i);
@@ -47,6 +48,32 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
         dxcommon_->GetDevice()->CreateRenderTargetView(sr, &rtvDesc, rtvHandle);
     }
 
+}
+
+void RTVManager::DrawRenderTexture(uint32_t _index)
+{
+
+    auto it = renderTextures_.find(_index);
+    if (it == renderTextures_.end())
+        assert(false && "not found RenderTexture");
+
+    auto psoManager = PSOManager::GetInstance();
+
+    psoManager->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
+    psoManager->SetRootSignature(PSOFlags::Type_OffScreen);
+
+
+    it->second->Draw();
+
+}
+
+void RTVManager::DrawRenderTexture(const std::string& _name)
+{
+    auto it = textureMap_.find(_name);
+    if (it == textureMap_.end())
+        assert(false && "not found RenderTexture");
+
+    DrawRenderTexture(it->second);
 }
 
 void RTVManager::SetRenderTexture(uint32_t _index, uint32_t _dsvHandle)
@@ -105,6 +132,8 @@ uint32_t RTVManager::CreateRenderTexture(std::string _name, uint32_t _width, uin
     renderTextures_[rtvIndex]->Initialize(rtvResource.Get(), rtvHandle, _format, rtvIndex);
     renderTextures_[rtvIndex]->SetViewport(viewport_);
     renderTextures_[rtvIndex]->SetScissorRect(scissorRect_);
+    renderTextures_[rtvIndex]->SetClearColor(_clearColor);
+
 
 
     return rtvIndex;

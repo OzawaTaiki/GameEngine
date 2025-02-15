@@ -27,14 +27,14 @@ void ImGuiManager::Initialize()
     if (!srvManager_)
         assert(false);
 
-    srvManager_->Allocate();
+    uint32_t index = srvManager_->Allocate();
     ImGui_ImplDX12_Init(
         dx->GetDevice(),
         static_cast<int>(dx->GetBackBufferSize()),
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         srvManager_->GetSRVHeap(),
-        srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
-        srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart()
+        srvManager_->GetCPUSRVDescriptorHandle(index),
+        srvManager_->GetGPUSRVDescriptorHandle(index)
     );
 
 
