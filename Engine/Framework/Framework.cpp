@@ -35,6 +35,13 @@ void Framework::Initialize()
     srvManager_ = SRVManager::GetInstance();
     srvManager_->Initialize();
 
+
+
+    rtvManager_ = RTVManager::GetInstance();
+    rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+    rtvManager_->CreateRenderTexture("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f));
+
+
     PSOManager::GetInstance()->Initialize();
 
     LightingSystem::GetInstance()->Initialize();
@@ -94,12 +101,15 @@ void Framework::Update()
 
 void Framework::PreDraw()
 {
-    dxCommon_->PreDraw();
+    rtvManager_->SetRenderTexture(2, 0);
     srvManager_->PreDraw();
 }
 
 void Framework::PostDraw()
 {
+    dxCommon_->PreDraw();
+    rtvManager_->SetSwapChainRenderTexture(dxCommon_->GetSwapChain(), 0);
+    rtvManager_->DrawRenderTexture("default");
     imguiManager_->End();
     imguiManager_->Draw();
 

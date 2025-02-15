@@ -20,16 +20,17 @@ enum class PSOFlags
     Type_Sprite				= 1 << 2,
     Type_LineDrawer			= 1 << 3,
     Type_Particle			= 1 << 4,
+    Type_OffScreen          = 1 << 5,
 
-    Blend_Normal			= 1 << 5,
-    Blend_Add				= 1 << 6,
-    Blend_Sub				= 1 << 7,
-    Blend_Multiply			= 1 << 8,
-    Blend_Screen			= 1 << 9,
+    Blend_Normal			= 1 << 11,
+    Blend_Add				= 1 << 12,
+    Blend_Sub				= 1 << 13,
+    Blend_Multiply			= 1 << 14,
+    Blend_Screen			= 1 << 15,
 
-    Cull_None				= 1 << 10,
-    Cull_Front				= 1 << 11,
-    Cull_Back				= 1 << 12,
+    Cull_None				= 1 << 20,
+    Cull_Front				= 1 << 21,
+    Cull_Back				= 1 << 22,
 };
 
 PSOFlags SetBlendMode(PSOFlags _flag, PSOFlags _mode);
@@ -87,7 +88,8 @@ constexpr PSOFlags& operator&=(PSOFlags& a, PSOFlags b)
 #pragma region PSOFlagsのマスク
 constexpr PSOFlags TypeMask =
 PSOFlags::Type_Model | PSOFlags::Type_AnimationModel |
-PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle; // 0～4ビット
+PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
+| PSOFlags::Type_OffScreen; // 0～4ビット
 
 constexpr PSOFlags BlendMask =
 PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
@@ -112,6 +114,9 @@ public:
 	std::optional<ID3D12PipelineState*> GetPipeLineStateObject(PSOFlags _flag);
 	std::optional<ID3D12RootSignature*> GetRootSignature(PSOFlags _flag);
 
+    void SetPipeLineStateObject(PSOFlags _flag);
+    void SetRootSignature(PSOFlags _flag);
+
 private:
 
 	Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
@@ -126,6 +131,7 @@ private:
     void CreatePSOForSprite(PSOFlags _flags);
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);
+    void CreatePSOForOffScreen();
 
 	D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
     D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);

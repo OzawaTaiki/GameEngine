@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core/DXCommon/LeakChecker/D3DResourceLeakChecker.h>
-
+#include <Math/Vector/Vector4.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -20,6 +20,7 @@ public:
 	void Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _backBufferHeight);
 
 	void PreDraw();
+	void PreDraw1();
 	void PostDraw();
 
     void WaitForGPU();
@@ -32,6 +33,10 @@ public:
 	ID3D12Device* GetDevice() { return device_.Get(); }
 
 	size_t GetBackBufferSize() const { return swapChainDesc_.BufferCount; }
+    UINT GetCurrentBackBufferIndex() const { return swapChain_->GetCurrentBackBufferIndex(); }
+
+    IDXGISwapChain4* GetSwapChain() { return swapChain_.Get(); }
+    ID3D12Resource* GetSwapChainResource(size_t _index) { return swapChainResources_[_index].Get(); }
 
     void SetClearColor(float _r, float _g, float _b, float _a) { clearColor_[0] = _r; clearColor_[1] = _g; clearColor_[2] = _b; clearColor_[3] = _a; }
     void SetClearColor(float _color[4]) { clearColor_[0] = _color[0]; clearColor_[1] = _color[1]; clearColor_[2] = _color[2]; clearColor_[3] = _color[3]; }
@@ -39,6 +44,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
+	//Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource( uint32_t _width, uint32_t _height,
+		//DXGI_FORMAT _format, const Vector4& _clearColor);
+
+    D3D12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandle(uint32_t _index) { return GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV_, _index); }
+
 private:
 
 	void CreateDevice();
@@ -53,6 +63,8 @@ private:
 	void CreateScissorRect();
 	void CreateDXcCompiler();
 	void InitializeImGui();
+    void CreateRenderTexture();
+
 
 	void InitializeFixFPS();
 	void UpdateFixFPS();
@@ -65,7 +77,6 @@ private:
 
 
 	uint32_t desriptorSizeSRV_;
-	uint32_t desriptorSizeRTV_;
 
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
@@ -78,21 +89,22 @@ private:
 
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
 	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+    float rtClearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};
 
-	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandles_[2];
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
 	uint64_t fenceValue_;
 	HANDLE fenceEvent_;
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	uint32_t desriptorSizeDSV_;
 	D3D12_RESOURCE_BARRIER barrier_{};
