@@ -19,64 +19,6 @@ cbuffer gColor : register(b2)
     float4 materialColor;
 }
 
-struct DirectionalLight
-{
-    float4 color;
-    float3 direction;
-    float intensity;
-    int isHalf;
-};
-
-struct PointLight
-{
-    float4 color;
-    float3 position;
-    float intensity;
-    float radius;
-    float decay;
-    int isHalf;
-};
-
-struct SpotLight
-{
-    float4 color;
-    float3 position;
-    float intensity;
-    float3 direction;
-    float distance;
-    float decay;
-    float cosAngle;
-    float cosFalloutStart;
-    int isHalf;
-};
-static const int MAX_POINT_LIGHT = 32;
-static const int MAX_SPOT_LIGHT = 16;
-cbuffer gLightGroup : register(b3)
-{
-    DirectionalLight DL;
-    PointLight PL[MAX_POINT_LIGHT];
-    SpotLight SL[MAX_SPOT_LIGHT];
-    int numPointLight;
-    int numSpotLight;
-}
-
-////平行光源
-//cbuffer gDirectionalLight : register(b3)
-//{
-//    DirectionalLight DL;
-//}
-
-////点光源
-//cbuffer gPointLight : register(b4)
-//{
-//    PointLight PL;
-//}
-
-////スポットライト
-//cbuffer gSpotLight : register(b5)
-//{
-//    SpotLight SL;
-//}
 
 struct PixelShaderOutput
 {
@@ -219,4 +161,14 @@ float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3
         lighting += CalculateSpotLighting(_input, SL[i], _toEye, _textureColor);
     }
     return lighting;
+}
+
+
+PixelShaderOutput ShadowMapPS(VertexShaderOutput _input)
+{
+    PixelShaderOutput output;
+
+    output.color = float4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    return output;
 }

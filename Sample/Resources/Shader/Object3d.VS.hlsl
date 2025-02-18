@@ -24,5 +24,17 @@ VertexShaderOutput main(VertexShaderInput _input)
     return output;
 }
 
+VertexShaderOutput ShadowMapVS(VertexShaderInput _input)
+{
+    VertexShaderOutput output;
+    output.position = mul(_input.position, mul(World, DL.lightVP));
+    output.texcoord = _input.texcoord;
+    output.normal = _input.normal;
+    output.worldPosition = mul(_input.position, World).xyz;
+
+
+    return output;
+}
+
 
 

@@ -115,6 +115,11 @@ void SampleScene::Draw()
 
 }
 
+void SampleScene::DrawShadow()
+{
+    oModel_->DrawShadow(&SceneCamera_);
+}
+
 #ifdef _DEBUG
 #include <imgui.h>
 void SampleScene::ImGui()

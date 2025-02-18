@@ -34,6 +34,8 @@ public:
     // 描画
     void Draw();
 
+    void DrawShadow();
+
     void SetTransition(std::unique_ptr<ISceneTransition> _transition);
 
     // シーンの予約

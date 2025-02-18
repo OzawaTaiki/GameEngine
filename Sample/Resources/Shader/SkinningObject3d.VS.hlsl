@@ -20,6 +20,7 @@ cbuffer TransformationMatrix : register(b1)
     float4x4 World;
     float4x4 worldInverseTranspose;
 };
+
 struct VertexShaderInput
 {
     float4 position : POSITION0;

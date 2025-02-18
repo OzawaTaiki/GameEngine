@@ -48,6 +48,8 @@ void ModelManager::PreDrawForObjectModel() const
 
     commandList->SetGraphicsRootSignature(rootSignature_[0]);
     commandList->SetPipelineState(graphicsPipelineState_[0]);
+
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void ModelManager::PreDrawForAnimationModel() const
@@ -56,6 +58,8 @@ void ModelManager::PreDrawForAnimationModel() const
 
     commandList->SetGraphicsRootSignature(rootSignature_[1]);
     commandList->SetPipelineState(graphicsPipelineState_[1]);
+
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 Model* ModelManager::FindSameModel(const std::string& _name)

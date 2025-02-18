@@ -407,6 +407,7 @@
     <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
       <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -710,6 +711,9 @@
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
       <Filter>Core\DXCommon\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>Core\DXCommon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

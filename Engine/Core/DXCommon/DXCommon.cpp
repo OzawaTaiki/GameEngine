@@ -77,10 +77,10 @@ void DXCommon::PreDraw()
 	//指定した色で画面算体をクリアする
 
 
-	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	//const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	//描画先とRTVとDSVの設定を行う
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV, 0);
+	//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV, 0);
 	//commandList_->OMSetRenderTargets(1, &RTVHandles_[backBufferIndex], false, &dsvHandle);
 
 	//float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
@@ -88,48 +88,6 @@ void DXCommon::PreDraw()
 
 	//指定した深度で画面をクリアする
 	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-	//commandList_->RSSetViewports(1, &viewport_);                      // Viewportを設定
-	//commandList_->RSSetScissorRects(1, &scissorRect_);                      // Scissorを設定
-
-	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void DXCommon::PreDraw1()
-{
-	////これから書き込むバックバッファのインデックスを取得
-	//UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
-	////trasitionBarrierを貼るコード
-	////今回のバリアはtransition
-	//barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	////Noneにしておく
-	//barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	////バリアを貼る対象のリソース。現在のバックバッファに対して行う
-	//barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	////遷移前（現在）のResourceState
-	//barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	////遷移後のResourceState
-	//barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	////transitionBarrierを張る
-	//commandList_->ResourceBarrier(1, &barrier_);
-
-
-	//描画先のRTVを設定する
-	//指定した色で画面算体をクリアする
-
-
-	const uint32_t desriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-
-	//描画先とRTVとDSVの設定を行う
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV, 0);
-	//commandList_->OMSetRenderTargets(1, &RTVHandles_[2], false, &dsvHandle);
-
-	////float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-	//commandList_->ClearRenderTargetView(RTVHandles_[2], rtClearValue_, 0, nullptr);
-
-	//指定した深度で画面をクリアする
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	//commandList_->RSSetViewports(1, &viewport_);                      // Viewportを設定
 	//commandList_->RSSetScissorRects(1, &scissorRect_);                      // Scissorを設定

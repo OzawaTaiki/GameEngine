@@ -4,8 +4,11 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Light/System/LightingSystem.h>
 #include <Debug/ImGuiManager.h>
+#include <Math/Matrix/MatrixFunction.h>
 
 #include <cmath>
+
+Vector2 LightGroup::shadowMapSize_ = { 1024,1024 };
 
 void LightGroup::Initialize()
 {
@@ -18,6 +21,8 @@ void LightGroup::Initialize()
 
     selectablePointLights_.clear();
     selectableSpotLights_.clear();
+
+    dirty_ = true;
 }
 
 void LightGroup::Update()
@@ -207,9 +212,16 @@ void LightGroup::DeleteSpotLight(const std::string& _name)
 
 LightGroup::LightTransferData LightGroup::GetLightData()
 {
+    if (!dirty_)
+        return lightData_;
+
     LightTransferData data;
 
     directionalLight_.direction = directionalLight_.direction.Normalize();
+    const float distance = 500.0f;
+    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, directionalLight_.direction, { 1.0f,0.0f,0.0f });
+    Matrix4x4 projMat = MakeOrthographicMatrix(0, 0, shadowMapSize_.x, shadowMapSize_.y, -1.0f, 1.0f);
+    directionalLight_.viewProjection = viewMat * projMat;
 
     data.directionalLight = directionalLight_;
 
@@ -250,6 +262,8 @@ LightGroup::LightTransferData LightGroup::GetLightData()
 
     dirty_ = false;
 
+    lightData_ = data;
+
     return data;
 }
 
@@ -259,9 +273,12 @@ void LightGroup::DrawDebugWindow()
 
     ImGui::Begin("LightGroup");
 
-    ImGui::Checkbox("DirectionalLight", &enableDirectionalLight_);
-    ImGui::Checkbox("PointLight", &enablePointLight_);
-    ImGui::Checkbox("SpotLight", &enableSpotLight_);
+    if(ImGui::Checkbox("DirectionalLight", &enableDirectionalLight_))
+        dirty_ = true;
+    if(ImGui::Checkbox("PointLight", &enablePointLight_))
+        dirty_ = true;
+    if(ImGui::Checkbox("SpotLight", &enableSpotLight_))
+        dirty_ = true;
 
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.18f, 0.22f, 0.58f, 0.71f));
     if(ImGui::CollapsingHeader("Directional Light"))
@@ -272,10 +289,12 @@ void LightGroup::DrawDebugWindow()
         bool isHalf = directionalLight_.isHalf;
         ImGui::Checkbox("IsHalf", &isHalf);
         directionalLight_.isHalf = isHalf;
+        dirty_ = true;
     }
 
     if (ImGui::CollapsingHeader("Point Light"))
     {
+        dirty_ = true;
         ImGui::InputText("create Light Name", addPointLightName_, sizeof(addPointLightName_));
 
         if (ImGui::Button("Add"))
@@ -284,6 +303,7 @@ void LightGroup::DrawDebugWindow()
             std::string name = addPointLightName_;
             AddPointLight(light, name);
             strcpy_s(addPointLightName_, sizeof(addPointLightName_), "");
+            dirty_ = true;
         }
         ImGui::Separator();
 
@@ -339,6 +359,7 @@ void LightGroup::DrawDebugWindow()
     ImGui::PushID("Spot Light");
     if (ImGui::CollapsingHeader("Spot Light"))
     {
+        dirty_ = true;
         ImGui::InputText("create Light Name", addSpotLightName_, sizeof(addSpotLightName_));
 
         if (ImGui::Button("Add"))
@@ -347,6 +368,7 @@ void LightGroup::DrawDebugWindow()
             std::string name = addSpotLightName_;
             AddSpotLight(light, name);
             strcpy_s(addSpotLightName_, sizeof(addSpotLightName_), "");
+            dirty_ = true;
         }
 
         if (ImGui::BeginTable("Spot Light", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
@@ -407,6 +429,33 @@ void LightGroup::DrawDebugWindow()
     ImGui::End();
 #endif // _DEBUG
 
+}
+
+Matrix4x4 LightGroup::LookAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up)
+{
+    Vector3 zaxis = (_at - _eye).Normalize();
+    Vector3 xaxis = _up.Cross(zaxis).Normalize();
+    if (xaxis.Length() == 0)
+    {
+        xaxis = { 1.0f,0.0f,0.0f };
+    }
+    Vector3 yaxis = zaxis.Cross(xaxis);
+    if (yaxis.Length() == 0)
+    {
+        yaxis = { 0.0f,1.0f,0.0f };
+    }
+
+    Matrix4x4 result =
+    {
+        {
+            {xaxis.x, yaxis.x, zaxis.x, 0.0f},
+            {xaxis.y, yaxis.y, zaxis.y, 0.0f},
+            {xaxis.z, yaxis.z, zaxis.z, 0.0f},
+            { -xaxis.Dot(_eye), -yaxis.Dot(_eye), -zaxis.Dot(_eye), 1.0f }
+        }
+    };
+
+    return result;
 }
 
 LightGroup::LightTransferData LightGroup::GetDefaultLightData()
