@@ -12,10 +12,13 @@ RenderTarget::RenderTarget() :
 
 }
 
-void RenderTarget::Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format)
+void RenderTarget::Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format, uint32_t _width, uint32_t _height)
 {
     renderTextureResource_ = _resource;
     rtvHandle_ = _rtvHandle;
+
+    width_ = _width;
+    height_ = _height;
 
     auto srvManager = SRVManager::GetInstance();
     srvManager->CreateSRVForRenderTexture(srvIndex_, renderTextureResource_.Get(), _format);
@@ -32,8 +35,22 @@ void RenderTarget::SetRenderTexture() const
 
     commandList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 
-    commandList->RSSetViewports(1, &viewport_);
-    commandList->RSSetScissorRects(1, &scissorRect_);
+    D3D12_VIEWPORT viewport{};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = static_cast<FLOAT>(width_);
+    viewport.Height = static_cast<FLOAT>(height_);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    D3D12_RECT scissorRect{};
+    scissorRect.left = 0;
+    scissorRect.top = 0;
+    scissorRect.right = width_;
+    scissorRect.bottom = height_;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
 
 }
 
@@ -46,8 +63,22 @@ void RenderTarget::SetDepthStencil() const
     commandList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
     commandList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 
-    commandList->RSSetViewports(1, &viewport_);
-    commandList->RSSetScissorRects(1, &scissorRect_);
+    D3D12_VIEWPORT viewport{};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = static_cast<FLOAT>(width_);
+    viewport.Height = static_cast<FLOAT>(height_);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    D3D12_RECT scissorRect{};
+    scissorRect.left = 0;
+    scissorRect.top = 0;
+    scissorRect.right = width_;
+    scissorRect.bottom = height_;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
 }
 
 void RenderTarget::Draw() const
@@ -78,4 +109,3 @@ void RenderTarget::Draw() const
 
     commandList->ResourceBarrier(1, &barrier_);
 }
-

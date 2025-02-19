@@ -38,6 +38,10 @@ void SampleFramework::Update()
 void SampleFramework::Draw()
 {
     Framework::PreDraw();
+
+    rtvManager_->SetDepthStencil("ShadowMap");
+    sceneManager_->DrawShadow();
+
     rtvManager_->SetRenderTexture("default");
 
     // ========== 描画処理 ==========
@@ -47,9 +51,6 @@ void SampleFramework::Draw()
     lineDrawer_->Draw();
     //=============================
 
-    rtvManager_->SetDepthStencil("ShadowMap");
-
-    sceneManager_->DrawShadow();
 
     dxCommon_->PreDraw();
     // スワップチェインに戻す

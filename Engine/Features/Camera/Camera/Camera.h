@@ -90,4 +90,8 @@ private:
     ConstantBufferDate* constMap_ = nullptr;
 
     void Map();
+
+    Matrix4x4 LoolAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up);
 };
+
+

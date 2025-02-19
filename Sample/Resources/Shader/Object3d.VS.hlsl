@@ -14,6 +14,9 @@ struct VertexShaderInput
     float3 normal : NORMAL0;
 };
 
+
+
+
 VertexShaderOutput main(VertexShaderInput _input)
 {
     VertexShaderOutput output;
@@ -26,6 +29,7 @@ VertexShaderOutput main(VertexShaderInput _input)
 
 VertexShaderOutput ShadowMapVS(VertexShaderInput _input)
 {
+
     VertexShaderOutput output;
     output.position = mul(_input.position, mul(World, DL.lightVP));
     output.texcoord = _input.texcoord;
@@ -35,6 +39,4 @@ VertexShaderOutput ShadowMapVS(VertexShaderInput _input)
 
     return output;
 }
-
-
 

@@ -17,7 +17,7 @@ public:
     RenderTarget();
     ~RenderTarget() = default;
 
-    void Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format);
+    void Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format, uint32_t _width, uint32_t _height);
 
     void SetViewport(D3D12_VIEWPORT _viewport) { viewport_ = _viewport; }
     void SetScissorRect(D3D12_RECT _scissorRect) { scissorRect_ = _scissorRect; }
@@ -36,12 +36,16 @@ public:
 
 
 
+
 private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
     float clearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
 
     uint32_t srvIndex_ = 0;
+
+    uint32_t width_ = 0;
+    uint32_t height_ = 0;
 
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;

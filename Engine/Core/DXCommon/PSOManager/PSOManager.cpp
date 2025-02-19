@@ -1230,6 +1230,8 @@ void PSOManager::CreatePSOForShadowMap()
 #pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
+    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+
 #pragma endregion
 
 #pragma region RasterizerState

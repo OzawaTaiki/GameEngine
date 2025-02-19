@@ -218,9 +218,27 @@ LightGroup::LightTransferData LightGroup::GetLightData()
     LightTransferData data;
 
     directionalLight_.direction = directionalLight_.direction.Normalize();
+
+    Vector3 up = { 0.0f,1.0f,0.0f };
+    if (std::abs(up.Dot(directionalLight_.direction)) > 0.99f)
+    {
+        up = { 0.0f,0.0f,1.0f };
+    }
+
     const float distance = 500.0f;
-    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, directionalLight_.direction, { 1.0f,0.0f,0.0f });
-    Matrix4x4 projMat = MakeOrthographicMatrix(0, 0, shadowMapSize_.x, shadowMapSize_.y, -1.0f, 1.0f);
+    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, directionalLight_.direction, up);
+
+    float fovY_ = 0.45f;
+    float aspectRatio_ = 16.0f / 9.0f;
+    float nearClip_ = 0.1f;
+    float farClip_ = 1000.0f;
+
+    float halfWidth = shadowMapSize_.x / 2.0f;
+    float halfHeight = shadowMapSize_.y / 2.0f;
+
+    Matrix4x4 projMat =
+        MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
+        //MakeOrthographicMatrix(-halfWidth, halfWidth, halfHeight, -halfHeight, nearClip_, farClip_);
     directionalLight_.viewProjection = viewMat * projMat;
 
     data.directionalLight = directionalLight_;

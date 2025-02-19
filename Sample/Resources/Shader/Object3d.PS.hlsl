@@ -167,7 +167,6 @@ float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3
 PixelShaderOutput ShadowMapPS(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
-
     output.color = float4(0.5f, 0.5f, 0.5f, 1.0f);
 
     return output;

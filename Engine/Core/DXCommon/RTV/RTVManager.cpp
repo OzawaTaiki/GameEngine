@@ -149,7 +149,7 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
     textureMap_[_name] = rtvIndex;
 
     renderTargets_[rtvIndex] = std::make_unique<RenderTarget>();
-    renderTargets_[rtvIndex]->Initialize(rtvResource, GetCPURTVDescriptorHandle(rtvIndex), _colorFormat);
+    renderTargets_[rtvIndex]->Initialize(rtvResource, GetCPURTVDescriptorHandle(rtvIndex), _colorFormat, _width, _height);
     renderTargets_[rtvIndex]->SetViewport(viewport_);
     renderTargets_[rtvIndex]->SetScissorRect(scissorRect_);
     renderTargets_[rtvIndex]->SetClearColor(_clearColor);

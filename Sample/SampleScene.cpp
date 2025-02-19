@@ -31,6 +31,10 @@ void SampleScene::Initialize()
     oModel_->Initialize("Plane/Plane.gltf");
     oModel_->translate_.x = 3;
 
+    oModel2_ = std::make_unique<ObjectModel>("cube");
+    oModel2_->Initialize("Cube/Cube.obj");
+    oModel2_->translate_.x = -3;
+
     aModel_ = std::make_unique<AnimationModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
@@ -74,6 +78,7 @@ void SampleScene::Update()
 
 
     oModel_->Update();
+    oModel2_->Update();
     aModel_->Update();
     sprite_->Update();
 
@@ -102,6 +107,7 @@ void SampleScene::Draw()
 {
 
     oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
@@ -118,6 +124,7 @@ void SampleScene::Draw()
 void SampleScene::DrawShadow()
 {
     oModel_->DrawShadow(&SceneCamera_);
+    oModel2_->DrawShadow(&SceneCamera_);
 }
 
 #ifdef _DEBUG
