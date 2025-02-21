@@ -15,11 +15,12 @@ public:
 
     void QueueCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index);
 
-    void SetLightGroup(LightGroup* _lightGroup) { *lightData_ = _lightGroup->GetLightData(); }
+    void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
 
 
 private:
 
+    LightGroup* lightGroup_ = nullptr;
     LightGroup::LightTransferData* lightData_;
     Microsoft::WRL::ComPtr<ID3D12Resource> lightBuffer_ = nullptr;
 

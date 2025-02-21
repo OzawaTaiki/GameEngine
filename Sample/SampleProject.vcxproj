@@ -70,7 +70,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>GameEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(solutiondir)..\Generated\OutPuts\$(configuration)\</AdditionalLibraryDirectories>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -102,11 +101,6 @@
     <ClCompile Include="SceneFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Engine\GameEngine.vcxproj">
-      <Project>{9fb9cd27-3069-43a4-90e8-44bc0a21d5da}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include=".editorconfig">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
@@ -118,6 +112,11 @@
     <ClInclude Include="SampleFramework.h" />
     <ClInclude Include="SampleScene.h" />
     <ClInclude Include="SceneFactory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\GameEngine.vcxproj">
+      <Project>{9fb9cd27-3069-43a4-90e8-44bc0a21d5da}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -28,11 +28,19 @@ void SampleScene::Initialize()
     input_ = Input::GetInstance();
 
     oModel_ = std::make_unique<ObjectModel>("plane");
-    oModel_->Initialize("Plane/Plane.gltf");
+    oModel_->Initialize("bunny.gltf");
     oModel_->translate_.x = 3;
+
+    oModel2_ = std::make_unique<ObjectModel>("cube");
+    oModel2_->Initialize("Cube/Cube.obj");
+    oModel2_->translate_.x = -3;
 
     aModel_ = std::make_unique<AnimationModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
+
+    plane_ = std::make_unique<ObjectModel>("plane2");
+    plane_->Initialize("Tile/Tile.gltf");
+    plane_->GetUVTransform().SetScale({ 100,100 });
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
     sprite_ = Sprite::Create("uvChecker", textureHandle);
@@ -74,7 +82,9 @@ void SampleScene::Update()
 
 
     oModel_->Update();
+    oModel2_->Update();
     aModel_->Update();
+    plane_->Update();
     sprite_->Update();
 
     if (input_->IsKeyTriggered(DIK_TAB))
@@ -102,8 +112,10 @@ void SampleScene::Draw()
 {
 
     oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
+    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     Sprite::PreDraw();
     sprite_->Draw();
@@ -113,6 +125,13 @@ void SampleScene::Draw()
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
 
+}
+
+void SampleScene::DrawShadow()
+{
+
+    oModel_->DrawShadow(&SceneCamera_);
+    oModel2_->DrawShadow(&SceneCamera_);
 }
 
 #ifdef _DEBUG

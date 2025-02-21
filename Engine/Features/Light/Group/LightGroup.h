@@ -2,6 +2,7 @@
 
 #include <Math/Vector/Vector3.h>
 #include <Math/Vector/Vector4.h>
+#include <Math/Matrix/Matrix4x4.h>
 
 #include <cstdint>
 #include <array>
@@ -19,6 +20,8 @@
 */
 struct DirectionalLight
 {
+    Matrix4x4 viewProjection = Matrix4x4::Identity();
+
     Vector4 color = {1,1,1,1};		// ライトの色
 
     Vector3 direction = { 0,-1,0 };	// ライトの向き
@@ -111,6 +114,7 @@ public:
 public:
 
     static LightTransferData GetDefaultLightData();
+    static void SetShadowMapSize(const Vector2& _size) { shadowMapSize_ = _size; }
 
     LightGroup() = default;
     ~LightGroup() = default;
@@ -140,6 +144,8 @@ public:
 
 private:
 
+    LightTransferData lightData_;
+
     template<typename T>
     struct NamedLight {
         T light = {};
@@ -164,4 +170,8 @@ private:
 
     char addPointLightName_[128] = {};
     char addSpotLightName_[128] = {};
+
+    static  Vector2 shadowMapSize_;
+
+    Matrix4x4 LookAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up);
 };

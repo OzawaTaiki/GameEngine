@@ -4,6 +4,8 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImGuiDebugManager.h>
+#include <Core/DXCommon/RTV/RTVManager.h>
+
 
 
 ObjectModel::ObjectModel(const std::string& _name)
@@ -43,6 +45,7 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
@@ -58,10 +61,24 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+}
+
+void ObjectModel::DrawShadow(const Camera* _camera)
+{
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
+
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)

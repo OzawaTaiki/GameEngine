@@ -20,7 +20,6 @@ public:
 	void Initialize(WinApp* _winApp, int32_t _backBufferWidth, int32_t _backBufferHeight);
 
 	void PreDraw();
-	void PreDraw1();
 	void PostDraw();
 
     void WaitForGPU();

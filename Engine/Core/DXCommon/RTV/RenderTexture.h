@@ -10,39 +10,53 @@
 #include <cstdint>
 
 
-class RenderTexture
+class RenderTarget
 {
 public:
 
-    RenderTexture();
-    ~RenderTexture() = default;
+    RenderTarget();
+    ~RenderTarget() = default;
 
-    void Initialize(ID3D12Resource* _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format, uint32_t _rtvIndex);
+    void Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format, uint32_t _width, uint32_t _height);
 
     void SetViewport(D3D12_VIEWPORT _viewport) { viewport_ = _viewport; }
     void SetScissorRect(D3D12_RECT _scissorRect) { scissorRect_ = _scissorRect; }
+    void SetDepthStencilResource(D3D12_CPU_DESCRIPTOR_HANDLE _dsvHandle) { dsvHandle_ = _dsvHandle; }
+    void SetDepthStencilResource(ID3D12Resource* _dsvResource);
 
-    uint32_t GetRTVIndex() const { return rtvIndex_; }
     uint32_t GetSRVIndex() const { return srvIndex_; }
 
     void SetClearColor(float _r, float _g, float _b, float _a)  { clearValue_[0] = _r;          clearValue_[1] = _g;        clearValue_[2] = _b;        clearValue_[3] = _a;        }
     void SetClearColor(float _color[4])                         { clearValue_[0] = _color[0];   clearValue_[1] = _color[1]; clearValue_[2] = _color[2]; clearValue_[3] = _color[3]; }
     void SetClearColor(const Vector4& _color)                   { clearValue_[0] = _color.x ;   clearValue_[1] = _color.y;  clearValue_[2] = _color.z;  clearValue_[3] = _color.w;  }
 
-    void SetRenderTexture(uint32_t _dsvHandle = 0) const;
+    void SetRenderTexture() const;
+    void SetDepthStencil() ;
+
+    void ChangeState(D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after);
+    void QueueCommandDSVtoSRV(uint32_t _index);
 
     void Draw() const;
+
 
 
 
 private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+    ID3D12Resource* dsvResource_ = nullptr;
     float clearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
 
-    uint32_t rtvIndex_ = 0;
+    bool stateSRV_ = false;
+
     uint32_t srvIndex_ = 0;
+
+    uint32_t width_ = 0;
+    uint32_t height_ = 0;
+
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
+
 
     D3D12_VIEWPORT viewport_{};
     D3D12_RECT scissorRect_{};

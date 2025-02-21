@@ -75,7 +75,10 @@ void Camera::UpdateMatrix()
 {
     matWorld_ = MakeAffineMatrix(scale_, rotate_, translate_ + shakeOffset_);
     matView_ = Inverse(matWorld_);
+    //translate_ = { 0,500,0 };
+    //matView_ = LoolAt(translate_, { 0,0,0 }, { 1,0,0 });
     matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
+    //matProjection_ = MakeOrthographicMatrix(0, 0, 1280, 720, 0.1f, 1000.0f);
     matViewProjection_ = matView_ * matProjection_;
 
 
@@ -133,4 +136,31 @@ void Camera::Map()
 {
     resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferDate));
     resource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
+}
+
+Matrix4x4 Camera::LoolAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up)
+{
+    Vector3 zaxis = (_at - _eye).Normalize();
+    Vector3 xaxis = _up.Cross(zaxis).Normalize();
+    if (xaxis.Length() == 0)
+    {
+        xaxis = { 1.0f,0.0f,0.0f };
+    }
+    Vector3 yaxis = zaxis.Cross(xaxis);
+    if (yaxis.Length() == 0)
+    {
+        yaxis = { 0.0f,1.0f,0.0f };
+    }
+
+    Matrix4x4 result =
+    {
+        {
+            {xaxis.x, yaxis.x, zaxis.x, 0.0f},
+            {xaxis.y, yaxis.y, zaxis.y, 0.0f},
+            {xaxis.z, yaxis.z, zaxis.z, 0.0f},
+            { -xaxis.Dot(_eye), -yaxis.Dot(_eye), -zaxis.Dot(_eye), 1.0f }
+        }
+    };
+
+    return result;
 }

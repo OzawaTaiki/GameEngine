@@ -21,6 +21,7 @@ enum class PSOFlags
     Type_LineDrawer			= 1 << 3,
     Type_Particle			= 1 << 4,
     Type_OffScreen          = 1 << 5,
+    Type_ShadowMap          = 1 << 6,
 
     Blend_Normal			= 1 << 11,
     Blend_Add				= 1 << 12,
@@ -89,7 +90,8 @@ constexpr PSOFlags& operator&=(PSOFlags& a, PSOFlags b)
 constexpr PSOFlags TypeMask =
 PSOFlags::Type_Model | PSOFlags::Type_AnimationModel |
 PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
-| PSOFlags::Type_OffScreen; // 0～4ビット
+| PSOFlags::Type_OffScreen | PSOFlags::Type_ShadowMap
+; // 0～4ビット
 
 constexpr PSOFlags BlendMask =
 PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
@@ -124,7 +126,9 @@ private:
 		const std::wstring& _filePath,
 		//Compilerに使用するprofile
 		const wchar_t* _profile,
-		const std::wstring& _dirPath = L"Resources/Shader/");
+        const std::wstring& _entryFuncName = L"main",
+		const std::wstring& _dirPath = L"Resources/Shader/"
+        );
 
 	void CreatePSOForModel(PSOFlags _flags);
 	void CreatePSOForAnimationModel(PSOFlags _flags);
@@ -132,6 +136,9 @@ private:
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);
     void CreatePSOForOffScreen();
+
+    void CreatePSOForShadowMap();
+
 
 	D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
     D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);

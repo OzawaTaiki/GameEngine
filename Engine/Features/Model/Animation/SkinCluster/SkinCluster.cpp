@@ -91,6 +91,6 @@ void SkinCluster::CreateSkinCluster(aiBone* _bone)
 
 void SkinCluster::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
 {
-    _commandList->SetGraphicsRootDescriptorTable(8, paletteSrvHandle_.second);
+    _commandList->SetGraphicsRootDescriptorTable(6, paletteSrvHandle_.second);
 }
 
