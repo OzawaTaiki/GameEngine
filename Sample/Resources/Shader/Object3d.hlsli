@@ -4,6 +4,7 @@ struct VertexShaderOutput
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
     float3 worldPosition : Position0;
+    float4 shadowPos : TEXCOORD1;
 };
 
 cbuffer Camera : register(b0)

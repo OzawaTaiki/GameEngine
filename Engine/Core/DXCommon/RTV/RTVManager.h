@@ -73,8 +73,8 @@ private:
     float clearColor_[4] = { 0.4625f,0.925f,0.4625f,1.0f };
 
     std::map<std::string, uint32_t> textureMap_;
-    std::map<std::uint32_t, std::unique_ptr<RenderTarget>> renderTargets_;
-    std::list<Microsoft::WRL::ComPtr<ID3D12Resource>> dsvResources_;
+    std::map<uint32_t, std::unique_ptr<RenderTarget>> renderTargets_;
+    std::map<uint32_t,Microsoft::WRL::ComPtr<ID3D12Resource>> dsvResources_;
 
     RTVManager() = default;
     ~RTVManager() = default;

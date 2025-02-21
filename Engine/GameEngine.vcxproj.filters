@@ -443,6 +443,9 @@
     <FxCompile Include="..\Sample\Resources\Shader\FullScreen.VS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="ShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

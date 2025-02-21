@@ -28,7 +28,7 @@ void PSOManager::Initialize()
 
 
     CreatePSOForModel           (PSOFlags::Type_Model           | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
-    CreatePSOForAnimationModel  (PSOFlags::Type_AnimationModel  | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
+    //CreatePSOForAnimationModel  (PSOFlags::Type_AnimationModel  | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
     CreatePSOForSprite          (PSOFlags::Type_Sprite          | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
     CreatePSOForLineDrawer      (PSOFlags::Type_LineDrawer      | PSOFlags::Blend_Normal    | PSOFlags::Cull_None);
     CreatePSOForParticle        (PSOFlags::Type_Particle        | PSOFlags::Blend_Add       | PSOFlags::Cull_Back);
@@ -161,7 +161,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
 #pragma region Sampler
     //Samplerの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -170,6 +170,20 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+
+
+    // シャドウマップ用のサンプラ
+    staticSamplers[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT; // 比較用フィルタ
+    staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER; // 境界外を無効化
+    staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    staticSamplers[1].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // 影の外は光が当たる
+    staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 深度比較
+    staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;
+    staticSamplers[1].ShaderRegister = 1; // s1
+    staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+
 
 #pragma endregion
 
@@ -181,13 +195,19 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
     //descriptorRange
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].BaseShaderRegister = 0;
     descriptorRange[0].NumDescriptors = 1;//数は１つ
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
+    D3D12_DESCRIPTOR_RANGE shadowMapRange[1] = {};
+    shadowMapRange[0].BaseShaderRegister = 1;  // t1 にバインド
+    shadowMapRange[0].NumDescriptors = 1;
+    shadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    shadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[6] = {};
+    D3D12_ROOT_PARAMETER rootParameters[7] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -219,6 +239,12 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     rootParameters[5].Descriptor.ShaderRegister = 3;
+
+    // シャドウマップ
+    rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[6].DescriptorTable.pDescriptorRanges = shadowMapRange;
+    rootParameters[6].DescriptorTable.NumDescriptorRanges = _countof(shadowMapRange);
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -311,7 +337,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -511,7 +537,7 @@ void PSOManager::CreatePSOForAnimationModel(PSOFlags _flags)
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -661,7 +687,7 @@ void PSOManager::CreatePSOForSprite(PSOFlags _flags)
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -789,7 +815,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -953,7 +979,7 @@ void PSOManager::CreatePSOForParticle(PSOFlags _flags)
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -1080,7 +1106,7 @@ void PSOManager::CreatePSOForOffScreen()
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -1104,7 +1130,7 @@ void PSOManager::CreatePSOForShadowMap()
 
 #pragma region Sampler
     //Samplerの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -1113,6 +1139,18 @@ void PSOManager::CreatePSOForShadowMap()
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
     staticSamplers[0].ShaderRegister = 0;
     staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+
+    // シャドウマップ用のサンプラ
+    staticSamplers[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT; // 比較用フィルタ
+    staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER; // 境界外を無効化
+    staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    staticSamplers[1].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // 影の外は光が当たる
+    staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS; // 深度比較
+    staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;
+    staticSamplers[1].ShaderRegister = 1; // s1
+    staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
 
 #pragma endregion
 
@@ -1124,7 +1162,7 @@ void PSOManager::CreatePSOForShadowMap()
 
     //descriptorRange
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].BaseShaderRegister = 0;
     descriptorRange[0].NumDescriptors = 1;//数は１つ
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
@@ -1162,6 +1200,7 @@ void PSOManager::CreatePSOForShadowMap()
     rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     rootParameters[5].Descriptor.ShaderRegister = 3;
+
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -1221,9 +1260,9 @@ void PSOManager::CreatePSOForShadowMap()
 
 #pragma region Shader
     /// shaderをコンパイルする
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Object3d.VS.hlsl", L"vs_6_0",L"ShadowMapVS");
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"ShadowMap.hlsl", L"vs_6_0",L"ShadowMapVS");
     assert(vertexShaderBlob != nullptr);
-    Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Object3d.PS.hlsl", L"ps_6_0", L"ShadowMapPS");
+    Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"ShadowMap.hlsl", L"ps_6_0", L"ShadowMapPS");
     assert(pixelShaderBlob != nullptr);
 #pragma endregion
 
@@ -1257,7 +1296,7 @@ void PSOManager::CreatePSOForShadowMap()
     graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;

@@ -28,12 +28,32 @@ struct PixelShaderOutput
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
+Texture2D<float> gShadowMap : register(t1);
+SamplerComparisonState gShadowSampler : register(s1);
+
 float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
 float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, float3 _toEye, float4 _textureColor);
 float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _textureColor);
 
 float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
 float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
+
+float ComputeShadow(float4 shadowCoord)
+{
+    shadowCoord.xyz /= shadowCoord.w;
+    shadowCoord.x = shadowCoord.x * 0.5 + 0.5;
+    shadowCoord.y = -shadowCoord.y * 0.5 + 0.5;
+
+    // 現在のピクセルの深度値
+    float currentDepth = shadowCoord.z;
+
+    // シャドウマップに記録された深度値
+    float closestDepth = gShadowMap.Sample(gSampler, shadowCoord.xy).r;
+
+    // 深度比較による影の判定
+    float shadow = (currentDepth > closestDepth + 0.001f) ? 0.5f : 1.0f;
+    return shadow;
+}
 
 PixelShaderOutput main(VertexShaderOutput _input)
 {
@@ -46,9 +66,14 @@ PixelShaderOutput main(VertexShaderOutput _input)
 
     float3 toEye = normalize(worldPosition - _input.worldPosition);
 
-    float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor);
+    float shadowFactor = ComputeShadow(_input.shadowPos);
+
+    // シャドウファクターを適用したライティング
+    float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor) * shadowFactor;
     float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
-    float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor);
+    float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor) * shadowFactor;
+
+
 
     if (enableLighting != 0)
     {
@@ -161,13 +186,4 @@ float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3
         lighting += CalculateSpotLighting(_input, SL[i], _toEye, _textureColor);
     }
     return lighting;
-}
-
-
-PixelShaderOutput ShadowMapPS(VertexShaderOutput _input)
-{
-    PixelShaderOutput output;
-    output.color = float4(0.5f, 0.5f, 0.5f, 1.0f);
-
-    return output;
 }

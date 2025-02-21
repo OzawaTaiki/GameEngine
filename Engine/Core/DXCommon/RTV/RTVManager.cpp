@@ -160,6 +160,7 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
     {
         dsvIndex = AllocateDSVIndex();
         CreateDepthStencilTextureResource(_width, _height, dsvIndex);
+        renderTargets_[rtvIndex]->SetDepthStencilResource(dsvResources_[dsvIndex].Get());
     }
 
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDSVDescriptorHandle(dsvIndex);
@@ -235,7 +236,7 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
     resourceDesc.Height = _height; // Textureの高さ
     resourceDesc.MipLevels = 1; // mipmapの数
     resourceDesc.DepthOrArraySize = 1; // 奥行き or 配列Textureの配列数
-    resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // DepthStencilとして利用可能なフォーマット
+    resourceDesc.Format = DXGI_FORMAT_R32_TYPELESS; // DepthStencilとして利用可能なフォーマット
     resourceDesc.SampleDesc.Count = 1; // サンプリングカウント、通常は1
     resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // 2次元
     resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // DepthStencilとして使う指定
@@ -246,7 +247,7 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
     //震度のクリア設定
     D3D12_CLEAR_VALUE depthClearValue{};
     depthClearValue.DepthStencil.Depth = 1.0f;//1.0f(最大値)でクリア
-    depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット，Resourceと合わせる
+    depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;//フォーマット，Resourceと合わせる
 
     // Resourceの生成
     HRESULT hr = device->CreateCommittedResource(
@@ -262,12 +263,11 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
     auto dsvHandle = GetCPUDSVDescriptorHandle(_dsvIndex);
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//基本的にはresourceに合わせる
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;//基本的にはresourceに合わせる
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2dTexture
     //DSVHeapの先頭にDSVを作る
     device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvHandle);
-
-    dsvResources_.emplace_back(depthStencilResource);
+    dsvResources_[_dsvIndex] = depthStencilResource;
 
 
 }

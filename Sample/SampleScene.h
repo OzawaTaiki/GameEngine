@@ -45,6 +45,7 @@ private:
 
     std::unique_ptr<ObjectModel> oModel_= nullptr;
     std::unique_ptr<ObjectModel> oModel2_= nullptr;
+    std::unique_ptr<ObjectModel> plane_ = nullptr;
 
     Sprite* sprite_ = nullptr;
 

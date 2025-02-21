@@ -426,7 +426,7 @@ Matrix4x4  MakePerspectiveFovMatrix(float _fovY, float _aspectRatio, float _near
 
 Matrix4x4  MakeOrthographicMatrix(float _left, float _top, float _right, float _bottom, float _nearClip, float _farClip)
 {
-    float m11 = 2.0f / (_right - _left);
+    /*float m11 = 2.0f / (_right - _left);
     float m22 = 2.0f / (_top - _bottom);
     float m33 = 1.0f / (_farClip - _nearClip);
     float m41 = (_left + _right) / (_left - _right);
@@ -442,16 +442,16 @@ Matrix4x4  MakeOrthographicMatrix(float _left, float _top, float _right, float _
             {m41,m42,m43,1}
         }
     };
-    return result;
+    return result;*/
 
-    /*
-    float m11 = 2.0f / (right - left);
-    float m22 = 2.0f / (top - bottom);
-    float m33 = 1.0f / (farClip - nearClip);
-    float m41 = -(right + left) / (right - left);    // 符号と分数を修正
-    float m42 = -(top + bottom) / (top - bottom);    // 符号と分数を修正
-    float m43 = -nearClip / (farClip - nearClip);    // 分母を修正
-    
+
+    float m11 = 2.0f / (_right - _left);
+    float m22 = 2.0f / (_top - _bottom);
+    float m33 = 1.0f / (_farClip - _nearClip);
+    float m41 = -(_right + _left) / (_right - _left);    // 符号と分数を修正
+    float m42 = -(_top + _bottom) / (_top - _bottom);    // 符号と分数を修正
+    float m43 = -_nearClip / (_farClip - _nearClip);    // 分母を修正
+
     Matrix4x4 result =
     {
         {
@@ -461,7 +461,7 @@ Matrix4x4  MakeOrthographicMatrix(float _left, float _top, float _right, float _
             {m41, m42, m43, 1}
         }
     };
-    */
+    return result;
 }
 
 Matrix4x4  MakeViewportMatrix(float _left, float _top, float _width, float _height, float _minDepth, float _maxDepth)
