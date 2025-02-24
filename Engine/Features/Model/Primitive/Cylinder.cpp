@@ -46,10 +46,10 @@ void Cylinder::Generate()
     for (int32_t index = 0; index <= divide_; ++index)
     {
         // 上面
-        Mesh::VertexData topVertex;
+        VertexData topVertex;
 
         // 下面
-        Mesh::VertexData bottomVertex;
+        VertexData bottomVertex;
 
         float angle = kDivideAngle * static_cast<float>(index);
 
@@ -86,7 +86,7 @@ void Cylinder::Generate()
     if (top_)
     {
         // 上面の中心
-        Mesh::VertexData topCenter;
+        VertexData topCenter;
         topCenter.position = Vector4(0, height_ / 2, 0, 1.0f);
         topCenter.normal = Vector3(0.0f, 1.0f, 0.0f);
         topCenter.texcoord = { 0.5f, 0.0f };
@@ -102,7 +102,7 @@ void Cylinder::Generate()
     if (bottom_)
     {
         // 下面の中心
-        Mesh::VertexData bottomCenter;
+        VertexData bottomCenter;
         bottomCenter.position = Vector4(0, -height_ / 2, 0, 1.0f);
         bottomCenter.normal = Vector3(0.0f, -1.0f, 0.0f);
         bottomCenter.texcoord = { 0.5f, 1.0f };
@@ -116,7 +116,7 @@ void Cylinder::Generate()
         }
     }
 
-    mesh_.Initialize(vertices_, indices_);
+    mesh_.Initialize(vertices_, indices_, SkinningCS::CreateOutputVertexResource(vertices_.size()));
 
 }
 

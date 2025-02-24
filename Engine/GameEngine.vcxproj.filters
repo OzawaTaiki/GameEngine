@@ -408,6 +408,9 @@
       <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
+      <Filter>Features\Model\Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -443,7 +446,10 @@
     <FxCompile Include="..\Sample\Resources\Shader\FullScreen.VS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="ShadowMap.hlsl">
+    <FxCompile Include="..\Sample\Resources\Shader\ShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
@@ -717,6 +723,9 @@
     </ClInclude>
     <ClInclude Include="ShadowMap.h">
       <Filter>Core\DXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Animation\SkinningCS.h">
+      <Filter>Features\Model\Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

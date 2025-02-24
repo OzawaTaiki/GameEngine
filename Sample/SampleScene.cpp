@@ -115,7 +115,7 @@ void SampleScene::Draw()
     oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     Sprite::PreDraw();
     sprite_->Draw();

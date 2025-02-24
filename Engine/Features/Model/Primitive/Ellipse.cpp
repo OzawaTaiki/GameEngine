@@ -61,7 +61,7 @@ void EllipseModel::Generate()
             float sinPhi = std::sinf(phi);
             float cosPhi = std::cosf(phi);
 
-            Mesh::VertexData vertex;
+            VertexData vertex;
 
             // 楕円体の頂点位置を計算
             vertex.position = Vector4(
@@ -107,8 +107,10 @@ void EllipseModel::Generate()
     }
 
     // メッシュの初期化
-    mesh_.Initialize(vertices_, indices_);
+    mesh_.Initialize(vertices_, indices_, SkinningCS::CreateOutputVertexResource(vertices_.size()));
 }
+
+
 
 
 void EllipseModel::Update()

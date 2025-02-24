@@ -8,6 +8,7 @@
 #include <Features/Model/Mesh/Mesh.h>
 #include <Features/Model/Animation/ModelAnimation.h>
 #include <Features/Model/Animation/Node/Node.h>
+#include <Features/Model/Animation/SkinningCS.h>
 #include <Features/Model/Animation/Skeleton/Skeleton.h>
 #include <Features/Model/Animation/SkinCluster/SkinCluster.h>
 #include <Features/Light/System/LightingSystem.h>
@@ -75,6 +76,9 @@ private:
     Node node_ = {};
     Skeleton skeleton_ = {};
     SkinCluster skinCluster_ = {};
+
+    std::unique_ptr<SkinningCS> skinningCS_ = nullptr;
+
 
 
     std::unique_ptr<LightGroup> lightGroup_ = nullptr;

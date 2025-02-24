@@ -82,3 +82,18 @@ void SRVManager::CreateSRVForRenderTexture(uint32_t _index, ID3D12Resource* _res
 
     dxcommon_->GetDevice()->CreateShaderResourceView(_resource, &srvDesc, GetCPUSRVDescriptorHandle(_index));
 }
+
+void SRVManager::CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize)
+{
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+    uavDesc.Buffer.FirstElement = 0;
+    uavDesc.Buffer.NumElements = _elementNum;
+    uavDesc.Buffer.CounterOffsetInBytes = 0;
+    uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    uavDesc.Buffer.StructureByteStride = _elementSize;
+
+    dxcommon_->GetDevice()->CreateUnorderedAccessView(_resource, nullptr, &uavDesc, GetCPUSRVDescriptorHandle(_index));
+}
+
