@@ -107,7 +107,7 @@ void EllipseModel::Generate()
     }
 
     // メッシュの初期化
-    mesh_.Initialize(vertices_, indices_, SkinningCS::CreateOutputVertexResource(vertices_.size()));
+    mesh_.Initialize(vertices_, indices_);
 }
 
 

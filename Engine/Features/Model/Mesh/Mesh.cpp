@@ -22,21 +22,28 @@ struct std::hash<VertexData> {
 };
 
 
-void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i, Microsoft::WRL::ComPtr<ID3D12Resource> _outputResource)
+void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i)
 {
     dxCommon = DXCommon::GetInstance();
     vertices_ = _v;
     indices_ = _i;
-    outPutVertexResource_ = _outputResource;
     InitializeReources();
     TransferData();
 
+}
+
+void Mesh::SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource)
+{
+    outPutVertexResource_ = _resource;
+
+    vertexBufferView_.BufferLocation = outPutVertexResource_->GetGPUVirtualAddress();
 }
 
 void Mesh::TransferData()
 {
     std::memcpy(vConstMap_, vertices_.data(), sizeof(VertexData) * vertices_.size());
     std::memcpy(iConstMap_, indices_.data(), sizeof(uint32_t) * indices_.size());
+
 }
 
 void Mesh::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
@@ -62,7 +69,7 @@ void Mesh::InitializeReources()
     CreateResources();
     Map();
 
-    vertexBufferView_.BufferLocation = outPutVertexResource_->GetGPUVirtualAddress();
+    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
     vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
 

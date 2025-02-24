@@ -30,7 +30,8 @@ class Mesh
 public:
 
 
-    void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i, Microsoft::WRL::ComPtr<ID3D12Resource> _outputResource);
+    void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i);
+    void SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource);
     //void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/models/");
 
     void TransferData();

@@ -9,8 +9,8 @@ struct Well
 struct Vertex
 {
     float4 postion;
-    float3 normal;
     float2 texcoord;
+    float3 normal;
 };
 
 struct VertexInfluence
@@ -45,6 +45,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
         Vertex skinned;
 
         skinned.texcoord = input.texcoord;
+
+        float weightSum = influence.weight.x + influence.weight.y + influence.weight.z + influence.weight.w;
+        if (weightSum > 1e-6f)
+        {
+            influence.weight /= weightSum;
+        }
+        else
+        {
+            influence.weight = float4(1.0f, 0.0f, 0.0f, 0.0f);
+        }
 
         skinned.postion = mul(input.postion, gMatrixPalette[influence.index.x].skeletonSpaceMatrix) * influence.weight.x;
         skinned.postion += mul(input.postion, gMatrixPalette[influence.index.y].skeletonSpaceMatrix) * influence.weight.y;

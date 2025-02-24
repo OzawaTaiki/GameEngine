@@ -35,7 +35,7 @@ void SampleScene::Initialize()
     oModel2_->Initialize("Cube/Cube.obj");
     oModel2_->translate_.x = -3;
 
-    aModel_ = std::make_unique<AnimationModel>("sample");
+    aModel_ = std::make_unique<ObjectModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
     plane_ = std::make_unique<ObjectModel>("plane2");
@@ -132,6 +132,7 @@ void SampleScene::DrawShadow()
 
     oModel_->DrawShadow(&SceneCamera_);
     oModel2_->DrawShadow(&SceneCamera_);
+    aModel_->DrawShadow(&SceneCamera_);
 }
 
 #ifdef _DEBUG

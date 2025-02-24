@@ -265,6 +265,8 @@ void Model::LoadFile(const std::string& _filepath)
 
     if (scene->HasAnimations())
     {
+        mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
+
         skinningCS_ = std::make_unique<SkinningCS>();
         skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
         skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
@@ -323,7 +325,7 @@ void Model::LoadMesh(const aiScene* _scene)
             skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
         }
 
-        pMesh->Initialize(vertices, indices, SkinningCS::CreateOutputVertexResource(vertices.size()));
+        pMesh->Initialize(vertices, indices);
         pMesh->SetMin(min);
         pMesh->SetMax(max);
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);

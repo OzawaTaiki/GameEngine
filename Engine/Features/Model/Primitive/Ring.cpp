@@ -88,7 +88,7 @@ void Ring::Generate()
         indices_.push_back((index + 1));
     }
 
-    mesh_.Initialize(vertices_, indices_, SkinningCS::CreateOutputVertexResource(vertices_.size()));
+    mesh_.Initialize(vertices_, indices_);
 
 }
 
