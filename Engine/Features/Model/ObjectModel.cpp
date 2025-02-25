@@ -48,7 +48,6 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 {
     objectColor_->SetColor(_color);
 
-    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -63,7 +62,6 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 {
     objectColor_->SetColor(_color);
 
-    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
@@ -83,26 +81,24 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
     model_->ChangeAnimation(_name, _blendTime, _isLoop);
 }
 
-void ObjectModel::DrawShadow(const Camera* _camera)
+void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
 {
-    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
-    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
+    if (idForGPU == nullptr)
+        CreateIDResource();
 
+    *idForGPU = _id;
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
-    objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
+    commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+    model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromObj(_filePath);
-}
-
-void ObjectModel::UpdateUVTransform()
-{
 }
 
 void ObjectModel::ImGui()
@@ -121,4 +117,11 @@ void ObjectModel::ImGui()
     ImGui::PopID();
 
 #endif // _DEBUG
+}
+
+void ObjectModel::CreateIDResource()
+{
+    idResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t));
+
+    idResource_->Map(0, nullptr, (void**)&idForGPU);
 }

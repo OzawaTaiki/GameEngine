@@ -1126,7 +1126,7 @@ void PSOManager::CreatePSOForShadowMap()
 {
     HRESULT hr = S_FALSE;
 
-    uint32_t type = GetType(PSOFlags::Type_ShadowMap);
+    size_t type = GetType(PSOFlags::Type_ShadowMap);
 
 #pragma region Sampler
     //Samplerの設定
@@ -1160,15 +1160,8 @@ void PSOManager::CreatePSOForShadowMap()
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-    //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;
-    descriptorRange[0].NumDescriptors = 1;//数は１つ
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
-
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[6] = {};
+    D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -1176,30 +1169,19 @@ void PSOManager::CreatePSOForShadowMap()
     rootParameters[0].Descriptor.ShaderRegister = 0;
 
     // transform
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-    rootParameters[1].Descriptor.ShaderRegister = 1;                           // レジスタ番号0を使う
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[1].Descriptor.ShaderRegister = 1;
 
-    //マテリアル
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-    rootParameters[2].Descriptor.ShaderRegister = 1;                           // レジスタ番号0を使う
-
-    // 色
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[3].Descriptor.ShaderRegister = 2;
-
-    // テクスチャ
-    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-    rootParameters[4].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-    rootParameters[4].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
-
+    // id
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[2].Descriptor.ShaderRegister = 2;
     // LightGroup
-    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[5].Descriptor.ShaderRegister = 3;
+    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+    rootParameters[3].Descriptor.ShaderRegister = 3;
+
 
 
     descriptionRootSignature.pParameters = rootParameters;
@@ -1269,7 +1251,8 @@ void PSOManager::CreatePSOForShadowMap()
 #pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
-    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+    blendDesc.RenderTarget[0].BlendEnable = FALSE;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 #pragma endregion
 

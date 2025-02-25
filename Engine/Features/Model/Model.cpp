@@ -40,9 +40,6 @@ void Model::Update(float _deltaTime)
         skinningCS_->Execute();
 
 
-    for (auto& material : material_)
-    {
-    }
 }
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
@@ -67,7 +64,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4, _textureHandle);
         // ライトたち
-    LightingSystem::GetInstance()->QueueCommand(commandList, 5);
+        QueueLightCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -95,7 +92,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4);
         // ライトたち
-        LightingSystem::GetInstance()->QueueCommand(commandList, 5);
+        QueueLightCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -131,7 +128,7 @@ Model* Model::CreateFromObj(const std::string& _filePath)
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
 {
-    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
+    QueueLightCommand(_commandList, 5);
 
     for (auto& mesh : mesh_)
     {
@@ -151,7 +148,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _a
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, bool _animation) const
 {
-    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
+    QueueLightCommand(_commandList, 5);
 
 
     for (auto& mesh : mesh_)
@@ -162,6 +159,22 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
+}
+
+void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
+{
+    QueueLightCommand(_commandList, 3);
+    for (auto& mesh : mesh_)
+    {
+        mesh->QueueCommand(_commandList);
+        _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+    }
+
+}
+
+void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _index) const
+{
+    LightingSystem::GetInstance()->QueueCommand(_commandList, _index);
 }
 
 void Model::SetAnimation(const std::string& _name,bool _loop)
@@ -275,7 +288,6 @@ void Model::LoadFile(const std::string& _filepath)
 
     }
 
-    TransferData();
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::string str = std::to_string(duration);
@@ -415,9 +427,4 @@ void Model::CreateSkinCluster(const aiMesh* _mesh)
         {
         }
     }
-}
-
-
-void Model::TransferData()
-{
 }

@@ -110,6 +110,7 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
+    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
     oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
@@ -129,10 +130,12 @@ void SampleScene::Draw()
 
 void SampleScene::DrawShadow()
 {
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
 
-    oModel_->DrawShadow(&SceneCamera_);
-    oModel2_->DrawShadow(&SceneCamera_);
-    aModel_->DrawShadow(&SceneCamera_);
+    oModel_->DrawShadow(&SceneCamera_, 0);
+    oModel2_->DrawShadow(&SceneCamera_, 256);
+    aModel_->DrawShadow(&SceneCamera_, 511);
 }
 
 #ifdef _DEBUG

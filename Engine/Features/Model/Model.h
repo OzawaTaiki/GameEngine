@@ -41,6 +41,10 @@ public:
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;
 
+    void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const;
+
+    void QueueLightCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index) const;
+
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }
     void SetAnimation(const std::string& _name, bool _loop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _loop = false);
@@ -91,6 +95,5 @@ private:
     void CreateSkeleton();
     void CreateSkinCluster(const aiMesh* _mesh);
 
-    void TransferData();
 
 };
