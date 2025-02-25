@@ -134,8 +134,12 @@ void SampleScene::DrawShadow()
     PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
 
     oModel_->DrawShadow(&SceneCamera_, 0);
-    oModel2_->DrawShadow(&SceneCamera_, 256);
-    aModel_->DrawShadow(&SceneCamera_, 511);
+    oModel2_->DrawShadow(&SceneCamera_, 1);
+    aModel_->DrawShadow(&SceneCamera_, 2);
+
+    // depthtextureとrendertextreuからIDを指定して影の輪郭を取得
+    // https://claude.ai/chat/01808d8d-c6f8-49d8-a17b-bd4981ce2684
+    // その陰からメッシュを作成して高さを与えて描画
 }
 
 #ifdef _DEBUG
