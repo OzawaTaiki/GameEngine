@@ -26,17 +26,22 @@ void ObjectModel::Initialize(const std::string& _filePath)
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
 
+    gameTime_ = GameTime::GetInstance();
+
 }
 
 void ObjectModel::Update()
 {
+    model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+
+
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
         worldTransform_.quaternion_ = quaternion_;
     else
         worldTransform_.rotate_ = euler_;
-    worldTransform_.UpdateData();
+    worldTransform_.UpdateData(useQuaternion_);
 }
 
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
@@ -66,6 +71,16 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+}
+
+void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
+{
+    model_->SetAnimation(_name, _isLoop);
+}
+
+void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop)
+{
+    model_->ChangeAnimation(_name, _blendTime, _isLoop);
 }
 
 void ObjectModel::DrawShadow(const Camera* _camera)

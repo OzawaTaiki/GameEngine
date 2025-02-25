@@ -36,6 +36,10 @@ void Model::Update(float _deltaTime)
     skeleton_.Update();
     skinCluster_.Update(skeleton_.GetJoints());
 
+    if (skinningCS_)
+        skinningCS_->Execute();
+
+
     for (auto& material : material_)
     {
     }
@@ -259,6 +263,17 @@ void Model::LoadFile(const std::string& _filepath)
 
     skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
 
+    if (scene->HasAnimations())
+    {
+        mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
+
+        skinningCS_ = std::make_unique<SkinningCS>();
+        skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
+
+    }
 
     TransferData();
     auto end = std::chrono::high_resolution_clock::now();
@@ -277,32 +292,31 @@ void Model::LoadMesh(const aiScene* _scene)
         assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
         assert(mesh->HasTextureCoords(0));				    // TexcoordがないMeshは今回は非対応
         std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
-        pMesh->Initialize();
+        std::vector<VertexData> vertices;
+        std::vector<uint32_t> indices;
 
         Vector3 min = { 16536 };
         Vector3 max = { -16536 };
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
         {
-            Mesh::VertexData vertex = {};
+            VertexData vertex = {};
             vertex.position = { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, -mesh->mVertices[vertexIndex].z, 1.0f };
             vertex.normal = { mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, -mesh->mNormals[vertexIndex].z };
             vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
 
-            pMesh->vertices_.push_back(vertex);
+            vertices.push_back(vertex);
 
             min = Vector3::Min(min, vertex.position.xyz());
             max = Vector3::Max(max, vertex.position.xyz());
         }
 
-        pMesh->SetMin(min);
-        pMesh->SetMax(max);
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace& face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices == 3); // 三角形のみサポート
             for (uint32_t index = 0; index < face.mNumIndices; ++index)
             {
-                pMesh->indices_.push_back(face.mIndices[index]);
+                indices.push_back(face.mIndices[index]);
             }
         }
 
@@ -311,11 +325,15 @@ void Model::LoadMesh(const aiScene* _scene)
             skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
         }
 
+        pMesh->Initialize(vertices, indices);
+        pMesh->SetMin(min);
+        pMesh->SetMax(max);
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);
         pMesh->TransferData();
 
-
         mesh_.push_back(std::move(pMesh));
+
+
     }
 }
 
@@ -356,6 +374,8 @@ void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath)
     if (_scene->mNumAnimations == 0)
         return;
 
+    //todo コンストラクタで初期化
+    // 基本スキンクラスターでもってるからそこに持たせたほうがいいのかも？
 
     for (uint32_t animationIndex = 0; animationIndex < _scene->mNumAnimations; ++animationIndex)
     {

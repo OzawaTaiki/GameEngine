@@ -119,7 +119,6 @@ public:
     void SetPipeLineStateObject(PSOFlags _flag);
     void SetRootSignature(PSOFlags _flag);
 
-private:
 
 	Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
 		//Complierするshaderファイルへのパス
@@ -130,7 +129,9 @@ private:
 		const std::wstring& _dirPath = L"Resources/Shader/"
         );
 
-	void CreatePSOForModel(PSOFlags _flags);
+private:
+
+    void CreatePSOForModel(PSOFlags _flags);
 	void CreatePSOForAnimationModel(PSOFlags _flags);
     void CreatePSOForSprite(PSOFlags _flags);
     void CreatePSOForLineDrawer(PSOFlags _flags);

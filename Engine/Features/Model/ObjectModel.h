@@ -19,6 +19,8 @@ public:
     void DrawShadow(const Camera* _camera);
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
 
+    void SetAnimation(const std::string& _name, bool _isLoop = false);
+    void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
@@ -50,6 +52,8 @@ private:
     Model* model_ = nullptr;
     std::string name_ = "";
 
+    std::string timeChannel = "default";
+    GameTime* gameTime_ = nullptr;
 
 
 };

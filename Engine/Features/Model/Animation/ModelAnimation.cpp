@@ -65,6 +65,11 @@ void ModelAnimation::Update(std::vector<Joint>& _joints, float _deltaTime)
 
                     joint.SetTransform(blendedTransform);
                 }
+                else
+                {
+                    joint.SetTransform(currentTransform);
+                }
+
             }
         }
     }
