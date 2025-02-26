@@ -5,11 +5,11 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleProject", "SampleProject.vcxproj", "{F79FD642-70BD-4C9F-8B88-EA7815757679}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "..\Engine\externals\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "..\Engine\externals\imgui\imgui.vcxproj", "{BE1B472E-0BDB-4498-9428-4AAE04BD3B14}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameEngine", "..\Engine\GameEngine.vcxproj", "{9FB9CD27-3069-43A4-90E8-44BC0A21D5DA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "..\Engine\Externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{F79FD642-70BD-4C9F-8B88-EA7815757679}.Debug|x64.Build.0 = Debug|x64
 		{F79FD642-70BD-4C9F-8B88-EA7815757679}.Release|x64.ActiveCfg = Release|x64
 		{F79FD642-70BD-4C9F-8B88-EA7815757679}.Release|x64.Build.0 = Release|x64
-		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x64.ActiveCfg = Debug|x64
-		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x64.Build.0 = Debug|x64
-		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.ActiveCfg = Release|x64
-		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.Build.0 = Release|x64
 		{BE1B472E-0BDB-4498-9428-4AAE04BD3B14}.Debug|x64.ActiveCfg = Debug|x64
 		{BE1B472E-0BDB-4498-9428-4AAE04BD3B14}.Debug|x64.Build.0 = Debug|x64
 		{BE1B472E-0BDB-4498-9428-4AAE04BD3B14}.Release|x64.ActiveCfg = Release|x64
@@ -33,6 +29,10 @@ Global
 		{9FB9CD27-3069-43A4-90E8-44BC0A21D5DA}.Debug|x64.Build.0 = Debug|x64
 		{9FB9CD27-3069-43A4-90E8-44BC0A21D5DA}.Release|x64.ActiveCfg = Release|x64
 		{9FB9CD27-3069-43A4-90E8-44BC0A21D5DA}.Release|x64.Build.0 = Release|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x64.ActiveCfg = Debug|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x64.Build.0 = Debug|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.ActiveCfg = Release|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
