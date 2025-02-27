@@ -149,6 +149,18 @@ void DXCommon::WaitForGPU()
 	}
 }
 
+void DXCommon::ChangeState(ID3D12Resource* _resource, D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after)
+{
+    //バリアの設定
+    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier_.Transition.pResource = _resource;
+    barrier_.Transition.StateBefore = _before;
+    barrier_.Transition.StateAfter = _after;
+    //バリアを設定
+    commandList_->ResourceBarrier(1, &barrier_);
+}
+
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _sizeInBytes)
 {
 	// 頂点リソース用のヒープの設定
@@ -178,7 +190,35 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _
 	return bufferResource;
 }
 
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateUAVBufferResource(uint32_t _sizeInBytes)
+{
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource;
 
+	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+	uploadHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = _sizeInBytes;
+	//バッファの場合はこれらを１にする決まり
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+
+	//実際に頂点リソースを作る
+	HRESULT hr = device_->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
+		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
+		IID_PPV_ARGS(&bufferResource));
+
+	assert(SUCCEEDED(hr));
+
+	return bufferResource;
+}
 
 void DXCommon::CreateDevice()
 {

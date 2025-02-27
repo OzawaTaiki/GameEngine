@@ -110,6 +110,7 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
+    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
     oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
@@ -129,10 +130,16 @@ void SampleScene::Draw()
 
 void SampleScene::DrawShadow()
 {
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
 
-    oModel_->DrawShadow(&SceneCamera_);
-    oModel2_->DrawShadow(&SceneCamera_);
-    aModel_->DrawShadow(&SceneCamera_);
+    oModel_->DrawShadow(&SceneCamera_, 0);
+    oModel2_->DrawShadow(&SceneCamera_, 1);
+    aModel_->DrawShadow(&SceneCamera_, 2);
+
+    // depthtextureとrendertextreuからIDを指定して影の輪郭を取得
+    // https://claude.ai/chat/01808d8d-c6f8-49d8-a17b-bd4981ce2684
+    // その陰からメッシュを作成して高さを与えて描画
 }
 
 #ifdef _DEBUG

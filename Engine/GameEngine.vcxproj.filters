@@ -407,7 +407,6 @@
     <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
       <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
       <Filter>Features\Model\Animation</Filter>
     </ClCompile>
@@ -720,9 +719,6 @@
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
       <Filter>Core\DXCommon\RTV</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMap.h">
-      <Filter>Core\DXCommon</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\SkinningCS.h">
       <Filter>Features\Model\Animation</Filter>
