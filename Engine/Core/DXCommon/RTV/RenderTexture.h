@@ -24,7 +24,8 @@ public:
     void SetDepthStencilResource(D3D12_CPU_DESCRIPTOR_HANDLE _dsvHandle) { dsvHandle_ = _dsvHandle; }
     void SetDepthStencilResource(ID3D12Resource* _dsvResource);
 
-    uint32_t GetSRVIndex() const { return srvIndex_; }
+
+    uint32_t GetSRVIndex() const { return srvIndexofRTV_; }
 
     void SetClearColor(float _r, float _g, float _b, float _a)  { clearValue_[0] = _r;          clearValue_[1] = _g;        clearValue_[2] = _b;        clearValue_[3] = _a;        }
     void SetClearColor(float _color[4])                         { clearValue_[0] = _color[0];   clearValue_[1] = _color[1]; clearValue_[2] = _color[2]; clearValue_[3] = _color[3]; }
@@ -33,23 +34,36 @@ public:
     void SetRenderTexture() const;
     void SetDepthStencil() ;
 
-    void ChangeState(D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after);
-    void QueueCommandDSVtoSRV(uint32_t _index);
+    void ChangeRTVState( D3D12_RESOURCE_STATES _after);
+    void ChangeDSVState( D3D12_RESOURCE_STATES _after);
 
-    void Draw() const;
+    void QueueCommandDSVtoSRV(uint32_t _index);
+    void QueueCommandRTVtoSRV(uint32_t _index);
+
+    uint32_t GetSRVindexofRTV() const { return srvIndexofRTV_; }
+    uint32_t GetSRVindexofDSV() const { return srvIndexofDSV_; }
+
+    void Draw() ;
 
 
 
 
 private:
 
+    D3D12_RESOURCE_STATES RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    D3D12_RESOURCE_STATES DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+
+
     Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
     ID3D12Resource* dsvResource_ = nullptr;
     float clearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
 
-    bool stateSRV_ = false;
+    // DSVの状態がSRVか
+    bool isDSVinSRVState = false;
+    bool isRTVinSRVState = false;
 
-    uint32_t srvIndex_ = 0;
+    uint32_t srvIndexofRTV_ = 0;
+    uint32_t srvIndexofDSV_ = 0;
 
     uint32_t width_ = 0;
     uint32_t height_ = 0;

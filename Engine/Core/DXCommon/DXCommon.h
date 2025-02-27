@@ -37,14 +37,15 @@ public:
     IDXGISwapChain4* GetSwapChain() { return swapChain_.Get(); }
     ID3D12Resource* GetSwapChainResource(size_t _index) { return swapChainResources_[_index].Get(); }
 
+    void ChangeState(ID3D12Resource* _resource, D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after);
+
     void SetClearColor(float _r, float _g, float _b, float _a) { clearColor_[0] = _r; clearColor_[1] = _g; clearColor_[2] = _b; clearColor_[3] = _a; }
     void SetClearColor(float _color[4]) { clearColor_[0] = _color[0]; clearColor_[1] = _color[1]; clearColor_[2] = _color[2]; clearColor_[3] = _color[3]; }
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVBufferResource(uint32_t _sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
-	//Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource( uint32_t _width, uint32_t _height,
-		//DXGI_FORMAT _format, const Vector4& _clearColor);
 
     D3D12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandle(uint32_t _index) { return GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), desriptorSizeDSV_, _index); }
 

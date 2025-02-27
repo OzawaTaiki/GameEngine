@@ -3,13 +3,13 @@
 
 RenderTarget::RenderTarget() :
     renderTextureResource_(nullptr),
-    srvIndex_(0),
+    srvIndexofRTV_(0),
+    srvIndexofDSV_(0),
     rtvHandle_{},
     viewport_{},
     scissorRect_{}
 {
-    srvIndex_ = SRVManager::GetInstance()->Allocate();
-
+    srvIndexofRTV_ = SRVManager::GetInstance()->Allocate();
 }
 
 void RenderTarget::Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, D3D12_CPU_DESCRIPTOR_HANDLE _rtvHandle, DXGI_FORMAT _format, uint32_t _width, uint32_t _height)
@@ -21,16 +21,16 @@ void RenderTarget::Initialize(Microsoft::WRL::ComPtr<ID3D12Resource> _resource, 
     height_ = _height;
 
     auto srvManager = SRVManager::GetInstance();
-    srvManager->CreateSRVForRenderTexture(srvIndex_, renderTextureResource_.Get(), _format);
+    srvManager->CreateSRVForRenderTexture(srvIndexofRTV_, renderTextureResource_.Get(), _format);
 }
 
 void RenderTarget::SetDepthStencilResource(ID3D12Resource* _dsvResource)
 {
-    srvIndex_ = SRVManager::GetInstance()->Allocate();
+    srvIndexofDSV_ = SRVManager::GetInstance()->Allocate();
 
     dsvResource_ = _dsvResource;
 
-    SRVManager::GetInstance()->CreateSRVForRenderTexture(srvIndex_, dsvResource_, DXGI_FORMAT_R32_FLOAT);
+    SRVManager::GetInstance()->CreateSRVForRenderTexture(srvIndexofDSV_, dsvResource_, DXGI_FORMAT_R32_FLOAT);
 
 }
 
@@ -66,20 +66,18 @@ void RenderTarget::SetRenderTexture() const
 
 void RenderTarget::SetDepthStencil()
 {
-
-
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
-    if(stateSRV_)
+    if (DSVCurrentState_ != D3D12_RESOURCE_STATE_DEPTH_WRITE)
     {
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
         barrier.Transition.pResource = dsvResource_;
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        barrier.Transition.StateBefore = DSVCurrentState_;
         barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
         commandList->ResourceBarrier(1, &barrier);
-        stateSRV_ = false;
+        DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
     }
 
     commandList->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
@@ -105,19 +103,44 @@ void RenderTarget::SetDepthStencil()
     commandList->RSSetScissorRects(1, &scissorRect);
 }
 
-void RenderTarget::ChangeState(D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after)
+void RenderTarget::ChangeRTVState(D3D12_RESOURCE_STATES _after)
 {
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
 
-    D3D12_RESOURCE_BARRIER barrier_ = {};
-    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier_.Transition.pResource = renderTextureResource_.Get();
-    barrier_.Transition.StateBefore = _before;
-    barrier_.Transition.StateAfter = _after;
+    if (RTVCurrentState_ != _after)
+    {
+        D3D12_RESOURCE_BARRIER barrier_ = {};
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = renderTextureResource_.Get();
+        barrier_.Transition.StateBefore = RTVCurrentState_;
+        barrier_.Transition.StateAfter = _after;
 
-    commandList->ResourceBarrier(1, &barrier_);
+        commandList->ResourceBarrier(1, &barrier_);
+
+        RTVCurrentState_ = _after;
+    }
+
+}
+
+void RenderTarget::ChangeDSVState( D3D12_RESOURCE_STATES _after)
+{
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+
+    if (DSVCurrentState_ != _after)
+    {
+        D3D12_RESOURCE_BARRIER barrier_ = {};
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = dsvResource_;
+        barrier_.Transition.StateBefore = DSVCurrentState_;
+        barrier_.Transition.StateAfter = _after;
+
+        commandList->ResourceBarrier(1, &barrier_);
+        DSVCurrentState_ = _after;
+    }
 }
 
 void RenderTarget::QueueCommandDSVtoSRV(uint32_t _index)
@@ -126,41 +149,65 @@ void RenderTarget::QueueCommandDSVtoSRV(uint32_t _index)
     auto commandList = DXCommon->GetCommandList();
     auto srvManager = SRVManager::GetInstance();
 
-    if(!stateSRV_)
+    if (DSVCurrentState_ != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
     {
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
         barrier.Transition.pResource = dsvResource_;
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        barrier.Transition.StateBefore = DSVCurrentState_;
         barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
         commandList->ResourceBarrier(1, &barrier);
-        stateSRV_ = true;
+
+        DSVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     }
 
-    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndex_);
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofDSV_);
 
     commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
 
 }
 
-void RenderTarget::Draw() const
+void RenderTarget::QueueCommandRTVtoSRV(uint32_t _index)
+{
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+    auto srvManager = SRVManager::GetInstance();
+    if (RTVCurrentState_!= D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    {
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = renderTextureResource_.Get();
+        barrier.Transition.StateBefore = RTVCurrentState_;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        commandList->ResourceBarrier(1, &barrier);
+
+        RTVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    }
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofRTV_);
+    commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
+}
+
+void RenderTarget::Draw()
 {
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
     auto srvManager = SRVManager::GetInstance();
 
     D3D12_RESOURCE_BARRIER barrier_{};
-    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier_.Transition.pResource = renderTextureResource_.Get();
-    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    if (RTVCurrentState_ != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    {
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = renderTextureResource_.Get();
+        barrier_.Transition.StateBefore = RTVCurrentState_;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        commandList->ResourceBarrier(1, &barrier_);
+    }
 
-    commandList->ResourceBarrier(1, &barrier_);
 
-
-    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndex_);
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofRTV_);
 
     commandList->SetGraphicsRootDescriptorTable(0, srvHandle);
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -171,4 +218,6 @@ void RenderTarget::Draw() const
     barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
     commandList->ResourceBarrier(1, &barrier_);
+
+    RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 }
