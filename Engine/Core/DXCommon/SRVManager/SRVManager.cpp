@@ -92,7 +92,7 @@ void SRVManager::CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uin
     uavDesc.Buffer.NumElements = _elementNum;
     uavDesc.Buffer.CounterOffsetInBytes = 0;
     uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-    uavDesc.Buffer.StructureByteStride = _elementSize;
+    uavDesc.Buffer.StructureByteStride = UINT(_elementSize);
 
     dxcommon_->GetDevice()->CreateUnorderedAccessView(_resource, nullptr, &uavDesc, GetCPUSRVDescriptorHandle(_index));
 }

@@ -27,7 +27,10 @@ public:
     uint32_t CreateSRVForInfluenceResource(ID3D12Resource* _resource, uint32_t _vertexNum);
     uint32_t CreateSRVForMatrixPaletteResource(ID3D12Resource* _resource, uint32_t _jointNum);
 
-
+    uint32_t GetInputVertexSrvIndex() const { return inputVertexSrvIndex_; }
+    uint32_t GetOutputVertexUavIndex() const { return outputVertexUavIndex_; }
+    uint32_t GetInfluenceSrvIndex() const { return influenceSrvIndex_; }
+    uint32_t GetMatrixPaletteSrvIndex() const { return matrixPaletteSrvIndex_; }
 
 
     static Microsoft::WRL::ComPtr<ID3D12Resource> CreateOutputVertexResource(size_t _vertexSize);

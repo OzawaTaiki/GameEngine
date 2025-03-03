@@ -410,6 +410,9 @@
     <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
       <Filter>Features\Model\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="Features\SilhouetteDetection.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -722,6 +725,9 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\SkinningCS.h">
       <Filter>Features\Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\SilhouetteDetection.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

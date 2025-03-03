@@ -58,6 +58,10 @@ public:
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }
 
+    uint32_t GetVertexSrvIndex() { return skinningCS_->GetInputVertexSrvIndex(); }
+
+    ID3D12Resource* GetIndexResource(size_t _index = -1);
+
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;
 
