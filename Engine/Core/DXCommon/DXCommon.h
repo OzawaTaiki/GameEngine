@@ -24,6 +24,8 @@ public:
 
     void WaitForGPU();
 
+    void ExecuteCommandList();
+
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 	ID3D12GraphicsCommandList* GetLoadCommandList() { return loadCommanList_.Get(); }
 
@@ -44,6 +46,8 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(uint32_t _sizeInBytes);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVBufferResource(uint32_t _sizeInBytes);
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateReadbackResources(size_t _sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _heapType, UINT _numDescriptors, bool _shaderVisible);
 

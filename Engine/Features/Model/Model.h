@@ -36,7 +36,8 @@ public:
 
     void ShowImGui(const std::string& _name);
 
-    static Model* CreateFromObj(const std::string& _filePath);
+    static Model* CreateFromFile(const std::string& _filePath);
+    static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
 
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;

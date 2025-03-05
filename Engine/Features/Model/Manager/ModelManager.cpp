@@ -73,3 +73,15 @@ Model* ModelManager::FindSameModel(const std::string& _name)
         return models_[_name].get();
     }
 }
+
+Model* ModelManager::GetModelPtr()
+{
+    std::string name = "hmm_";
+
+    size_t index = models_.size();
+
+    name += std::to_string(index);
+
+    return FindSameModel(name);
+
+}

@@ -149,6 +149,26 @@ void DXCommon::WaitForGPU()
 	}
 }
 
+void DXCommon::ExecuteCommandList()
+{
+	HRESULT hr = S_FALSE;
+	//コマンドリストを閉じる
+	hr = commandList_->Close();
+	assert(SUCCEEDED(hr));
+	//コマンドリストを実行
+	ID3D12CommandList* commandLists[] = { commandList_.Get() };
+	commandQueue_->ExecuteCommandLists(1, commandLists);
+
+	WaitForGPU();
+
+	//次のフレーム用のコマンドリストを準備
+	hr = commandAllocator_->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+
+}
+
 void DXCommon::ChangeState(ID3D12Resource* _resource, D3D12_RESOURCE_STATES _before, D3D12_RESOURCE_STATES _after)
 {
     //バリアの設定
@@ -218,6 +238,42 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateUAVBufferResource(uint32_
 	assert(SUCCEEDED(hr));
 
 	return bufferResource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateReadbackResources(size_t _size)
+{
+	Microsoft::WRL::ComPtr<ID3D12Resource> readbackBuffer;
+
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC desc = {};
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	desc.Alignment = 0;
+	desc.Width = _size;
+	desc.Height = 1;
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = DXGI_FORMAT_UNKNOWN;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	HRESULT hr = device_->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&desc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(&readbackBuffer));
+	assert(SUCCEEDED(hr));
+
+	return readbackBuffer;
 }
 
 void DXCommon::CreateDevice()

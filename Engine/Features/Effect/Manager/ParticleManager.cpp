@@ -149,7 +149,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
         groupName += "NoEmitter";
 
     Group& group = groups_[groupName];
-    group.model = Model::CreateFromObj(_modelPath);
+    group.model = Model::CreateFromFile(_modelPath);
     if (_textureHandle == UINT32_MAX)
         group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
     else
@@ -195,7 +195,7 @@ void ParticleManager::CreateParticleGroup(const std::string& _groupName, const s
         groupName += "NoEmitter";
 
     Group& group = groups_[groupName];
-    group.model = Model::CreateFromObj(_modelPath);
+    group.model = Model::CreateFromFile(_modelPath);
     if (_textureHandle == UINT32_MAX)
         group.textureHandle = group.model->GetMaterialPtr()->GetTexturehandle();
     else
@@ -250,7 +250,7 @@ void ParticleManager::SetGroupModel(const std::string& _groupName, const std::st
     if (!groups_.contains(_groupName))
         throw std::runtime_error("not find particleGroup! name:" + '\"' + _groupName + '\"');
 
-    groups_[_groupName].model = Model::CreateFromObj(_modelPath);
+    groups_[_groupName].model = Model::CreateFromFile(_modelPath);
 }
 
 void ParticleManager::SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle)

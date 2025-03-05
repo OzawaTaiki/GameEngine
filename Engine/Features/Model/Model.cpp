@@ -108,7 +108,7 @@ void Model::ShowImGui(const std::string& _name)
 
 }
 
-Model* Model::CreateFromObj(const std::string& _filePath)
+Model* Model::CreateFromFile(const std::string& _filePath)
 {
     Model* model = ModelManager::GetInstance()->FindSameModel(_filePath);
 
@@ -116,6 +116,24 @@ Model* Model::CreateFromObj(const std::string& _filePath)
     {
        model-> LoadFile(_filePath);
     }
+
+    model->lightGroup_ = std::make_unique<LightGroup>();
+    model->lightGroup_->Initialize();
+
+    model->currentAnimation_ = std::make_unique<ModelAnimation>();
+    model->currentAnimation_->Initialize();
+
+    return model;
+}
+
+Model* Model::CreateFromMesh(std::unique_ptr<Mesh> _mesh)
+{
+    Model* model = ModelManager::GetInstance()->GetModelPtr();
+
+    model->mesh_.push_back(std::move(_mesh));
+    model->material_.push_back(std::make_unique<Material>());
+    model->material_[0]->Initialize("");
+
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
@@ -174,7 +192,7 @@ void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
 
 void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _index) const
 {
-    LightingSystem::GetInstance()->QueueCommand(_commandList, _index);
+    LightingSystem::GetInstance()->QueueGraphicsCommand(_commandList, _index);
 }
 
 void Model::SetAnimation(const std::string& _name,bool _loop)

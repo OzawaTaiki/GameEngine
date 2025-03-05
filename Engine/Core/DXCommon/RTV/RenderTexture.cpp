@@ -116,6 +116,7 @@ void RenderTarget::ChangeRTVState(D3D12_RESOURCE_STATES _after)
         barrier_.Transition.pResource = renderTextureResource_.Get();
         barrier_.Transition.StateBefore = RTVCurrentState_;
         barrier_.Transition.StateAfter = _after;
+        barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
         commandList->ResourceBarrier(1, &barrier_);
 
@@ -137,8 +138,44 @@ void RenderTarget::ChangeDSVState( D3D12_RESOURCE_STATES _after)
         barrier_.Transition.pResource = dsvResource_;
         barrier_.Transition.StateBefore = DSVCurrentState_;
         barrier_.Transition.StateAfter = _after;
+        barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
 
         commandList->ResourceBarrier(1, &barrier_);
+        DSVCurrentState_ = _after;
+    }
+}
+
+void RenderTarget::ChangeRTVState(ID3D12GraphicsCommandList* _cmdList, D3D12_RESOURCE_STATES _after)
+{
+    if (RTVCurrentState_ != _after)
+    {
+        D3D12_RESOURCE_BARRIER barrier_ = {};
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = renderTextureResource_.Get();
+        barrier_.Transition.StateBefore = RTVCurrentState_;
+        barrier_.Transition.StateAfter = _after;
+        barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+        _cmdList->ResourceBarrier(1, &barrier_);
+        RTVCurrentState_ = _after;
+    }
+}
+
+void RenderTarget::ChangeDSVState(ID3D12GraphicsCommandList* _cmdList, D3D12_RESOURCE_STATES _after)
+{
+    if (DSVCurrentState_ != _after)
+    {
+        D3D12_RESOURCE_BARRIER barrier_ = {};
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = dsvResource_;
+        barrier_.Transition.StateBefore = DSVCurrentState_;
+        barrier_.Transition.StateAfter = _after;
+        barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+        _cmdList->ResourceBarrier(1, &barrier_);
         DSVCurrentState_ = _after;
     }
 }

@@ -37,6 +37,9 @@ public:
     void ChangeRTVState( D3D12_RESOURCE_STATES _after);
     void ChangeDSVState( D3D12_RESOURCE_STATES _after);
 
+    void ChangeRTVState(ID3D12GraphicsCommandList* _cmdList, D3D12_RESOURCE_STATES _after);
+    void ChangeDSVState(ID3D12GraphicsCommandList* _cmdList, D3D12_RESOURCE_STATES _after);
+
     void QueueCommandDSVtoSRV(uint32_t _index);
     void QueueCommandRTVtoSRV(uint32_t _index);
 
@@ -45,7 +48,8 @@ public:
 
     void Draw() ;
 
-
+    ID3D12Resource* GetRTVResource() const { return renderTextureResource_.Get(); }
+    ID3D12Resource* GetDSVResource() const { return dsvResource_; }
 
 
 private:

@@ -16,7 +16,7 @@ AnimationModel::~AnimationModel()
 
 void AnimationModel::Initialize(const std::string& _filePath)
 {
-    model_ = Model::CreateFromObj(_filePath);
+    model_ = Model::CreateFromFile(_filePath);
 
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();

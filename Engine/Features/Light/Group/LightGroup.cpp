@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-Vector2 LightGroup::shadowMapSize_ = { 256,256 };
+Vector2 LightGroup::shadowMapSize_ = { 128,128 };
 
 void LightGroup::Initialize()
 {
@@ -227,7 +227,7 @@ LightGroup::LightTransferData LightGroup::GetLightData()
 
     const float distance = 100.0f;
     //Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0,0,0), up);
-    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, directionalLight_.direction * distance, up);
+    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0,0,0), up);
 
     float fovY_ = 0.45f;
     float aspectRatio_ = 16.0f / 9.0f;

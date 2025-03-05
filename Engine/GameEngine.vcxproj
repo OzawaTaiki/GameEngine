@@ -133,6 +133,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp" />
     <ClCompile Include="Core\DXCommon\DXCommon.cpp" />
     <ClCompile Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Core\DXCommon\PSOManager\PSOManager.cpp" />
@@ -211,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BlendMode.h" />
+    <ClInclude Include="Core\DXCommon\CmdList\CommandList.h" />
     <ClInclude Include="Core\DXCommon\DXCommon.h" />
     <ClInclude Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.h" />
     <ClInclude Include="Core\DXCommon\PSOManager\PSOManager.h" />

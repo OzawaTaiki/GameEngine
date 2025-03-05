@@ -131,6 +131,7 @@ public:
     void SetEnablePointLight(bool _enable) { enablePointLight_ = _enable; }
     void SetEnableSpotLight(bool _enable) { enableSpotLight_ = _enable; }
 
+    DirectionalLight& GetDirectionalLight() { return directionalLight_; }
     PointLight& GetPointLight(const std::string& _name);
     SpotLight& GetSpotLight(const std::string& _name);
 

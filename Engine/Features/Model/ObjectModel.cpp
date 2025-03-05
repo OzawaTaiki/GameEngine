@@ -20,7 +20,7 @@ ObjectModel::~ObjectModel()
 
 void ObjectModel::Initialize(const std::string& _filePath)
 {
-    model_ = Model::CreateFromObj(_filePath);
+    model_ = Model::CreateFromFile(_filePath);
 
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
@@ -28,6 +28,15 @@ void ObjectModel::Initialize(const std::string& _filePath)
 
     gameTime_ = GameTime::GetInstance();
 
+}
+
+void ObjectModel::Initialize(std::unique_ptr<Mesh>  _mesh)
+{
+    model_ = Model::CreateFromMesh(std::move(_mesh));
+    worldTransform_.Initialize();
+    objectColor_ = std::make_unique<ObjectColor>();
+    objectColor_->Initialize();
+    gameTime_ = GameTime::GetInstance();
 }
 
 void ObjectModel::Update()
@@ -98,7 +107,7 @@ void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
 
 void ObjectModel::SetModel(const std::string& _filePath)
 {
-    model_ = Model::CreateFromObj(_filePath);
+    model_ = Model::CreateFromFile(_filePath);
 }
 
 void ObjectModel::ImGui()

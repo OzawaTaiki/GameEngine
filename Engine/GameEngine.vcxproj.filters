@@ -190,6 +190,9 @@
     <Filter Include="Core\DXCommon\RTV">
       <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\DXCommon\CommandList">
+      <UniqueIdentifier>{54397afa-09b9-473c-9f3a-691043753c50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -412,6 +415,9 @@
     </ClCompile>
     <ClCompile Include="Features\SilhouetteDetection.cpp">
       <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp">
+      <Filter>Core\DXCommon\CommandList</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -728,6 +734,9 @@
     </ClInclude>
     <ClInclude Include="Features\SilhouetteDetection.h">
       <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\CmdList\CommandList.h">
+      <Filter>Core\DXCommon\CommandList</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@ public:
     ~ObjectModel();
 
     void Initialize(const std::string& _filePath);
+    void Initialize(std::unique_ptr< Mesh> _mesh);
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
