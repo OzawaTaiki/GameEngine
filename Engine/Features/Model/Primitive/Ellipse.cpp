@@ -168,7 +168,7 @@ void EllipseModel::Draw(const Camera& _camera, const Vector4& _color)
     objectColor_.SetColor(_color);
     objectColor_.QueueCommand(commandList, 3);
     commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
-    LightingSystem::GetInstance()->QueueCommand(commandList, 5);
+    LightingSystem::GetInstance()->QueueGraphicsCommand(commandList, 5);
 
     commandList->DrawIndexedInstanced(mesh_.GetIndexNum(), 1, 0, 0, 0);
 }

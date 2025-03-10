@@ -24,6 +24,12 @@ void SRVManager::PreDraw()
     dxcommon_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
+void SRVManager::PreDraw(ID3D12GraphicsCommandList* _commandList)
+{
+    ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap_.Get() };
+    _commandList->SetDescriptorHeaps(1, descriptorHeaps);
+}
+
 uint32_t SRVManager::Allocate()
 {
     uint32_t index = useIndex_++;
@@ -92,8 +98,18 @@ void SRVManager::CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uin
     uavDesc.Buffer.NumElements = _elementNum;
     uavDesc.Buffer.CounterOffsetInBytes = 0;
     uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-    uavDesc.Buffer.StructureByteStride = _elementSize;
+    uavDesc.Buffer.StructureByteStride = UINT(_elementSize);
 
     dxcommon_->GetDevice()->CreateUnorderedAccessView(_resource, nullptr, &uavDesc, GetCPUSRVDescriptorHandle(_index));
 }
 
+void SRVManager::CreateUAV(uint32_t _index, ID3D12Resource* _resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC* _desc)
+{
+    // UAVを作成して指定されたインデックスのディスクリプタヒープに設定
+    dxcommon_->GetDevice()->CreateUnorderedAccessView(
+        _resource,       // リソース
+        nullptr,         // カウンターリソース
+        _desc,           // UAV記述子
+        GetCPUSRVDescriptorHandle(_index) // ディスクリプタハンドル
+    );
+}

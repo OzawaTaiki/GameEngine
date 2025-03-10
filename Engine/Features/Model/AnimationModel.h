@@ -38,7 +38,7 @@ public:
 
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
-    void SetModel(const std::string& _filePath) { model_ = Model::CreateFromObj(_filePath); }
+    void SetModel(const std::string& _filePath) { model_ = Model::CreateFromFile(_filePath); }
 
     void SetTimeChannel(const std::string& _channel) { timeChannel = _channel; }
 

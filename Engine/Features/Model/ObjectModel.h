@@ -13,6 +13,7 @@ public:
     ~ObjectModel();
 
     void Initialize(const std::string& _filePath);
+    void Initialize(std::unique_ptr< Mesh> _mesh);
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
@@ -27,12 +28,14 @@ public:
 
     const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
-    void UpdateUVTransform();
+    uint32_t GetVertexSrvIndex() { return model_->GetVertexSrvIndex(); }
 
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     Vector3 GetMin()const { return model_->GetMin(); }
     Vector3 GetMax()const { return model_->GetMax(); }
     Material* GetMaterial() { return model_->GetMaterialPtr(); }
+
+    ID3D12Resource* GetIndexResource(size_t _index = -1) { return model_->GetIndexResource(_index); }
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };

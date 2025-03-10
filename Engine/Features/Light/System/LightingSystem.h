@@ -13,7 +13,8 @@ public:
 
     void Initialize();
 
-    void QueueCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index);
+    void QueueGraphicsCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index);
+    void QueueComputeCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index);
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = _lightGroup; }
 

@@ -17,6 +17,11 @@ struct Vector2
 
     Vector2 operator-()const;
 
+    Vector2& operator+=(const Vector2& _v);
+    Vector2& operator-=(const Vector2& _v);
+    Vector2& operator*=(float _value);
+    Vector2& operator/=(float _value);
+
 	inline bool operator==(const Vector2& _v) const{
 		return x == _v.x && y == _v.y;
 	}
