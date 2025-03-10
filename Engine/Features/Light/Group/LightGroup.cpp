@@ -227,10 +227,10 @@ LightGroup::LightTransferData LightGroup::GetLightData()
 
     const float distance = 100.0f;
     //Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0,0,0), up);
-    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0,0,0), up);
+    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0.0f, 0.0f,0.0f), up);
 
-    float fovY_ = 0.45f;
-    float aspectRatio_ = 16.0f / 9.0f;
+    //float fovY_ = 0.45f;
+    //float aspectRatio_ = 16.0f / 9.0f;
     float nearClip_ = 0.1f;
     float farClip_ = 1000.0f;
 

@@ -35,6 +35,36 @@ Vector2 Vector2::operator-()const
     return { -x,-y };
 }
 
+Vector2& Vector2::operator+=(const Vector2& _v)
+{
+    x += _v.x;
+    y += _v.y;
+    return *this;
+}
+
+Vector2& Vector2::operator-=(const Vector2& _v)
+{
+    x -= _v.x;
+    y -= _v.y;
+    return *this;
+}
+
+Vector2& Vector2::operator*=(float _value)
+{
+    x *= _value;
+    y *= _value;
+    return *this;
+}
+
+Vector2& Vector2::operator/=(float _value)
+{
+    x /= _value;
+    y /= _value;
+    return *this;
+}
+
+
+
 float Vector2::Length() const
 {
     return std::sqrtf(x * x + y * y);
