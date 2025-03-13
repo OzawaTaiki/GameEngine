@@ -35,6 +35,8 @@ public:
     void SetSelect(bool _isSelect) { isSelect_ = _isSelect; }
     bool IsSelect() const { return isSelect_; }
 
+    void ClearSelectKeyFrames();
+
     std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
     void AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType);
 
