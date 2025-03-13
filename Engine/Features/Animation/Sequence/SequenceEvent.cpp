@@ -12,6 +12,14 @@ void SequenceEvent::Update(float _currentTime)
 
 }
 
+void SequenceEvent::ClearSelectKeyFrames()
+{
+    for (auto& keyFrame : keyFrames_)
+    {
+        keyFrame.isSelect = false;
+    }
+}
+
 void SequenceEvent::AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType)
 {
     KeyFrame keyFrame;
