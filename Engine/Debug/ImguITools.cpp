@@ -5,6 +5,7 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
 #include <Features/Animation/Sequence/AnimationSequence.h>
+#include <Math/Easing.h>
 
 #include <numbers>
 #include <list>
@@ -51,6 +52,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     {
         return;
     }
+
 
     ImGui::PushID(_label);
 
@@ -396,7 +398,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                     if (*it) {
                         SequenceEvent* event = *it;
                         // 該当のトラックにキーフレームを追加
-                        event->AddKeyFrame(mouseTime, 0.0f, 0); // 仮の値
+                        event->AddKeyFrame(mouseTime); // 仮の値
                         trackIndex = 0.0f;
                     }
                 }
@@ -407,6 +409,9 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         // 各トラックを描画
         trackY = 0; // Child内の相対位置
         for (auto sequenceEvent : sequenceEvents) {
+
+            sequenceEvent->DeleteMarkedKeyFrame();
+
             // トラックの背景を描画（Childウィンドウ内の相対位置で計算）
             ImVec2 trackStartPos = ImVec2(0, trackY);
             ImVec2 trackEndPos = ImVec2(tracksAreaSize.x, trackY + kTrackHeight);
@@ -577,20 +582,16 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                     if (ImGui::BeginPopup("KeyContextMenu")) {
                         if (ImGui::MenuItem("Delete")) {
                             // キーフレームの削除フラグを立てる
-                            //sequenceEvent->MarkKeyframeForDeletion(keyFrame.time);
+                            keyFrame.deleteFlag = true;
                         }
-                        if (ImGui::MenuItem("Edit Value")) {
+                        if (ImGui::BeginMenu("Edit Value")) {
                             // 値編集ダイアログを開く
+                            SequenceEvent::EditKeyFrameValue(keyFrame);
+                            ImGui::EndMenu();
+
                         }
                         if (ImGui::BeginMenu("Easing")) {
-                            static const char* easingTypes[] = {
-                                "Linear", "EaseIn", "EaseOut", "EaseInOut"
-                            };
-                            for (int i = 0; i < 4; i++) {
-                                if (ImGui::MenuItem(easingTypes[i])) {
-                                    keyFrame.easingType = i;
-                                }
-                            }
+                            keyFrame.easingType = Easing::SelectEasingFunc();
                             ImGui::EndMenu();
                         }
                         ImGui::EndPopup();
@@ -653,7 +654,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     if (ImGui::BeginPopup("NewEventPopup")) {
         static char newEventName[64] = "";
         static int selectedType = 0;
-        static const char* eventTypes[] = { "float", "Vector2", "Vector3", "Vector4" };
+        static const char* eventTypes[] = { "int32_t","float", "Vector2", "Vector3", "Vector4","Quaternion"};
 
         ImGui::InputText("Event Name", newEventName, sizeof(newEventName));
         ImGui::Combo("Type", &selectedType, eventTypes, IM_ARRAYSIZE(eventTypes));
@@ -661,17 +662,23 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         if (ImGui::Button("Create") && strlen(newEventName) > 0) {
             // 新しいイベントの作成
             switch (selectedType) {
-            case 0: // float
+            case 0:// int32
+                _sequence->CreateSequenceEvent<int32_t>(newEventName, int32_t(0));
+                break;
+            case 1: // float
                 _sequence->CreateSequenceEvent<float>(newEventName, 0.0f);
                 break;
-            case 1: // Vector2
+            case 2: // Vector2
                 _sequence->CreateSequenceEvent<Vector2>(newEventName, Vector2(0, 0));
                 break;
-            case 2: // Vector3
+            case 3: // Vector3
                 _sequence->CreateSequenceEvent<Vector3>(newEventName, Vector3(0, 0, 0));
                 break;
-            case 3: // Vector4
+            case 4: // Vector4
                 _sequence->CreateSequenceEvent<Vector4>(newEventName, Vector4(0, 0, 0, 0));
+                break;
+            case 5: // Quaternion
+                _sequence->CreateSequenceEvent<Quaternion>(newEventName, Quaternion(0, 0, 0, 1).Normalize());
                 break;
             }
             newEventName[0] = '\0';
