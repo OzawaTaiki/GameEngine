@@ -23,10 +23,12 @@ public:
         ParameterValue value;
         uint32_t easingType;
         bool isSelect;
+        bool deleteFlag;
     };
 
 public:
-    SequenceEvent(const std::string& _label);
+    SequenceEvent() = default;
+    SequenceEvent(const std::string& _label, ParameterValue _value);
     ~SequenceEvent() = default;
 
     void Update(float _currentTime);
@@ -39,13 +41,36 @@ public:
 
     std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
     void AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType);
+    void AddKeyFrame(float _time);
 
-    bool ImDragValue();
+    void DeleteMarkedKeyFrame();
+
+    static void EditKeyFrameValue(KeyFrame& _keyFrame);
+
 
 private:
+    enum class UseType {
+        Int,
+        Float,
+        Vector2,
+        Vector3,
+        Vector4,
+        Quaternion,
+
+        Error
+    };
+
+    UseType useType_;
+
+    // 型のチェックを行うため
+    UseType CheckType(ParameterValue _value);
+
+
+
 
     std::string label_;
     bool isSelect_;
+
 
 
     std::list<KeyFrame> keyFrames_;

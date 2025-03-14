@@ -26,8 +26,9 @@ public:
     template<typename T>
     void CreateSequenceEvent(const std::string& _label, T _value, float _startTime = 0.0f, uint32_t _easingType = 0)
     {
-        std::unique_ptr<SequenceEvent> sequenceEvent = std::make_unique<SequenceEvent>(_label);
+        std::unique_ptr<SequenceEvent> sequenceEvent = std::make_unique<SequenceEvent>(_label, _value);
         AddSequenceEvent(std::move(sequenceEvent));
+        
     }
 
     std::list<SequenceEvent*> GetSequenceEvents();
