@@ -23,7 +23,7 @@ public:
         ParameterValue value;
         uint32_t easingType;
         bool isSelect;
-        bool deleteFlag;
+        bool isDelete;
     };
 
 public:
@@ -44,6 +44,9 @@ public:
     void AddKeyFrame(float _time);
 
     void DeleteMarkedKeyFrame();
+
+    void MarkForDelete();
+    bool IsDelete() const { return isDelete_; }
 
     static void EditKeyFrameValue(KeyFrame& _keyFrame);
 
@@ -71,6 +74,7 @@ private:
     std::string label_;
     bool isSelect_;
 
+    bool isDelete_;
 
 
     std::list<KeyFrame> keyFrames_;

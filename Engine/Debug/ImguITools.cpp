@@ -53,6 +53,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         return;
     }
 
+    _sequence->DeleteMarkedSequenceEvent();
 
     ImGui::PushID(_label);
 
@@ -90,6 +91,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         float centerControlsWidth = 200.0f; // 中央のコントロール幅
         float rightControlsWidth = 200.0f;  // 右側のコントロール幅
 
+        // TODO 再生停止ボタンの実装
         // 左側のコントロール：再生/停止/巻き戻しボタン
         ImGui::BeginGroup();
         if (ImGui::Button("Play", ImVec2(45, 0))) {
@@ -451,6 +453,21 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                 // このトラックを選択
                 sequenceEvent->SetSelect(true);
             }
+            std::string popupId = "TrackDeleteMenu" + sequenceEvent->GetLabel();
+            if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+                ImGui::OpenPopup(popupId.c_str());
+            }
+
+            // 右クリックメニュー
+            if (ImGui::BeginPopup(popupId.c_str())) {
+                if (ImGui::Button("Delete Track")) {
+                    sequenceEvent->MarkForDelete();
+                }
+                ImGui::EndPopup();
+            }
+
+
+
 
             static bool isDragging = false;
             static SequenceEvent::KeyFrame* draggingKeyFrame = nullptr;
@@ -506,19 +523,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                     );
 
 
-                    // TODO
                     bool isActive = ImGui::IsItemActive();
-                   /* ImGui::Begin("test");
-
-                    ImGui::Text("Hover :%s", ImGui::IsItemHovered() ? "true" : "false");
-                    ImGui::Text("Active :%s", isActive ? "true" : "false");
-                    ImGui::Text("Clicked :%s", ImGui::IsItemClicked(ImGuiMouseButton_Left) ? "true" : "false");
-                    ImGui::Text("Select :%s", keyFrame.isSelect ? "true" : "false");
-                    ImGui::Text("isDrag :%s", ImGui::IsMouseDragging(ImGuiMouseButton_Left) ? "true" : "false");
-
-                    ImGui::End();*/
-
-
 
                     // ドラッグ処理
                     if (isActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
@@ -582,7 +587,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                     if (ImGui::BeginPopup("KeyContextMenu")) {
                         if (ImGui::MenuItem("Delete")) {
                             // キーフレームの削除フラグを立てる
-                            keyFrame.deleteFlag = true;
+                            keyFrame.isDelete = true;
                         }
                         if (ImGui::BeginMenu("Edit Value")) {
                             // 値編集ダイアログを開く

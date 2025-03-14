@@ -18,10 +18,15 @@ public:
     void AddSequenceEvent(std::unique_ptr<SequenceEvent> _sequenceEvent);
     void AddTargetWorldTransform(WorldTransform* _worldTransform);
 
+    void DeleteMarkedSequenceEvent();
+
     std::string GetLabel() const { return label_; }
 
     float GetCurrent() const { return currentTime_; }
     void SetCurrentTime(float _currentTime) { currentTime_ = _currentTime; }
+
+    void MarkEventForDeletion(const std::string& _label);
+    void MarkEventForDeletion(SequenceEvent* _sequenceEvent);
 
     template<typename T>
     void CreateSequenceEvent(const std::string& _label, T _value, float _startTime = 0.0f, uint32_t _easingType = 0)

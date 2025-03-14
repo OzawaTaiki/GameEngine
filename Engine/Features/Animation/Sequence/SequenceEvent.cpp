@@ -13,6 +13,8 @@ void SequenceEvent::Update(float _currentTime)
 // t を引数でもらってくるべき
 {
     DeleteMarkedKeyFrame();
+
+    //TODO SequenceEvent::Update
 }
 
 void SequenceEvent::ClearSelectKeyFrames()
@@ -37,7 +39,7 @@ void SequenceEvent::AddKeyFrame(float _time, ParameterValue _value, uint32_t _ea
     keyFrame.value = _value;
     keyFrame.easingType = _easingType;
     keyFrame.isSelect = false;
-    keyFrame.deleteFlag = false;
+    keyFrame.isDelete = false;
 
     keyFrames_.push_back(keyFrame);
 }
@@ -48,7 +50,7 @@ void SequenceEvent::AddKeyFrame(float _time)
     keyFrame.time = _time;
     keyFrame.easingType = 0;
     keyFrame.isSelect = false;
-    keyFrame.deleteFlag = false;
+    keyFrame.isDelete = false;
 
     if      (useType_ == UseType::Int)          keyFrame.value = 0;
     else if (useType_ == UseType::Float)        keyFrame.value = 0.0f;
@@ -67,12 +69,17 @@ void SequenceEvent::AddKeyFrame(float _time)
 void SequenceEvent::DeleteMarkedKeyFrame()
 {
     for (auto it = keyFrames_.begin(); it != keyFrames_.end();) {
-        if (it->deleteFlag)
+        if (it->isDelete)
             it = keyFrames_.erase(it);
 
         else
             ++it;
     }
+}
+
+void SequenceEvent::MarkForDelete()
+{
+    isDelete_ = true;
 }
 
 void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
@@ -84,23 +91,23 @@ void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
             ImGui::DragInt("Value", &arg);
         }
         else if constexpr (std::is_same_v<T, float>) {
-            ImGui::DragFloat("speed", &speed, 0.01f);
+            ImGui::DragFloat("Speed", &speed, 0.01f,0.01f);
             ImGui::DragFloat("Value", &arg,speed);
         }
         else if constexpr (std::is_same_v<T, Vector2>) {
-            ImGui::DragFloat("speed", &speed, 0.01f);
+            ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f,10.0f);
             ImGui::DragFloat2("Value", &arg.x, speed);
         }
         else if constexpr (std::is_same_v<T, Vector3>) {
-            ImGui::DragFloat("speed", &speed, 0.01f);
+            ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
             ImGui::DragFloat3("Value", &arg.x, speed);
         }
         else if constexpr (std::is_same_v<T, Vector4>) {
-            ImGui::DragFloat("speed", &speed, 0.01f);
+            ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
             ImGui::DragFloat4("Value", &arg.x, speed);
         }
         else if constexpr (std::is_same_v<T, Quaternion>) {
-            ImGui::DragFloat("speed", &speed, 0.01f);
+            ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
             ImGui::DragFloat4("Value", &arg.x, speed);
         }
         else {

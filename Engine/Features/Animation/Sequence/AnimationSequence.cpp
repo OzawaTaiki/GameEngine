@@ -32,6 +32,34 @@ void AnimationSequence::AddTargetWorldTransform(WorldTransform* _worldTransform)
     }
 }
 
+void AnimationSequence::DeleteMarkedSequenceEvent()
+{
+    for (auto it = sequenceEvents_.begin(); it != sequenceEvents_.end();)
+    {
+        if ((*it)->IsDelete())
+            it = sequenceEvents_.erase(it);
+
+        else
+            ++it;
+    }
+}
+
+void AnimationSequence::MarkEventForDeletion(const std::string& _label)
+{
+    sequenceEvents_.remove_if([_label](const std::unique_ptr<SequenceEvent>& sequenceEvent)
+        {
+            return sequenceEvent->GetLabel() == _label;
+        });
+}
+
+void AnimationSequence::MarkEventForDeletion(SequenceEvent* _sequenceEvent)
+{
+    sequenceEvents_.remove_if([_sequenceEvent](const std::unique_ptr<SequenceEvent>& sequenceEvent)
+        {
+            return sequenceEvent.get() == _sequenceEvent;
+        });
+}
+
 std::list<SequenceEvent*> AnimationSequence::GetSequenceEvents()
 {
     std::list<SequenceEvent*> sequenceEvents;
