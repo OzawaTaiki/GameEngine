@@ -24,14 +24,6 @@ void AnimationSequence::AddSequenceEvent(std::unique_ptr<SequenceEvent> _sequenc
     }
 }
 
-void AnimationSequence::AddTargetWorldTransform(WorldTransform* _worldTransform)
-{
-    if (_worldTransform)
-    {
-        targetWorldTransforms_.push_back(_worldTransform);
-    }
-}
-
 void AnimationSequence::DeleteMarkedSequenceEvent()
 {
     for (auto it = sequenceEvents_.begin(); it != sequenceEvents_.end();)

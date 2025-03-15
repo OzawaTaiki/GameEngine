@@ -119,6 +119,33 @@ Quaternion Quaternion::FromToRotation(const Vector3& _from, const Vector3& _to)
     return Quaternion(axis.x * sinHalf, axis.y * sinHalf, axis.z * sinHalf, std::cosf(angle / 2.0f));
 }
 
+Quaternion Quaternion::Lerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
+{
+    return _q1 * (1.0f - _t) + _q2 * _t;
+}
+
+Quaternion Quaternion::Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
+{
+    Quaternion q0 = _q1;
+    float dot = _q1.Dot(_q2);
+    if (dot < 0.0f)
+    {
+        q0 = -_q1;
+        dot = -dot;
+    }
+    if (dot > 1.0f - 1e-6f)
+    {
+        return Lerp(q0, _q2, _t);
+    }
+    float theta = std::acosf(dot);
+    float scale0, scale1;
+
+    scale0 = std::sinf((1.0f - _t) * theta);
+    scale1 = std::sinf(_t * theta);
+
+    return (q0 * scale0 + _q2 * scale1) / std::sinf(theta);
+}
+
 Quaternion Quaternion::operator-() const
 {
     return Quaternion(-x, -y, -z, -w);

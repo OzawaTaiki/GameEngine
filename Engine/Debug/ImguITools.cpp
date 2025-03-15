@@ -79,6 +79,8 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     static bool showSnapping = true; // スナッピング機能の有効/無効
     static float snappingInterval = 0.1f; // スナップ間隔（秒）
 
+    static bool isPlaying = false; // 再生中かどうか
+
     // ===== コントロールパネル部分 =====
     {
         // コントロールパネル全体のサイズを固定
@@ -93,20 +95,28 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 
         // TODO 再生停止ボタンの実装
         // 左側のコントロール：再生/停止/巻き戻しボタン
+
+
         ImGui::BeginGroup();
         if (ImGui::Button("Play", ImVec2(45, 0))) {
             // 再生ロジック
+            isPlaying = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop", ImVec2(45, 0))) {
             // 停止ロジック
+            isPlaying = false;
         }
         ImGui::SameLine();
         if (ImGui::Button("Start", ImVec2(45, 0))) {
             currentTime = 0.0f;
             _sequence->SetCurrentTime(currentTime);
+            isPlaying = true;
         }
         ImGui::EndGroup();
+
+        if(isPlaying)
+            currentTime = _sequence->GetCurrent();
 
         // 中央のコントロール：現在時間
         ImGui::SameLine(leftControlsWidth);
@@ -595,8 +605,11 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                             ImGui::EndMenu();
 
                         }
+                        // イージング関数の選択
+                        // TODO イージング関数のComboが正常じゃない
+
                         if (ImGui::BeginMenu("Easing")) {
-                            keyFrame.easingType = Easing::SelectEasingFunc();
+                            keyFrame.easingType = Easing::SelectEasingFunc(keyFrame.easingType);
                             ImGui::EndMenu();
                         }
                         ImGui::EndPopup();
@@ -649,6 +662,18 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             IM_COL32(200, 200, 200, 255),
             statusText
         );
+    }
+    if (isPlaying)
+    {
+        //TODO deltaTimeを設定できるように
+        _sequence->Update(1.0f / 60.0f);
+        // TODO 値を確認できるように
+
+       /* int32_t v = _sequence->GetValue<int32_t>("a");
+
+        ImGui::Begin("test");
+        ImGui::Text("val : %d", v);
+        ImGui::End();*/
     }
 
     // 新しいイベント作成ボタン

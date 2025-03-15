@@ -503,59 +503,7 @@ void ImGuiHelper::TimeLine::Draw(AnimationSequence* _sequence)
 void ImGuiHelper::TimeLine::CreateEventButton(AnimationSequence* _sequence)
 {
 
-    static int selectedDataType = 0;
-    static const char* dataTypes[] = { "int32_t", "float", "Vector2", "Vector3", "Vector4", "Quaternion" };
-    static char createEventName[128] = "";
-    static float startTime = 0.0f;
-    static uint32_t easingType = 0;
-
-    if (ImGui::Button("New Events"))
-    {
-        ImGui::OpenPopup("NewEvents");
-    }
-
-    if (ImGui::BeginPopup("NewEvents"))
-    {
-        ImGui::Combo("DataType", &selectedDataType, dataTypes, IM_ARRAYSIZE(dataTypes));
-        ImGui::InputText("Name", createEventName, IM_ARRAYSIZE(createEventName));
-
-        ImGui::InputFloat("StartTime", &startTime);
-        easingType = Easing::SelectEasingFunc();
-        //ImGui::InputScalar("EasingType", ImGuiDataType_U32, &easingType);
-
-        if (ImGui::Button("CerateEvents"))
-        {
-            switch (selectedDataType)
-            {
-            case 0:
-                _sequence->CreateSequenceEvent<int32_t>(createEventName, 0, startTime, easingType);
-                break;
-            case 1:
-                _sequence->CreateSequenceEvent<float>(createEventName, 0.0f, startTime, easingType);
-                break;
-            case 2:
-                _sequence->CreateSequenceEvent<Vector2>(createEventName, Vector2(0, 0), startTime, easingType);
-                break;
-            case 3:
-                _sequence->CreateSequenceEvent<Vector3>(createEventName, Vector3(0, 0, 0), startTime, easingType);
-                break;
-            case 4:
-                _sequence->CreateSequenceEvent<Vector4>(createEventName, Vector4(0, 0, 0, 0), startTime, easingType);
-                break;
-            case 5:
-                _sequence->CreateSequenceEvent<Quaternion>(createEventName, Quaternion(0, 0, 0, 1), startTime, easingType);
-                break;
-            default:
-                break;
-            }
-            strcpy_s(createEventName, "");
-            easingType = 0;
-            startTime = 0.0f;
-            selectedDataType = 0;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
+    
 }
 
 void ImGuiHelper::DrawTitleBar(const char* _text, const ImVec4& _color)
