@@ -39,6 +39,12 @@ public:
 
     static Quaternion FromToRotation(const Vector3& _from, const Vector3& _to);
 
+    // 線形補間
+    static Quaternion Lerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
+
+    // 球面線形補間
+    static Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
+
 
     ///****演算子オーバロード****///
     Quaternion operator-() const;

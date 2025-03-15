@@ -5,7 +5,6 @@
 #include <list>
 #include<memory>
 
-class WorldTransform;
 class AnimationSequence
 {
 public:
@@ -16,7 +15,6 @@ public:
 
 
     void AddSequenceEvent(std::unique_ptr<SequenceEvent> _sequenceEvent);
-    void AddTargetWorldTransform(WorldTransform* _worldTransform);
 
     void DeleteMarkedSequenceEvent();
 
@@ -33,17 +31,29 @@ public:
     {
         std::unique_ptr<SequenceEvent> sequenceEvent = std::make_unique<SequenceEvent>(_label, _value);
         AddSequenceEvent(std::move(sequenceEvent));
-        
+
+    }
+
+    template<typename T>
+    T GetValue(const std::string& _label) const {
+        for (auto& sequenceEvent : sequenceEvents_)
+        {
+            if (sequenceEvent->GetLabel() == _label)
+            {
+                return sequenceEvent->GetValue<T>();
+            }
+        }
+        throw std::runtime_error("Invalid label");
+        return T();
     }
 
     std::list<SequenceEvent*> GetSequenceEvents();
+
 private:
 
     std::string label_;
     float currentTime_;
 
-    // 値を適用するワールドトランスフォーム
-    std::list<WorldTransform*> targetWorldTransforms_;// いらんかも
     std::list<std::unique_ptr<SequenceEvent>>sequenceEvents_;
 
 };

@@ -37,11 +37,17 @@ public:
     void SetSelect(bool _isSelect) { isSelect_ = _isSelect; }
     bool IsSelect() const { return isSelect_; }
 
+    template<typename T>
+    T GetValue() const { return std::get<T>(value_); }
+
     void ClearSelectKeyFrames();
 
     std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
     void AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType);
     void AddKeyFrame(float _time);
+
+    void InsertKeyFrame(const KeyFrame& _keyFrame);
+    void SortKeyFrames();
 
     void DeleteMarkedKeyFrame();
 
@@ -69,13 +75,12 @@ private:
     UseType CheckType(ParameterValue _value);
 
 
-
-
     std::string label_;
     bool isSelect_;
 
     bool isDelete_;
 
+    ParameterValue value_; // 補間した値
 
     std::list<KeyFrame> keyFrames_;
 

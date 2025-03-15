@@ -1,4 +1,5 @@
 #include "SequenceEvent.h"
+#include <Math/Easing.h>
 
 #include <stdexcept>
 
@@ -10,12 +11,103 @@ SequenceEvent::SequenceEvent(const std::string& _label, ParameterValue _value) :
 }
 
 void SequenceEvent::Update(float _currentTime)
-// t を引数でもらってくるべき
 {
     DeleteMarkedKeyFrame();
 
-    //TODO SequenceEvent::Update
+    // キーフレームがない場合は何もしない
+    if (keyFrames_.empty())
+    {
+        return;
+    }
+
+    // 最初のキーフレームより前の時間の場合
+    auto firstKeyFrame = keyFrames_.begin();
+    if (_currentTime <= firstKeyFrame->time)
+    {
+        value_ = firstKeyFrame->value;
+        return;
+    }
+
+    // 最後のキーフレームより後の時間の場合
+    auto lastKeyFrame = std::prev(keyFrames_.end());
+    if (_currentTime >= lastKeyFrame->time)
+    {
+        value_ = lastKeyFrame->value;
+        return;
+    }
+
+    // 2つのキーフレーム間の補間
+    KeyFrame* prevKeyFrame = nullptr;
+    KeyFrame* nextKeyFrame = nullptr;
+
+    // 現在の時間を挟む2つのキーフレームを探す
+    for (auto it = keyFrames_.begin(); it != keyFrames_.end(); ++it)
+    {
+        if (it->time > _currentTime)
+        {
+            nextKeyFrame = &(*it);
+            prevKeyFrame = &(*std::prev(it));
+            break;
+        }
+    }
+
+    if (!prevKeyFrame || !nextKeyFrame)
+    {
+        return; // エラー時は何もしない
+    }
+
+    // 2つのキーフレーム間の補間係数を計算
+    float totalTime = nextKeyFrame->time - prevKeyFrame->time;
+    float t = (_currentTime - prevKeyFrame->time) / totalTime;
+
+    // イージング関数を適用
+    t = Easing::SelectFuncPtr(nextKeyFrame->easingType)(t);
+
+    // 型ごとに補間処理
+    std::visit([&](auto&& prevValue) {
+        using T = std::decay_t<decltype(prevValue)>;
+
+        auto& nextValue = std::get<T>(nextKeyFrame->value);
+
+        if constexpr (std::is_same_v<T, int32_t>) {
+            // 整数値の補間（四捨五入）
+            value_ = static_cast<int32_t>(std::round(prevValue + (nextValue - prevValue) * t));
+        }
+        else if constexpr (std::is_same_v<T, float>) {
+            // 浮動小数点の線形補間
+            value_ = prevValue + (nextValue - prevValue) * t;
+        }
+        else if constexpr (std::is_same_v<T, Vector2>) {
+            // Vector2の補間
+            value_ = Vector2(
+                prevValue.x + (nextValue.x - prevValue.x) * t,
+                prevValue.y + (nextValue.y - prevValue.y) * t
+            );
+        }
+        else if constexpr (std::is_same_v<T, Vector3>) {
+            // Vector3の補間
+            value_ = Vector3(
+                prevValue.x + (nextValue.x - prevValue.x) * t,
+                prevValue.y + (nextValue.y - prevValue.y) * t,
+                prevValue.z + (nextValue.z - prevValue.z) * t
+            );
+        }
+        else if constexpr (std::is_same_v<T, Vector4>) {
+            // Vector4の補間
+            value_ = Vector4(
+                prevValue.x + (nextValue.x - prevValue.x) * t,
+                prevValue.y + (nextValue.y - prevValue.y) * t,
+                prevValue.z + (nextValue.z - prevValue.z) * t,
+                prevValue.w + (nextValue.w - prevValue.w) * t
+            );
+        }
+        else if constexpr (std::is_same_v<T, Quaternion>) {
+            // Quaternionの球面線形補間
+            value_ = Quaternion::Slerp(prevValue, nextValue, t);
+        }
+        }, prevKeyFrame->value);
 }
+
 
 void SequenceEvent::ClearSelectKeyFrames()
 {
@@ -41,7 +133,8 @@ void SequenceEvent::AddKeyFrame(float _time, ParameterValue _value, uint32_t _ea
     keyFrame.isSelect = false;
     keyFrame.isDelete = false;
 
-    keyFrames_.push_back(keyFrame);
+    InsertKeyFrame(keyFrame);
+    //keyFrames_.push_back(keyFrame);
 }
 
 void SequenceEvent::AddKeyFrame(float _time)
@@ -62,9 +155,54 @@ void SequenceEvent::AddKeyFrame(float _time)
         throw std::runtime_error("Invalid type");
         return;
     }
+    InsertKeyFrame(keyFrame);
 
-    keyFrames_.push_back(keyFrame);
+    //keyFrames_.push_back(keyFrame);
 }
+
+void SequenceEvent::InsertKeyFrame(const KeyFrame& _keyFrame)
+{
+    if(keyFrames_.empty())
+    {
+        keyFrames_.push_back(_keyFrame);
+        return;
+    }
+
+
+    // 並びが正しいか
+    float prevTime = 0.0f;
+
+    // キーフレームの挿入
+    for (auto it = keyFrames_.begin(); it != keyFrames_.end(); ++it)
+    {
+        // ひとつ前の要素の時間が現在の要素の時間より大きい場合
+        if (it->time < prevTime)
+        {
+            keyFrames_.push_back(_keyFrame);
+            SortKeyFrames();
+            return;
+        }
+
+        if (it->time > _keyFrame.time)
+        {
+            keyFrames_.insert(it, _keyFrame);
+            return;
+        }
+
+        prevTime = it->time;
+    }
+
+    keyFrames_.push_back(_keyFrame);
+
+}
+
+void SequenceEvent::SortKeyFrames()
+{
+    keyFrames_.sort([](const KeyFrame& _a, const KeyFrame& _b) {
+        return _a.time < _b.time;
+        });
+}
+
 
 void SequenceEvent::DeleteMarkedKeyFrame()
 {
