@@ -316,6 +316,44 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             drawList->AddConvexPolyFilled(trianglePoints, 3, kCurrentTimeMarkerColor);
         }
 
+        // 最大再生時間のマーカーを描画（メインのタイムライントラック領域セクション内）
+        // 現在時間の縦線を描画した後に追加
+        {
+            float maxPlayTime = _sequence->GetMaxPlayTime();
+            float maxPlayTimeX = tracksAreaPos.x + kTrackHeaderWidth + (maxPlayTime - viewStart) * pixelsPerSecond;
+
+            // 表示範囲内にある場合のみ描画
+            if (maxPlayTimeX >= tracksAreaPos.x + kTrackHeaderWidth && maxPlayTimeX <= tracksAreaPos.x + tracksAreaSize.x) {
+                // 最大再生時間の縦線（点線）
+                const int lineSegments = 20; // 線分の数
+                const float dashLength = tracksHeight / (lineSegments * 2);
+
+                for (int i = 0; i < lineSegments; i++) {
+                    float startY = tracksAreaPos.y + i * dashLength * 2;
+                    drawList->AddLine(
+                        ImVec2(maxPlayTimeX, startY),
+                        ImVec2(maxPlayTimeX, startY + dashLength),
+                        IM_COL32(255, 100, 100, 200), // 赤っぽい色
+                        1.0f
+                    );
+                }
+
+                // 「Max Time」ラベルを上部に表示
+                const char* maxTimeLabel = "Max Time";
+                ImVec2 labelSize = ImGui::CalcTextSize(maxTimeLabel);
+                drawList->AddRectFilled(
+                    ImVec2(maxPlayTimeX - labelSize.x / 2 - 2, tracksAreaPos.y - labelSize.y - 4),
+                    ImVec2(maxPlayTimeX + labelSize.x / 2 + 2, tracksAreaPos.y),
+                    IM_COL32(80, 10, 10, 200)
+                );
+                drawList->AddText(
+                    ImVec2(maxPlayTimeX - labelSize.x / 2, tracksAreaPos.y - labelSize.y - 2),
+                    IM_COL32(255, 200, 200, 255),
+                    maxTimeLabel
+                );
+            }
+        }
+
         // シーケンスイベントの表示
         auto sequenceEvents = _sequence->GetSequenceEvents();
 
@@ -624,6 +662,8 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                             );
                             //}
                         }
+
+                        sequenceEvent->SortKeyFrames();
                     }
 
                     // マウスボタンが離されたときのスナップ処理
@@ -719,15 +759,68 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             statusText
         );
     }
+
+    // 再生処理の修正（if (isPlaying) ブロック内）
     if (isPlaying)
     {
-        //TODO deltaTimeを設定できるように
-        _sequence->Update(1.0f / 60.0f);
+        // deltaTimeは60FPSを想定
+        const float deltaTime = 1.0f / 60.0f;
+
+        // 時間を進める
+        currentTime += deltaTime;
+
+        // ループ処理
+        if (_sequence->IsLooping()) {
+            float maxTime = _sequence->GetMaxPlayTime();
+            if (currentTime >= maxTime) {
+                currentTime = 0.0f;
+            }
+        }
+        else {
+            // ループしない場合は最大時間で停止
+            if (currentTime >= _sequence->GetMaxPlayTime()) {
+                currentTime = _sequence->GetMaxPlayTime();
+                isPlaying = false; // 再生停止
+            }
+        }
+
+        // 現在時間を設定
+        _sequence->SetCurrentTime(currentTime);
+
+        // シーケンスの更新
+        _sequence->Update(deltaTime);
     }
 
-    // 新しいイベント作成ボタン
+    // ===== 下部のコントロールエリア（New Event, Loop, Max Time）=====
+    ImGui::SetCursorPos(ImVec2(5, windowSize.y - kStatusBarHeight - 30));
+
+    // 左側に新しいイベント作成ボタン
     if (ImGui::Button("New Event")) {
         ImGui::OpenPopup("NewEventPopup");
+    }
+
+    // 右側にループと最大時間の設定
+    float rightControlsStartX = 150.0f; // New Eventボタンの右側に配置する開始位置
+
+    ImGui::SameLine(rightControlsStartX);
+
+    // ループと最大再生時間の設定をインラインで表示
+    bool isLooping = _sequence->IsLooping();
+    if (ImGui::Checkbox("Loop", &isLooping)) {
+        _sequence->SetLooping(isLooping);
+    }
+
+    ImGui::SameLine(rightControlsStartX + 100.0f);
+
+    // 最大再生時間の設定
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Max Time:");
+    ImGui::SameLine();
+
+    float maxPlayTime = _sequence->GetMaxPlayTime();
+    ImGui::SetNextItemWidth(120.0f);
+    if (ImGui::DragFloat("##MaxPlayTime", &maxPlayTime, 0.1f, 0.1f, 1000.0f, "%.1f s")) {
+        _sequence->SetMaxPlayTime(maxPlayTime);
     }
 
     if (ImGui::BeginPopup("NewEventPopup")) {

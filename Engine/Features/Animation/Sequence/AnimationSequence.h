@@ -23,6 +23,12 @@ public:
     float GetCurrent() const { return currentTime_; }
     void SetCurrentTime(float _currentTime) { currentTime_ = _currentTime; }
 
+    bool IsLooping() const { return isLooping_; }
+    void SetLooping(bool _isLooping) { isLooping_ = _isLooping; }
+
+    float GetMaxPlayTime() const { return maxPlayTime_; }
+    void SetMaxPlayTime(float _maxPlayTime) { maxPlayTime_ = _maxPlayTime; }
+
     void MarkEventForDeletion(const std::string& _label);
     void MarkEventForDeletion(SequenceEvent* _sequenceEvent);
 
@@ -53,6 +59,8 @@ private:
 
     std::string label_;
     float currentTime_;
+    bool isLooping_;
+    float maxPlayTime_;
 
     std::list<std::unique_ptr<SequenceEvent>>sequenceEvents_;
 

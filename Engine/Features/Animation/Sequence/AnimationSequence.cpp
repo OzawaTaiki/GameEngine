@@ -2,7 +2,8 @@
 
 AnimationSequence::AnimationSequence(const std::string& _label):
     label_(_label),
-    currentTime_(0.0f)
+    currentTime_(0.0f),
+    isLooping_(false)
 {
 }
 
