@@ -85,7 +85,7 @@ public:
     static std::string GetEasingFuncName(int _funcNum);
 
     static std::function<float(float)> SelectFuncPtr(int _funcNum);
-    static int SelectEasingFunc();
+    static int SelectEasingFunc(int _funcNum);
 
 private:
     static const char* easingFuncs[];

@@ -54,6 +54,9 @@ void SampleScene::Initialize()
     colors.push_back({ 0.1f,Vector4(0,1,0,1) });
     colors.push_back({ 0.532f,Vector4(0,1,0,1) });
     colors.push_back({ 0.12f,Vector4(1,1,0,1) });
+
+    sequence_ = std::make_unique<AnimationSequence>("test");
+
 }
 
 void SampleScene::Update()
@@ -75,6 +78,8 @@ void SampleScene::Update()
     }
 
     ImGuiTool::GradientEditor("Ambient", colors);
+    ImGuiTool::TimeLine("TimeLine", sequence_.get());
+    ImGuiTool::GradientEditor("GradientEditor", colors);
 
     lights_->DrawDebugWindow();
 #endif // _DEBUG
