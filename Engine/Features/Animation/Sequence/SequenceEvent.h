@@ -39,6 +39,7 @@ public:
 
     template<typename T>
     T GetValue() const { return std::get<T>(value_); }
+    ParameterValue GetValue() const { return value_; }
 
     void ClearSelectKeyFrames();
 

@@ -4,12 +4,13 @@
 #include <Debug/ImGuiHelper.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
+
 #include <Features/Animation/Sequence/AnimationSequence.h>
 #include <Math/Easing.h>
 
 #include <numbers>
 #include <list>
-
+#include <algorithm>
 
 
 void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Vector4>>& _colors)
@@ -93,10 +94,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         float centerControlsWidth = 200.0f; // 中央のコントロール幅
         float rightControlsWidth = 200.0f;  // 右側のコントロール幅
 
-        // TODO 再生停止ボタンの実装
         // 左側のコントロール：再生/停止/巻き戻しボタン
-
-
         ImGui::BeginGroup();
         if (ImGui::Button("Play", ImVec2(45, 0))) {
             // 再生ロジック
@@ -115,7 +113,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         }
         ImGui::EndGroup();
 
-        if(isPlaying)
+        if (isPlaying)
             currentTime = _sequence->GetCurrent();
 
         // 中央のコントロール：現在時間
@@ -145,7 +143,6 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             timeScale = std::min(500.0f, timeScale + 20.0f);
         }
 
-
         // スナップ
         ImGui::SameLine(0, 20.0f); // ズームコントロールとの間隔
         ImGui::Checkbox("Snap", &showSnapping);
@@ -157,10 +154,12 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         ImGui::EndChild();
     }
 
+    const float kValueDisplayWidth = 150.0f;  // 値表示エリアの幅
+
     // ===== タイムスケールヘッダー部分 =====
     {
         ImVec2 timeScaleHeaderPos = ImVec2(windowPos.x + kTrackHeaderWidth, timelineBase.y + kControlPanelHeight);
-        ImVec2 timeScaleHeaderSize = ImVec2(contentSize.x - kTrackHeaderWidth, kTimeScaleHeaderHeight);
+        ImVec2 timeScaleHeaderSize = ImVec2(contentSize.x - kTrackHeaderWidth - kValueDisplayWidth, kTimeScaleHeaderHeight);
 
         // 時間軸の背景を描画
         drawList->AddRectFilled(
@@ -169,7 +168,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             kTimelineBgColor
         );
 
-        // 時間目盛りを描画
+        // 時間目盛りを描画（以下同じ）
         float pixelsPerSecond = timeScale;
         float secondsInView = timeScaleHeaderSize.x / pixelsPerSecond;
         viewEnd = viewStart + secondsInView;
@@ -246,7 +245,12 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         float tracksHeight = contentSize.y - kControlPanelHeight - kTimeScaleHeaderHeight - kStatusBarHeight - kTimelineHeightPadding;
 
         ImVec2 tracksAreaPos = ImVec2(windowPos.x, tracksStartY);
-        ImVec2 tracksAreaSize = ImVec2(contentSize.x, tracksHeight);
+        // トラックエリアのサイズを調整（値表示分を減らす）
+        ImVec2 tracksAreaSize = ImVec2(contentSize.x - kValueDisplayWidth, tracksHeight);
+
+        // 値表示エリアの位置とサイズ
+        ImVec2 valueDisplayPos = ImVec2(tracksAreaPos.x + tracksAreaSize.x, tracksAreaPos.y);
+        ImVec2 valueDisplaySize = ImVec2(kValueDisplayWidth, tracksHeight);
 
         // トラックエリアの背景
         drawList->AddRectFilled(
@@ -255,11 +259,28 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
             kTimelineBgColor
         );
 
+        // 値表示エリアの背景（一度だけ描画）
+        drawList->AddRectFilled(
+            valueDisplayPos,
+            ImVec2(valueDisplayPos.x + valueDisplaySize.x, valueDisplayPos.y + valueDisplaySize.y),
+            IM_COL32(45, 45, 45, 255)  // 少し明るい背景色
+        );
+
         // ヘッダー部分の背景
         drawList->AddRectFilled(
             tracksAreaPos,
             ImVec2(tracksAreaPos.x + kTrackHeaderWidth, tracksAreaPos.y + tracksAreaSize.y),
             IM_COL32(55, 55, 55, 255)
+        );
+
+        // 値表示エリアのヘッダー - 中央揃えで表示
+        const char* valueHeader = "Current Value";
+        ImVec2 headerTextSize = ImGui::CalcTextSize(valueHeader);
+        drawList->AddText(
+            ImVec2(valueDisplayPos.x + (valueDisplaySize.x - headerTextSize.x) / 2,
+                valueDisplayPos.y - kTimeScaleHeaderHeight + (kTimeScaleHeaderHeight - headerTextSize.y) / 2),
+            IM_COL32(200, 200, 200, 255),
+            valueHeader
         );
 
         // 垂直グリッドラインを描画
@@ -421,7 +442,6 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         // 各トラックを描画
         trackY = 0; // Child内の相対位置
         for (auto sequenceEvent : sequenceEvents) {
-
             sequenceEvent->DeleteMarkedKeyFrame();
 
             // トラックの背景を描画（Childウィンドウ内の相対位置で計算）
@@ -476,8 +496,50 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                 ImGui::EndPopup();
             }
 
+            // 値表示エリアのトラック部分の背景 - 選択状態に応じて色を変更
+            ImU32 valueBgColor = sequenceEvent->IsSelect() ?
+                IM_COL32(70, 70, 90, 255) :  // 選択時: より明るい/青みがかった背景
+                IM_COL32(45, 45, 45, 255);   // 非選択時: 通常の暗い背景
 
+            drawList->AddRectFilled(
+                ImVec2(valueDisplayPos.x, valueDisplayPos.y + trackY),
+                ImVec2(valueDisplayPos.x + valueDisplaySize.x, valueDisplayPos.y + trackY + kTrackHeight),
+                valueBgColor
+            );
 
+            // 現在時間での値を更新
+            sequenceEvent->Update(_sequence->GetCurrent());
+
+            // 値を文字列化して表示
+            char valueText[64] = "";
+            std::visit([&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+
+                if constexpr (std::is_same_v<T, int32_t>) {
+                    snprintf(valueText, sizeof(valueText), "%d", value);
+                }
+                else if constexpr (std::is_same_v<T, float>) {
+                    snprintf(valueText, sizeof(valueText), "%.2f", value);
+                }
+                else if constexpr (std::is_same_v<T, Vector2>) {
+                    snprintf(valueText, sizeof(valueText), "(%.1f, %.1f)", value.x, value.y);
+                }
+                else if constexpr (std::is_same_v<T, Vector3>) {
+                    snprintf(valueText, sizeof(valueText), "(%.1f, %.1f, %.1f)", value.x, value.y, value.z);
+                }
+                else if constexpr (std::is_same_v<T, Vector4> || std::is_same_v<T, Quaternion>) {
+                    snprintf(valueText, sizeof(valueText), "(%.1f, %.1f, %.1f, %.1f)", value.x, value.y, value.z, value.w);
+                }
+                }, sequenceEvent->GetValue());
+
+            // 値テキストのサイズを計算して中央に配置
+            ImVec2 valueTextSize = ImGui::CalcTextSize(valueText);
+            drawList->AddText(
+                ImVec2(valueDisplayPos.x + (valueDisplaySize.x - valueTextSize.x) / 2,
+                    valueDisplayPos.y + trackY + (kTrackHeight - valueTextSize.y) / 2),
+                IM_COL32(220, 220, 100, 255),  // 黄色っぽい色
+                valueText
+            );
 
             static bool isDragging = false;
             static SequenceEvent::KeyFrame* draggingKeyFrame = nullptr;
@@ -510,13 +572,12 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                         // 他のキーフレームの選択をクリア
                         for (auto& otherEvent : sequenceEvents) {
                             otherEvent->ClearSelectKeyFrames();
-                            }
+                        }
                         keyFrame.isSelect = true;
                     }
 
                     // キーフレームの色を決定
                     ImU32 keyColor = kKeyframeColor; // デフォルト色
-
 
                     if (ImGui::IsItemHovered() && !isDragging) {
                         keyColor = kKeyframeColorHover; // ホバー状態
@@ -531,7 +592,6 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                         kTimeMarkerSize,
                         keyColor
                     );
-
 
                     bool isActive = ImGui::IsItemActive();
 
@@ -555,13 +615,13 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                             float snappedTime = roundf(newTime / snappingInterval) * snappingInterval;
                             //if (fabsf(newTime - snappedTime) < kSnapThreshold) {
                                 // スナップガイドラインを描画
-                                float snapX = tracksAreaPos.x + kTrackHeaderWidth + (snappedTime - viewStart) * pixelsPerSecond;
-                                drawList->AddLine(
-                                    ImVec2(snapX, tracksAreaPos.y),
-                                    ImVec2(snapX, tracksAreaPos.y + tracksAreaSize.y),
-                                    IM_COL32(255, 255, 0, 100), // 黄色の半透明ライン
-                                    1.0f
-                                );
+                            float snapX = tracksAreaPos.x + kTrackHeaderWidth + (snappedTime - viewStart) * pixelsPerSecond;
+                            drawList->AddLine(
+                                ImVec2(snapX, tracksAreaPos.y),
+                                ImVec2(snapX, tracksAreaPos.y + tracksAreaSize.y),
+                                IM_COL32(255, 255, 0, 100), // 黄色の半透明ライン
+                                1.0f
+                            );
                             //}
                         }
                     }
@@ -603,11 +663,8 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                             // 値編集ダイアログを開く
                             SequenceEvent::EditKeyFrameValue(keyFrame);
                             ImGui::EndMenu();
-
                         }
                         // イージング関数の選択
-                        // TODO イージング関数のComboが正常じゃない
-
                         if (ImGui::BeginMenu("Easing")) {
                             keyFrame.easingType = Easing::SelectEasingFunc(keyFrame.easingType);
                             ImGui::EndMenu();
@@ -631,7 +688,6 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
                     // ドラッグ状態をリセット
                     isDragging = false;
                     draggingKeyFrame = nullptr;
-
                 }
             }
 
@@ -667,13 +723,6 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     {
         //TODO deltaTimeを設定できるように
         _sequence->Update(1.0f / 60.0f);
-        // TODO 値を確認できるように
-
-       /* int32_t v = _sequence->GetValue<int32_t>("a");
-
-        ImGui::Begin("test");
-        ImGui::Text("val : %d", v);
-        ImGui::End();*/
     }
 
     // 新しいイベント作成ボタン
@@ -684,7 +733,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     if (ImGui::BeginPopup("NewEventPopup")) {
         static char newEventName[64] = "";
         static int selectedType = 0;
-        static const char* eventTypes[] = { "int32_t","float", "Vector2", "Vector3", "Vector4","Quaternion"};
+        static const char* eventTypes[] = { "int32_t","float", "Vector2", "Vector3", "Vector4","Quaternion" };
 
         ImGui::InputText("Event Name", newEventName, sizeof(newEventName));
         ImGui::Combo("Type", &selectedType, eventTypes, IM_ARRAYSIZE(eventTypes));
