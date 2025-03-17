@@ -77,7 +77,6 @@ void SampleScene::Update()
         aModel_->ChangeAnimation("ScaleAnim", 0.5f);
     }
 
-    ImGuiTool::GradientEditor("Ambient", colors);
     ImGuiTool::TimeLine("TimeLine", sequence_.get());
     ImGuiTool::GradientEditor("GradientEditor", colors);
 
@@ -85,6 +84,13 @@ void SampleScene::Update()
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
+    static bool play = false;
+    if (ImGui::Button("Play"))
+    {
+        play = !play;
+    }
+    if (play)
+        oModel_->translate_ = sequence_->GetValue<Vector3>("a");
 
     oModel_->Update();
     oModel2_->Update();
