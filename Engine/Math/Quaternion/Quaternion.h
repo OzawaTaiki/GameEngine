@@ -54,7 +54,7 @@ public:
     Quaternion operator* (const Quaternion& _q) const;
 
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Quaternion, x, y, z, w);
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Quaternion, x, y, z, w)
 
 #ifdef _DEBUG
     void ShowData(const std::string& _label, bool _newWindow = true) const;

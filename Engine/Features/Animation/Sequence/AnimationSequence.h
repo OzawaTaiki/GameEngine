@@ -1,20 +1,25 @@
 #pragma once
 
 #include <Features/Animation/Sequence/SequenceEvent.h>
+#include <Features/Json/JsonBinder.h>
 
+#include <json.hpp>
 #include <list>
-#include<memory>
+#include <memory>
 
 class AnimationSequence
 {
 public:
     AnimationSequence(const std::string& _label);
-    ~AnimationSequence() = default;
+    ~AnimationSequence();
 
+    void Initialize(const std::string& _filepath = "");
     void Update(float _deltaTime);
 
+    void Save();
 
-    void AddSequenceEvent(std::unique_ptr<SequenceEvent> _sequenceEvent);
+
+    void AddSequenceEvent(SequenceEvent* _sequenceEvent);
 
     void DeleteMarkedSequenceEvent();
 
@@ -35,8 +40,8 @@ public:
     template<typename T>
     void CreateSequenceEvent(const std::string& _label, T _value, float _startTime = 0.0f, uint32_t _easingType = 0)
     {
-        std::unique_ptr<SequenceEvent> sequenceEvent = std::make_unique<SequenceEvent>(_label, _value);
-        AddSequenceEvent(std::move(sequenceEvent));
+        SequenceEvent* sequenceEvent = new SequenceEvent(_label, _value);
+        AddSequenceEvent(sequenceEvent);
 
     }
 
@@ -44,9 +49,9 @@ public:
     T GetValue(const std::string& _label) const {
         for (auto& sequenceEvent : sequenceEvents_)
         {
-            if (sequenceEvent->GetLabel() == _label)
+            if (sequenceEvent.second->GetLabel() == _label)
             {
-                return sequenceEvent->GetValue<T>();
+                return sequenceEvent.second->GetValue<T>();
             }
         }
         throw std::runtime_error("Invalid label");
@@ -62,6 +67,14 @@ private:
     bool isLooping_;
     float maxPlayTime_;
 
-    std::list<std::unique_ptr<SequenceEvent>>sequenceEvents_;
+    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
+
+    uint32_t sequenceSize_;
+    std::map<std::string, SequenceEvent*> sequenceEvents_;
+
+    std::vector<std::string> eventLabels_;
+
+
+
 
 };
