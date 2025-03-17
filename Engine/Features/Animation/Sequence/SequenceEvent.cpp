@@ -3,11 +3,29 @@
 
 #include <stdexcept>
 
-SequenceEvent::SequenceEvent(const std::string& _label, ParameterValue _value) :
+SequenceEvent::SequenceEvent(const std::string& _label, JsonBinder* _jsonBinder) :
     label_(_label),
-    isSelect_(false)
+    isSelect_(false),
+    isDelete_(false),
+    jsonBinder_(_jsonBinder)
+{
+    RegisterVariables();
+}
+
+SequenceEvent::SequenceEvent(const std::string& _label, ParameterValue _value, JsonBinder* _jsonBinder) :
+    label_(_label),
+    isSelect_(false),
+    isDelete_(false),
+    jsonBinder_(_jsonBinder)
 {
     useType_ = CheckType(_value);
+    RegisterVariables();
+}
+
+void SequenceEvent::Initialize(const std::string& _label)
+{
+    if (!_label.empty())
+        label_ = _label;
 }
 
 void SequenceEvent::Update(float _currentTime)
@@ -108,6 +126,26 @@ void SequenceEvent::Update(float _currentTime)
         }, prevKeyFrame->value);
 }
 
+void SequenceEvent::Save()
+{
+    jsonBinder_->SendVariable(label_ + "_keyFrames", keyFrames_);
+}
+
+void SequenceEvent::RegisterVariables()
+{
+    if (jsonBinder_)
+    {
+        jsonBinder_->GetVariableValue(label_ + "_keyFrames", keyFrames_);
+        jsonBinder_->RegisterVariable(label_ + "_variableType", reinterpret_cast<uint32_t*>(&useType_));
+    }
+}
+
+void SequenceEvent::SetJsonBinder(JsonBinder* _jsonBinder)
+{
+    jsonBinder_ = _jsonBinder;
+    RegisterVariables();
+}
+
 
 void SequenceEvent::ClearSelectKeyFrames()
 {
@@ -132,6 +170,8 @@ void SequenceEvent::AddKeyFrame(float _time, ParameterValue _value, uint32_t _ea
     keyFrame.easingType = _easingType;
     keyFrame.isSelect = false;
     keyFrame.isDelete = false;
+
+    useType_ = CheckType(_value);
 
     InsertKeyFrame(keyFrame);
     //keyFrames_.push_back(keyFrame);

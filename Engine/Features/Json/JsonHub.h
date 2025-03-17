@@ -25,12 +25,14 @@ class JsonHub
 public:
     struct VariableAddress
     {
-        std::variant < int32_t*, uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*, Quaternion*,
+        std::variant <bool*, int32_t*, uint32_t*, float*, Vector2*, Vector3*, Vector4*, std::string*, Quaternion*,
+            RefVector<bool>,
             RefVector<int32_t>, RefVector<uint32_t>,
             RefVector<float>,
             RefVector<Vector2>, RefVector<Vector3>,
             RefVector<Vector4>, RefVector<std::string>,
             RefVector<Quaternion>,
+            std::list<bool>*,
             std::list<int32_t>*, std::list<uint32_t>*,
             std::list<float>*,
             std::list<Vector2>*, std::list<Vector3>*,
@@ -41,12 +43,14 @@ public:
 
     struct VariableValue
     {
-        std::variant < int32_t, uint32_t, float, Vector2, Vector3, Vector4, std::string, Quaternion,
+        std::variant <bool, int32_t, uint32_t, float, Vector2, Vector3, Vector4, std::string, Quaternion,
+            std::vector<bool>,
             std::vector<int32_t>, std::vector<uint32_t>,
             std::vector<float>,
             std::vector<Vector2>, std::vector<Vector3>,
             std::vector<Vector4>, std::vector<std::string>,
             std::vector<Quaternion>,
+            std::list<bool>,
             std::list<int32_t>, std::list<uint32_t>,
             std::list<float>,
             std::list<Vector2>, std::list<Vector3>,

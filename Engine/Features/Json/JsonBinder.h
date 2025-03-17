@@ -167,17 +167,19 @@ inline void JsonBinder::SendVariable(const std::string& _variableName, const std
 template<typename T>
 inline bool JsonBinder::IsDefaultType()
 {
-    if constexpr (std::is_same_v<T, int32_t> ||
-                  std::is_same_v<T, uint32_t> ||
-                  std::is_same_v<T, float> ||
-                  std::is_same_v<T, Vector2> ||
-                  std::is_same_v<T, Vector3> ||
-                  std::is_same_v<T, Vector4> ||
-                  std::is_same_v<T, std::string>)
+    if constexpr (std::is_same_v<T, bool> ||
+        std::is_same_v<T, int32_t> ||
+        std::is_same_v<T, uint32_t> ||
+        std::is_same_v<T, float> ||
+        std::is_same_v<T, Vector2> ||
+        std::is_same_v<T, Vector3> ||
+        std::is_same_v<T, Vector4> ||
+        std::is_same_v<T, std::string>)
     {
         return true;
     }
-    else if constexpr (std::is_same_v<T, std::vector<int32_t>> ||
+    else if constexpr (std::is_same_v<T, std::vector<bool>> ||
+                       std::is_same_v<T, std::vector<int32_t>> ||
                        std::is_same_v<T, std::vector<uint32_t>> ||
                        std::is_same_v<T, std::vector<float>> ||
                        std::is_same_v<T, std::vector<Vector2>> ||
@@ -187,7 +189,8 @@ inline bool JsonBinder::IsDefaultType()
     {
         return true;
     }
-    else if constexpr (std::is_same_v<T, std::list<int32_t>> ||
+    else if constexpr (std::is_same_v<T, std::list<bool>> ||
+                       std::is_same_v<T, std::list<int32_t>> ||
                        std::is_same_v<T, std::list<uint32_t> > ||
                        std::is_same_v<T, std::list<float>> ||
                        std::is_same_v<T, std::list<Vector2>> ||
