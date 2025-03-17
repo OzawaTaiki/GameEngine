@@ -408,7 +408,6 @@
     <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp">
       <Filter>Features\Animation\Sequence</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp" />
     <ClCompile Include="Debug\ImguITools.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
@@ -423,6 +422,9 @@
     </ClCompile>
     <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
       <Filter>Features\Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp">
+      <Filter>Features\Animation\Sequence</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -729,7 +731,6 @@
       <Filter>Features\Scene\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h">
-    <ClInclude Include="Features\Animation\Sequence\AnimationSequence .h">
       <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h">
