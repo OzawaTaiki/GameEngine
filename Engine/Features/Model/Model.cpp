@@ -30,16 +30,16 @@ void Model::Update(float _deltaTime)
         // アニメーションが終わったらアニメーションを解除
         if (!currentAnimation_->IsPlaying())
         {
-            preAnimation_ = currentAnimation_;
-            currentAnimation_ = nullptr;
+            preAnimation_ = currentAnimation_.get();
         }
     }
     skeleton_.Update();
     skinCluster_.Update(skeleton_.GetJoints());
 
-    for (auto& material : material_)
-    {
-    }
+    if (skinningCS_)
+        skinningCS_->Execute();
+
+
 }
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
@@ -64,7 +64,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4, _textureHandle);
         // ライトたち
-    LightingSystem::GetInstance()->QueueCommand(commandList, 5);
+        QueueLightCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -92,7 +92,7 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
         // テクスチャ
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(commandList, 4);
         // ライトたち
-        LightingSystem::GetInstance()->QueueCommand(commandList, 5);
+        QueueLightCommand(commandList, 5);
 
         commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
@@ -119,12 +119,16 @@ Model* Model::CreateFromObj(const std::string& _filePath)
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
+
+    model->currentAnimation_ = std::make_unique<ModelAnimation>();
+    model->currentAnimation_->Initialize();
+
     return model;
 }
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
 {
-    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
+    QueueLightCommand(_commandList, 5);
 
     for (auto& mesh : mesh_)
     {
@@ -144,7 +148,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _a
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, bool _animation) const
 {
-    LightingSystem::GetInstance()->QueueCommand(_commandList, 5);
+    QueueLightCommand(_commandList, 5);
 
 
     for (auto& mesh : mesh_)
@@ -157,6 +161,22 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     }
 }
 
+void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
+{
+    QueueLightCommand(_commandList, 3);
+    for (auto& mesh : mesh_)
+    {
+        mesh->QueueCommand(_commandList);
+        _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+    }
+
+}
+
+void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _index) const
+{
+    LightingSystem::GetInstance()->QueueCommand(_commandList, _index);
+}
+
 void Model::SetAnimation(const std::string& _name,bool _loop)
 {
     if (animation_.find(_name) == animation_.end())
@@ -164,10 +184,24 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
         assert(false && "アニメーションが見つかりません");
         return;
     }
-    currentAnimation_ = animation_[_name].get();
+    currentAnimation_->SetAnimation(animation_[_name]->GetAnimation());
+    //currentAnimation_ = animation_[_name].get();
     currentAnimation_->SetLoop(_loop);
     currentAnimation_->Reset();
-    
+
+}
+
+void Model::ChangeAnimation(const std::string& _name,float _blendTime, bool _loop)
+{
+    if (animation_.find(_name) == animation_.end())
+    {
+        assert(false && "アニメーションが見つかりません");
+        return;
+    }
+    currentAnimation_->ChangeAnimation(animation_[_name]->GetAnimation(), _blendTime);
+    //currentAnimation_ = animation_[_name].get();
+    currentAnimation_->SetLoop(_loop);
+    currentAnimation_->Reset();
 }
 
 void Model::ToIdle(float _timeToIdle)
@@ -178,7 +212,7 @@ void Model::ToIdle(float _timeToIdle)
     }
     else if(preAnimation_)
     {
-        currentAnimation_ = preAnimation_;
+        //currentAnimation_ = preAnimation_;
         currentAnimation_->ToIdle(_timeToIdle);
     }
 }
@@ -242,8 +276,18 @@ void Model::LoadFile(const std::string& _filepath)
 
     skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
 
+    if (scene->HasAnimations())
+    {
+        mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
 
-    TransferData();
+        skinningCS_ = std::make_unique<SkinningCS>();
+        skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
+        skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
+
+    }
+
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::string str = std::to_string(duration);
@@ -260,32 +304,31 @@ void Model::LoadMesh(const aiScene* _scene)
         assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
         assert(mesh->HasTextureCoords(0));				    // TexcoordがないMeshは今回は非対応
         std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
-        pMesh->Initialize();
+        std::vector<VertexData> vertices;
+        std::vector<uint32_t> indices;
 
         Vector3 min = { 16536 };
         Vector3 max = { -16536 };
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
         {
-            Mesh::VertexData vertex = {};
+            VertexData vertex = {};
             vertex.position = { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, -mesh->mVertices[vertexIndex].z, 1.0f };
             vertex.normal = { mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, -mesh->mNormals[vertexIndex].z };
             vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
 
-            pMesh->vertices_.push_back(vertex);
+            vertices.push_back(vertex);
 
             min = Vector3::Min(min, vertex.position.xyz());
             max = Vector3::Max(max, vertex.position.xyz());
         }
 
-        pMesh->SetMin(min);
-        pMesh->SetMax(max);
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace& face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices == 3); // 三角形のみサポート
             for (uint32_t index = 0; index < face.mNumIndices; ++index)
             {
-                pMesh->indices_.push_back(face.mIndices[index]);
+                indices.push_back(face.mIndices[index]);
             }
         }
 
@@ -294,11 +337,15 @@ void Model::LoadMesh(const aiScene* _scene)
             skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
         }
 
+        pMesh->Initialize(vertices, indices);
+        pMesh->SetMin(min);
+        pMesh->SetMax(max);
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);
         pMesh->TransferData();
 
-
         mesh_.push_back(std::move(pMesh));
+
+
     }
 }
 
@@ -339,6 +386,8 @@ void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath)
     if (_scene->mNumAnimations == 0)
         return;
 
+    //todo コンストラクタで初期化
+    // 基本スキンクラスターでもってるからそこに持たせたほうがいいのかも？
 
     for (uint32_t animationIndex = 0; animationIndex < _scene->mNumAnimations; ++animationIndex)
     {
@@ -378,9 +427,4 @@ void Model::CreateSkinCluster(const aiMesh* _mesh)
         {
         }
     }
-}
-
-
-void Model::TransferData()
-{
 }

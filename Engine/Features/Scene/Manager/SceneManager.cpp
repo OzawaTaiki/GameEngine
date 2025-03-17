@@ -65,6 +65,11 @@ void SceneManager::Draw()
     }
 }
 
+void SceneManager::DrawShadow()
+{
+    currentScene_->DrawShadow();
+}
+
 void SceneManager::SetTransition(std::unique_ptr<ISceneTransition> _transition)
 {
     if (_transition != nullptr)

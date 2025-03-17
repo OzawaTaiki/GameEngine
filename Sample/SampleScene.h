@@ -28,6 +28,7 @@ public:
     void Initialize() override;
     void Update() override;
     void Draw() override;
+    void DrawShadow() override;
 
 private:
     // シーン関連
@@ -41,9 +42,11 @@ private:
     Input* input_ = nullptr;
     ParticleManager* particleManager_ = nullptr;
 
-    std::unique_ptr<AnimationModel> aModel_ = nullptr;
+    std::unique_ptr<ObjectModel> aModel_ = nullptr;
 
     std::unique_ptr<ObjectModel> oModel_= nullptr;
+    std::unique_ptr<ObjectModel> oModel2_= nullptr;
+    std::unique_ptr<ObjectModel> plane_ = nullptr;
 
     Sprite* sprite_ = nullptr;
 

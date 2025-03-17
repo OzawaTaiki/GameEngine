@@ -28,17 +28,17 @@ void ModelManager::Initialize()
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_[0] = rootSignature.value();
 
-    /// PSOを取得
-    pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[1]);
-    // PSOが生成されているか確認
-    assert(pso.has_value() && pso != nullptr);
-    graphicsPipelineState_ [1] = pso.value();
+    ///// PSOを取得
+    //pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[1]);
+    //// PSOが生成されているか確認
+    //assert(pso.has_value() && pso != nullptr);
+    //graphicsPipelineState_ [1] = pso.value();
 
-    /// RootSingnatureを取得
-    rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[1]);
-    // 生成されているか確認
-    assert(rootSignature.has_value() && rootSignature != nullptr);
-    rootSignature_[1] = rootSignature.value();
+    ///// RootSingnatureを取得
+    //rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[1]);
+    //// 生成されているか確認
+    //assert(rootSignature.has_value() && rootSignature != nullptr);
+    //rootSignature_[1] = rootSignature.value();
 
 }
 
@@ -48,6 +48,8 @@ void ModelManager::PreDrawForObjectModel() const
 
     commandList->SetGraphicsRootSignature(rootSignature_[0]);
     commandList->SetPipelineState(graphicsPipelineState_[0]);
+
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void ModelManager::PreDrawForAnimationModel() const
@@ -56,6 +58,8 @@ void ModelManager::PreDrawForAnimationModel() const
 
     commandList->SetGraphicsRootSignature(rootSignature_[1]);
     commandList->SetPipelineState(graphicsPipelineState_[1]);
+
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 Model* ModelManager::FindSameModel(const std::string& _name)

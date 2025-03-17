@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    std::vector<Mesh::VertexData> vertices_;
+    std::vector<VertexData> vertices_;
     std::vector<uint32_t> indices_;
 };
 

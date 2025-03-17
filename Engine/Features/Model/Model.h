@@ -8,6 +8,7 @@
 #include <Features/Model/Mesh/Mesh.h>
 #include <Features/Model/Animation/ModelAnimation.h>
 #include <Features/Model/Animation/Node/Node.h>
+#include <Features/Model/Animation/SkinningCS.h>
 #include <Features/Model/Animation/Skeleton/Skeleton.h>
 #include <Features/Model/Animation/SkinCluster/SkinCluster.h>
 #include <Features/Light/System/LightingSystem.h>
@@ -40,8 +41,13 @@ public:
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;
 
+    void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const;
+
+    void QueueLightCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index) const;
+
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }
     void SetAnimation(const std::string& _name, bool _loop = false);
+    void ChangeAnimation(const std::string& _name, float _blendTime, bool _loop = false);
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
 
@@ -69,11 +75,14 @@ private:
     std::vector<std::unique_ptr<Mesh>> mesh_ = {};
     std::vector<std::unique_ptr<Material>> material_ = {};
     std::map<std::string,std::unique_ptr<ModelAnimation>> animation_ = {};
-    ModelAnimation* currentAnimation_ = nullptr;
+    std::unique_ptr<ModelAnimation> currentAnimation_ = nullptr;
     ModelAnimation* preAnimation_= nullptr;
     Node node_ = {};
     Skeleton skeleton_ = {};
     SkinCluster skinCluster_ = {};
+
+    std::unique_ptr<SkinningCS> skinningCS_ = nullptr;
+
 
 
     std::unique_ptr<LightGroup> lightGroup_ = nullptr;
@@ -86,6 +95,5 @@ private:
     void CreateSkeleton();
     void CreateSkinCluster(const aiMesh* _mesh);
 
-    void TransferData();
 
 };

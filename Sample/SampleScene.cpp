@@ -28,11 +28,19 @@ void SampleScene::Initialize()
     input_ = Input::GetInstance();
 
     oModel_ = std::make_unique<ObjectModel>("plane");
-    oModel_->Initialize("Plane/Plane.gltf");
+    oModel_->Initialize("bunny.gltf");
     oModel_->translate_.x = 3;
 
-    aModel_ = std::make_unique<AnimationModel>("sample");
+    oModel2_ = std::make_unique<ObjectModel>("cube");
+    oModel2_->Initialize("Cube/Cube.obj");
+    oModel2_->translate_.x = -3;
+
+    aModel_ = std::make_unique<ObjectModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
+
+    plane_ = std::make_unique<ObjectModel>("plane2");
+    plane_->Initialize("Tile/Tile.gltf");
+    plane_->GetUVTransform().SetScale({ 100,100 });
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
     sprite_ = Sprite::Create("uvChecker", textureHandle);
@@ -59,6 +67,16 @@ void SampleScene::Update()
         Input::GetInstance()->IsKeyPressed(DIK_RSHIFT))
         enableDebugCamera_ = !enableDebugCamera_;
 
+    if (ImGui::Button("rot"))
+    {
+        aModel_->ChangeAnimation("RotateAnim", 0.5f,true);
+    }
+
+    if (ImGui::Button("scale"))
+    {
+        aModel_->ChangeAnimation("ScaleAnim", 0.5f);
+    }
+
     ImGuiTool::TimeLine("TimeLine", sequence_.get());
     ImGuiTool::GradientEditor("GradientEditor", colors);
 
@@ -75,7 +93,9 @@ void SampleScene::Update()
         oModel_->translate_ = sequence_->GetValue<Vector3>("a");
 
     oModel_->Update();
+    oModel2_->Update();
     aModel_->Update();
+    plane_->Update();
     sprite_->Update();
 
     if (input_->IsKeyTriggered(DIK_TAB))
@@ -101,8 +121,11 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
+    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
+    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
@@ -114,6 +137,20 @@ void SampleScene::Draw()
 
     ParticleManager::GetInstance()->Draw(&SceneCamera_);
 
+}
+
+void SampleScene::DrawShadow()
+{
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
+
+    oModel_->DrawShadow(&SceneCamera_, 0);
+    oModel2_->DrawShadow(&SceneCamera_, 1);
+    aModel_->DrawShadow(&SceneCamera_, 2);
+
+    // depthtextureとrendertextreuからIDを指定して影の輪郭を取得
+    // https://claude.ai/chat/01808d8d-c6f8-49d8-a17b-bd4981ce2684
+    // その陰からメッシュを作成して高さを与えて描画
 }
 
 #ifdef _DEBUG

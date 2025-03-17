@@ -11,29 +11,31 @@
 #include <string>
 #include <functional>
 
+
+struct VertexData
+{
+    Vector4 position;
+    Vector2 texcoord;
+    Vector3 normal;
+
+    bool operator==(const VertexData& _obj) const {
+        return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;
+    }
+};
+
 struct VertexInfluenceData;
 class DXCommon;
 class Mesh
 {
 public:
 
-    struct VertexData
-    {
-        Vector4 position;
-        Vector2 texcoord;
-        Vector3 normal;
 
-        bool operator==(const VertexData& _obj) const {
-            return position == _obj.position && texcoord == _obj.texcoord && normal == _obj.normal;
-        }
-    };
-
-    void Initialize();
     void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i);
+    void SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource);
     //void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/models/");
 
     void TransferData();
-    void QueueCommand(ID3D12GraphicsCommandList* _commandList)const;
+    void QueueCommand(ID3D12GraphicsCommandList* _commandList) const;
     void QueueCommand(ID3D12GraphicsCommandList* _commandList, const D3D12_VERTEX_BUFFER_VIEW& _vbv)const;
 
     uint32_t GetIndexNum() const { return static_cast<uint32_t>(indices_.size()); }
@@ -41,6 +43,12 @@ public:
 
     D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
     D3D12_INDEX_BUFFER_VIEW* GetIndexBufferView() { return &indexBufferView_; }
+
+    VertexData* GetVertexData() { return vConstMap_; }
+
+    ID3D12Resource* GetVertexResource() { return vertexResource_.Get(); }
+    ID3D12Resource* GetOutputVertexResource() { return outPutVertexResource_.Get(); }
+
 
     uint32_t GetUseMaterialIndex() const { return useMaterialIndex_; }
     void SetUseMaterialIndex(uint32_t _index) { useMaterialIndex_ = _index; }
@@ -60,8 +68,10 @@ private:
     std::string                                 name_                   = {};
 
     VertexData*                                 vConstMap_              = nullptr;              // map用
-    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_        = nullptr;
-    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_        = {};
+    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_         = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource>      outPutVertexResource_   = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_       = {};
+
 
     uint32_t*                                   iConstMap_              = nullptr;              // map用
     Microsoft::WRL::ComPtr<ID3D12Resource>      indexResource_         = nullptr;

@@ -18,6 +18,11 @@ void LightingSystem::Initialize()
 
 void LightingSystem::QueueCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index)
 {
+    if (lightGroup_)
+        *lightData_ = lightGroup_->GetLightData();
+    else
+        *lightData_ = LightGroup::GetDefaultLightData();
+
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
     commandList->SetGraphicsRootConstantBufferView(_index, lightBuffer_->GetGPUVirtualAddress());

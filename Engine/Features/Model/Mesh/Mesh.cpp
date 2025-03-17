@@ -12,8 +12,8 @@
 #include <assimp/postprocess.h>
 
 template <>
-struct std::hash<Mesh::VertexData> {
-    size_t operator()(const Mesh::VertexData& v) const {
+struct std::hash<VertexData> {
+    size_t operator()(const VertexData& v) const {
         size_t h1 = std::hash<Vector4>{}(v.position);
         size_t h2 = std::hash<Vector2>{}(v.texcoord);
         size_t h3 = std::hash<Vector3>{}(v.normal);
@@ -21,30 +21,35 @@ struct std::hash<Mesh::VertexData> {
     }
 };
 
-void Mesh::Initialize()
-{
-    dxCommon = DXCommon::GetInstance();
-    vertices_.clear();
-    indices_.clear();
-}
 
 void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i)
 {
     dxCommon = DXCommon::GetInstance();
     vertices_ = _v;
     indices_ = _i;
+    InitializeReources();
     TransferData();
+
+}
+
+void Mesh::SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource)
+{
+    outPutVertexResource_ = _resource;
+
+    vertexBufferView_.BufferLocation = outPutVertexResource_->GetGPUVirtualAddress();
 }
 
 void Mesh::TransferData()
 {
-    InitializeReources();
     std::memcpy(vConstMap_, vertices_.data(), sizeof(VertexData) * vertices_.size());
     std::memcpy(iConstMap_, indices_.data(), sizeof(uint32_t) * indices_.size());
+
 }
 
 void Mesh::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
 {
+    //*vOut_ = *vConstMap_;
+
     _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
     _commandList->IASetIndexBuffer(&indexBufferView_);
@@ -84,6 +89,4 @@ void Mesh::Map()
 {
     vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
     indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iConstMap_));
-
-
 };

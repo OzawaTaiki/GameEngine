@@ -35,6 +35,12 @@ void Framework::Initialize()
     srvManager_ = SRVManager::GetInstance();
     srvManager_->Initialize();
 
+
+
+    rtvManager_ = RTVManager::GetInstance();
+    rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+
+
     PSOManager::GetInstance()->Initialize();
 
     LightingSystem::GetInstance()->Initialize();
@@ -94,7 +100,6 @@ void Framework::Update()
 
 void Framework::PreDraw()
 {
-    dxCommon_->PreDraw();
     srvManager_->PreDraw();
 }
 

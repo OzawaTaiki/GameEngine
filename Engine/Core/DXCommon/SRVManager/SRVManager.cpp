@@ -71,3 +71,29 @@ void SRVManager::CreateSRVForStructureBuffer(uint32_t _index, ID3D12Resource* _r
     dxcommon_->GetDevice()->CreateShaderResourceView(_resource, &srvDesc, GetCPUSRVDescriptorHandle(_index));
 
 }
+
+void SRVManager::CreateSRVForRenderTexture(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format)
+{
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = _format;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    dxcommon_->GetDevice()->CreateShaderResourceView(_resource, &srvDesc, GetCPUSRVDescriptorHandle(_index));
+}
+
+void SRVManager::CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize)
+{
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+    uavDesc.Buffer.FirstElement = 0;
+    uavDesc.Buffer.NumElements = _elementNum;
+    uavDesc.Buffer.CounterOffsetInBytes = 0;
+    uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    uavDesc.Buffer.StructureByteStride = _elementSize;
+
+    dxcommon_->GetDevice()->CreateUnorderedAccessView(_resource, nullptr, &uavDesc, GetCPUSRVDescriptorHandle(_index));
+}
+

@@ -56,9 +56,9 @@ void Ring::Generate()
     for (int32_t index = 0; index <= divide_; ++index)
     {
         // 外側の頂点
-        Mesh::VertexData outerVertex;
+        VertexData outerVertex;
         // 内側の頂点
-        Mesh::VertexData innerVertex;
+        VertexData innerVertex;
 
         float angle = kDivideAngle * static_cast<float>(index);
 

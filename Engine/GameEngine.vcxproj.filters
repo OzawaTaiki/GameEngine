@@ -187,6 +187,9 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{5a86c1ea-ecf1-4be9-bddc-a3ce876dd994}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\DXCommon\RTV">
+      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Features\Animation">
       <UniqueIdentifier>{fc8c535f-f4d7-4570-9f9e-79de5a290788}</UniqueIdentifier>
     </Filter>
@@ -412,6 +415,15 @@
     <ClCompile Include="Debug\ImGuiHelper.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
+      <Filter>Features\Model\Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -441,6 +453,18 @@
     <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.PS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.VS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\ShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -454,6 +478,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Sample\Resources\Shader\FullScreen.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -702,10 +729,23 @@
       <Filter>Features\Scene\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h">
+    <ClInclude Include="Features\Animation\Sequence\AnimationSequence .h">
       <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h">
       <Filter>Features\Animation\Sequence</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
+      <Filter>Features\Scene\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\RTV\RTVManager.h">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
+      <Filter>Core\DXCommon\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Animation\SkinningCS.h">
+      <Filter>Features\Model\Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

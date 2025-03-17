@@ -22,6 +22,7 @@ public:
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
 
     void SetAnimation(const std::string& _name, bool _isLoop = false);
+    void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
     void StopAnimation() { model_->StopAnimation(); }
     void ToIdle(float _timeToIdle) { model_->ToIdle(_timeToIdle); }
     bool IsAnimationEnd() { return model_->IsAllAnimationEnd(); }

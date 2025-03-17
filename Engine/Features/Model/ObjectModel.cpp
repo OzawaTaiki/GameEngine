@@ -4,6 +4,8 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImGuiDebugManager.h>
+#include <Core/DXCommon/RTV/RTVManager.h>
+
 
 
 ObjectModel::ObjectModel(const std::string& _name)
@@ -24,25 +26,30 @@ void ObjectModel::Initialize(const std::string& _filePath)
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
 
+    gameTime_ = GameTime::GetInstance();
+
 }
 
 void ObjectModel::Update()
 {
+    model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+
+
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
         worldTransform_.quaternion_ = quaternion_;
     else
         worldTransform_.rotate_ = euler_;
-    worldTransform_.UpdateData();
+    worldTransform_.UpdateData(useQuaternion_);
 }
 
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 {
     objectColor_->SetColor(_color);
 
-    ModelManager::GetInstance()->PreDrawForObjectModel();
 
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
@@ -55,22 +62,43 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 {
     objectColor_->SetColor(_color);
 
-    ModelManager::GetInstance()->PreDrawForObjectModel();
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
 }
 
+void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
+{
+    model_->SetAnimation(_name, _isLoop);
+}
+
+void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop)
+{
+    model_->ChangeAnimation(_name, _blendTime, _isLoop);
+}
+
+void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
+{
+    if (idForGPU == nullptr)
+        CreateIDResource();
+
+    *idForGPU = _id;
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+    model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+
+}
+
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromObj(_filePath);
-}
-
-void ObjectModel::UpdateUVTransform()
-{
 }
 
 void ObjectModel::ImGui()
@@ -89,4 +117,11 @@ void ObjectModel::ImGui()
     ImGui::PopID();
 
 #endif // _DEBUG
+}
+
+void ObjectModel::CreateIDResource()
+{
+    idResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t));
+
+    idResource_->Map(0, nullptr, (void**)&idForGPU);
 }
