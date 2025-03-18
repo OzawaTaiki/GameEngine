@@ -105,8 +105,8 @@ public:
 
         std::array<SpotLight, MAX_SPOT_LIGHT> spotLights;
 
-        uint32_t numPointLight;
-        uint32_t numSpotLight;
+        uint32_t numPointLight = 0;
+        uint32_t numSpotLight = 0;
         uint32_t pad[2];
     };
 

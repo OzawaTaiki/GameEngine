@@ -10,16 +10,15 @@ SpriteManager* SpriteManager::GetInstance()
 
 void SpriteManager::Initialize()
 {
-    psoFlags_ = PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
 
     /// PSOを取得
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_);
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
     graphicsPipelineState_ = pso.value();
 
     /// RootSingnatureを取得
-    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_);
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back);
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_ = rootSignature.value();

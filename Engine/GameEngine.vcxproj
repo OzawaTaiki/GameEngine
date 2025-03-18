@@ -147,6 +147,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
     <ClCompile Include="Debug\ImGuiManager.cpp" />
     <ClCompile Include="Debug\ImguITools.cpp" />
+    <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp" />
+    <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp" />
     <ClCompile Include="Features\Camera\Camera\Camera.cpp" />
     <ClCompile Include="Features\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Features\Collision\Collider\Collider.cpp" />
@@ -226,6 +228,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Debug\ImGuiHelper.h" />
     <ClInclude Include="Debug\ImGuiManager.h" />
     <ClInclude Include="Debug\ImguITools.h" />
+    <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h" />
+    <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h" />
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
     <ClInclude Include="Features\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Features\Collision\Collider\Collider.h" />

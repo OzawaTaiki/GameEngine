@@ -33,8 +33,7 @@ bool UIButton::IsPressed() const
 
 bool UIButton::IsPressed(PadButton _button) const
 {
-    // TODO:
-    // ボタンが選択されているか
+    // TODO: ボタンが選択されているか
 
     if (Input::GetInstance()->IsPadTriggered(_button))
     {

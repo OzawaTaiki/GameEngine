@@ -54,6 +54,10 @@ void SampleScene::Initialize()
     colors.push_back({ 0.1f,Vector4(0,1,0,1) });
     colors.push_back({ 0.532f,Vector4(0,1,0,1) });
     colors.push_back({ 0.12f,Vector4(1,1,0,1) });
+
+    sequence_ = std::make_unique<AnimationSequence>("test");
+    sequence_->Initialize("Resources/Data/");
+
 }
 
 void SampleScene::Update()
@@ -74,9 +78,20 @@ void SampleScene::Update()
         aModel_->ChangeAnimation("ScaleAnim", 0.5f);
     }
 
-    ImGuiTool::GradientEditor("Ambient", colors);
+    ImGuiTool::TimeLine("TimeLine", sequence_.get());
+    ImGuiTool::GradientEditor("GradientEditor", colors);
 
     lights_->DrawDebugWindow();
+
+    static bool play = false;
+    if (ImGui::Button("Play"))
+    {
+        //play = !play;
+        sequence_->Save();
+    }
+    if (play)
+        oModel_->translate_ = sequence_->GetValue<Vector3>("a");
+
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
