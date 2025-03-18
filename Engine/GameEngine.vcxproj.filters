@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{D0F66E73-3CD4-4176-95D7-CCCC087662C914C8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{BFD5512E-9E82-428A-999C-CCCCE9EF73248938}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{F79B66BE-AD1B-4513-B410-CCCC6EADCC295BA6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{6EF3D10F-8DD7-466E-9AD9-CCCCFEC70535402F}</UniqueIdentifier>
     </Filter>
@@ -744,9 +735,6 @@
     </ClInclude>
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h">
       <Filter>Features\Animation\Sequence</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Scene\Interface\ISceneTransition.h">
-      <Filter>Features\Scene\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RTVManager.h">
       <Filter>Core\DXCommon\RTV</Filter>
