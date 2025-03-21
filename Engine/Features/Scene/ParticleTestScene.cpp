@@ -33,6 +33,12 @@ void ParticleTestScene::Initialize()
     lineDrawer_->Initialize();
     lineDrawer_->SetCameraPtr(&SceneCamera_);
 
+    lights_ = std::make_unique<LightGroup>();
+    lights_->Initialize();
+
+    LightingSystem::GetInstance()->SetLightGroup(lights_.get());
+
+
 }
 
 void ParticleTestScene::Update()
@@ -75,8 +81,6 @@ void ParticleTestScene::Draw()
 {
     ModelManager::GetInstance()->PreDrawForObjectModel();
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
-
-    ModelManager::GetInstance()->PreDrawForAnimationModel();
 
     Sprite::PreDraw();
 

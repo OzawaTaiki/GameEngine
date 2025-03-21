@@ -12,21 +12,20 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Initialize()
 {
-    psoFlags_[0] = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
-    psoFlags_[1] = PSOFlags::Type_AnimationModel | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
+    psoFlags_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
 
 
     /// PSOを取得
-    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[0]);
+    auto pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_);
     // PSOが生成されているか確認
     assert(pso.has_value() && pso != nullptr);
-    graphicsPipelineState_[0] = pso.value();
+    graphicsPipelineState_ = pso.value();
 
     /// RootSingnatureを取得
-    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[0]);
+    auto rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_);
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
-    rootSignature_[0] = rootSignature.value();
+    rootSignature_ = rootSignature.value();
 
     ///// PSOを取得
     //pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[1]);
@@ -46,18 +45,8 @@ void ModelManager::PreDrawForObjectModel() const
 {
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
-    commandList->SetGraphicsRootSignature(rootSignature_[0]);
-    commandList->SetPipelineState(graphicsPipelineState_[0]);
-
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void ModelManager::PreDrawForAnimationModel() const
-{
-    auto commandList = DXCommon::GetInstance()->GetCommandList();
-
-    commandList->SetGraphicsRootSignature(rootSignature_[1]);
-    commandList->SetPipelineState(graphicsPipelineState_[1]);
+    commandList->SetGraphicsRootSignature(rootSignature_);
+    commandList->SetPipelineState(graphicsPipelineState_);
 
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

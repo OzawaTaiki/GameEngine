@@ -285,9 +285,6 @@
     <ClCompile Include="Features\Model\Animation\SkinCluster\SkinCluster.cpp">
       <Filter>Features\Model\Animation\SkinCluster</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Model\AnimationModel.cpp">
-      <Filter>Features\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Model\Color\ObjectColor.cpp">
       <Filter>Features\Model\Color</Filter>
     </ClCompile>
@@ -585,9 +582,6 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\SkinCluster\SkinCluster.h">
       <Filter>Features\Model\Animation\SkinCluster</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Model\AnimationModel.h">
-      <Filter>Features\Model</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Color\ObjectColor.h">
       <Filter>Features\Model\Color</Filter>
