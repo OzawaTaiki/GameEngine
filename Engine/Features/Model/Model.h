@@ -34,8 +34,6 @@ public:
 
     void DrawSkeleton(const Matrix4x4& _wMat);
 
-    void ShowImGui(const std::string& _name);
-
     static Model* CreateFromFile(const std::string& _filePath);
     static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
 

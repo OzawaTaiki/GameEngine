@@ -103,10 +103,6 @@ void Model::DrawSkeleton(const Matrix4x4& _wMat)
     skeleton_.Draw(_wMat);
 }
 
-void Model::ShowImGui(const std::string& _name)
-{
-
-}
 
 Model* Model::CreateFromFile(const std::string& _filePath)
 {
