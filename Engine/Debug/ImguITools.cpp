@@ -12,6 +12,8 @@
 #include <list>
 #include <algorithm>
 
+#ifdef _DEBUG
+
 
 void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Vector4>>& _colors)
 {
@@ -865,3 +867,4 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 }
 
 
+#endif // _DEBUG

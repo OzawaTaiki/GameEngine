@@ -262,6 +262,7 @@ void SequenceEvent::MarkForDelete()
 
 void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
 {
+#ifdef _DEBUG
     static float speed = 1.0f;
     std::visit([](auto&& arg) {
         using T = std::decay_t<decltype(arg)>;
@@ -292,6 +293,7 @@ void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
             throw std::runtime_error("Invalid type");
         }
         }, _keyFrame.value);
+#endif // _DEBUG
 }
 
 SequenceEvent::UseType SequenceEvent::CheckType(ParameterValue _value)
