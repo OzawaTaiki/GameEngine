@@ -19,7 +19,6 @@ public:
 
     void Initialize();
     void PreDraw();
-    Sprite* Create(const std::string& _name);
 
 private:
 

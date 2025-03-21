@@ -38,7 +38,7 @@ public:
 
 
 protected:
-    Sprite* sprite_ = nullptr;
+    std::unique_ptr <Sprite> sprite_ = nullptr;
 
     Vector2 position_ = { 0,0 };
     Vector2 size_ = { 0,0 };

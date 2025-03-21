@@ -130,19 +130,17 @@ std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::fun
     {
         auto it = debugWindows_.find(name);
 
-        while (it != debugWindows_.end());
+        while (debugWindows_.find(name) != debugWindows_.end())
         {
-            if (it->first == name)
-                count++;
-
+            name = name + std::to_string(count);
             it++;
         }
-        name = name + std::to_string(count);
     }
 
 
     debugWindows_[name] = _func;
-    isSelect_.push_back(false);
+    if(isSelect_.size()<debugWindows_.size())
+        isSelect_.push_back(false);
 
     return name;
 }

@@ -33,9 +33,3 @@ void SpriteManager::PreDraw()
     commandList->SetGraphicsRootSignature(rootSignature_);
     commandList->SetPipelineState(graphicsPipelineState_);
 }
-
-Sprite* SpriteManager::Create(const std::string& _name)
-{
-    sprites_.push_back(std::make_unique<Sprite>(_name));
-    return sprites_.back().get();
-}
