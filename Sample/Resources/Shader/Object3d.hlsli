@@ -47,11 +47,11 @@ struct SpotLight
 };
 static const int MAX_POINT_LIGHT = 32;
 static const int MAX_SPOT_LIGHT = 16;
-struct LightGroup
+cbuffer gLightGroup : register(b3)
 {
     DirectionalLight DL;
     PointLight PL[MAX_POINT_LIGHT];
     SpotLight SL[MAX_SPOT_LIGHT];
     int numPointLight;
     int numSpotLight;
-};
+}

@@ -1,5 +1,5 @@
 #include "Resources/Shader/Object3d.hlsli"
-#include "Object3d.hlsli"
+//#include "Object3d.hlsli"
 
 
 cbuffer gMaterial : register(b1)
@@ -19,10 +19,6 @@ cbuffer gColor : register(b2)
     float4 materialColor;
 }
 
-cbuffer gLightGroup : register(b3)
-{
-    LightGroup lightGroup;
-}
 
 struct PixelShaderOutput
 {
@@ -98,8 +94,6 @@ PixelShaderOutput main(VertexShaderOutput _input)
 
 float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
 {
-    DirectionalLight DL = lightGroup.DL;
-
     if (DL.intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
 
@@ -177,9 +171,9 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
 float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
 {
     float3 lighting = float3(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < lightGroup.numPointLight; i++)
+    for (int i = 0; i < numPointLight; i++)
     {
-        lighting += CalculatePointLighting(_input, lightGroup.PL[i], _toEye, _textureColor);;
+        lighting += CalculatePointLighting(_input, PL[i], _toEye, _textureColor);;
     }
     return lighting;
 }
@@ -187,9 +181,9 @@ float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float
 float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
 {
     float3 lighting = float3(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < lightGroup.numSpotLight; i++)
+    for (int i = 0; i < numSpotLight; i++)
     {
-        lighting += CalculateSpotLighting(_input, lightGroup.SL[i], _toEye, _textureColor);
+        lighting += CalculateSpotLighting(_input, SL[i], _toEye, _textureColor);
     }
     return lighting;
 }

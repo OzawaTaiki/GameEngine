@@ -26,20 +26,7 @@ void ModelManager::Initialize()
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_ = rootSignature.value();
-
-    ///// PSOを取得
-    //pso = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags_[1]);
-    //// PSOが生成されているか確認
-    //assert(pso.has_value() && pso != nullptr);
-    //graphicsPipelineState_ [1] = pso.value();
-
-    ///// RootSingnatureを取得
-    //rootSignature = PSOManager::GetInstance()->GetRootSignature(psoFlags_[1]);
-    //// 生成されているか確認
-    //assert(rootSignature.has_value() && rootSignature != nullptr);
-    //rootSignature_[1] = rootSignature.value();
-
-}
+ }
 
 void ModelManager::PreDrawForObjectModel() const
 {

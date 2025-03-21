@@ -48,7 +48,7 @@ private:
     std::unique_ptr<ObjectModel> oModel2_= nullptr;
     std::unique_ptr<ObjectModel> plane_ = nullptr;
 
-    Sprite* sprite_ = nullptr;
+    std::unique_ptr <Sprite> sprite_ = nullptr;
 
     std::unique_ptr<LightGroup> lights_;
     std::list<std::pair<float, Vector4>> colors;

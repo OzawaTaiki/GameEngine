@@ -7,6 +7,8 @@
 #include <list>
 #include <DirectXTex.h>
 
+#ifdef _DEBUG
+
 class AnimationSequence;
 
 namespace ImGuiTool
@@ -42,3 +44,5 @@ namespace ImGuiTool
 
     void TimeLine(const char* _label, AnimationSequence* _sequence);
 }
+
+#endif // _DEBUG
