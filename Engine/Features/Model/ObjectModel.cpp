@@ -47,7 +47,7 @@ void ObjectModel::Update()
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
-        worldTransform_.quaternion_ = quaternion_;
+        worldTransform_.quaternion_ = quaternion_.Normalize();
     else
         worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData(useQuaternion_);
@@ -123,6 +123,12 @@ void ObjectModel::ImGui()
         ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
 
     ImGui::Checkbox("UseQuaternion", &useQuaternion_);
+
+    ImGui::InputText("use Model", filePathBuffer_, 128);
+    if (ImGui::Button("SetModel"))
+    {
+        SetModel(filePathBuffer_);
+    }
     ImGui::PopID();
 
 #endif // _DEBUG

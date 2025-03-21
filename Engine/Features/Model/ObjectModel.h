@@ -62,6 +62,8 @@ private:
     uint32_t* idForGPU = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> idResource_ = nullptr;
 
+    char filePathBuffer_[128];
+
     void CreateIDResource();
 
 };
