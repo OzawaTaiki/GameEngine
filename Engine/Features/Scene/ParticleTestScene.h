@@ -59,6 +59,8 @@ private:
 
     std::unique_ptr<ObjectModel> plane_ = nullptr;
 
+    std::unique_ptr<LightGroup> lights_;
+
     //ConfigManager* pConfigManager_ = nullptr;
 
 

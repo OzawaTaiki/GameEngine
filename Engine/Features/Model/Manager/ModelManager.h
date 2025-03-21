@@ -18,7 +18,6 @@ public:
 
     void Initialize();
     void PreDrawForObjectModel() const;
-    void PreDrawForAnimationModel() const;
 
 
     Model* FindSameModel(const std::string& _name);
@@ -27,10 +26,10 @@ private:
 
     std::unordered_map < std::string, std::unique_ptr<Model>> models_ = {};
 
-    std::array <ID3D12RootSignature*, 2> rootSignature_ = {};
-    std::array <ID3D12PipelineState*, 2> graphicsPipelineState_ = {};
+    ID3D12RootSignature* rootSignature_ = {};
+    ID3D12PipelineState* graphicsPipelineState_ = {};
 
-    std::array<PSOFlags, 2> psoFlags_ = {};
+    PSOFlags psoFlags_ = {};
 
 
     ModelManager() = default;
