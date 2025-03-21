@@ -26,6 +26,7 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		return true;
 	}
+
 #endif // _DEBUG
 
 	// メッセージに応じてゲーム固有の処理を行う

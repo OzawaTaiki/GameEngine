@@ -14,6 +14,7 @@ public:
     void Initialize();
 
     void PreDraw();
+    void PreDraw(ID3D12GraphicsCommandList* _commandList);
 
     uint32_t Allocate();
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
@@ -23,6 +24,8 @@ public:
     void CreateSRVForStructureBuffer(uint32_t _index, ID3D12Resource* _resource, UINT _numElement,UINT _structureBufferStride);
     void CreateSRVForRenderTexture(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format);
     void CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize);
+    void CreateUAV(uint32_t _index, ID3D12Resource* _resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC* _desc);
+
 
     ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap_.Get(); }
 

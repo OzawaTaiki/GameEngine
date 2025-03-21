@@ -16,15 +16,22 @@ void LightingSystem::Initialize()
     *lightData_ = LightGroup::GetDefaultLightData();
 }
 
-void LightingSystem::QueueCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index)
+void LightingSystem::QueueGraphicsCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index)
 {
     if (lightGroup_)
         *lightData_ = lightGroup_->GetLightData();
     else
         *lightData_ = LightGroup::GetDefaultLightData();
 
-    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    _commandList->SetGraphicsRootConstantBufferView(_index, lightBuffer_->GetGPUVirtualAddress());
+}
 
-    commandList->SetGraphicsRootConstantBufferView(_index, lightBuffer_->GetGPUVirtualAddress());
+void LightingSystem::QueueComputeCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index)
+{
+    if (lightGroup_)
+        *lightData_ = lightGroup_->GetLightData();
+    else
+        *lightData_ = LightGroup::GetDefaultLightData();
 
+    _commandList->SetComputeRootConstantBufferView(_index, lightBuffer_->GetGPUVirtualAddress());
 }

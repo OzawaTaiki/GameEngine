@@ -20,7 +20,7 @@ ObjectModel::~ObjectModel()
 
 void ObjectModel::Initialize(const std::string& _filePath)
 {
-    model_ = Model::CreateFromObj(_filePath);
+    model_ = Model::CreateFromFile(_filePath);
 
     worldTransform_.Initialize();
     objectColor_ = std::make_unique<ObjectColor>();
@@ -28,6 +28,15 @@ void ObjectModel::Initialize(const std::string& _filePath)
 
     gameTime_ = GameTime::GetInstance();
 
+}
+
+void ObjectModel::Initialize(std::unique_ptr<Mesh>  _mesh)
+{
+    model_ = Model::CreateFromMesh(std::move(_mesh));
+    worldTransform_.Initialize();
+    objectColor_ = std::make_unique<ObjectColor>();
+    objectColor_->Initialize();
+    gameTime_ = GameTime::GetInstance();
 }
 
 void ObjectModel::Update()
@@ -38,7 +47,7 @@ void ObjectModel::Update()
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
-        worldTransform_.quaternion_ = quaternion_;
+        worldTransform_.quaternion_ = quaternion_.Normalize();
     else
         worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData(useQuaternion_);
@@ -98,7 +107,7 @@ void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
 
 void ObjectModel::SetModel(const std::string& _filePath)
 {
-    model_ = Model::CreateFromObj(_filePath);
+    model_ = Model::CreateFromFile(_filePath);
 }
 
 void ObjectModel::ImGui()
@@ -114,6 +123,12 @@ void ObjectModel::ImGui()
         ImGui::DragFloat3("Rotate", &euler_.x, 0.01f);
 
     ImGui::Checkbox("UseQuaternion", &useQuaternion_);
+
+    ImGui::InputText("use Model", filePathBuffer_, 128);
+    if (ImGui::Button("SetModel"))
+    {
+        SetModel(filePathBuffer_);
+    }
     ImGui::PopID();
 
 #endif // _DEBUG

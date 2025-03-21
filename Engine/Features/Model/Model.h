@@ -34,9 +34,8 @@ public:
 
     void DrawSkeleton(const Matrix4x4& _wMat);
 
-    void ShowImGui(const std::string& _name);
-
-    static Model* CreateFromObj(const std::string& _filePath);
+    static Model* CreateFromFile(const std::string& _filePath);
+    static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
 
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;
@@ -57,6 +56,10 @@ public:
 
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }
+
+    uint32_t GetVertexSrvIndex() { return skinningCS_->GetInputVertexSrvIndex(); }
+
+    ID3D12Resource* GetIndexResource(size_t _index = -1);
 
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;

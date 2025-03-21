@@ -91,7 +91,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,10 +130,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mt.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp" />
     <ClCompile Include="Core\DXCommon\DXCommon.cpp" />
     <ClCompile Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Core\DXCommon\PSOManager\PSOManager.cpp" />
@@ -187,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp" />
     <ClCompile Include="Features\Scene\ParticleTestScene.cpp" />
+    <ClCompile Include="Features\SilhouetteDetection.cpp" />
     <ClCompile Include="Features\Sprite\Sprite.cpp" />
     <ClCompile Include="Features\Sprite\SpriteManager.cpp" />
     <ClCompile Include="Features\UI\UIBase.cpp" />
@@ -214,6 +214,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BlendMode.h" />
+    <ClInclude Include="Core\DXCommon\CmdList\CommandList.h" />
     <ClInclude Include="Core\DXCommon\DXCommon.h" />
     <ClInclude Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.h" />
     <ClInclude Include="Core\DXCommon\PSOManager\PSOManager.h" />
@@ -271,6 +272,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Scene\ISceneFactory.h" />
     <ClInclude Include="Features\Scene\Manager\SceneManager.h" />
     <ClInclude Include="Features\Scene\ParticleTestScene.h" />
+    <ClInclude Include="Features\SilhouetteDetection.h" />
     <ClInclude Include="Features\Sprite\Sprite.h" />
     <ClInclude Include="Features\Sprite\SpriteManager.h" />
     <ClInclude Include="Features\UI\UIBase.h" />

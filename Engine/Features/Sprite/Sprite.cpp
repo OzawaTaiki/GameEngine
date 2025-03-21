@@ -81,14 +81,14 @@ void Sprite::Draw(const Vector4& _color)
     commandList->DrawInstanced(6, 1, 0, 0);
 }
 
-Sprite* Sprite::Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor)
+std::unique_ptr<Sprite> Sprite::Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor)
 {
-    Sprite* sprite = SpriteManager::GetInstance()->Create(_name);
+    std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>(_name);
     sprite->textureHandle_ = _textureHandle;
     sprite->anchor_ = _anchor;
     sprite->Initialize();
 
-    return sprite;
+    return std::move(sprite);
 }
 
 void Sprite::StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight)

@@ -48,6 +48,7 @@ public:
 
     ID3D12Resource* GetVertexResource() { return vertexResource_.Get(); }
     ID3D12Resource* GetOutputVertexResource() { return outPutVertexResource_.Get(); }
+    ID3D12Resource* GetIndexResource() { return indexResource_.Get(); }
 
 
     uint32_t GetUseMaterialIndex() const { return useMaterialIndex_; }
