@@ -152,6 +152,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Camera\Camera\Camera.cpp" />
     <ClCompile Include="Features\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Features\Collision\Collider\Collider.cpp" />
+    <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayer.cpp" />
+    <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayerManager.cpp" />
+    <ClCompile Include="Features\Collision\Detector\CollisionDetector.cpp" />
     <ClCompile Include="Features\Collision\Manager\CollisionManager.cpp" />
     <ClCompile Include="Features\Collision\Shapes.cpp" />
     <ClCompile Include="Features\Effect\Effect\Effect.cpp" />
@@ -232,6 +235,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
     <ClInclude Include="Features\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Features\Collision\Collider\Collider.h" />
+    <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayer.h" />
+    <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayerManager.h" />
+    <ClInclude Include="Features\Collision\Detector\CollisionDetector.h" />
     <ClInclude Include="Features\Collision\Manager\CollisionManager.h" />
     <ClInclude Include="Features\Collision\Shapes.h" />
     <ClInclude Include="Features\Effect\Effect\Effect.h" />

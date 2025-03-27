@@ -3,8 +3,13 @@
 
 float Vector3::Length() const
 {
-    return std::sqrtf(x * x + y * y + z * z);
+    return std::sqrtf(LengthSquared());
 
+}
+
+float Vector3::LengthSquared() const
+{
+    return x * x + y * y + z * z;
 }
 
 Vector3 Vector3::Normalize() const
