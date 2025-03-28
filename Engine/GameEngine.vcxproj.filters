@@ -190,6 +190,12 @@
     <Filter Include="Core\DXCommon\CommandList">
       <UniqueIdentifier>{54397afa-09b9-473c-9f3a-691043753c50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Collision\Detector">
+      <UniqueIdentifier>{3c490bbe-ea41-43a8-beef-a2eb15a7352e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Collision\Layer">
+      <UniqueIdentifier>{a0c69786-c92a-47e0-a0ae-0906c1456213}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -422,6 +428,15 @@
     </ClCompile>
     <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp">
       <Filter>Core\DXCommon\CommandList</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayer.cpp">
+      <Filter>Features\Collision\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayerManager.cpp">
+      <Filter>Features\Collision\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\Detector\CollisionDetector.cpp">
+      <Filter>Features\Collision\Detector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -744,6 +759,15 @@
     </ClInclude>
     <ClInclude Include="Core\DXCommon\CmdList\CommandList.h">
       <Filter>Core\DXCommon\CommandList</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayer.h">
+      <Filter>Features\Collision\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayerManager.h">
+      <Filter>Features\Collision\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\Detector\CollisionDetector.h">
+      <Filter>Features\Collision\Detector</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

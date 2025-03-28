@@ -5,6 +5,7 @@
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImguITools.h>
 
 
@@ -57,6 +58,31 @@ void SampleScene::Initialize()
 
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
+
+    bunnyCollider_ = new AABBCollider();
+    bunnyCollider_->SetLayer("bunny");
+    bunnyCollider_->SetMinMax({ -1,-1,-1 }, { 1,1,1 });
+    bunnyCollider_->SetWorldTransform(oModel_->GetWorldTransform());
+    bunnyCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
+        Debug::Log("bunny Collision\n");
+        });
+
+    cubeCollider_ = new SphereCollider();
+    cubeCollider_->SetLayer("cube");
+    cubeCollider_->SetRadius(1);
+    cubeCollider_->SetWorldTransform(oModel2_->GetWorldTransform());
+    cubeCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
+        });
+
+    cubeCollider2_ = new CapsuleCollider();
+    cubeCollider2_->SetLayer("cube2");
+    cubeCollider2_->SetRadius(1);
+    cubeCollider2_->SetHeight(5);
+    cubeCollider2_->SetWorldTransform(aModel_->GetWorldTransform());
+    cubeCollider2_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
+        Debug::Log("cube2 Collision\n");
+        });
+
 
 }
 
@@ -121,6 +147,12 @@ void SampleScene::Update()
         ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
 
+
+    CollisionManager::GetInstance()->RegisterCollider(bunnyCollider_);
+    CollisionManager::GetInstance()->RegisterCollider(cubeCollider_);
+    CollisionManager::GetInstance()->RegisterCollider(cubeCollider2_);
+
+    CollisionManager::GetInstance()->Update();
 }
 
 void SampleScene::Draw()

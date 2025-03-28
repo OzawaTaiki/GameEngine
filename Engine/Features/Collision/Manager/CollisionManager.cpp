@@ -1,7 +1,5 @@
-#include <Features/Collision/Manager/CollisionManager.h>
-#include <Features/Collision/Collider/Collider.h>
-#include <Math/Vector/VectorFunction.h>
-#include <Math/Matrix/MatrixFunction.h>
+#include "CollisionManager.h"
+#include <Features/LineDrawer/LineDrawer.h>
 #include <algorithm>
 
 CollisionManager* CollisionManager::GetInstance()
@@ -10,345 +8,190 @@ CollisionManager* CollisionManager::GetInstance()
     return &instance;
 }
 
-uint32_t CollisionManager::GetAtttibute(const std::string& _atrribute)
+void CollisionManager::Initialize()
 {
-    auto it = atrributeMap_.find(_atrribute);
-    if (it != atrributeMap_.end())
-        return it->second;
-
-    atrributeMap_[_atrribute] = static_cast <uint32_t>(1 << atrributeMap_.size());
-    uint32_t result = atrributeMap_[_atrribute];
-    return result;
+    colliders_.clear();
+    collisionPairs_.clear();
+    isDrawEnabled_ = true;
 }
 
-uint32_t CollisionManager::GetMask(const std::string& _atrribute)
+void CollisionManager::Finalize()
 {
-    return ~GetAtttibute(_atrribute);
+    colliders_.clear();
+    collisionPairs_.clear();
+}
+
+void CollisionManager::Update()
+{
+    // 衝突判定を実行
+    CheckCollisions();
+
+    // 衝突応答を実行
+    ResolveCollisions();
+
+    // 衝突状態を更新
+    UpdateCollisionStates();
+
+    // デバッグ描画が有効なら描画
+    if (isDrawEnabled_)
+    {
+        DrawColliders();
+    }
+
+    // 全てのコライダーをクリア（次のフレームのために）
+    colliders_.clear();
+    collisionPairs_.clear();
 }
 
 void CollisionManager::RegisterCollider(Collider* _collider)
 {
+    // nullチェック
+    if (_collider == nullptr)
+        return;
+
+    // 既に登録されているかチェック
+    auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
+    if (it != colliders_.end())
+        return;
+
+    // コライダーを登録
     colliders_.push_back(_collider);
 }
 
-void CollisionManager::CheckAllCollision()
+void CollisionManager::CheckCollisions()
 {
-    for (auto itA = colliders_.begin(); itA != colliders_.end(); itA++)
+    // ブロードフェーズの更新（空間分割等の最適化）
+    UpdateBroadPhase();
+
+    // 全てのコライダー同士の組み合わせで衝突判定を実行
+    for (size_t i = 0; i < colliders_.size(); ++i)
     {
-        for (auto itB = std::next(itA); itB != colliders_.end(); itB++)
+        Collider* colliderA = colliders_[i];
+
+        for (size_t j = i + 1; j < colliders_.size(); ++j)
         {
-            if ((*itA)->GetMask() & (*itB)->GetAtrribute() &&
-                (*itB)->GetMask() & (*itA)->GetAtrribute())
+            Collider* colliderB = colliders_[j];
+
+            // レイヤーマスクでフィルタリング
+            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
             {
-                CheckCollisionPair(*itA, *itB);
+                continue; // 衝突しないように設定されている
+            }
+
+            // 衝突情報
+            ColliderInfo info;
+
+            // CollisionDetectorを使用して衝突判定を実行
+            if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
+            {
+                // 衝突情報を保存
+                CollisionPair pair;
+                pair.colliderA = colliderA;
+                pair.colliderB = colliderB;
+                pair.info = info;
+                collisionPairs_.push_back(pair);
+
+                // 各コライダーに現在の衝突を記録
+                colliderA->AddCurrentCollision(colliderB, info);
+
+                // 衝突情報を反転して相手側にも記録
+                ColliderInfo reversedInfo = info;
+                reversedInfo.contactNormal = -info.contactNormal;
+                colliderB->AddCurrentCollision(colliderA, reversedInfo);
             }
         }
     }
 }
 
-bool CollisionManager::PreCheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
+void CollisionManager::ResolveCollisions()
 {
-    Sphere a;
-    a.center = _colliderA->GetWorldMatrix().GetTranslate();
-    a.radius = _colliderA->GetPreSize();
-
-    Sphere b;
-    b.center = _colliderB->GetWorldMatrix().GetTranslate();
-    b.radius = _colliderB->GetPreSize();
-
-    if (IsCollision(a, b))
-        return true;
-    else
-        return false;
-
-}
-
-void CollisionManager::CheckCollisionPair(Collider* _colliderA, Collider* _colliderB)
-{
-    //if (!PreCheckCollisionPair(_colliderA, _colliderB))
-    //    return;
-
-    switch (_colliderA->GetBoundingBox())
+    // 全ての衝突ペアに対して衝突応答を実行
+    for (const auto& pair : collisionPairs_)
     {
-    case Collider::BoundingBox::Sphere_3D:
-        {
-            Sphere sphereA = _colliderA->GetShape<Sphere>();
-            sphereA.center = Transform(sphereA.referencePoint, _colliderA->GetWorldMatrix());
-
-            switch (_colliderB->GetBoundingBox())
-            {
-            case Collider::BoundingBox::Sphere_3D:
-                {
-                    Sphere sphereB = _colliderB->GetShape<Sphere>();
-                    sphereB.center = Transform(sphereA.referencePoint, _colliderB->GetWorldMatrix());
-
-                    if (IsCollision(sphereA, sphereB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                }
-                break;
-            case Collider::BoundingBox::AABB_3D:
-                {
-                    AABB aabbB = _colliderB->GetShape<AABB>();
-                    aabbB.center = Transform({ 0,0,0 }, _colliderB->GetWorldMatrix());
-
-                    if (IsCollision(sphereA, aabbB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::OBB_3D:
-                {
-                    OBB obbB = _colliderB->GetShape<OBB>();
-                    //obbB.center = Transform(obbB.referencePoint, _colliderB->GetWorldMatrix());
-                    if (IsCollision(sphereA, obbB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::NONE:
-                assert(false && "Please set BoundingBox before SetShape");
-                break;
-            default:
-                break;
-                }
-            }
-        break;
-    case Collider::BoundingBox::AABB_3D:
-        {
-            AABB aabbA = _colliderA->GetShape<AABB>();
-            switch (_colliderB->GetBoundingBox())
-            {
-            case Collider::BoundingBox::Sphere_3D:
-                {
-                    Sphere sphereB = _colliderB->GetShape<Sphere>();
-                    if (IsCollision(sphereB, aabbA))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::AABB_3D:
-                {
-                    AABB aabbB = _colliderB->GetShape<AABB>();
-                    if (IsCollision(aabbA, aabbB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::OBB_3D:
-                {
-                    OBB obbB = _colliderB->GetShape<OBB>();
-                    if (IsCollision(aabbA, obbB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::NONE:
-                assert(false && "Please set BoundingBox before SetShape");
-                break;
-            default:
-                break;
-            }
-        }
-        break;
-    case Collider::BoundingBox::OBB_3D:
-            {
-                OBB obbA = _colliderA->GetShape<OBB>();
-            switch (_colliderB->GetBoundingBox())
-            {
-            case Collider::BoundingBox::Sphere_3D:
-                {
-                    Sphere sphereB = _colliderB->GetShape<Sphere>();
-                    if (IsCollision(sphereB, obbA))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::AABB_3D:
-                {
-                    AABB aabbB = _colliderB->GetShape<AABB>();
-                    if (IsCollision(aabbB, obbA))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-                }
-            case Collider::BoundingBox::OBB_3D:
-                {
-                    OBB obbB = _colliderB->GetShape<OBB>();
-                    if (IsCollision(obbA, obbB))
-                    {
-                        _colliderA->OnCollision(_colliderB);
-                        _colliderB->OnCollision(_colliderA);
-                    }
-                    break;
-
-
-                }
-                break;
-            }
-        }
-        break;
-    case Collider::BoundingBox::NONE:
-        assert(false && "Please set BoundingBox before SetShape");
-        break;
-    default:
-        break;
+        ResolveCollision(pair);
     }
-};
-
-bool CollisionManager::IsCollision(const Sphere& _sphere1, const Sphere& _sphere2)
-{
-    float distance = Length(Subtract(_sphere1.center, _sphere2.center));
-    return distance <= _sphere1.radius + _sphere2.radius;
 }
 
-bool CollisionManager::IsCollision(const Sphere& _sphere, const AABB& _aabb)
+void CollisionManager::UpdateCollisionStates()
 {
-    Vector3 closestPoint;
-    closestPoint.x = std::clamp(_sphere.center.x, _aabb.min.x, _aabb.max.x);
-    closestPoint.y = std::clamp(_sphere.center.y, _aabb.min.y, _aabb.max.y);
-    closestPoint.z = std::clamp(_sphere.center.z, _aabb.min.z, _aabb.max.z);
-
-    float distance = Length(closestPoint - _sphere.center);
-
-    if (distance <= _sphere.radius)
+    // 全てのコライダーの衝突状態を更新
+    for (auto collider : colliders_)
     {
-        return true;
+        collider->UpdateCollisionState();
     }
-
-    return false;
 }
 
-bool CollisionManager::IsCollision(const Sphere& _sphere, const OBB& _obb)
+void CollisionManager::DrawColliders()
 {
-    Matrix4x4 obbWorldMatInv = Inverse(_obb.worldMat);
+    // デバッグ描画が無効ならスキップ
+    if (!isDrawEnabled_)
+        return;
 
-    Vector3  centerInOBBLocalSphere = Transform(_sphere.center, obbWorldMatInv);
-    AABB aabbOBBLocal;// = { _obb.min,_obb.max };
-    aabbOBBLocal.min = Transform(_obb.min, obbWorldMatInv);
-    aabbOBBLocal.max = Transform(_obb.max, obbWorldMatInv);
-    for (int i = 0; i < 3; i++)
+    // 衝突中のコライダーを赤色で描画
+    std::vector<Collider*> collidingColliders;
+
+    // 衝突中のコライダーを抽出
+    for (const auto& pair : collisionPairs_)
     {
-        if (aabbOBBLocal.min[i] > aabbOBBLocal.max[i])
+        collidingColliders.push_back(pair.colliderA);
+        collidingColliders.push_back(pair.colliderB);
+    }
+
+    // 全てのコライダーを描画
+    for (auto collider : colliders_)
+    {
+        // コライダーが衝突中か判定
+        bool isColliding = std::find(collidingColliders.begin(), collidingColliders.end(), collider) != collidingColliders.end();
+
+        // 衝突状態に応じて色を設定
+        if (isColliding)
         {
-            std::swap(aabbOBBLocal.min[i], aabbOBBLocal.max[i]);
+            // 衝突中は赤色
+            LineDrawer::GetInstance()->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
         }
+        else
+        {
+            // 通常時は緑色
+            LineDrawer::GetInstance()->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+        }
+
+        // コライダーを描画
+        collider->Draw();
     }
 
-    Sphere sphereOBBLocal;
-    sphereOBBLocal.center = centerInOBBLocalSphere;
-    sphereOBBLocal.radius = _sphere.radius;
+    // 衝突点と法線を描画
+    LineDrawer::GetInstance()->SetColor({ 1.0f , 1.0f , 1.0f , 1.0f });
+    //LineDrawer::GetInstance()->SetColor({ 0.7f, 0.7f, 0.7f, 1.0f }); // ぐれー
+    for (const auto& pair : collisionPairs_)
+    {
+        // 衝突点を描画
+        Vector3 contactPoint = pair.info.contactPoint;
+        Vector3 normalEnd = contactPoint + pair.info.contactNormal * 0.5f; // 法線の長さを適当に調整
 
-    return IsCollision(sphereOBBLocal, aabbOBBLocal);
-}
-
-
-bool CollisionManager::IsCollision(const AABB& _aabb1, const AABB& _aabb2)
-{
-    if ((_aabb1.min.x <= _aabb2.max.x && _aabb1.max.x >= _aabb2.min.x) && // x
-        (_aabb1.min.y <= _aabb2.max.y && _aabb1.max.y >= _aabb2.min.y) && // y
-        (_aabb1.min.z <= _aabb2.max.z && _aabb1.max.z >= _aabb2.min.z)) { // z
-        //衝突
-        return true;
+        // 法線を描画
+        LineDrawer::GetInstance()->RegisterPoint(contactPoint, normalEnd);
     }
-
-    return false;
 }
 
-bool CollisionManager::IsCollision(const AABB& _aabb, const OBB& _obb)
+void CollisionManager::ResolveCollision(const CollisionPair& _pair)
 {
-    // AABBをOBBに変換
-    OBB aabbConverted;
-    aabbConverted = AABBConvertToOBB(_aabb);
+    // 両方のコライダーに衝突通知を送る
+    if (_pair.colliderA && _pair.colliderB)
+    {
+        // コライダーAに衝突通知
+        _pair.colliderA->OnCollision(_pair.colliderB, _pair.info);
 
-    return IsCollision(aabbConverted, _obb);
+        // コライダーBに衝突通知（法線方向を反転）
+        ColliderInfo invertedInfo = _pair.info;
+        invertedInfo.contactNormal = -_pair.info.contactNormal;
+
+        _pair.colliderB->OnCollision(_pair.colliderA, invertedInfo);
+    }
 }
 
-bool CollisionManager::IsCollision(const OBB& _obb1, const OBB& _obb2)
+void CollisionManager::UpdateBroadPhase()
 {
-    //分離軸候補の計算
-	Vector3 axes[15];
-	axes[0] = _obb1.orientations[0];
-	axes[1] = _obb1.orientations[1];
-	axes[2] = _obb1.orientations[2];
-
-	axes[3] = _obb2.orientations[0];
-	axes[4] = _obb2.orientations[1];
-	axes[5] = _obb2.orientations[2];
-
-	int index = 6;
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			axes[index++] = Cross(_obb1.orientations[i], _obb2.orientations[j]);
-		}
-	}
-
-	for (auto axis : axes)
-	{
-		float minObb1, maxObb1;
-		float minObb2, maxObb2;
-
-		//軸に射影および点の最大と最小を求める
-		CalculateProjectionRange(_obb1, axis, minObb1, maxObb1);
-		CalculateProjectionRange(_obb2, axis, minObb2, maxObb2);
-
-		float l1, l2;
-		l1 = maxObb1 - minObb1;
-		l2 = maxObb2 - minObb2;
-
-		float sumSpan = l1 + l2;
-
-		float longSpan = std::max(maxObb1, maxObb2) - std::min(minObb1, minObb2);
-		if (sumSpan < longSpan)
-		{	//分離している	//すなわち衝突していない
-			return false;
-		}
-	}
-	return true;
-}
-
-void CollisionManager::CalculateProjectionRange(const OBB& _obb, const Vector3& _axis, float& _min, float& _max)
-{
-	_min = std::numeric_limits<float>::infinity();
-	_max = -(float)std::numeric_limits<float>::infinity();
-
-	for (auto vertex : _obb.vertices)
-	{
-		float proj = Dot(_axis, vertex);
-		_min = std::min(_min, proj);
-		_max = std::max(_max, proj);
-	}
-
-	return;
-}
-
-OBB CollisionManager::AABBConvertToOBB(const AABB& _aabb)
-{
-    OBB obb;
-    obb.min = _aabb.min;
-    obb.max = _aabb.max;
-    obb.orientations[0] = { 1,0,0 };
-    obb.orientations[1] = { 0,1,0 };
-    obb.orientations[2] = { 0,0,1 };
-    obb.vertices = _aabb.vertices;
-
-    return obb;
+    // 空間分割などの最適化を行う場合はここに実装
+    // 現在は単純な総当たりで実装
 }

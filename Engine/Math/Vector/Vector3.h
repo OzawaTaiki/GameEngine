@@ -31,6 +31,8 @@ struct Vector3
     // メンバ関数
     // ベクトルの長さを返す
 	float Length()const;
+    // ベクトルの長さの2乗を返す
+    float LengthSquared()const;
     // ベクトルを正規化する
 	Vector3 Normalize() const;
     // ベクトルの内積を返す

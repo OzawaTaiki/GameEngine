@@ -116,13 +116,46 @@ void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
 
 void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal)
 {
+    // 法線を正規化
+    Vector3 normal = _normal.Normalize();
+
+    // 法線ベクトルに垂直な2つのベクトルを見つける
+    Vector3 tangent1, tangent2;
+
+    // 法線ベクトルが上向きベクトル(0,1,0)と近い場合は別の基準ベクトルを使用
+    if (std::abs(normal.Dot(Vector3(0, 1, 0))) > 0.99f)
+    {
+        // X軸を基準にする
+        tangent1 = Vector3(0, 0, 1);
+    }
+    else
+    {
+        // 上向きベクトルと法線の外積で最初の接ベクトルを得る
+        tangent1 = normal.Cross(Vector3(0, 1, 0)).Normalize();
+    }
+
+    // 法線と最初の接ベクトルの外積で2つ目の接ベクトルを得る
+    tangent2 = normal.Cross(tangent1).Normalize();
+
+    // この2つの接ベクトルを使って円周上の点を計算
     const float kEvery = std::numbers::pi_v<float> *2.0f / _segmentCount;
-    for (uint32_t index = 0; index < _segmentCount; ++index)
+
+    for (uint32_t index = 0; index < static_cast<uint32_t>(_segmentCount); ++index)
     {
         float rad = index * kEvery;
         float nextRad = (index + 1) * kEvery;
-        Vector3 spos = _center + Vector3{ std::cos(rad) * _radius, 0.0f, std::sin(rad) * _radius };
-        Vector3 epos = _center + Vector3{ std::cos(nextRad) * _radius, 0.0f, std::sin(nextRad) * _radius };
+
+        // 現在の円周上の点
+        Vector3 spos = _center +
+            tangent1 * std::cos(rad) * _radius +
+            tangent2 * std::sin(rad) * _radius;
+
+        // 次の円周上の点
+        Vector3 epos = _center +
+            tangent1 * std::cos(nextRad) * _radius +
+            tangent2 * std::sin(nextRad) * _radius;
+
+        // 線分を登録
         RegisterPoint(spos, epos);
     }
 }

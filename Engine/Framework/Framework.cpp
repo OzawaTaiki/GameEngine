@@ -5,6 +5,7 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
+
 #include <Features/Json/JsonHub.h>
 
 #include <Debug/ImGuiDebugManager.h>
@@ -74,6 +75,7 @@ void Framework::Initialize()
     sceneManager_ = SceneManager::GetInstance();
 
     collisionManager_ = CollisionManager::GetInstance();
+    collisionManager_->Initialize();
 
 #ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->Initialize();
@@ -96,6 +98,7 @@ void Framework::Update()
     gameTime_->Update();
 
     input_->Update();
+
 }
 
 void Framework::PreDraw()
@@ -113,6 +116,8 @@ void Framework::PostDraw()
 
 void Framework::Finalize()
 {
+    collisionManager_->Finalize();
+
     imguiManager_->Finalize();
     delete imguiManager_;
 

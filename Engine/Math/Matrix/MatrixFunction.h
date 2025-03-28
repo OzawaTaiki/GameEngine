@@ -13,8 +13,6 @@ Matrix4x4 Multiply(const Matrix4x4& _m1, const Matrix4x4& _m2);
 Matrix4x4 Inverse(const Matrix4x4& _m);
 Matrix4x4 Transpose(const Matrix4x4& _m);
 Matrix4x4 MakeIdentity4x4();
-void MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m);
-void MatrixScreenPrintf(int _x, int _y, const Matrix4x4& _m, const char* label);
 Matrix4x4 MakeScaleMatrix(const Vector3& _scale);
 Matrix4x4 MakeTranslateMatrix(const Vector3& _translate);
 Matrix4x4 MakeRotateXMatrix(float _radian);

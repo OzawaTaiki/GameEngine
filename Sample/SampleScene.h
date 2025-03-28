@@ -17,6 +17,8 @@
 #include <Features/UVTransform/UVTransformAnimation.h>
 #include <Features/Animation/Sequence/AnimationSequence.h>
 
+#include <Features/Collision/Manager/CollisionManager.h>
+
 #include <memory>
 
 class SampleScene : public BaseScene
@@ -54,6 +56,11 @@ private:
     std::list<std::pair<float, Vector4>> colors;
 
     std::unique_ptr<AnimationSequence> sequence_ = nullptr;
+
+    AABBCollider* bunnyCollider_ = nullptr;
+    SphereCollider* cubeCollider_ = nullptr;
+    CapsuleCollider* cubeCollider2_ = nullptr;
+
 
 
 #ifdef _DEBUG

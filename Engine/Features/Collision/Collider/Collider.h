@@ -2,7 +2,9 @@
 
 #include <Math/Vector/Vector3.h>
 #include <Math/Matrix/Matrix4x4.h>
-#include <Features/Collision/Shapes.h>
+
+#include <Features/Collision/CollisionLayer/CollisionLayer.h>
+#include <Features/Model/Transform/WorldTransform.h>
 
 #include <string>
 #include <cstdint>
@@ -11,135 +13,285 @@
 #include <variant>
 #include <cassert>
 
-/*
-    衝突判定のクラス
-使い方
-Initilaizeで
-    Colliderのインスタンスを作成し、SetBoundingBoxで衝突判定の形状を設定する
-    SetShapeで形状のデータを設定する
-    SetAtrributeで自身の属性を設定する
-    SetMaskで当たらない属性を設定する
-    SetGetWorldMatrixFuncでワールド行列を取得する関数を設定する
-    SetOnCollisionFuncで衝突時の処理を行う関数を設定する
-    SetReferencePointで基準点を設定する(初期は{0,0,0})
+class Collider;
 
-Updateで
-    CollisionManagerのRegisterColliderでColliderを登録する
-    ※必ず毎フレーム登録すること
+enum class CollisionState
+{
+    None = 0, // 何もしていない
+    Enter, // 衝突した瞬間
+    Stay, // 衝突している間
+    Exit // 離れた瞬間
+};
 
-*/
-class Collider final
+struct ColliderInfo
+{
+    bool hasCollision = false;      // 衝突しているか
+    Vector3 contactPoint;           // 衝突点
+    Vector3 contactNormal;          // 衝突面の法線
+    float penetration = 0.0f;       // めりこみ量
+    CollisionState state = CollisionState::None; // 衝突状態
+
+    ColliderInfo() = default;
+};
+
+struct CollisionPair
+{
+    Collider* colliderA = nullptr;
+    Collider* colliderB = nullptr;
+    ColliderInfo info;
+};
+
+enum class BoundingBox
+{
+    NONE = 0,
+    Sphere_3D,
+    AABB_3D,
+    OBB_3D,
+    Capsule_3D
+};
+
+/// Scene::Initialize(){
+/// Collider* collider = new SphereCollider();
+/// collider->SetLayer("Player");
+/// collider->SetLayerMask("Enemy");
+/// collider->SetRadius(1.0f);
+/// collider->SetWorldTransform(worldTransform);
+/// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
+///     // 衝突時の処理
+/// });
+/// }
+///
+/// Scene::Update(){
+/// CollisionManager::GetInstance()->RegisterCollider(collider);
+/// }
+class Collider
 {
 public:
-    enum class BoundingBox : uint8_t
+    // コンストラクタ
+    Collider() = default;
+    // デストラクタ
+    virtual ~Collider() = default;
+
+    // 衝突イベント処理（CollisionManagerから呼ばれる）
+    void OnCollision(Collider* _other, const ColliderInfo& _info);
+
+    // 衝突状態を更新（CollisionManagerから呼ばれる）
+    void UpdateCollisionState();
+
+    // 特定のコライダーとの衝突状態を取得
+    CollisionState GetCollisionState(Collider* _other) const;
+
+    // 任意のコライダーと衝突しているかどうか
+    bool IsColliding() const { return !currentCollisions_.empty(); }
+
+    // 特定のコライダーと衝突しているかどうか
+    bool IsCollidingWith(Collider* _other) const;
+
+    // 描画メソッド
+    virtual void Draw() = 0;
+
+    // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
+    void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
     {
-        Sphere_3D = 0,
-        AABB_3D = 1,
-        OBB_3D = 2,
+        fOnCollision_ = _callback;
+    }
 
-        NONE
-    };
+    // 自身のlayerを取得する
+    uint32_t GetLayer() const { return collisionLayer_.GetLayer(); }
 
-    void Update();
-    void Draw();
+    // 衝突しないlayerを取得する
+    uint32_t GetLayerMask() const { return collisionLayer_.GetLayerMask(); }
 
+    // 自身のlayerをセット設定する
+    void SetLayer(const std::string& _layer) { collisionLayer_.SetLayer(_layer); }
 
-    void SetBoundingBox(BoundingBox _set) { boundingBox_ = _set; }
+    // 自身のlayerMaskをセット設定する
+    void SetLayerMask(const std::string& _layer) { collisionLayer_.SetLayerMask(_layer); }
+
+    // バウンディングボックスを取得する
     BoundingBox GetBoundingBox() const { return boundingBox_; }
 
-    // 衝突判定の形状を設定する
-    // _shape->形状
-    void SetShape(float _radius);
-    void SetShape(const Vector3& _min, const Vector3& _max);
+    // バウンディングボックスを設定する
+    void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
+
+    // ワールドトランスフォームを設定する
+    void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
+
+    // ワールドトランスフォームを取得する
+    const WorldTransform* GetWorldTransform() const { return worldTransform_; }
+
+    // _pointが内部に含まれているか
+    virtual bool Contains(const Vector3& _point) const = 0;
+
+    // _pointから最も近い点を求める
+    virtual Vector3 GetClosestPoint(const Vector3& _point) const = 0;
+
+    // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
+    void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
+
+private:
+    // 衝突状態の管理
+    struct CollisionData
+    {
+        ColliderInfo info;
+        bool wasColliding = false;
+        bool isColliding = false;
+    };
+
+    bool isStatic_ = false; // 静的かどうか 動かない物体
+    CollisionLayer collisionLayer_; // 衝突判定の属性
+    BoundingBox boundingBox_ = BoundingBox::NONE; // 衝突判定の形状
+    const WorldTransform* worldTransform_ = nullptr; // ワールド行列
+
+    // 衝突状態の記録
+    std::unordered_map<Collider*, CollisionData> collisionMap_;
+
+    // 現在のフレームで衝突しているコライダーのリスト（UpdateCollisionStateで使用）
+    std::vector<Collider*> currentCollisions_;
+
+    // 衝突コールバック関数
+    std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
+};
 
 
-    // 衝突判定の形状を取得する
-    template <typename T>
-    T GetShape() const;
 
-    // ワールド行列を取得する
-    Matrix4x4 GetWorldMatrix()const { return fGetWorldMatrix_(); }
-    // 衝突時の処理を行う
-    void OnCollision(const Collider* _other);
+class SphereCollider : public Collider
+{
+public:
+    // コンストラクタ
+    SphereCollider() : Collider(), radius_(0.0f) { SetBoundingBox(BoundingBox::Sphere_3D); }
+    // デストラクタ
+    ~SphereCollider() = default;
 
-    // 判定属性を設定する
-    // _atrribute->自信の属性
-    void SetAtrribute(const std::string& _atrribute);
+    void Draw() override;
 
-    // 固有の名前を設定する
-    // _id->固有の名前
-    void SetId(const std::string& _id) { id_ = _id; }
+    // 球の半径を設定する
+    void SetRadius(float _radius) { radius_ = _radius; }
+    // 球の半径を取得する
+    float GetRadius() const { return radius_; }
 
-    // 判定マスクを設定する
-    // _atrribute->当たらない属性
-    void SetMask(const std::string& _atrribute);
-    // 判定マスクを設定する
-    // _atrribute->当たらない属性
-    void SetMask(std::initializer_list<std::string> _atrribute);
-
-    // ワールド行列を取得する関数を設定する
-    void SetGetWorldMatrixFunc(std::function<Matrix4x4(void)> _f) { fGetWorldMatrix_ = _f; }
-    // 衝突時の処理を行う関数を設定する
-    void SetOnCollisionFunc(std::function<void(const Collider*)> _f) { fOnCollision_ = _f; }
-
-    void SetReferencePoint(const Vector3& _referencePoint);
-
-    // 判定属性を取得する
-    uint32_t GetMask()const { return mask_; }
-    // 判定マスクを取得する
-    uint32_t GetAtrribute()const { return atrribute_; }
-
-    std::string GetName()const { return name_; }
-
-    std::string GetId()const { return id_; }
-
-    void NotHit() { preIsHit_ = isHit_; isHit_ = false; }
-
-    // 衝突した瞬間
-    bool IsCollisionEnter()const { return isHit_ && !preIsHit_; }
-
-    // 衝突中
-    bool IsCollisionStay()const { return isHit_; }
-
-    // 衝突から離れた瞬間
-    bool IsCollisionExit()const { return !isHit_ && preIsHit_; }
-
-    float GetPreSize()const { return preSize_; }
-
-    void RegsterCollider();
+    // 球の中に_pointが含まれているか
+    bool Contains(const Vector3& _point) const override;
+    // _pointから最も近い点を求める
+    Vector3 GetClosestPoint(const Vector3& _point) const override;
 
 private:
 
-    // 衝突判定の形状とそのデータ
-    std::variant<Sphere, AABB, OBB> shape_;
-    // 事前衝突判定のサイズ
-    float preSize_= {};
-
-    bool isHit_ = false;
-    bool preIsHit_ = false;
-
-    BoundingBox boundingBox_ = BoundingBox::NONE;
-    uint32_t atrribute_ = 0x0;
-    uint32_t mask_ = 0x1;
-
-    std::string name_ = "";
-    std::string id_ = "";
-
-    std::function<Matrix4x4(void)> fGetWorldMatrix_ = nullptr;
-    std::function<void(const Collider*)> fOnCollision_ = nullptr;
+    float radius_ = 0.0f; // 球の半径
 };
 
-template<typename T>
-inline T Collider::GetShape() const
+class AABBCollider : public Collider
 {
-    if (std::holds_alternative<T>(shape_))
-    {
-        return std::get<T>(shape_);
-    }
-    else
-    {
-        assert(false && "has not this type");
-        return T();
-    }
+public:
+    // コンストラクタ
+    AABBCollider() : Collider() { SetBoundingBox(BoundingBox::AABB_3D); }
+    // デストラクタ
+    ~AABBCollider() = default;
 
-}
+    void Draw() override;
+
+    // AABBの最小値と最大値を設定する
+    void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
+
+    // AABBの最小値を取得する
+    Vector3 GetMin() const { return min_; }
+    // AABBの最大値を取得する
+    Vector3 GetMax() const { return max_; }
+
+    // AABBの中に_pointが含まれているか
+    bool Contains(const Vector3& _point) const override;
+    // _pointから最も近い点を求める
+    Vector3 GetClosestPoint(const Vector3& _point) const override;
+
+private:
+    Vector3 min_; // AABBの最小値
+    Vector3 max_; // AABBの最大値
+};
+
+
+class OBBCollider : public Collider
+{
+public:
+    // コンストラクタ
+    OBBCollider() : Collider() { SetBoundingBox(BoundingBox::OBB_3D); }
+    // デストラクタ
+    ~OBBCollider() = default;
+
+    void Draw() override;
+
+    // OBBの半分の大きさを設定する
+    void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
+    // OBBの半分の大きさを取得する
+    Vector3 GetHalfExtents() const { return halfExtents_; }
+
+    // OBBの基準点を設定する
+    void SetLocalPivot(const Vector3& _localPivot) { localPivot_ = _localPivot; }
+    // OBBの基準点を取得する
+    Vector3 GetLocalPivot() const { return localPivot_; }
+
+    // OBBの中に_pointが含まれているか
+    bool Contains(const Vector3& _point) const override;
+    // _pointから最も近い点を求める
+    Vector3 GetClosestPoint(const Vector3& _point) const override;
+
+    // OBBの頂点を取得する
+    std::vector<Vector3> GetVertices() const;
+    // OBBの中心を取得する
+    Vector3 GetCenter() const;
+
+private:
+    Vector3 halfExtents_; // OBBの半分の大きさ
+    Vector3 localPivot_; // OBBの基準点
+};
+
+class CapsuleCollider : public Collider
+{
+public:
+    // コンストラクタ
+    CapsuleCollider() : Collider(), direction_({ 0,1,0 }) { SetBoundingBox(BoundingBox::Capsule_3D); }
+    // デストラクタ
+    ~CapsuleCollider() = default;
+
+    void Draw() override;
+
+    // カプセルの半径を設定する
+    void SetRadius(float _radius) { radius_ = _radius; }
+    // カプセルの半径を取得する
+    float GetRadius() const { return radius_; }
+
+    // カプセルの向きを設定する
+    void SetDirection(const Vector3& _direction) { direction_ = _direction.Normalize(); }
+    // カプセルの向きを取得する
+    Vector3 GetDirection() const { return direction_; }
+
+    // カプセルの基準点を設定する
+    void SetLocalPivot(const Vector3& _localPivot) { localPivot_ = _localPivot; }
+    // カプセルの基準点を取得する
+    Vector3 GetLocalPivot() const { return localPivot_; }
+
+    // カプセルの高さを設定する
+    void SetHeight(float _height) { height_ = _height; }
+    // カプセルの高さを取得する
+    float GetHeight() const { return height_; }
+
+    // カプセルの中に_pointが含まれているか
+    bool Contains(const Vector3& _point) const override;
+    // _pointから最も近い点を求める
+    Vector3 GetClosestPoint(const Vector3& _point) const override;
+
+    // カプセルの中心を取得する
+    Vector3 GetCenter() const;
+
+    // カプセルの中心線の両端を取得する
+    void GetCapsuleSegment(Vector3& _start, Vector3& _end) const ;
+
+    // 点と線分間の最近接点を計算
+    Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
+
+
+private:
+    float radius_ = 0.0f; // カプセルの半径
+    float height_ = 0.0f; // カプセルの高さ(半球含めた高さ)
+    Vector3 direction_; // カプセルの向き
+    Vector3 localPivot_; // カプセルの基準点
+};
