@@ -533,7 +533,7 @@ bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollide
         return false;
     }
 
-    float distance = std::sqrt(distanceSquared);
+    float distance = length;
 
     // 衝突情報を設定
     _info.hasCollision = true;

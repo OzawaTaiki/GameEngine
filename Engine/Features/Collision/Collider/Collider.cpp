@@ -6,6 +6,11 @@
 
 #include <numbers>
 
+Collider::Collider()
+{
+    defaultTransform_.Initialize();
+}
+
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
 {
     // 衝突コールバックを実行（状態はColliderInfo内で提供）
@@ -41,6 +46,16 @@ CollisionState Collider::GetCollisionState(Collider* _other) const
     }
 
     return CollisionState::None; // 衝突なし
+}
+
+const WorldTransform* Collider::GetWorldTransform() const
+{
+    if (worldTransform_ == nullptr)
+    {
+        return &defaultTransform_;
+    }
+
+    return worldTransform_;
 }
 
 void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
@@ -125,8 +140,11 @@ void SphereCollider::Draw()
     // 球の半径をスケール分拡大
     float scale = GetWorldTransform()->scale_.x;
     float radius = radius_ * scale;
+
+    Matrix4x4 mat = MakeAffineMatrix({ radius,radius ,radius }, GetWorldTransform()->quaternion_, center);
+
     // 球を描画
-    LineDrawer::GetInstance()->DrawSphere(GetWorldTransform()->matWorld_);
+    LineDrawer::GetInstance()->DrawSphere(mat);
 }
 
 bool SphereCollider::Contains(const Vector3& _point) const
