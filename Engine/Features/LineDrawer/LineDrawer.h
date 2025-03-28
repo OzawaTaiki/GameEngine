@@ -21,12 +21,18 @@ public:
     void SetCameraPtr(const Camera* _cameraPtr) { cameraptr_ = _cameraPtr; }
     void SetColor(const Vector4& _color) { color_ = _color; }
     void RegisterPoint(const Vector3& _start, const Vector3& _end);
+    void RegisterPoint(const Vector3& _start, const Vector3& _end,const Vector4& _color);
     void Draw();
 
     void DrawOBB(const Matrix4x4& _affineMat);
+    void DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color);
     void DrawOBB(const std::array <Vector3, 8>& _vertices);
+    void DrawOBB(const std::array <Vector3, 8>& _vertices, const Vector4& _color);
+
     void DrawSphere(const Matrix4x4& _affineMat);
+    void DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color);
     void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal);
+    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color);
 
 private:
     void TransferData();
@@ -43,7 +49,6 @@ private:
     struct ConstantBufferData
     {
         Matrix4x4 vp;
-        Vector4 color;
     };
     Microsoft::WRL::ComPtr <ID3D12Resource> resources_ = nullptr;
     ConstantBufferData* constMap_;
@@ -51,6 +56,7 @@ private:
     struct PointData
     {
         Vector4 position;
+        Vector4 color;
     };
 
     PointData* vConstMap_ = nullptr;
