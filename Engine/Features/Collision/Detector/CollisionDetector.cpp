@@ -271,8 +271,8 @@ bool CollisionDetector::IntersectSphereSphere(SphereCollider* _sphere1, SphereCo
 bool CollisionDetector::IntersectAABBAABB(AABBCollider* _aabb1, AABBCollider* _aabb2, ColliderInfo& _info)
 {
     // AABBのワールド座標を計算
-    WorldTransform* transform1 = _aabb1->GetWorldTransform();
-    WorldTransform* transform2 = _aabb2->GetWorldTransform();
+    const WorldTransform* transform1 = _aabb1->GetWorldTransform();
+    const WorldTransform* transform2 = _aabb2->GetWorldTransform();
 
     Vector3 min1 = _aabb1->GetMin() + transform1->transform_;
     Vector3 max1 = _aabb1->GetMax() + transform1->transform_;
@@ -511,7 +511,7 @@ bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollide
     float radius = _sphere->GetRadius();
 
     // AABBのワールド座標
-    WorldTransform* aabbTransform = _aabb->GetWorldTransform();
+    const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
     Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_;
     Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_;
 
@@ -687,7 +687,7 @@ bool CollisionDetector::IntersectAABBCapsule(AABBCollider* _aabb, CapsuleCollide
     _capsule->GetCapsuleSegment(start, end);
 
     // AABBのワールド座標
-    WorldTransform* aabbTransform = _aabb->GetWorldTransform();
+    const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
     Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_;
     Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_;
 

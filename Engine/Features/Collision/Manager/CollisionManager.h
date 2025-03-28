@@ -1,14 +1,12 @@
 #pragma once
 
 #include <Features/Collision/Collider/Collider.h>
-
-#include <list>
+#include <Features/Collision/Detector/CollisionDetector.h>
+#include <vector>
 #include <unordered_map>
-#include <string>
-#include <memory>
+#include <functional>
 
-
-class Collider;
+// 衝突判定の管理を行うクラス
 class CollisionManager
 {
 public:
@@ -33,9 +31,24 @@ public:
     // 衝突応答を実行する
     void ResolveCollisions();
 
+    // 衝突状態を更新する
+    void UpdateCollisionStates();
+
+    // コライダーを描画する
+    void DrawColliders();
+
+    // デバッグ描画の有効/無効を設定
+    void SetDrawEnabled(bool _enabled) { isDrawEnabled_ = _enabled; }
+
+    // デバッグ描画の有効/無効を取得
+    bool IsDrawEnabled() const { return isDrawEnabled_; }
+
 private:
     // 衝突応答を実行する
     void ResolveCollision(const CollisionPair& _pair);
+
+    // 空間分割などの最適化のためのユーティリティ
+    void UpdateBroadPhase();
 
 private:
     // コライダーのリスト
@@ -43,6 +56,12 @@ private:
 
     // 衝突ペアのリスト
     std::vector<CollisionPair> collisionPairs_;
+
+    // デバッグ描画の有効/無効
+    bool isDrawEnabled_ = true;
+
+    // 空間分割のためのグリッド（将来的な拡張のために用意）
+    // std::unordered_map<int, std::vector<Collider*>> grid_;
 
 private:
     // コンストラクタ

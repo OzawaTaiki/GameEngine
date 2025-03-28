@@ -2,6 +2,132 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Math/Vector/VectorFunction.h>
 
+#include <Features/LineDrawer/LineDrawer.h>
+
+#include <numbers>
+
+void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
+{
+    // 衝突コールバックを実行（状態はColliderInfo内で提供）
+    if (fOnCollision_) {
+        fOnCollision_(_other, _info);
+    }
+}
+
+bool Collider::IsCollidingWith(Collider* _other) const
+{
+    auto it = collisionMap_.find(_other);
+    if (it != collisionMap_.end()) {
+        return it->second.isColliding;
+    }
+    return false;
+}
+
+CollisionState Collider::GetCollisionState(Collider* _other) const
+{
+    auto it = collisionMap_.find(_other);
+    if (it != collisionMap_.end()) {
+        const CollisionData& data = it->second;
+
+        if (data.isColliding && !data.wasColliding) {
+            return CollisionState::Enter; // 衝突開始
+        }
+        else if (data.isColliding && data.wasColliding) {
+            return CollisionState::Stay;  // 衝突中
+        }
+        else if (!data.isColliding && data.wasColliding) {
+            return CollisionState::Exit;  // 衝突終了
+        }
+    }
+
+    return CollisionState::None; // 衝突なし
+}
+
+void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
+{
+    // 現在のフレームでの衝突を記録
+    currentCollisions_.push_back(_other);
+
+    // 衝突マップに追加または更新
+    auto it = collisionMap_.find(_other);
+    if (it != collisionMap_.end()) {
+        // 既存のエントリを更新
+        it->second.info = _info;
+        it->second.isColliding = true;
+    }
+    else {
+        // 新しいエントリを追加
+        CollisionData data;
+        data.info = _info;
+        data.isColliding = true;
+        data.wasColliding = false;
+        collisionMap_[_other] = data;
+    }
+}
+
+void Collider::UpdateCollisionState()
+{
+    // すべてのマップエントリについて、現在衝突していないとマーク
+    for (auto& pair : collisionMap_) {
+        pair.second.isColliding = false;
+    }
+
+    // 現在のフレームでの衝突を設定
+    for (Collider* other : currentCollisions_) {
+        auto it = collisionMap_.find(other);
+        if (it != collisionMap_.end()) {
+            it->second.isColliding = true;
+        }
+    }
+
+    // 状態の変化をチェックし、必要に応じてコールバックを実行
+    for (auto& pair : collisionMap_) {
+        Collider* other = pair.first;
+        CollisionData& data = pair.second;
+
+        ColliderInfo info = data.info;
+
+        if (data.isColliding && !data.wasColliding) {
+            // 衝突開始
+            info.state = CollisionState::Enter;
+            if (fOnCollision_) {
+                fOnCollision_(other, info);
+            }
+        }
+        else if (data.isColliding && data.wasColliding) {
+            // 衝突中
+            info.state = CollisionState::Stay;
+            if (fOnCollision_) {
+                fOnCollision_(other, info);
+            }
+        }
+        else if (!data.isColliding && data.wasColliding) {
+            // 衝突終了
+            info.state = CollisionState::Exit;
+            if (fOnCollision_) {
+                fOnCollision_(other, info);
+            }
+        }
+
+        // 現在の状態を前フレームの状態として保存
+        data.wasColliding = data.isColliding;
+    }
+
+    // 現在のフレームでの衝突リストをクリア
+    currentCollisions_.clear();
+}
+
+void SphereCollider::Draw()
+{
+    // 球を描画
+    // 球の中心をワールド空間に変換
+    Vector3 center = GetWorldTransform()->transform_;
+    // 球の半径をスケール分拡大
+    float scale = GetWorldTransform()->scale_.x;
+    float radius = radius_ * scale;
+    // 球を描画
+    LineDrawer::GetInstance()->DrawSphere(GetWorldTransform()->matWorld_);
+}
 
 bool SphereCollider::Contains(const Vector3& _point) const
 {
@@ -11,6 +137,33 @@ bool SphereCollider::Contains(const Vector3& _point) const
 Vector3 SphereCollider::GetClosestPoint(const Vector3& _point) const
 {
     return _point.Normalize() * radius_;
+}
+
+void AABBCollider::Draw()
+{
+    // AABBを描画するために8つの頂点を計算
+    std::array<Vector3, 8> vertices;
+
+    // ワールド空間での頂点を計算
+    WorldTransform transform = *GetWorldTransform();
+    Vector3 pos = transform.transform_;
+    Vector3 scale = transform.scale_;
+
+    // ローカル空間でのAABBの頂点
+    Vector3 scaledMin = Vector3(min_.x * scale.x, min_.y * scale.y, min_.z * scale.z);
+    Vector3 scaledMax = Vector3(max_.x * scale.x, max_.y * scale.y, max_.z * scale.z);
+
+    vertices[0] = pos + Vector3(scaledMax.x, scaledMax.y, scaledMax.z); // 右上前
+    vertices[1] = pos + Vector3(scaledMax.x, scaledMax.y, scaledMin.z); // 右上後
+    vertices[2] = pos + Vector3(scaledMax.x, scaledMin.y, scaledMax.z); // 右下前
+    vertices[3] = pos + Vector3(scaledMax.x, scaledMin.y, scaledMin.z); // 右下後
+    vertices[4] = pos + Vector3(scaledMin.x, scaledMax.y, scaledMax.z); // 左上前
+    vertices[5] = pos + Vector3(scaledMin.x, scaledMax.y, scaledMin.z); // 左上後
+    vertices[6] = pos + Vector3(scaledMin.x, scaledMin.y, scaledMax.z); // 左下前
+    vertices[7] = pos + Vector3(scaledMin.x, scaledMin.y, scaledMin.z); // 左下後
+
+    LineDrawer::GetInstance()->DrawOBB(vertices);
+
 }
 
 bool AABBCollider::Contains(const Vector3& _point) const
@@ -27,6 +180,25 @@ Vector3 AABBCollider::GetClosestPoint(const Vector3& _point) const
         std::clamp(_point.y, min_.y, max_.y),
         std::clamp(_point.z, min_.z, max_.z)
     );
+}
+
+void OBBCollider::Draw()
+{
+    std::vector<Vector3> corners = GetVertices();
+
+    std::array<Vector3, 8> c;
+    // 順番を入れ替えて配置
+    c[0] = corners[6]; // 右上前 -> (+x, +y, +z)
+    c[1] = corners[2]; // 右上後 -> (+x, +y, -z)
+    c[2] = corners[5]; // 右下前 -> (+x, -y, +z)
+    c[3] = corners[1]; // 右下後 -> (+x, -y, -z)
+    c[4] = corners[7]; // 左上前 -> (-x, +y, +z)
+    c[5] = corners[3]; // 左上後 -> (-x, +y, -z)
+    c[6] = corners[4]; // 左下前 -> (-x, -y, +z)
+    c[7] = corners[0]; // 左下後 -> (-x, -y, -z)
+
+    // OBBを描画
+    LineDrawer::GetInstance()->DrawOBB(c);
 }
 
 bool OBBCollider::Contains(const Vector3& _point) const
@@ -87,6 +259,7 @@ std::vector<Vector3> OBBCollider::GetVertices() const
         corners[i] = center + Transform(localCorners[i], rotMat);
     }
 
+
     return corners;
 }
 
@@ -101,6 +274,114 @@ Vector3 OBBCollider::GetCenter() const
     return transform.transform_ + pivot;
 
 }
+
+void CapsuleCollider::Draw()
+{
+    // カプセルの中心線の両端を取得
+    Vector3 start, end;
+    GetCapsuleSegment(start, end);
+
+    // 方向ベクトルを取得
+    Vector3 direction = (end - start).Normalize();
+
+    // 中心線を描画
+    LineDrawer::GetInstance()->RegisterPoint(start, end);
+
+    // 法線と垂直な2つのベクトルを見つける
+    Vector3 tangent1, tangent2;
+
+    // 方向ベクトルが上向きベクトル(0,1,0)と近い場合は別の基準ベクトルを使用
+    if (std::abs(direction.Dot(Vector3(0, 1, 0))) > 0.99f)
+    {
+        // X軸を基準にする
+        tangent1 = Vector3(0, 0, 1);
+    }
+    else
+    {
+        // 上向きベクトルと方向の外積で最初の接ベクトルを得る
+        tangent1 = direction.Cross(Vector3(0, 1, 0)).Normalize();
+    }
+
+    // 方向と最初の接ベクトルの外積で2つ目の接ベクトルを得る
+    tangent2 = direction.Cross(tangent1).Normalize();
+
+    // 円周上の点の数
+    const int circleSegments = 16;
+    const float kEvery = std::numbers::pi_v<float> *2.0f / circleSegments;
+
+    // 胴体部分の円を描画する数
+    const int lengthSegments = 4;
+
+    // 胴体部分の円周上の点を記録する配列
+    std::vector<std::vector<Vector3>> circlePoints(lengthSegments + 1);
+
+    // 胴体部分の円を描画して、各円周上の点を記録
+    for (int i = 0; i <= lengthSegments; i++)
+    {
+        float t = static_cast<float>(i) / lengthSegments;
+        Vector3 center = start + (end - start) * t;
+
+        // この円の点を保存するための配列
+        circlePoints[i].resize(circleSegments);
+
+        // 円を描画
+        for (int j = 0; j < circleSegments; j++)
+        {
+            float rad = j * kEvery;
+            float nextRad = ((j + 1) % circleSegments) * kEvery;
+
+            // 現在の円周上の点
+            Vector3 spos = center +
+                tangent1 * std::cos(rad) * radius_ +
+                tangent2 * std::sin(rad) * radius_;
+
+            // 次の円周上の点
+            Vector3 epos = center +
+                tangent1 * std::cos(nextRad) * radius_ +
+                tangent2 * std::sin(nextRad) * radius_;
+
+            // 点を記録
+            circlePoints[i][j] = spos;
+
+            // 円の線分を登録
+            LineDrawer::GetInstance()->RegisterPoint(spos, epos);
+        }
+    }
+
+    // 胴体の縦線を描画
+    for (int j = 0; j < circleSegments; j += 4) // 縦線の数を減らして見やすくする
+    {
+        for (int i = 0; i < lengthSegments; i++)
+        {
+            // 現在の円の点と次の円の対応する点を結ぶ
+            LineDrawer::GetInstance()->RegisterPoint(circlePoints[i][j], circlePoints[i + 1][j]);
+        }
+    }
+
+    // デフォルトの上向きベクトル
+    Vector3 defaultUp(0, 1, 0);
+    // 方向ベクトルを基準にした回転行列を作成
+    Matrix4x4 rotMat = DirectionToDirection(defaultUp, direction);
+
+    // 上半球を描画
+    Matrix4x4 sphereMat = MakeIdentity4x4();
+    // 半球の位置に移動
+    sphereMat = MakeTranslateMatrix(end);
+    // スケールと回転を適用
+    sphereMat = MakeScaleMatrix(Vector3(radius_, radius_, radius_)) * rotMat * sphereMat;
+
+    // 半球の描画
+    LineDrawer::GetInstance()->DrawSphere(sphereMat);
+
+    // 下半球を描画
+    sphereMat = MakeIdentity4x4();
+    sphereMat = MakeTranslateMatrix(start);
+    sphereMat = MakeScaleMatrix(Vector3(radius_, radius_, radius_)) * rotMat * sphereMat;
+
+    // 半球の描画
+    LineDrawer::GetInstance()->DrawSphere(sphereMat);
+}
+
 
 bool CapsuleCollider::Contains(const Vector3& _point) const
 {

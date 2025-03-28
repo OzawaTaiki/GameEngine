@@ -1,6 +1,5 @@
 #include "CollisionManager.h"
-#include <Features/Collision/Collider/Collider.h>
-#include <Features/Collision/Detector/CollisionDetector.h>
+#include <Features/LineDrawer/LineDrawer.h>
 #include <algorithm>
 
 CollisionManager* CollisionManager::GetInstance()
@@ -13,6 +12,7 @@ void CollisionManager::Initialize()
 {
     colliders_.clear();
     collisionPairs_.clear();
+    isDrawEnabled_ = true;
 }
 
 void CollisionManager::Finalize()
@@ -23,13 +23,29 @@ void CollisionManager::Finalize()
 
 void CollisionManager::Update()
 {
-    // 全てのコライダーをクリア
+    // 衝突判定を実行
+    CheckCollisions();
+
+    // 衝突応答を実行
+    ResolveCollisions();
+
+    // 衝突状態を更新
+    UpdateCollisionStates();
+
+    // デバッグ描画が有効なら描画
+    if (isDrawEnabled_)
+    {
+        DrawColliders();
+    }
+
+    // 全てのコライダーをクリア（次のフレームのために）
     colliders_.clear();
     collisionPairs_.clear();
 }
 
 void CollisionManager::RegisterCollider(Collider* _collider)
-{ // nullチェック
+{
+    // nullチェック
     if (_collider == nullptr)
         return;
 
@@ -44,6 +60,8 @@ void CollisionManager::RegisterCollider(Collider* _collider)
 
 void CollisionManager::CheckCollisions()
 {
+    // ブロードフェーズの更新（空間分割等の最適化）
+    UpdateBroadPhase();
 
     // 全てのコライダー同士の組み合わせで衝突判定を実行
     for (size_t i = 0; i < colliders_.size(); ++i)
@@ -73,6 +91,14 @@ void CollisionManager::CheckCollisions()
                 pair.colliderB = colliderB;
                 pair.info = info;
                 collisionPairs_.push_back(pair);
+
+                // 各コライダーに現在の衝突を記録
+                colliderA->AddCurrentCollision(colliderB, info);
+
+                // 衝突情報を反転して相手側にも記録
+                ColliderInfo reversedInfo = info;
+                reversedInfo.contactNormal = -info.contactNormal;
+                colliderB->AddCurrentCollision(colliderA, reversedInfo);
             }
         }
     }
@@ -87,35 +113,85 @@ void CollisionManager::ResolveCollisions()
     }
 }
 
+void CollisionManager::UpdateCollisionStates()
+{
+    // 全てのコライダーの衝突状態を更新
+    for (auto collider : colliders_)
+    {
+        collider->UpdateCollisionState();
+    }
+}
+
+void CollisionManager::DrawColliders()
+{
+    // デバッグ描画が無効ならスキップ
+    if (!isDrawEnabled_)
+        return;
+
+    // 衝突中のコライダーを赤色で描画
+    std::vector<Collider*> collidingColliders;
+
+    // 衝突中のコライダーを抽出
+    for (const auto& pair : collisionPairs_)
+    {
+        collidingColliders.push_back(pair.colliderA);
+        collidingColliders.push_back(pair.colliderB);
+    }
+
+    // 全てのコライダーを描画
+    for (auto collider : colliders_)
+    {
+        // コライダーが衝突中か判定
+        bool isColliding = std::find(collidingColliders.begin(), collidingColliders.end(), collider) != collidingColliders.end();
+
+        // 衝突状態に応じて色を設定
+        if (isColliding)
+        {
+            // 衝突中は赤色
+            LineDrawer::GetInstance()->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+        }
+        else
+        {
+            // 通常時は緑色
+            LineDrawer::GetInstance()->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+        }
+
+        // コライダーを描画
+        collider->Draw();
+    }
+
+    // 衝突点と法線を描画
+    LineDrawer::GetInstance()->SetColor({ 1.0f , 1.0f , 1.0f , 1.0f });
+    //LineDrawer::GetInstance()->SetColor({ 0.7f, 0.7f, 0.7f, 1.0f }); // ぐれー
+    for (const auto& pair : collisionPairs_)
+    {
+        // 衝突点を描画
+        Vector3 contactPoint = pair.info.contactPoint;
+        Vector3 normalEnd = contactPoint + pair.info.contactNormal * 0.5f; // 法線の長さを適当に調整
+
+        // 法線を描画
+        LineDrawer::GetInstance()->RegisterPoint(contactPoint, normalEnd);
+    }
+}
+
 void CollisionManager::ResolveCollision(const CollisionPair& _pair)
 {
-    // 両方のコライダーで衝突時のコールバックを呼び出す
+    // 両方のコライダーに衝突通知を送る
     if (_pair.colliderA && _pair.colliderB)
     {
-        // コライダーAのコールバック関数を呼び出す
-        if (_pair.colliderA)
-        {
-            // 衝突時のコールバック関数が設定されていれば呼び出す
-            std::function<void(Collider*, const ColliderInfo&)> callback = [&](Collider* collider, const ColliderInfo& info) {
-                // 何もしない（コライダー側でコールバックを設定している場合はそれが呼ばれる）
-                };
+        // コライダーAに衝突通知
+        _pair.colliderA->OnCollision(_pair.colliderB, _pair.info);
 
-            callback(_pair.colliderB, _pair.info);
-        }
+        // コライダーBに衝突通知（法線方向を反転）
+        ColliderInfo invertedInfo = _pair.info;
+        invertedInfo.contactNormal = -_pair.info.contactNormal;
 
-        // コライダーBのコールバック関数を呼び出す
-        if (_pair.colliderB)
-        {
-            // 反転した衝突情報を作成
-            ColliderInfo invertedInfo = _pair.info;
-            invertedInfo.contactNormal = -_pair.info.contactNormal;
-
-            // 衝突時のコールバック関数が設定されていれば呼び出す
-            std::function<void(Collider*, const ColliderInfo&)> callback = [&](Collider* collider, const ColliderInfo& info) {
-                // 何もしない（コライダー側でコールバックを設定している場合はそれが呼ばれる）
-                };
-
-            callback(_pair.colliderA, invertedInfo);
-        }
+        _pair.colliderB->OnCollision(_pair.colliderA, invertedInfo);
     }
+}
+
+void CollisionManager::UpdateBroadPhase()
+{
+    // 空間分割などの最適化を行う場合はここに実装
+    // 現在は単純な総当たりで実装
 }

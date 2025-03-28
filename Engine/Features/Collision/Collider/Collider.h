@@ -15,12 +15,21 @@
 
 class Collider;
 
+enum class CollisionState
+{
+    None = 0, // 何もしていない
+    Enter, // 衝突した瞬間
+    Stay, // 衝突している間
+    Exit // 離れた瞬間
+};
+
 struct ColliderInfo
 {
     bool hasCollision = false;      // 衝突しているか
     Vector3 contactPoint;           // 衝突点
     Vector3 contactNormal;          // 衝突面の法線
     float penetration = 0.0f;       // めりこみ量
+    CollisionState state = CollisionState::None; // 衝突状態
 
     ColliderInfo() = default;
 };
@@ -41,45 +50,51 @@ enum class BoundingBox
     Capsule_3D
 };
 
-/*
-    衝突判定のクラス
-使い方
-Initilaizeで
-    Colliderのインスタンスを作成し、SetBoundingBoxで衝突判定の形状を設定する
-    SetShapeで形状のデータを設定する
-    SetAtrributeで自身の属性を設定する
-    SetMaskで当たらない属性を設定する
-    SetGetWorldMatrixFuncでワールド行列を取得する関数を設定する
-    SetOnCollisionFuncで衝突時の処理を行う関数を設定する
-    SetReferencePointで基準点を設定する(初期は{0,0,0})
-
-Updateで
-    CollisionManagerのRegisterColliderでColliderを登録する
-    ※必ず毎フレーム登録すること
-
-*/
-
-
+/// Scene::Initialize(){
+/// Collider* collider = new SphereCollider();
+/// collider->SetLayer("Player");
+/// collider->SetLayerMask("Enemy");
+/// collider->SetRadius(1.0f);
+/// collider->SetWorldTransform(worldTransform);
+/// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
+///     // 衝突時の処理
+/// });
+/// }
+///
+/// Scene::Update(){
+/// CollisionManager::GetInstance()->RegisterCollider(collider);
+/// }
 class Collider
 {
 public:
-
     // コンストラクタ
     Collider() = default;
     // デストラクタ
     virtual ~Collider() = default;
 
+    // 衝突イベント処理（CollisionManagerから呼ばれる）
+    void OnCollision(Collider* _other, const ColliderInfo& _info);
 
-    ///-----------------------------------------------
-    /// コールバック関数
-    ///
+    // 衝突状態を更新（CollisionManagerから呼ばれる）
+    void UpdateCollisionState();
 
-    // 衝突時の処理を行う関数を設定する
-    void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _fOnCollision) { fOnCollision_ = _fOnCollision; }
+    // 特定のコライダーとの衝突状態を取得
+    CollisionState GetCollisionState(Collider* _other) const;
 
-    ///-----------------------------------------------
-    /// Layer周り
-    ///
+    // 任意のコライダーと衝突しているかどうか
+    bool IsColliding() const { return !currentCollisions_.empty(); }
+
+    // 特定のコライダーと衝突しているかどうか
+    bool IsCollidingWith(Collider* _other) const;
+
+    // 描画メソッド
+    virtual void Draw() = 0;
+
+    // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
+    void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
+    {
+        fOnCollision_ = _callback;
+    }
 
     // 自身のlayerを取得する
     uint32_t GetLayer() const { return collisionLayer_.GetLayer(); }
@@ -87,13 +102,11 @@ public:
     // 衝突しないlayerを取得する
     uint32_t GetLayerMask() const { return collisionLayer_.GetLayerMask(); }
 
-    //自身のlayerをセット設定する
+    // 自身のlayerをセット設定する
     void SetLayer(const std::string& _layer) { collisionLayer_.SetLayer(_layer); }
 
-    //自身のlayerMaskをセット設定する
+    // 自身のlayerMaskをセット設定する
     void SetLayerMask(const std::string& _layer) { collisionLayer_.SetLayerMask(_layer); }
-
-
 
     // バウンディングボックスを取得する
     BoundingBox GetBoundingBox() const { return boundingBox_; }
@@ -101,33 +114,45 @@ public:
     // バウンディングボックスを設定する
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
 
+    // ワールドトランスフォームを設定する
+    void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
-    void SetWorldTransform(WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
-
-    WorldTransform* GetWorldTransform() const { return worldTransform_; }
-
-    ///-----------------------------------------------
-    /// 仮想関数
-    ///
+    // ワールドトランスフォームを取得する
+    const WorldTransform* GetWorldTransform() const { return worldTransform_; }
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) const = 0;
 
-    // _pointから最も近い点を求める。
+    // _pointから最も近い点を求める
     virtual Vector3 GetClosestPoint(const Vector3& _point) const = 0;
 
+    // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
+    void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
+
 private:
+    // 衝突状態の管理
+    struct CollisionData
+    {
+        ColliderInfo info;
+        bool wasColliding = false;
+        bool isColliding = false;
+    };
 
     bool isStatic_ = false; // 静的かどうか 動かない物体
-
     CollisionLayer collisionLayer_; // 衝突判定の属性
-
     BoundingBox boundingBox_ = BoundingBox::NONE; // 衝突判定の形状
+    const WorldTransform* worldTransform_ = nullptr; // ワールド行列
 
-    WorldTransform* worldTransform_ = nullptr; // ワールド行列
+    // 衝突状態の記録
+    std::unordered_map<Collider*, CollisionData> collisionMap_;
 
-    std::function<void(Collider*,const ColliderInfo&)> fOnCollision_; // 衝突時の処理を行う関数
+    // 現在のフレームで衝突しているコライダーのリスト（UpdateCollisionStateで使用）
+    std::vector<Collider*> currentCollisions_;
+
+    // 衝突コールバック関数
+    std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
 };
+
 
 
 class SphereCollider : public Collider
@@ -137,6 +162,8 @@ public:
     SphereCollider() : Collider(), radius_(0.0f) { SetBoundingBox(BoundingBox::Sphere_3D); }
     // デストラクタ
     ~SphereCollider() = default;
+
+    void Draw() override;
 
     // 球の半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }
@@ -160,6 +187,8 @@ public:
     AABBCollider() : Collider() { SetBoundingBox(BoundingBox::AABB_3D); }
     // デストラクタ
     ~AABBCollider() = default;
+
+    void Draw() override;
 
     // AABBの最小値と最大値を設定する
     void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
@@ -187,6 +216,8 @@ public:
     OBBCollider() : Collider() { SetBoundingBox(BoundingBox::OBB_3D); }
     // デストラクタ
     ~OBBCollider() = default;
+
+    void Draw() override;
 
     // OBBの半分の大きさを設定する
     void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
@@ -220,6 +251,8 @@ public:
     CapsuleCollider() : Collider(), direction_({ 0,1,0 }) { SetBoundingBox(BoundingBox::Capsule_3D); }
     // デストラクタ
     ~CapsuleCollider() = default;
+
+    void Draw() override;
 
     // カプセルの半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }
