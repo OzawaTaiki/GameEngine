@@ -47,8 +47,7 @@ enum class BoundingBox
     Sphere_3D,
     AABB_3D,
     OBB_3D,
-    Capsule_3D,
-    Ray_3D
+    Capsule_3D
 };
 
 /// Scene::Initialize(){
