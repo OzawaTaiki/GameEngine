@@ -46,10 +46,18 @@ void LineDrawer::Initialize()
 
 void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end)
 {
+    RegisterPoint(_start, _end, color_);
+}
+
+void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, const Vector4& _color)
+{
     assert(index + 2 < kMaxNum && "The line instance is too large");
 
-    vConstMap_[index++].position = { _start, 1.0f };
-    vConstMap_[index++].position = { _end, 1.0f };
+    vConstMap_[index].position = { _start, 1.0f };
+    vConstMap_[index++].color = _color;
+
+    vConstMap_[index].position = { _end, 1.0f };
+    vConstMap_[index++].color = _color;
 }
 
 void LineDrawer::Draw()
@@ -73,20 +81,27 @@ void LineDrawer::Draw()
 
 void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
 {
+    DrawOBB(_affineMat, color_);
+}
+
+void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color)
+{
     for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
     {
         uint32_t sIndex = obbIndices_[index - 1];
         uint32_t eIndex = obbIndices_[index];
-
         Vector3 spos = Transform(obbVertices_[sIndex], _affineMat);
         Vector3 epos = Transform(obbVertices_[eIndex], _affineMat);
-
-        RegisterPoint(spos, epos);
+        RegisterPoint(spos, epos, _color);
     }
-
 }
 
 void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices)
+{
+    DrawOBB(_vertices, color_);
+}
+
+void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices, const Vector4& _color)
 {
     for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
     {
@@ -96,11 +111,16 @@ void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices)
         Vector3 spos = _vertices[sIndex];
         Vector3 epos = _vertices[eIndex];
 
-        RegisterPoint(spos, epos);
+        RegisterPoint(spos, epos, _color);
     }
 }
 
 void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
+{
+    DrawSphere(_affineMat, color_);
+}
+
+void LineDrawer::DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color)
 {
     for (uint32_t index = 1; index < sphereIndices_.size(); index += 2)
     {
@@ -110,11 +130,16 @@ void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
         Vector3 spos = Transform(sphereVertices_[sIndex], _affineMat);
         Vector3 epos = Transform(sphereVertices_[eIndex], _affineMat);
 
-        RegisterPoint(spos, epos);
+        RegisterPoint(spos, epos, _color);
     }
 }
 
 void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal)
+{
+    DrawCircle(_center, _radius, _segmentCount, _normal, color_);
+}
+
+void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color)
 {
     // 法線を正規化
     Vector3 normal = _normal.Normalize();
@@ -162,7 +187,6 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
 
 void LineDrawer::TransferData()
 {
-    constMap_->color = color_;
     constMap_->vp = cameraptr_->GetViewProjection();
 }
 
