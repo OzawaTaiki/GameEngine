@@ -68,7 +68,7 @@ class Collider
 {
 public:
     // コンストラクタ
-    Collider() = default;
+    Collider();
     // デストラクタ
     virtual ~Collider() = default;
 
@@ -118,7 +118,7 @@ public:
     void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
     // ワールドトランスフォームを取得する
-    const WorldTransform* GetWorldTransform() const { return worldTransform_; }
+    const WorldTransform* GetWorldTransform() const;
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) const = 0;
@@ -151,6 +151,9 @@ private:
 
     // 衝突コールバック関数
     std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
+
+    WorldTransform defaultTransform_;
+
 };
 
 

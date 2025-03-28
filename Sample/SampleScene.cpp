@@ -11,6 +11,9 @@
 
 SampleScene::~SampleScene()
 {
+    delete bunnyCollider_;
+    delete cubeCollider_;
+    delete cubeCollider2_;
 }
 
 void SampleScene::Initialize()
@@ -62,14 +65,13 @@ void SampleScene::Initialize()
     bunnyCollider_ = new AABBCollider();
     bunnyCollider_->SetLayer("bunny");
     bunnyCollider_->SetMinMax({ -1,-1,-1 }, { 1,1,1 });
-    bunnyCollider_->SetWorldTransform(oModel_->GetWorldTransform());
     bunnyCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
         Debug::Log("bunny Collision\n");
         });
 
     cubeCollider_ = new SphereCollider();
     cubeCollider_->SetLayer("cube");
-    cubeCollider_->SetRadius(1);
+    cubeCollider_->SetRadius(.5f);
     cubeCollider_->SetWorldTransform(oModel2_->GetWorldTransform());
     cubeCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
         });
@@ -184,9 +186,6 @@ void SampleScene::DrawShadow()
     oModel2_->DrawShadow(&SceneCamera_, 1);
     aModel_->DrawShadow(&SceneCamera_, 2);
 
-    // depthtextureとrendertextreuからIDを指定して影の輪郭を取得
-    // https://claude.ai/chat/01808d8d-c6f8-49d8-a17b-bd4981ce2684
-    // その陰からメッシュを作成して高さを与えて描画
 }
 
 #ifdef _DEBUG
