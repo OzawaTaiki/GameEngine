@@ -17,22 +17,22 @@ public:
     void SetFolderPath();
     void Save();
 
-#pragma region 変数登録関数
-    // 変数を登録する関数
+#pragma region 登録関数
+    // 登録する関数
     template<typename T>
     inline void RegisterVariable(const std::string& _variableName, T* _variablePtr);
 
-    // 変数を登録する関数
+    // 登録する関数
     template<typename T>
     inline void RegisterVariable(const std::string& _variableName, std::vector<T>* _variablePtr);
 
-    // 変数を登録する関数
+    // 登録する関数
     template<typename T>
     inline void RegisterVariable(const std::string& _variableName, std::list<T>* _variablePtr);
 
 #pragma endregion
 
-#pragma region 変数取得関数
+#pragma region 取得関数
     // データを取得する関数
     template<typename T>
     inline void GetVariableValue(const std::string& _variableName, T& _var);
@@ -47,7 +47,7 @@ public:
 
 #pragma endregion
 
-#pragma region 変数送信関数
+#pragma region 送信関数
 
     // 登録した変数を送信する関数
     void RegisterVariable();
@@ -174,6 +174,7 @@ inline bool JsonBinder::IsDefaultType()
         std::is_same_v<T, Vector2> ||
         std::is_same_v<T, Vector3> ||
         std::is_same_v<T, Vector4> ||
+        std::is_same_v<T,Quaternion>||
         std::is_same_v<T, std::string>)
     {
         return true;
@@ -185,6 +186,7 @@ inline bool JsonBinder::IsDefaultType()
                        std::is_same_v<T, std::vector<Vector2>> ||
                        std::is_same_v<T, std::vector<Vector3>> ||
                        std::is_same_v<T, std::vector<Vector4>> ||
+                       std::is_same_v<T, std::vector<Quaternion>> ||
                        std::is_same_v<T, std::vector<std::string>>)
     {
         return true;
@@ -196,6 +198,7 @@ inline bool JsonBinder::IsDefaultType()
                        std::is_same_v<T, std::list<Vector2>> ||
                        std::is_same_v<T, std::list<Vector3>> ||
                        std::is_same_v<T, std::list<Vector4>> ||
+                       std::is_same_v<T, std::list<Quaternion>> ||
                        std::is_same_v<T, std::list<std::string>>)
     {
         return true;
