@@ -1,7 +1,6 @@
 #include "AnimationSequence.h"
 
 
-    // TODO ファイルロードセーブ実装
 AnimationSequence::AnimationSequence(const std::string& _label) :
     label_(_label),
     currentTime_(0.0f),
@@ -25,7 +24,6 @@ void AnimationSequence::Initialize(const std::string& _filepath)
 {
     if (!_filepath.empty())
     {
-        // TODO ファイルロード
 
         jsonBinder_ = std::make_unique<JsonBinder>(label_,_filepath);
         jsonBinder_->RegisterVariable("SequenceSize", &sequenceSize_);
@@ -56,7 +54,6 @@ void AnimationSequence::Update(float _deltaTime)
 
 void AnimationSequence::Save()
 {
-    // TODO ファイルセーブ
     for (auto& sequenceEvent : sequenceEvents_)
     {
         sequenceEvent.second->Save();

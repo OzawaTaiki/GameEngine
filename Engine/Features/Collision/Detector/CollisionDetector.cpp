@@ -554,15 +554,15 @@ bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollide
 
         if (relDiff.x > relDiff.y && relDiff.x > relDiff.z)
         {
-            _info.contactNormal = Vector3(diff.x > 0 ? 1 : -1, 0, 0);
+            _info.contactNormal = Vector3(diff.x > 0.0f ? 1.0f : -1.0f, 0.0f, 0.0f);
         }
         else if (relDiff.y > relDiff.x && relDiff.y > relDiff.z)
         {
-            _info.contactNormal = Vector3(0, diff.y > 0 ? 1 : -1, 0);
+            _info.contactNormal = Vector3(0.0f, diff.y > 0.0f ? 1.0f : -1.0f, 0.0f);
         }
         else
         {
-            _info.contactNormal = Vector3(0, 0, diff.z > 0 ? 1 : -1);
+            _info.contactNormal = Vector3(0.0f, 0.0f, diff.z > 0.0f ? 1.0f : -1.0f);
         }
     }
 

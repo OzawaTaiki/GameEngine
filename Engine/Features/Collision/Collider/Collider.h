@@ -5,6 +5,7 @@
 
 #include <Features/Collision/CollisionLayer/CollisionLayer.h>
 #include <Features/Model/Transform/WorldTransform.h>
+#include <Features/Json/JsonBinder.h>
 
 #include <string>
 #include <cstdint>
@@ -90,6 +91,12 @@ public:
     // 描画メソッド
     virtual void Draw() = 0;
 
+    // ファイルから読み込み
+    virtual void Load(const std::string& _name) = 0;
+
+    // ファイルに保存
+    virtual void Save(const std::string& _name) = 0;
+
     // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
     void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
     {
@@ -110,9 +117,9 @@ public:
 
     // バウンディングボックスを取得する
     BoundingBox GetBoundingBox() const { return boundingBox_; }
-
     // バウンディングボックスを設定する
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
+
 
     // ワールドトランスフォームを設定する
     void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
@@ -129,6 +136,12 @@ public:
     // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
 
+
+protected:
+
+    bool InitJsonBinder(const std::string& _name, const std::string& _folderPath="Resources/Data/Colliders/");
+
+    JsonBinder* jsonBinder_ = nullptr;
 private:
     // 衝突状態の管理
     struct CollisionData
@@ -154,6 +167,7 @@ private:
 
     WorldTransform defaultTransform_;
 
+
 };
 
 
@@ -167,6 +181,10 @@ public:
     ~SphereCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // 球の半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }
@@ -192,6 +210,11 @@ public:
     ~AABBCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
+
 
     // AABBの最小値と最大値を設定する
     void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
@@ -221,6 +244,10 @@ public:
     ~OBBCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // OBBの半分の大きさを設定する
     void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
@@ -256,6 +283,10 @@ public:
     ~CapsuleCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // カプセルの半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }

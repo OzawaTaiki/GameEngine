@@ -80,6 +80,25 @@ void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
     }
 }
 
+bool Collider::InitJsonBinder(const std::string& _name, const std::string& _folderPath)
+{
+    if (jsonBinder_ == nullptr)
+    {
+        jsonBinder_ = new JsonBinder(_name, _folderPath);
+
+        collisionLayer_.RegisterLayer(jsonBinder_);
+        jsonBinder_->RegisterVariable("isStatic", &isStatic_);
+        jsonBinder_->RegisterVariable("boundingBox", reinterpret_cast<uint32_t*>(&boundingBox_));
+        jsonBinder_->RegisterVariable("transform", &defaultTransform_.transform_);
+        jsonBinder_->RegisterVariable("scale", &defaultTransform_.scale_);
+        jsonBinder_->RegisterVariable("quaternion", &defaultTransform_.quaternion_);
+
+        return true;
+    }
+
+    return false;
+}
+
 void Collider::UpdateCollisionState()
 {
     // すべてのマップエントリについて、現在衝突していないとマーク
@@ -147,6 +166,20 @@ void SphereCollider::Draw()
     LineDrawer::GetInstance()->DrawSphere(mat);
 }
 
+void SphereCollider::Load(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+        jsonBinder_->RegisterVariable("radius", &radius_);
+}
+
+void SphereCollider::Save(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+        jsonBinder_->RegisterVariable("radius", &radius_);
+
+    jsonBinder_->Save();
+}
+
 bool SphereCollider::Contains(const Vector3& _point) const
 {
     return _point.Length() <= radius_;
@@ -184,6 +217,26 @@ void AABBCollider::Draw()
 
 }
 
+void AABBCollider::Load(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("min", &min_);
+        jsonBinder_->RegisterVariable("max", &max_);
+    }
+}
+
+void AABBCollider::Save(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("min", &min_);
+        jsonBinder_->RegisterVariable("max", &max_);
+    }
+
+    jsonBinder_->Save();
+}
+
 bool AABBCollider::Contains(const Vector3& _point) const
 {
     return min_.x <= _point.x && _point.x <= max_.x &&
@@ -217,6 +270,25 @@ void OBBCollider::Draw()
 
     // OBBを描画
     LineDrawer::GetInstance()->DrawOBB(c);
+}
+
+void OBBCollider::Load(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("halfExtents", &halfExtents_);
+        jsonBinder_->RegisterVariable("localPivot", &localPivot_);
+    }
+}
+
+void OBBCollider::Save(const std::string& _name)
+{
+    if (InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("halfExtents", &halfExtents_);
+        jsonBinder_->RegisterVariable("localPivot", &localPivot_);
+    }
+    jsonBinder_->Save();
 }
 
 bool OBBCollider::Contains(const Vector3& _point) const
@@ -398,6 +470,30 @@ void CapsuleCollider::Draw()
 
     // 半球の描画
     LineDrawer::GetInstance()->DrawSphere(sphereMat);
+}
+
+void CapsuleCollider::Load(const std::string& _name)
+{
+    if(InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("radius", &radius_);
+        jsonBinder_->RegisterVariable("direction", &direction_);
+        jsonBinder_->RegisterVariable("localPivot", &localPivot_);
+        jsonBinder_->RegisterVariable("height", &height_);
+    }
+}
+
+void CapsuleCollider::Save(const std::string& _name)
+{
+    if (InitJsonBinder(_name))
+    {
+        jsonBinder_->RegisterVariable("radius", &radius_);
+        jsonBinder_->RegisterVariable("direction", &direction_);
+        jsonBinder_->RegisterVariable("localPivot", &localPivot_);
+        jsonBinder_->RegisterVariable("height", &height_);
+    }
+
+    jsonBinder_->Save();
 }
 
 

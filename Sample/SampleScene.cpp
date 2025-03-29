@@ -63,11 +63,12 @@ void SampleScene::Initialize()
     sequence_->Initialize("Resources/Data/");
 
     bunnyCollider_ = new AABBCollider();
-    bunnyCollider_->SetLayer("bunny");
+    bunnyCollider_->Load("bunny");
+    /*bunnyCollider_->SetLayer("bunny");
     bunnyCollider_->SetMinMax({ -1,-1,-1 }, { 1,1,1 });
     bunnyCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
         Debug::Log("bunny Collision\n");
-        });
+        });*/
 
     cubeCollider_ = new SphereCollider();
     cubeCollider_->SetLayer("cube");
@@ -120,6 +121,13 @@ void SampleScene::Update()
     if (play)
         oModel_->translate_ = sequence_->GetValue<Vector3>("a");
 
+
+    if (ImGui::Button("Save"))
+    {
+        bunnyCollider_->Save("bunny");
+        cubeCollider_->Save("cube");
+        cubeCollider2_->Save("cube2");
+    }
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
