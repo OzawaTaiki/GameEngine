@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <cstdint>
 
+class JsonBinder;
 class CollisionLayer
 {
 public:
@@ -22,6 +23,9 @@ public:
 
     // LayerMaskを設定する
     void SetLayerMask(const std::string& _layer);
+
+    // jsonBinderへの登録
+    void RegisterLayer(JsonBinder* _jsonBinder);
 
 private:
 

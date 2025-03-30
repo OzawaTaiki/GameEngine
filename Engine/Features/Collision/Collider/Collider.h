@@ -5,6 +5,7 @@
 
 #include <Features/Collision/CollisionLayer/CollisionLayer.h>
 #include <Features/Model/Transform/WorldTransform.h>
+#include <Features/Json/JsonBinder.h>
 
 #include <string>
 #include <cstdint>
@@ -50,6 +51,8 @@ enum class BoundingBox
     Capsule_3D
 };
 
+std::string ToString(BoundingBox _box);
+
 /// Scene::Initialize(){
 /// Collider* collider = new SphereCollider();
 /// collider->SetLayer("Player");
@@ -90,6 +93,12 @@ public:
     // 描画メソッド
     virtual void Draw() = 0;
 
+    // ファイルから読み込み
+    virtual void Load(const std::string& _name) = 0;
+
+    // ファイルに保存
+    virtual void Save(const std::string& _name) = 0;
+
     // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
     void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
     {
@@ -110,9 +119,9 @@ public:
 
     // バウンディングボックスを取得する
     BoundingBox GetBoundingBox() const { return boundingBox_; }
-
     // バウンディングボックスを設定する
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
+
 
     // ワールドトランスフォームを設定する
     void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
@@ -129,6 +138,16 @@ public:
     // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
 
+
+protected:
+
+    bool InitJsonBinder(const std::string& _name, const std::string& _folderPath="Resources/Data/Colliders/");
+
+    void ImGui();
+
+    JsonBinder* jsonBinder_ = nullptr;
+
+    std::string name_;
 private:
     // 衝突状態の管理
     struct CollisionData
@@ -162,11 +181,15 @@ class SphereCollider : public Collider
 {
 public:
     // コンストラクタ
-    SphereCollider() : Collider(), radius_(0.0f) { SetBoundingBox(BoundingBox::Sphere_3D); }
+    SphereCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~SphereCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // 球の半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }
@@ -178,6 +201,8 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point) const override;
 
+
+    void ImGui();
 private:
 
     float radius_ = 0.0f; // 球の半径
@@ -187,11 +212,16 @@ class AABBCollider : public Collider
 {
 public:
     // コンストラクタ
-    AABBCollider() : Collider() { SetBoundingBox(BoundingBox::AABB_3D); }
+    AABBCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~AABBCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
+
 
     // AABBの最小値と最大値を設定する
     void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
@@ -206,6 +236,8 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point) const override;
 
+
+    void ImGui();
 private:
     Vector3 min_; // AABBの最小値
     Vector3 max_; // AABBの最大値
@@ -216,11 +248,15 @@ class OBBCollider : public Collider
 {
 public:
     // コンストラクタ
-    OBBCollider() : Collider() { SetBoundingBox(BoundingBox::OBB_3D); }
+    OBBCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~OBBCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // OBBの半分の大きさを設定する
     void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
@@ -242,6 +278,7 @@ public:
     // OBBの中心を取得する
     Vector3 GetCenter() const;
 
+    void ImGui();
 private:
     Vector3 halfExtents_; // OBBの半分の大きさ
     Vector3 localPivot_; // OBBの基準点
@@ -251,11 +288,15 @@ class CapsuleCollider : public Collider
 {
 public:
     // コンストラクタ
-    CapsuleCollider() : Collider(), direction_({ 0,1,0 }) { SetBoundingBox(BoundingBox::Capsule_3D); }
+    CapsuleCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~CapsuleCollider() = default;
 
     void Draw() override;
+
+    void Load(const std::string& _name) override;
+
+    void Save(const std::string& _name) override;
 
     // カプセルの半径を設定する
     void SetRadius(float _radius) { radius_ = _radius; }
@@ -291,6 +332,7 @@ public:
     // 点と線分間の最近接点を計算
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
 
+    void ImGui();
 
 private:
     float radius_ = 0.0f; // カプセルの半径

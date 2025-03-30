@@ -35,6 +35,8 @@ public:
     Vector3 GetMax()const { return model_->GetMax(); }
     Material* GetMaterial() { return model_->GetMaterialPtr(); }
 
+    std::string GetName() const{ return name_; }
+
     ID3D12Resource* GetIndexResource(size_t _index = -1) { return model_->GetIndexResource(_index); }
 
     Vector3 translate_ = { 0,0,0 };

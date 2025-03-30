@@ -1,0 +1,25 @@
+{
+    "cube": {
+        "boundingBox": 1,
+        "isStatic": false,
+        "layer": 1,
+        "layerMask": 0,
+        "quaternion": {
+            "w": 1.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "radius": 1.2699999809265137,
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "transform": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        }
+    }
+}
