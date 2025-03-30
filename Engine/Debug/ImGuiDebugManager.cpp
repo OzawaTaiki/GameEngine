@@ -89,6 +89,17 @@ void ImGuiDebugManager::ShowDebugWindow()
 
             ++i;
         }
+
+        ImGui::SeparatorText("Colliders");
+        i = 0;
+        for (auto& [name, func] : colliderDebugWindows_)
+        {
+            bool flag = colliderIsSelect_[i];
+            if (ImGui::Selectable(name.c_str(), &flag))
+                colliderIsSelect_[i] = flag;
+            ++i;
+        }
+
     }
     ImGui::End();
 
@@ -108,6 +119,26 @@ void ImGuiDebugManager::ShowDebugWindow()
                         ImGui::EndTabItem();
                     }
                     isSelect_[i] = flag;
+                }
+                i++;
+            }
+        }
+        ImGui::EndTabBar();
+
+        ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
+        {
+            size_t i = 0;
+            for (auto& [name, func] : colliderDebugWindows_)
+            {
+                if (colliderIsSelect_[i])
+                {
+                    bool flag = colliderIsSelect_[i];
+                    if (ImGui::BeginTabItem(name.c_str(), reinterpret_cast<bool*>(&flag)))
+                    {
+                        func();
+                        ImGui::EndTabItem();
+                    }
+                    colliderIsSelect_[i] = flag;
                 }
                 i++;
             }
@@ -151,5 +182,39 @@ void ImGuiDebugManager::RemoveDebugWindow(const std::string& _name)
     if (it != debugWindows_.end())
     {
         debugWindows_.erase(it);
+        return;
     }
+
+    it = colliderDebugWindows_.find(_name);
+    if (it != colliderDebugWindows_.end())
+    {
+        colliderDebugWindows_.erase(it);
+        return;
+    }
+}
+
+std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, std::function<void()> _func)
+{
+
+    std::string name = _name;
+    int32_t count = 0;
+
+    // すでに同じ名前のデバッグウィンドウが存在する場合、名前を変更する
+    if (colliderDebugWindows_.contains(name))
+    {
+        auto it = colliderDebugWindows_.find(name);
+
+        while (colliderDebugWindows_.find(name) != colliderDebugWindows_.end())
+        {
+            name = name + std::to_string(count);
+            it++;
+        }
+    }
+
+
+    colliderDebugWindows_[name] = _func;
+    if (colliderIsSelect_.size() < colliderDebugWindows_.size())
+        colliderIsSelect_.push_back(false);
+
+    return name;
 }

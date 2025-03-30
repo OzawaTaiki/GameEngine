@@ -51,6 +51,8 @@ enum class BoundingBox
     Capsule_3D
 };
 
+std::string ToString(BoundingBox _box);
+
 /// Scene::Initialize(){
 /// Collider* collider = new SphereCollider();
 /// collider->SetLayer("Player");
@@ -141,7 +143,11 @@ protected:
 
     bool InitJsonBinder(const std::string& _name, const std::string& _folderPath="Resources/Data/Colliders/");
 
+    void ImGui();
+
     JsonBinder* jsonBinder_ = nullptr;
+
+    std::string name_;
 private:
     // 衝突状態の管理
     struct CollisionData
@@ -167,7 +173,6 @@ private:
 
     WorldTransform defaultTransform_;
 
-
 };
 
 
@@ -176,7 +181,7 @@ class SphereCollider : public Collider
 {
 public:
     // コンストラクタ
-    SphereCollider() : Collider(), radius_(0.0f) { SetBoundingBox(BoundingBox::Sphere_3D); }
+    SphereCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~SphereCollider() = default;
 
@@ -196,6 +201,8 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point) const override;
 
+
+    void ImGui();
 private:
 
     float radius_ = 0.0f; // 球の半径
@@ -205,7 +212,7 @@ class AABBCollider : public Collider
 {
 public:
     // コンストラクタ
-    AABBCollider() : Collider() { SetBoundingBox(BoundingBox::AABB_3D); }
+    AABBCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~AABBCollider() = default;
 
@@ -229,6 +236,8 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point) const override;
 
+
+    void ImGui();
 private:
     Vector3 min_; // AABBの最小値
     Vector3 max_; // AABBの最大値
@@ -239,7 +248,7 @@ class OBBCollider : public Collider
 {
 public:
     // コンストラクタ
-    OBBCollider() : Collider() { SetBoundingBox(BoundingBox::OBB_3D); }
+    OBBCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~OBBCollider() = default;
 
@@ -269,6 +278,7 @@ public:
     // OBBの中心を取得する
     Vector3 GetCenter() const;
 
+    void ImGui();
 private:
     Vector3 halfExtents_; // OBBの半分の大きさ
     Vector3 localPivot_; // OBBの基準点
@@ -278,7 +288,7 @@ class CapsuleCollider : public Collider
 {
 public:
     // コンストラクタ
-    CapsuleCollider() : Collider(), direction_({ 0,1,0 }) { SetBoundingBox(BoundingBox::Capsule_3D); }
+    CapsuleCollider(const std::string& _name = "Collider");
     // デストラクタ
     ~CapsuleCollider() = default;
 
@@ -322,6 +332,7 @@ public:
     // 点と線分間の最近接点を計算
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
 
+    void ImGui();
 
 private:
     float radius_ = 0.0f; // カプセルの半径

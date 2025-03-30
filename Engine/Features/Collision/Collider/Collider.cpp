@@ -4,11 +4,14 @@
 
 #include <Features/LineDrawer/LineDrawer.h>
 
+#include <Debug/ImGuiDebugManager.h>
+
 #include <numbers>
 
 Collider::Collider()
 {
     defaultTransform_.Initialize();
+
 }
 
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
@@ -99,6 +102,25 @@ bool Collider::InitJsonBinder(const std::string& _name, const std::string& _fold
     return false;
 }
 
+void Collider::ImGui()
+{
+#ifdef _DEBUG
+
+    if (worldTransform_ == nullptr)
+    {
+        ImGui::DragFloat3("Position", &defaultTransform_.transform_.x, 0.01f);
+        ImGui::DragFloat3("Scale", &defaultTransform_.scale_.x, 0.01f);
+        ImGui::DragFloat4("Quaternion", &defaultTransform_.quaternion_.x, 0.01f);
+    }
+
+    ImGui::Text("Layer      : %x", collisionLayer_.GetLayer());
+    ImGui::Text("LayerMask  : %x", collisionLayer_.GetLayerMask());
+    ImGui::Text("BoundingBox: %s", ToString(boundingBox_).c_str());
+
+#endif // _DEBUG
+
+}
+
 void Collider::UpdateCollisionState()
 {
     // すべてのマップエントリについて、現在衝突していないとマーク
@@ -151,6 +173,13 @@ void Collider::UpdateCollisionState()
     currentCollisions_.clear();
 }
 
+SphereCollider::SphereCollider(const std::string& _name) : Collider()
+{
+    SetBoundingBox(BoundingBox::Sphere_3D);
+
+    name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
+}
+
 void SphereCollider::Draw()
 {
     // 球を描画
@@ -188,6 +217,23 @@ bool SphereCollider::Contains(const Vector3& _point) const
 Vector3 SphereCollider::GetClosestPoint(const Vector3& _point) const
 {
     return _point.Normalize() * radius_;
+}
+
+void SphereCollider::ImGui()
+{
+#ifdef _DEBUG
+
+    Collider::ImGui();
+    ImGui::DragFloat("Radius", &radius_, 0.01f);
+
+#endif // _DEBUG
+}
+
+AABBCollider::AABBCollider(const std::string& _name) : Collider()
+{
+    SetBoundingBox(BoundingBox::AABB_3D);
+
+    name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 }
 
 void AABBCollider::Draw()
@@ -251,6 +297,42 @@ Vector3 AABBCollider::GetClosestPoint(const Vector3& _point) const
         std::clamp(_point.y, min_.y, max_.y),
         std::clamp(_point.z, min_.z, max_.z)
     );
+}
+
+void AABBCollider::ImGui()
+{
+#ifdef _DEBUG
+
+    Collider::ImGui();
+
+    if (ImGui::DragFloat3("Min", &min_.x, 0.01f))
+    {
+        if (min_.x > max_.x)
+            max_.x = min_.x;
+        if (min_.y > max_.y)
+            max_.y = min_.y;
+        if (min_.z > max_.z)
+            max_.z = min_.z;
+    }
+    if (ImGui::DragFloat3("Max", &max_.x, 0.01f))
+    {
+        if (max_.x < min_.x)
+            min_.x = max_.x;
+        if (max_.y < min_.y)
+            min_.y = max_.y;
+        if (max_.z < min_.z)
+            min_.z = max_.z;
+    }
+
+
+#endif // _DEBUG
+}
+
+OBBCollider::OBBCollider(const std::string& _name) : Collider()
+{
+    SetBoundingBox(BoundingBox::OBB_3D);
+
+    name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 }
 
 void OBBCollider::Draw()
@@ -363,6 +445,24 @@ Vector3 OBBCollider::GetCenter() const
 
     return transform.transform_ + pivot;
 
+}
+
+void OBBCollider::ImGui()
+{
+#ifdef _DEBUG
+
+    Collider::ImGui();
+    ImGui::DragFloat3("HalfExtents", &halfExtents_.x, 0.01f);
+    ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+
+#endif // _DEBUG
+}
+
+CapsuleCollider::CapsuleCollider(const std::string& _name) : Collider()
+{
+    SetBoundingBox(BoundingBox::Capsule_3D);
+
+    name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 }
 
 void CapsuleCollider::Draw()
@@ -595,4 +695,35 @@ Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& _point, const Vect
     projection = std::clamp(projection, 0.0f, segmentLength);
 
     return _start + direction * projection;
+}
+
+void CapsuleCollider::ImGui()
+{
+#ifdef _DEBUG
+    Collider::ImGui();
+    ImGui::DragFloat("Radius", &radius_, 0.01f, 0.01f, 1000.0f);
+    ImGui::DragFloat("Height", &height_, 0.01f, 0.01f, 1000.0f);
+    if(ImGui::DragFloat3("Direction", &direction_.x, 0.01f))
+    {
+        direction_ = direction_.Normalize();
+    }
+    ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+#endif // _DEBUG
+}
+
+std::string ToString(BoundingBox _box)
+{
+    switch (_box)
+    {
+    case BoundingBox::Sphere_3D:
+        return "Sphere";
+    case BoundingBox::AABB_3D:
+        return "AABB";
+    case BoundingBox::OBB_3D:
+        return "OBB";
+    case BoundingBox::Capsule_3D:
+        return "Capsule";
+    default:
+        return "NONE";
+    }
 }

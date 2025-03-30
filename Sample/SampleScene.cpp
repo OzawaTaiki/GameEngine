@@ -62,7 +62,7 @@ void SampleScene::Initialize()
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
 
-    bunnyCollider_ = new AABBCollider();
+    bunnyCollider_ = new AABBCollider("bunny");
     bunnyCollider_->Load("bunny");
     /*bunnyCollider_->SetLayer("bunny");
     bunnyCollider_->SetMinMax({ -1,-1,-1 }, { 1,1,1 });

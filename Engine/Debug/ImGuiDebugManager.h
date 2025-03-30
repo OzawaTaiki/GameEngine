@@ -33,6 +33,14 @@ public:
     /// <param name="_name">識別用の名前 </param>
     void RemoveDebugWindow(const std::string& _name);
 
+    /// <summary>
+    /// Colliderのデバッグウィンドウを追加する
+    /// </summary>
+    /// <param name="_name"></param>
+    /// <param name="_func"></param>
+    /// <returns></returns>
+    std::string AddColliderDebugWindow(const std::string& _name, std::function<void()> _func);
+
 
 
 private:
@@ -41,7 +49,9 @@ private:
 #endif // _DEBUG
 
     std::map<std::string, std::function<void()>> debugWindows_;
+    std::map<std::string, std::function<void()>> colliderDebugWindows_;
     std::vector<uint8_t> isSelect_;
+    std::vector<uint8_t> colliderIsSelect_;
 
 
     ImGuiDebugManager() = default;
