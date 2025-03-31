@@ -43,6 +43,8 @@ public:
     // デバッグ描画の有効/無効を取得
     bool IsDrawEnabled() const { return isDrawEnabled_; }
 
+    void ImGui();
+
 private:
     // 衝突応答を実行する
     void ResolveCollision(const CollisionPair& _pair);
@@ -65,7 +67,7 @@ private:
 
 private:
     // コンストラクタ
-    CollisionManager() = default;
+    CollisionManager();
 
     // デストラクタ
     ~CollisionManager() = default;

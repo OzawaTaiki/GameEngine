@@ -116,6 +116,7 @@ void Collider::ImGui()
     ImGui::Text("Layer      : %x", collisionLayer_.GetLayer());
     ImGui::Text("LayerMask  : %x", collisionLayer_.GetLayerMask());
     ImGui::Text("BoundingBox: %s", ToString(boundingBox_).c_str());
+    ImGui::Checkbox("Draw", &isDraw_);
 
 #endif // _DEBUG
 
@@ -182,6 +183,9 @@ SphereCollider::SphereCollider(const std::string& _name) : Collider()
 
 void SphereCollider::Draw()
 {
+    if (!isDraw_)
+        return;
+
     // 球を描画
     // 球の中心をワールド空間に変換
     Vector3 center = GetWorldTransform()->transform_;
@@ -238,6 +242,9 @@ AABBCollider::AABBCollider(const std::string& _name) : Collider()
 
 void AABBCollider::Draw()
 {
+    if (!isDraw_)
+        return;
+
     // AABBを描画するために8つの頂点を計算
     std::array<Vector3, 8> vertices;
 
@@ -337,6 +344,9 @@ OBBCollider::OBBCollider(const std::string& _name) : Collider()
 
 void OBBCollider::Draw()
 {
+    if (!isDraw_)
+        return;
+
     std::vector<Vector3> corners = GetVertices();
 
     std::array<Vector3, 8> c;
@@ -467,6 +477,9 @@ CapsuleCollider::CapsuleCollider(const std::string& _name) : Collider()
 
 void CapsuleCollider::Draw()
 {
+    if (!isDraw_)
+        return;
+
     // カプセルの中心線の両端を取得
     Vector3 start, end;
     GetCapsuleSegment(start, end);
