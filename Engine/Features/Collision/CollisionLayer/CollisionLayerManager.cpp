@@ -1,5 +1,7 @@
 #include "CollisionLayerManager.h"
 
+#include <Features/Json/JsonBinder.h>
+
 CollisionLayerManager* CollisionLayerManager::GetInstance()
 {
     static CollisionLayerManager instance;
@@ -17,11 +19,27 @@ uint32_t CollisionLayerManager::GetLayer(const std::string& _layer)
     // 登録されていない場合新たに登録する
     layerMap_[_layer] = static_cast <uint32_t>(1 << layerMap_.size());
 
+    layerNames_.push_back(_layer);
+
     // 登録したLayerを返す
     uint32_t result = layerMap_[_layer];
     return result;
 }
 
+void CollisionLayerManager::InitJsonBinder()
+{
+    jsonBinder_ = std::make_unique<JsonBinder>("CollisionLayer", "Resources/Data/CollisionLayer/");
+    jsonBinder_->RegisterVariable("layerNames", &layerNames_);
+}
+
 CollisionLayerManager::CollisionLayerManager()
 {
+    InitJsonBinder();
+}
+
+CollisionLayerManager::~CollisionLayerManager()
+{
+    jsonBinder_->Save();
+
+    jsonBinder_.reset();
 }
