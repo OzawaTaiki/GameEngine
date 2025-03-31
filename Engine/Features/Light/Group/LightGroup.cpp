@@ -2,6 +2,7 @@
 
 #include <Features/Light/Group/LightGroup.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Core/DXCommon/RTV/RTVManager.h>
 #include <Features/Light/System/LightingSystem.h>
 #include <Debug/ImGuiManager.h>
 #include <Math/Matrix/MatrixFunction.h>
@@ -94,6 +95,22 @@ void LightGroup::AddPointLight(const PointLight& _light, const std::string& _nam
     if (_parent)
     {
         pl.parent = _parent;
+    }
+
+    if (pl.light.castShadow)
+    {
+        // シャドウマップを作成
+        pl.shadowMaps.clear();
+
+        // 標準で6方向用のシャドウマップを作成
+        for (size_t i = 0; i < 6; i++)
+        {
+            std::string name = pl.name + "_ShadowMap_ " + std::to_string(i);
+
+            uint32_t handle=RTVManager::GetInstance()->CreateRenderTarget(name, static_cast<uint32_t>(shadowMapSize_.x), static_cast<uint32_t>(shadowMapSize_.y), DXGI_FORMAT_R32_FLOAT, { 1.0f,1.0f,1.0f,1.0f }, true);
+
+            pl.shadowMaps.push_back(handle);
+        }
     }
 
     dirty_ = true;

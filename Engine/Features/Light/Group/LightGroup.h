@@ -4,6 +4,8 @@
 #include <Math/Vector/Vector4.h>
 #include <Math/Matrix/Matrix4x4.h>
 
+#include <Core/DXCommon/RTV/RenderTexture.h>
+
 #include <cstdint>
 #include <array>
 #include <vector>
@@ -28,7 +30,8 @@ struct DirectionalLight
     float intensity = 1.0f;	        // 輝度
 
     uint32_t isHalf = 1;            // ハーフランバートを使うか
-    float pad[3] = {};
+    uint32_t castShadow = 1;        // シャドウマップを生成するか
+    float pad[2] = {};
 };
 
 /**
@@ -50,7 +53,7 @@ struct PointLight
     float radius = 5.0f;	        // ライトの影響半径
     float decay = 0.5f;	            // 減衰率
     uint32_t isHalf = 1;            // ハーフランバートを使うか
-    float pad = {};
+    uint32_t castShadow = 1;        // シャドウマップを生成するか
 };
 
 
@@ -82,6 +85,10 @@ struct SpotLight
     float falloutStartAngle             // 開始角度
         = std::cosf(std::numbers::pi_v<float> / 3.0f);
     uint32_t isHalf = 1;
+
+    uint32_t castShadow = 1;            // シャドウマップを生成するか
+    float pad[3] = {};
+
 };
 
 /**
@@ -153,6 +160,7 @@ private:
         std::string name = "";
         bool select = false;
         Vector3* parent = nullptr;
+        std::vector<uint32_t> shadowMaps;
     };
 
     size_t pointLightCount_ = 0;

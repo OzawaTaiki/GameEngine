@@ -479,6 +479,7 @@
     <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="PointLightShadowMap.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
