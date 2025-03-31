@@ -62,7 +62,15 @@ std::string ToString(BoundingBox _box);
 /// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
 ///     // 衝突時の処理
 /// });
-/// }
+///
+/// OR
+///
+/// Collider* collider = new SphereCollider();
+/// collider->Load("SphereCollider");
+/// collider->SetWorldTransform(worldTransform);
+/// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
+///     // 衝突時の処理
+/// });
 ///
 /// Scene::Update(){
 /// CollisionManager::GetInstance()->RegisterCollider(collider);
