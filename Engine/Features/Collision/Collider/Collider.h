@@ -148,6 +148,8 @@ protected:
     JsonBinder* jsonBinder_ = nullptr;
 
     std::string name_;
+
+    bool isDraw_ = true;
 private:
     // 衝突状態の管理
     struct CollisionData
