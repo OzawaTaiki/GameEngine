@@ -14,6 +14,11 @@ Collider::Collider()
 
 }
 
+Collider::~Collider()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+}
+
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
 {
     // 衝突コールバックを実行（状態はColliderInfo内で提供）
@@ -180,6 +185,7 @@ SphereCollider::SphereCollider(const std::string& _name) : Collider()
 
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 }
+
 
 void SphereCollider::Draw()
 {
@@ -424,16 +430,18 @@ std::vector<Vector3> OBBCollider::GetVertices() const
     WorldTransform transform = *GetWorldTransform();
     Matrix4x4 rotMat = transform.quaternion_.ToMatrix();
 
+    Vector3 scaledHalfExtents = halfExtents_ * transform.scale_;
+
     // ローカル空間での頂点（中心を原点とする）
     Vector3 localCorners[8] = {
-        Vector3(-halfExtents_.x, -halfExtents_.y, -halfExtents_.z), // 0: 左下後
-        Vector3(halfExtents_.x, -halfExtents_.y, -halfExtents_.z), // 1: 右下後
-        Vector3(halfExtents_.x,  halfExtents_.y, -halfExtents_.z), // 2: 右上後
-        Vector3(-halfExtents_.x,  halfExtents_.y, -halfExtents_.z), // 3: 左上後
-        Vector3(-halfExtents_.x, -halfExtents_.y,  halfExtents_.z), // 4: 左下前
-        Vector3(halfExtents_.x, -halfExtents_.y,  halfExtents_.z), // 5: 右下前
-        Vector3(halfExtents_.x,  halfExtents_.y,  halfExtents_.z), // 6: 右上前
-        Vector3(-halfExtents_.x,  halfExtents_.y,  halfExtents_.z)  // 7: 左上前
+        Vector3(-scaledHalfExtents.x, -scaledHalfExtents.y, -scaledHalfExtents.z), // 0: 左下後
+        Vector3(scaledHalfExtents.x, -scaledHalfExtents.y, -scaledHalfExtents.z), // 1: 右下後
+        Vector3(scaledHalfExtents.x,  scaledHalfExtents.y, -scaledHalfExtents.z), // 2: 右上後
+        Vector3(-scaledHalfExtents.x,  scaledHalfExtents.y, -scaledHalfExtents.z), // 3: 左上後
+        Vector3(-scaledHalfExtents.x, -scaledHalfExtents.y,  scaledHalfExtents.z), // 4: 左下前
+        Vector3(scaledHalfExtents.x, -scaledHalfExtents.y,  scaledHalfExtents.z), // 5: 右下前
+        Vector3(scaledHalfExtents.x,  scaledHalfExtents.y,  scaledHalfExtents.z), // 6: 右上前
+        Vector3(-scaledHalfExtents.x,  scaledHalfExtents.y,  scaledHalfExtents.z)  // 7: 左上前
     };
 
     // ワールド空間に変換（回転して中心に配置）

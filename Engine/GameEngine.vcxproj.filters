@@ -196,6 +196,9 @@
     <Filter Include="Features\Collision\Layer">
       <UniqueIdentifier>{a0c69786-c92a-47e0-a0ae-0906c1456213}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Collision\RayCast">
+      <UniqueIdentifier>{7034c5ff-0b82-41a7-8e6f-aac371dce989}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -437,6 +440,12 @@
     </ClCompile>
     <ClCompile Include="Features\Collision\Detector\CollisionDetector.cpp">
       <Filter>Features\Collision\Detector</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\RayCast\Ray.cpp">
+      <Filter>Features\Collision\RayCast</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp">
+      <Filter>Features\Collision\RayCast</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -769,6 +778,12 @@
     </ClInclude>
     <ClInclude Include="Features\Collision\Detector\CollisionDetector.h">
       <Filter>Features\Collision\Detector</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\RayCast\Ray.h">
+      <Filter>Features\Collision\RayCast</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h">
+      <Filter>Features\Collision\RayCast</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

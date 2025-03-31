@@ -274,10 +274,10 @@ bool CollisionDetector::IntersectAABBAABB(AABBCollider* _aabb1, AABBCollider* _a
     const WorldTransform* transform1 = _aabb1->GetWorldTransform();
     const WorldTransform* transform2 = _aabb2->GetWorldTransform();
 
-    Vector3 min1 = _aabb1->GetMin() + transform1->transform_;
-    Vector3 max1 = _aabb1->GetMax() + transform1->transform_;
-    Vector3 min2 = _aabb2->GetMin() + transform2->transform_;
-    Vector3 max2 = _aabb2->GetMax() + transform2->transform_;
+    Vector3 min1 = _aabb1->GetMin() * transform1->scale_ + transform1->transform_;
+    Vector3 max1 = _aabb1->GetMax() * transform1->scale_ + transform1->transform_;
+    Vector3 min2 = _aabb2->GetMin() * transform2->scale_ + transform2->transform_;
+    Vector3 max2 = _aabb2->GetMax() * transform2->scale_ + transform2->transform_;
 
     // 各軸で重なりを確認
     if (max1.x < min2.x || min1.x > max2.x ||

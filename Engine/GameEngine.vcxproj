@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -156,6 +156,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayerManager.cpp" />
     <ClCompile Include="Features\Collision\Detector\CollisionDetector.cpp" />
     <ClCompile Include="Features\Collision\Manager\CollisionManager.cpp" />
+    <ClCompile Include="Features\Collision\RayCast\Ray.cpp" />
+    <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp" />
     <ClCompile Include="Features\Collision\Shapes.cpp" />
     <ClCompile Include="Features\Effect\Effect\Effect.cpp" />
     <ClCompile Include="Features\Effect\Effect\ParticleEmitters.cpp" />
@@ -239,6 +241,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayerManager.h" />
     <ClInclude Include="Features\Collision\Detector\CollisionDetector.h" />
     <ClInclude Include="Features\Collision\Manager\CollisionManager.h" />
+    <ClInclude Include="Features\Collision\RayCast\Ray.h" />
+    <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h" />
     <ClInclude Include="Features\Collision\Shapes.h" />
     <ClInclude Include="Features\Effect\Effect\Effect.h" />
     <ClInclude Include="Features\Effect\Effect\ParticleEmitters.h" />

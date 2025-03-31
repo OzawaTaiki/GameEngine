@@ -62,7 +62,15 @@ std::string ToString(BoundingBox _box);
 /// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
 ///     // 衝突時の処理
 /// });
-/// }
+///
+/// OR
+///
+/// Collider* collider = new SphereCollider();
+/// collider->Load("SphereCollider");
+/// collider->SetWorldTransform(worldTransform);
+/// collider->SetOnCollisionCallback([](Collider* _self, const ColliderInfo& _info) {
+///     // 衝突時の処理
+/// });
 ///
 /// Scene::Update(){
 /// CollisionManager::GetInstance()->RegisterCollider(collider);
@@ -73,7 +81,7 @@ public:
     // コンストラクタ
     Collider();
     // デストラクタ
-    virtual ~Collider() = default;
+    virtual ~Collider();
 
     // 衝突イベント処理（CollisionManagerから呼ばれる）
     void OnCollision(Collider* _other, const ColliderInfo& _info);
@@ -138,6 +146,7 @@ public:
     // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
 
+    std::string GetName() const { return name_; }
 
 protected:
 
