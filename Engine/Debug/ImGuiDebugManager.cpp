@@ -94,6 +94,7 @@ void ImGuiDebugManager::ShowDebugWindow()
         i = 0;
         for (auto& [name, func] : colliderDebugWindows_)
         {
+            if (name == "CollisionManager") continue;
             bool flag = colliderIsSelect_[i];
             if (ImGui::Selectable(name.c_str(), &flag))
                 colliderIsSelect_[i] = flag;
@@ -125,11 +126,16 @@ void ImGuiDebugManager::ShowDebugWindow()
         }
         ImGui::EndTabBar();
 
+        ImGui::SeparatorText("Colliders");
+        colliderDebugWindows_["CollisionManager"]();
         ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
         {
+
             size_t i = 0;
             for (auto& [name, func] : colliderDebugWindows_)
             {
+                if (name == "CollisionManager") continue;
+
                 if (colliderIsSelect_[i])
                 {
                     bool flag = colliderIsSelect_[i];
