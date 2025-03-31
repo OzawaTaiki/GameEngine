@@ -1,5 +1,6 @@
 #include "CollisionManager.h"
 #include <Features/LineDrawer/LineDrawer.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <algorithm>
 
 CollisionManager* CollisionManager::GetInstance()
@@ -174,6 +175,15 @@ void CollisionManager::DrawColliders()
     }
 }
 
+void CollisionManager::ImGui()
+{
+    ImGui::PushID(this);
+    // デバッグ描画の有効/無効を設定
+    ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
+
+    ImGui::PopID();
+}
+
 void CollisionManager::ResolveCollision(const CollisionPair& _pair)
 {
     // 両方のコライダーに衝突通知を送る
@@ -194,4 +204,9 @@ void CollisionManager::UpdateBroadPhase()
 {
     // 空間分割などの最適化を行う場合はここに実装
     // 現在は単純な総当たりで実装
+}
+
+CollisionManager::CollisionManager()
+{
+    ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
 }
