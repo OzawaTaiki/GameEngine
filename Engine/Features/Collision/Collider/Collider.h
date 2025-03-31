@@ -81,7 +81,7 @@ public:
     // コンストラクタ
     Collider();
     // デストラクタ
-    virtual ~Collider() = default;
+    virtual ~Collider();
 
     // 衝突イベント処理（CollisionManagerから呼ばれる）
     void OnCollision(Collider* _other, const ColliderInfo& _info);
@@ -146,6 +146,7 @@ public:
     // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
 
+    std::string GetName() const { return name_; }
 
 protected:
 

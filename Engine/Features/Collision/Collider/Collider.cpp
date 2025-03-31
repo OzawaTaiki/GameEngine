@@ -14,6 +14,11 @@ Collider::Collider()
 
 }
 
+Collider::~Collider()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+}
+
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
 {
     // 衝突コールバックを実行（状態はColliderInfo内で提供）
@@ -180,6 +185,7 @@ SphereCollider::SphereCollider(const std::string& _name) : Collider()
 
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 }
+
 
 void SphereCollider::Draw()
 {
