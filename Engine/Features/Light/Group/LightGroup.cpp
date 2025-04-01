@@ -107,7 +107,9 @@ void LightGroup::AddPointLight(const PointLight& _light, const std::string& _nam
         {
             std::string name = pl.name + "_ShadowMap_ " + std::to_string(i);
 
-            uint32_t handle=RTVManager::GetInstance()->CreateRenderTarget(name, static_cast<uint32_t>(shadowMapSize_.x), static_cast<uint32_t>(shadowMapSize_.y), DXGI_FORMAT_R32_FLOAT, { 1.0f,1.0f,1.0f,1.0f }, true);
+            uint32_t handle = RTVManager::GetInstance()->CreateRenderTarget(
+                name, static_cast<uint32_t>(shadowMapSize_.x), static_cast<uint32_t>(shadowMapSize_.y),
+                DXGI_FORMAT_R32_FLOAT, { 1.0f,1.0f,1.0f,1.0f }, true);
 
             pl.shadowMaps.push_back(handle);
         }
@@ -199,6 +201,30 @@ SpotLight& LightGroup::GetSpotLight(const std::string& _name)
         }
     }
     return selectableSpotLights_.front().light;
+}
+
+std::vector<PointLight>& LightGroup::GetPointLights()
+{
+    std::vector<PointLight> lights;
+
+    for (auto& light : selectablePointLights_)
+    {
+        lights.push_back(light.light);
+    }
+
+    return lights;
+}
+
+std::vector<SpotLight>& LightGroup::GetSpotLights()
+{
+    std::vector<SpotLight> lights;
+
+    for (auto& light : selectableSpotLights_)
+    {
+        lights.push_back(light.light);
+    }
+
+    return lights;
 }
 
 void LightGroup::DeletePointLight(const std::string& _name)

@@ -90,18 +90,45 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
     model_->ChangeAnimation(_name, _blendTime, _isLoop);
 }
 
-void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
+void ObjectModel::DrawShadow(const Camera* _camera, LightGroup* _lightGroup, uint32_t _id)
 {
+    if (_lightGroup == nullptr)
+        return;
+
     if (idForGPU == nullptr)
         CreateIDResource();
 
     *idForGPU = _id;
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
-    _camera->QueueCommand(commandList, 0);
-    worldTransform_.QueueCommand(commandList, 1);
-    commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
-    model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+
+    if(_lightGroup->GetDirectionalLight().castShadow)
+    {
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_DLShadowMap);
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_DLShadowMap);
+
+        _camera->QueueCommand(commandList, 0);
+        worldTransform_.QueueCommand(commandList, 1);
+        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+        model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+    }
+
+    std::vector<PointLight> pointLights = _lightGroup->GetPointLights();
+
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
+
+    for (size_t i = 0; i < pointLights.size(); i++)
+    {
+        if (!pointLights[i].castShadow)
+            continue;
+
+        _camera->QueueCommand(commandList, 0);
+        worldTransform_.QueueCommand(commandList, 1);
+        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+        model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+    }
+
 
 }
 

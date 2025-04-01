@@ -2,10 +2,12 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 
-const uint32_t RTVManager::kMaxRTVIndex_ = 8;
-const uint32_t RTVManager::kMaxDSVIndex_ = 8;
+const uint32_t RTVManager::kMaxRTVIndex_ = 32;
+const uint32_t RTVManager::kMaxDSVIndex_ = 32;
  uint32_t RTVManager::winWidth_ = 0;
  uint32_t RTVManager::winHeight_ = 0;
+
+
 
 RTVManager* RTVManager::GetInstance()
 {
@@ -18,7 +20,8 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
     dxcommon_ = DXCommon::GetInstance();
     rtvDescriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kMaxRTVIndex_, false);
     dsvDescriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, kMaxDSVIndex_, false);
-    descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    rtvDescriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    dsvDescriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     winWidth_ = _winWidth;
     winHeight_ = _winHeight;
@@ -292,27 +295,27 @@ uint32_t RTVManager::AllocateDSVIndex()
 D3D12_CPU_DESCRIPTOR_HANDLE RTVManager::GetCPUDSVDescriptorHandle(uint32_t _index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += (descriptorSize_ * _index);
+    handleCPU.ptr += (dsvDescriptorSize_  * _index);
     return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE RTVManager::GetGPUDSVDescriptorHandle(uint32_t _index)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = dsvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += (descriptorSize_ * _index);
+    handleGPU.ptr += (dsvDescriptorSize_ * _index);
     return handleGPU;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE RTVManager::GetCPURTVDescriptorHandle(uint32_t _index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += (descriptorSize_ * _index);
+    handleCPU.ptr += (rtvDescriptorSize_ * _index);
     return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE RTVManager::GetGPURTVDescriptorHandle(uint32_t _index)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = rtvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += (descriptorSize_ * _index);
+    handleGPU.ptr += (rtvDescriptorSize_ * _index);
     return handleGPU;
 }

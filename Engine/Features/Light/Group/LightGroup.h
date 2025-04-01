@@ -54,6 +54,8 @@ struct PointLight
     float decay = 0.5f;	            // 減衰率
     uint32_t isHalf = 1;            // ハーフランバートを使うか
     uint32_t castShadow = 1;        // シャドウマップを生成するか
+
+    Matrix4x4 viewProjection[6];    // シャドウマップのビュー射影行列
 };
 
 
@@ -88,6 +90,8 @@ struct SpotLight
 
     uint32_t castShadow = 1;            // シャドウマップを生成するか
     float pad[3] = {};
+
+    Matrix4x4 viewProjection = Matrix4x4::Identity();    // シャドウマップのビュー射影行列
 
 };
 
@@ -142,6 +146,9 @@ public:
     PointLight& GetPointLight(const std::string& _name);
     SpotLight& GetSpotLight(const std::string& _name);
 
+    std::vector<PointLight>& GetPointLights();
+    std::vector<SpotLight>& GetSpotLights();
+
     void DeletePointLight(const std::string& _name);
     void DeleteSpotLight(const std::string& _name);
 
@@ -155,7 +162,8 @@ private:
     LightTransferData lightData_;
 
     template<typename T>
-    struct NamedLight {
+    struct NamedLight
+    {
         T light = {};
         std::string name = "";
         bool select = false;

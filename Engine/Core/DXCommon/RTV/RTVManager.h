@@ -57,7 +57,9 @@ private:
     static uint32_t winHeight_;
     static const uint32_t kMaxRTVIndex_;
     static const uint32_t kMaxDSVIndex_;
-    uint32_t descriptorSize_;
+     uint32_t rtvDescriptorSize_;
+     uint32_t dsvDescriptorSize_;
+
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
