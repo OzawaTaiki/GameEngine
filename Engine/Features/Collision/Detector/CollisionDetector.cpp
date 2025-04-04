@@ -325,11 +325,18 @@ bool CollisionDetector::IntersectAABBAABB(AABBCollider* _aabb1, AABBCollider* _a
 
 bool CollisionDetector::IntersectOBBOBB(OBBCollider* _obb1, OBBCollider* _obb2, ColliderInfo& _info)
 {
+    WorldTransform transform1 = *_obb1->GetWorldTransform();
+    WorldTransform transform2 = *_obb2->GetWorldTransform();
+
+    Vector3 scale1 = transform1.scale_;
+    Vector3 scale2 = transform2.scale_;
+
+
     // 分離軸テスト
     const Vector3 center1 = _obb1->GetCenter();
     const Vector3 center2 = _obb2->GetCenter();
-    const Vector3 halfExtents1 = _obb1->GetHalfExtents();
-    const Vector3 halfExtents2 = _obb2->GetHalfExtents();
+    const Vector3 halfExtents1 = _obb1->GetHalfExtents() * scale1;
+    const Vector3 halfExtents2 = _obb2->GetHalfExtents() * scale2;
 
     // OBB1の軸
     Matrix4x4 rotMat1 = _obb1->GetWorldTransform()->quaternion_.ToMatrix();
