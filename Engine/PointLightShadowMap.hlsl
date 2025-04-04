@@ -1,4 +1,3 @@
-#include "Resources/Shader/Object3d.hlsli"
 
 struct VSInput
 {

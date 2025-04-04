@@ -1,36 +1,128 @@
 #include <Features/Light/Spot/SpotLight.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Core/DXCommon/RTV/RTVManager.h>
 #include <Math/Vector/VectorFunction.h>
-#include <numbers>
-#include <cmath>
+#include <Math/Matrix/MatrixFunction.h>
 
-void SpotLight::Initialize()
+SpotLightComponent::SpotLightComponent()
 {
-    resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
-    resource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
+    data_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    data_.position = { 1.0f, 1.0f, 0.0f };
+    data_.direction = { -1.0f, -1.0f, 0.0f };
+    data_.intensity = 4.0f;
+    data_.distance = 7.0f;
+    data_.decay = 2.0f;
+    data_.cosAngle = std::cosf(std::numbers::pi_v<float> / 3.0f);  // 60度
+    data_.falloutStartAngle = std::cosf(std::numbers::pi_v<float> / 3.0f);
+    data_.isHalf = 1;
+    data_.castShadow = 1;
+}
 
-    color_ = { 1.0f,1.0f ,1.0f ,1.0f };
-    position_ = { 0.0f,2.0f,0.0f };
-    direction_ = Normalize({ -1.0f,1.0f ,0.0f });
-    intensity_ = 4.0f;
-    distance_ = 7.0f;
-    cosAngle_ = std::cosf(std::numbers::pi_v<float> / 3.0f);
-    falloutStartAngle_= std::cos(std::numbers::pi_v<float> / 3.0f);
-    decay_ = 2.0f;
-    useHalfLambert_ = true;
+void SpotLightComponent::Update()
+{
+    if(parent_)
+    {
+        data_.position = *parent_;
+    }
+
+    data_.direction = data_.direction.Normalize();
+
+    if (data_.castShadow && shadowMapHandle_ != 0)
+    {
+        UpdateViewProjection(1024);
+    }
+}
+
+void SpotLightComponent::SetCosAngle(float angleDegree)
+{
+    float angleRad = angleDegree * std::numbers::pi_v<float> / 180.0f;
+    data_.cosAngle = std::cosf(angleRad);
+}
+
+void SpotLightComponent::SetFalloutStartAngle(float angleDegree)
+{
+    float angleRad = angleDegree * std::numbers::pi_v<float> / 180.0f;
+    data_.falloutStartAngle = std::cosf(angleRad);
+}
+
+void SpotLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
+{
+    if (!data_.castShadow) 
+        return;
+
+    Vector3 up = { 0.0f, 1.0f, 0.0f };
+    if (std::abs(up.Dot(data_.direction)) > 0.99f)
+    {
+        up = { 1.0f, 0.0f, 0.0f };
+    }
+
+    Vector3 target = data_.position + data_.direction;
+    Matrix4x4 viewMat = LookAt(data_.position, target, up);
+
+    float fovY = 2.0f * std::acosf(data_.cosAngle);
+
+    // シャドウマップは正方形
+    float aspectRatio = 1.0f;
+
+    // 射影行列の計算
+    float nearClip = 0.1f;
+    float farClip = data_.distance;
+    Matrix4x4 projMat = MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
+
+    // ビュー射影行列を設定
+    data_.viewProjection = viewMat * projMat;
 
 }
 
-void SpotLight::Update()
+void SpotLightComponent::CreateShadowMap(uint32_t shadowMapSize)
 {
+    if (!data_.castShadow) return;
+
+    // 既存のシャドウマップを解放
+    ReleaseShadowMap();
+
+    // シャドウマップを作成
+    std::string mapName = name_ + "_ShadowMap";
+
+    shadowMapHandle_ = RTVManager::GetInstance()->CreateRenderTarget(
+        mapName,
+        shadowMapSize,
+        shadowMapSize,
+        DXGI_FORMAT_R32_FLOAT,
+        { 1.0f, 1.0f, 1.0f, 1.0f },
+        true // 深度バッファも作成
+    );
+
+    // ビュー射影行列を更新
+    UpdateViewProjection(shadowMapSize);
 }
 
-void SpotLight::Draw()
+void SpotLightComponent::ReleaseShadowMap()
 {
+    shadowMapHandle_ = 0;
 }
 
-void SpotLight::TransferData()
+Matrix4x4 SpotLightComponent::LookAt(const Vector3& eye, const Vector3& at, const Vector3& up)
 {
-    bool flag = static_cast<bool>(useHalfLambert_);
-    *constMap_ = { color_,position_,intensity_,direction_,distance_,decay_, cosAngle_,falloutStartAngle_,flag };
+    Vector3 zaxis = (at - eye).Normalize();
+    Vector3 xaxis = up.Cross(zaxis).Normalize();
+    if (xaxis.Length() == 0) {
+        xaxis = { 1.0f, 0.0f, 0.0f };
+    }
+    Vector3 yaxis = zaxis.Cross(xaxis);
+    if (yaxis.Length() == 0) {
+        yaxis = { 0.0f, 1.0f, 0.0f };
+    }
+
+    Matrix4x4 result =
+    {
+        {
+            {xaxis.x, yaxis.x, zaxis.x, 0.0f},
+            {xaxis.y, yaxis.y, zaxis.y, 0.0f},
+            {xaxis.z, yaxis.z, zaxis.z, 0.0f},
+            {-xaxis.Dot(eye), -yaxis.Dot(eye), -zaxis.Dot(eye), 1.0f}
+        }
+    };
+
+    return result;
 }

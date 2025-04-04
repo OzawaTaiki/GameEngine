@@ -1,36 +1,75 @@
-#include <Features/Light/Directional/DirectionalLight.h>
-#include <Core/DXCommon/DXCommon.h>
+#include "DirectionalLight.h"
 
+#include <Math/Matrix/MatrixFunction.h>
 
-void DirectionalLight::Initialize()
+DirectionalLightComponent::DirectionalLightComponent()
 {
-    resource_= DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
-    resource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
-
-    color_ = { 1.0f,1.0f ,1.0f ,1.0f };
-    direction_ = { 0.0f,-1.0f,0.0f };
-    intendity_ = 1.0f;
-    useHalfLambert_ = true;
-
+    data_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    data_.direction = { 0.25f, -1.0f, 0.0f };
+    data_.direction = data_.direction.Normalize();
+    data_.intensity = 1.0f;
+    data_.isHalf = 1;
+    data_.castShadow = 1;
 }
 
-void DirectionalLight::Update()
+void DirectionalLightComponent::Update()
 {
+    data_.direction = data_.direction.Normalize();
 }
 
-void DirectionalLight::Draw()
+void DirectionalLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
 {
+    if (!data_.castShadow) return;
+
+    // シャドウマップサイズから計算値を設定
+    float halfSize = static_cast<float>(shadowMapSize) / 2.0f;
+
+    // 上方向ベクトルの設定
+    Vector3 up = { 0.0f, 1.0f, 0.0f };
+    if (std::abs(up.Dot(data_.direction)) == 1.0f) {
+        up = { 1.0f, 0.0f, 0.0f };
+    }
+
+    // ライトの視点位置からの距離
+    const float distance = 100.0f;
+
+    // ビュー行列を計算
+    Matrix4x4 viewMat = LookAt(-data_.direction * distance, Vector3{ 0.0f, 0.0f, 0.0f }, up);
+
+    // 射影行列を計算（平行投影）
+    float nearClip = 0.1f;
+    float farClip = 1000.0f;
+    Matrix4x4 projMat = MakeOrthographicMatrix(-halfSize, -halfSize, halfSize, halfSize, nearClip, farClip);
+
+    // ビュー射影行列を設定
+    data_.viewProjection = viewMat * projMat;
 }
 
-void DirectionalLight::TransferData()
+Matrix4x4 DirectionalLightComponent::LookAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up)
 {
-    bool flag = static_cast<bool>(useHalfLambert_);
-    *constMap_ = { color_,direction_,intendity_,flag };
+    Vector3 zaxis = (_at - _eye).Normalize();
+    Vector3 xaxis = _up.Cross(zaxis).Normalize();
+    if (xaxis.Length() == 0.0f)
+    {
+        xaxis = { 1.0f, 0.0f, 0.0f };
+    }
 
+    Vector3 yaxis = zaxis.Cross(xaxis);
+    if (yaxis.Length() == 0.0f)
+    {
+        yaxis = { 0.0f, 1.0f, 0.0f };
+    }
 
-}
+    Matrix4x4 result =
+    {
+        {
+            {xaxis.x, yaxis.x, zaxis.x, 0.0f},
+            {xaxis.y, yaxis.y, zaxis.y, 0.0f},
+            {xaxis.z, yaxis.z, zaxis.z, 0.0f},
+            {-xaxis.Dot(_eye), -yaxis.Dot(_eye), -zaxis.Dot(_eye), 1.0f}
+        }
+    };
 
-void DirectionalLight::SetDirection(const Vector3& _directoin)
-{
-    direction_ = _directoin.Normalize();
+    return result;
+
 }

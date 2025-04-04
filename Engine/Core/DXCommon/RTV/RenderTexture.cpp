@@ -32,18 +32,17 @@ void RenderTarget::SetDepthStencilResource(ID3D12Resource* _dsvResource)
 
     SRVManager::GetInstance()->CreateSRVForRenderTexture(srvIndexofDSV_, dsvResource_, DXGI_FORMAT_R32_FLOAT);
 
+    //DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+
 }
 
 
-void RenderTarget::SetRenderTexture() const
+void RenderTarget::SetRenderTexture()
 {
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
 
     commandList->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
-    commandList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-    commandList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 
     D3D12_VIEWPORT viewport{};
     viewport.TopLeftX = 0;
@@ -82,8 +81,8 @@ void RenderTarget::SetDepthStencil()
 
     commandList->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
 
-    commandList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    commandList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
+    //commandList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    //commandList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 
     D3D12_VIEWPORT viewport{};
     viewport.TopLeftX = 0;
@@ -101,6 +100,7 @@ void RenderTarget::SetDepthStencil()
 
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
+
 }
 
 void RenderTarget::ChangeRTVState(D3D12_RESOURCE_STATES _after)
@@ -198,7 +198,7 @@ void RenderTarget::QueueCommandDSVtoSRV(uint32_t _index)
 
         DSVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     }
-
+    
     auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofDSV_);
 
     commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
@@ -241,6 +241,7 @@ void RenderTarget::Draw()
         barrier_.Transition.StateBefore = RTVCurrentState_;
         barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
         commandList->ResourceBarrier(1, &barrier_);
+        RTVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     }
 
 
@@ -257,4 +258,26 @@ void RenderTarget::Draw()
     commandList->ResourceBarrier(1, &barrier_);
 
     RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+}
+
+void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
+{
+    // クリア前に適切な状態に遷移させる
+    if (DSVCurrentState_ != D3D12_RESOURCE_STATE_DEPTH_WRITE)
+    {
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = dsvResource_;
+        barrier.Transition.StateBefore = DSVCurrentState_;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+        _cmdList->ResourceBarrier(1, &barrier);
+        DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    }
+
+    _cmdList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    _cmdList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
+
 }

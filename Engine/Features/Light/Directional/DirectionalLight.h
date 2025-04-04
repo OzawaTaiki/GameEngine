@@ -1,52 +1,50 @@
 #pragma once
 
-#include <Math/Vector/Vector3.h>
-#include <Math/Vector/Vector4.h>
+#include <Features/Light/Light.h>
 
-#include <cstdint>
-#include <wrl.h>
-#include <d3d12.h>
+struct DirectionalLight
+{
+    Matrix4x4 viewProjection = Matrix4x4::Identity();
 
-class DirectionalLight
+    Vector4 color = { 1,1,1,1 };		// ライトの色
+
+    Vector3 direction = { 0,-1,0 };	// ライトの向き
+    float intensity = 1.0f;	        // 輝度
+
+    uint32_t isHalf = 1;            // ハーフランバートを使うか
+    uint32_t castShadow = 1;        // シャドウマップを生成するか
+    float pad[2] = {};
+};
+
+class DirectionalLightComponent : public Light
 {
 public:
+    DirectionalLightComponent();
+    ~DirectionalLightComponent() = default;
 
-    DirectionalLight() = default;
-    ~DirectionalLight() = default;
+    void Update() override;
 
-    void Initialize();
-    void Update();
-    void Draw();
+    bool IsCastShadow() const override { return data_.castShadow == 1; }
 
-    void TransferData();
+    DirectionalLight& GetData() { return data_; }
+    const DirectionalLight& GetData() const { return data_; }
 
-    ID3D12Resource* GetResource() { return resource_.Get(); }
 
-    void SetColor(const Vector4& _color) { color_ = _color; }
-    void SetDirection(const Vector3& _directoin);
-    void SetIntensity(float _intensity) { intendity_ = _intensity; }
+    void SetColor(const Vector4& color) { data_.color = color; }
+    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); }
+    void SetIntensity(float intensity) { data_.intensity = intensity; }
+    void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
+    void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
 
-    void EnableHalfLambert() { useHalfLambert_ = true; }
-    void DisEnableHalfLambert() { useHalfLambert_ = false; }
+
+    void UpdateViewProjection(uint32_t shadowMapSize);
+
+    uint32_t GetShadowMapHandle() const { return shadowMapHandle_; }
+    void SetShadowMapHandle(uint32_t handle) { shadowMapHandle_ = handle; }
 
 private:
+    DirectionalLight data_ = {};
+    uint32_t shadowMapHandle_ = 0;
 
-    Vector4 color_;
-    Vector3 direction_;
-    float intendity_;
-    bool useHalfLambert_;
-
-
-    struct ConstantBufferData
-    {
-        Vector4 color;		//ライトの色
-        Vector3 direction;	//ライトの向き
-        float intensity;	//輝度
-        uint32_t isHalf;
-        float pad[3];
-    };
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
-    ConstantBufferData* constMap_ = nullptr;
-
+    Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };

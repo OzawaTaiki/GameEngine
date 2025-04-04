@@ -254,6 +254,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Json\Loader\JsonLoader.h" />
     <ClInclude Include="Features\Light\Directional\DirectionalLight.h" />
     <ClInclude Include="Features\Light\Group\LightGroup.h" />
+    <ClInclude Include="Features\Light\Light.h" />
     <ClInclude Include="Features\Light\Point\PointLight.h" />
     <ClInclude Include="Features\Light\Spot\SpotLight.h" />
     <ClInclude Include="Features\Light\System\LightingSystem.h" />

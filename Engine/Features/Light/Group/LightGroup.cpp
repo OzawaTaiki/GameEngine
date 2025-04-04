@@ -1,536 +1,411 @@
-#define NOMINMAX
+#include "LightGroup.h"
 
-#include <Features/Light/Group/LightGroup.h>
-#include <Core/DXCommon/DXCommon.h>
-#include <Core/DXCommon/RTV/RTVManager.h>
-#include <Features/Light/System/LightingSystem.h>
-#include <Debug/ImGuiManager.h>
-#include <Math/Matrix/MatrixFunction.h>
-
-#include <cmath>
-
-Vector2 LightGroup::shadowMapSize_ = { 128,128 };
+uint32_t LightGroup::shadowMapSize_ = 1024;
 
 void LightGroup::Initialize()
 {
-    directionalLight_ = {
-        .color = {1.0f, 1.0f, 1.0f, 1.0f},
-        .direction = {0.0f, -1.0f, 0.0f},
-        .intensity = 1.0f,
-        .isHalf = 1
-    };
+    // デフォルトのライトを設定
+    auto defaultDirLight= std::make_shared<DirectionalLightComponent>();
+    SetDirectionalLight(defaultDirLight);
 
-    selectablePointLights_.clear();
-    selectableSpotLights_.clear();
+    pointLights_.clear();
 
     dirty_ = true;
+}
+
+void LightGroup::SetDirectionalLight(std::shared_ptr<DirectionalLightComponent> _light)
+{
+    directionalLight_ = _light;
+    if (directionalLight_) {
+        // シャドウマップサイズを更新
+        directionalLight_->UpdateViewProjection(shadowMapSize_);
+    }
+    dirty_ = true;
+}
+
+void LightGroup::AddPointLight(const std::string& _name, std::shared_ptr<PointLightComponent> _light)
+{
+    if (pointLights_.size() >= MAX_POINT_LIGHT)
+    {
+        return;
+    }
+
+    _light->SetName(_name);
+    pointLights_[_name] = _light;
+
+    if (_light->IsCastShadow())
+    {
+        _light->CreateShadowMaps(shadowMapSize_);
+    }
+
+    dirty_ = true;
+}
+
+void LightGroup::RemovePointLight(const std::string& _name)
+{
+    auto it = pointLights_.find(_name);
+    if (it != pointLights_.end()) {
+        // ポイントライトを削除
+        pointLights_.erase(it);
+        dirty_ = true;
+    }
+}
+
+std::shared_ptr<PointLightComponent> LightGroup::GetPointLight(const std::string& _name)
+{
+    auto it = pointLights_.find(_name);
+    if (it != pointLights_.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+std::vector<std::shared_ptr<PointLightComponent>> LightGroup::GetAllPointLights() const
+{
+    std::vector<std::shared_ptr<PointLightComponent>> lights;
+    for (auto& light : pointLights_) {
+        lights.push_back(light.second);
+    }
+    return lights;
+}
+
+void LightGroup::AddSpotLight(const std::string& _name, std::shared_ptr<SpotLightComponent> _light)
+{
+    if (spotLights_.size() >= MAX_SPOT_LIGHT)
+    {
+        return;
+    }
+    _light->SetName(_name);
+    spotLights_[_name] = _light;
+    if (_light->IsCastShadow())
+    {
+        _light->CreateShadowMap(shadowMapSize_);
+    }
+    dirty_ = true;
+}
+
+void LightGroup::RemoveSpotLight(const std::string& _name)
+{
+    auto it = spotLights_.find(_name);
+    if (it != spotLights_.end()) {
+        // スポットライトを削除
+        spotLights_.erase(it);
+        dirty_ = true;
+    }
+}
+
+std::shared_ptr<SpotLightComponent> LightGroup::GetSpotLight(const std::string& _name)
+{
+    auto it = spotLights_.find(_name);
+    if (it != spotLights_.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+std::vector<std::shared_ptr<SpotLightComponent>> LightGroup::GetAllSpotLights() const
+{
+    std::vector<std::shared_ptr<SpotLightComponent>> lights;
+    for (auto& light : spotLights_) {
+        lights.push_back(light.second);
+    }
+    return lights;
 }
 
 void LightGroup::Update()
 {
-}
-
-void LightGroup::Draw()
-{
-}
-
-void LightGroup::SetDirectionalLight(const DirectionalLight& _light)
-{
-    directionalLight_ = _light;
-    dirty_ = true;
-}
-
-void LightGroup::AddPointLight(const PointLight& _light, const std::string& _name, Vector3* _parent)
-{
-    if (selectablePointLights_.size() >= MAX_POINT_LIGHT)
-        return;
-
-    // ベース名を取得
-    std::string baseName = _name;
-    if (baseName == "")
+    if (directionalLight_)
     {
-        // デフォルト名を設定
-        baseName = "PointLight";
+        directionalLight_->Update();
     }
 
-    // 同じ名前があるかどうか
-    int32_t count = -1;
-    for (auto& light : selectablePointLights_)
+    for (auto& light : pointLights_)
     {
-        // 名前が一致するか
-        if (light.name == baseName)
-        {
-            count=0;
-        }
-        else if( light.name.rfind(baseName + " ", 0) == 0)
-        {
-            // 末尾の数字を取得
-            size_t pos = light.name.find_last_of(' ');
-            if (pos != std::string::npos)
-            {
-                // 数字を取得
-                std::string num = light.name.substr(pos + 1);
-                int32_t curCount = std::stoi(num);
-                // 最大値を取得
-                count = std::max(count, curCount);
-            }
-        }
+        light.second->Update();
     }
 
-    // 要素を追加
-    NamedLight<PointLight>& pl = selectablePointLights_.emplace_back();
-    // ライトを設定
-    pl.light = _light;
-
-    // 名前を設定
-    pl.name = baseName;
-    if (count != -1)
-    {
-        // Countが0はないときはナンバリング
-        pl.name += " " + std::to_string(count + 1);
-    }
-
-    pl.select = false;
-
-    if (_parent)
-    {
-        pl.parent = _parent;
-    }
-
-    if (pl.light.castShadow)
-    {
-        // シャドウマップを作成
-        pl.shadowMaps.clear();
-
-        // 標準で6方向用のシャドウマップを作成
-        for (size_t i = 0; i < 6; i++)
-        {
-            std::string name = pl.name + "_ShadowMap_ " + std::to_string(i);
-
-            uint32_t handle = RTVManager::GetInstance()->CreateRenderTarget(
-                name, static_cast<uint32_t>(shadowMapSize_.x), static_cast<uint32_t>(shadowMapSize_.y),
-                DXGI_FORMAT_R32_FLOAT, { 1.0f,1.0f,1.0f,1.0f }, true);
-
-            pl.shadowMaps.push_back(handle);
-        }
-    }
-
-    dirty_ = true;
-}
-
-void LightGroup::AddSpotLight(const SpotLight& _light, const std::string& _name, Vector3* _parent)
-{
-    if (selectableSpotLights_.size() >= MAX_SPOT_LIGHT)
-        return;
-
-    // ベース名を取得
-    std::string baseName = _name;
-    if (baseName == "")
-    {
-        // デフォルト名を設定
-        baseName = "SpotLight";
-    }
-
-    // 同じ名前があるかどうか
-    int32_t count = -1;
-    for (auto& light : selectableSpotLights_)
-    {
-        // 名前が一致するか
-        if (light.name == baseName)
-        {
-            count = 0;
-        }
-        else if( light.name.rfind(baseName + " ", 0) == 0)
-        {
-            // 末尾の数字を取得
-            size_t pos = light.name.find_last_of(' ');
-            if (pos != std::string::npos)
-            {
-                // 数字を取得
-                std::string num = light.name.substr(pos + 1);
-                int32_t curCount = std::stoi(num);
-                // 最大値を取得
-                count = std::max(count, curCount);
-            }
-        }
-    }
-
-    // 要素を追加
-    NamedLight<SpotLight>& sl = selectableSpotLights_.emplace_back();
-    // ライトを設定
-    sl.light = _light;
-
-    // 名前を設定
-    sl.name = baseName;
-    if (count != -1)
-    {
-        // Countが0はないときはナンバリング
-        sl.name += " " + std::to_string(count + 1);
-    }
-
-    sl.select = false;
-
-    if (_parent)
-    {
-        sl.parent = _parent;
-    }
-
-    dirty_ = true;
-}
-
-PointLight& LightGroup::GetPointLight(const std::string& _name)
-{
-    for (auto& light : selectablePointLights_)
-    {
-        if (light.name == _name)
-        {
-            return light.light;
-        }
-    }
-
-    return selectablePointLights_.front().light;
-}
-
-SpotLight& LightGroup::GetSpotLight(const std::string& _name)
-{
-    for (auto& light : selectableSpotLights_)
-    {
-        if (light.name == _name)
-        {
-            return light.light;
-        }
-    }
-    return selectableSpotLights_.front().light;
-}
-
-std::vector<PointLight>& LightGroup::GetPointLights()
-{
-    std::vector<PointLight> lights;
-
-    for (auto& light : selectablePointLights_)
-    {
-        lights.push_back(light.light);
-    }
-
-    return lights;
-}
-
-std::vector<SpotLight>& LightGroup::GetSpotLights()
-{
-    std::vector<SpotLight> lights;
-
-    for (auto& light : selectableSpotLights_)
-    {
-        lights.push_back(light.light);
-    }
-
-    return lights;
-}
-
-void LightGroup::DeletePointLight(const std::string& _name)
-{
-    for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
-    {
-        if (it->name == _name)
-        {
-            selectablePointLights_.erase(it);
-            break;
-        }
-    }
-    dirty_ = true;
-}
-
-void LightGroup::DeleteSpotLight(const std::string& _name)
-{
-    for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
-    {
-        if (it->name == _name)
-        {
-            selectableSpotLights_.erase(it);
-            break;
-        }
-    }
     dirty_ = true;
 }
 
 LightGroup::LightTransferData LightGroup::GetLightData()
 {
-    if (!dirty_)
-        return lightData_;
-
     LightTransferData data;
 
-    directionalLight_.direction = directionalLight_.direction.Normalize();
-
-    Vector3 up = { 0.0f,1.0f,0.0f };
-    if (std::abs(up.Dot(directionalLight_.direction)) == 1.0f)
+    if (directionalLight_ && enableDirectionalLight_)
     {
-        up = { 1.0f,0.0f,0.0f };
+        data.directionalLight = directionalLight_->GetData();
+    }
+    else
+    {
+        data.directionalLight.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+        data.directionalLight.direction = { 0.0f, -1.0f, 0.0f };
+        data.directionalLight.intensity = enableDirectionalLight_ ? 1.0f : 0.0f;
+        data.directionalLight.isHalf = 1;
+        data.directionalLight.castShadow = 0;
     }
 
-    const float distance = 100.0f;
-    //Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0,0,0), up);
-    Matrix4x4 viewMat = LookAt(-directionalLight_.direction * distance, (0.0f, 0.0f,0.0f), up);
-
-    //float fovY_ = 0.45f;
-    //float aspectRatio_ = 16.0f / 9.0f;
-    float nearClip_ = 0.1f;
-    float farClip_ = 1000.0f;
-
-    float halfWidth = shadowMapSize_.x / 2.0f;
-    float halfHeight = shadowMapSize_.y / 2.0f;
-
-    Matrix4x4 projMat =
-        //MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
-        MakeOrthographicMatrix(-halfWidth, -halfWidth, halfHeight, halfHeight , nearClip_, farClip_);
-    directionalLight_.viewProjection = viewMat * projMat;
-
-    data.directionalLight = directionalLight_;
-
-    if(!enableDirectionalLight_)
-        data.directionalLight.intensity = 0;
-
-
-
-    size_t i = 0;
-    if(enablePointLight_)
+    if (enablePointLight_)
     {
-        data.numPointLight = static_cast<uint32_t>(selectablePointLights_.size());
-        for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
+        uint32_t index = 0;
+        for (auto& [name,light] : pointLights_)
         {
-            data.pointLights[i] = it->light;
-            if (it->parent)
+            if (index >= MAX_POINT_LIGHT)
             {
-                data.pointLights[i].position += *it->parent;
+                break;
             }
-            i++;
+            data.pointLights[index] = light->GetData();
+            ++index;
         }
+        data.numPointLight = index;
+    }
+    else
+    {
+        data.numPointLight = 0;
     }
 
-    if(enableSpotLight_)
+    if (enableSpotLight_)
     {
-        i = 0;
-        data.numSpotLight = static_cast<uint32_t>(selectableSpotLights_.size());
-        for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
+        uint32_t index = 0;
+        for (auto& [name, light] : spotLights_)
         {
-            data.spotLights[i] = it->light;
-            if (it->parent)
+            if (index >= MAX_SPOT_LIGHT)
             {
-                data.spotLights[i].position += *it->parent;
+                break;
             }
-            i++;
+            data.spotLights[index] = light->GetData();
+            ++index;
         }
+        data.numSpotLight = index;
+    }
+    else
+    {
+        data.numSpotLight = 0;
     }
 
     dirty_ = false;
 
-    lightData_ = data;
-
     return data;
+
 }
 
-void LightGroup::DrawDebugWindow()
+void LightGroup::ImGui()
 {
 #ifdef _DEBUG
 
-    ImGui::Begin("LightGroup");
+    if (ImGui::Begin("Light Settings")) {
+        // Light group overall settings
+        if (ImGui::CollapsingHeader("Light Group Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Checkbox("Enable Directional Light", &enableDirectionalLight_);
+            ImGui::Checkbox("Enable Point Lights", &enablePointLight_);
+            ImGui::Checkbox("Enable Spot Lights", &enableSpotLight_);
+        }
 
-    if(ImGui::Checkbox("DirectionalLight", &enableDirectionalLight_))
-        dirty_ = true;
-    if(ImGui::Checkbox("PointLight", &enablePointLight_))
-        dirty_ = true;
-    if(ImGui::Checkbox("SpotLight", &enableSpotLight_))
-        dirty_ = true;
+        if (enableDirectionalLight_) {
+            DrawDirectionalLightImGui();
+        }
 
-    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.18f, 0.22f, 0.58f, 0.71f));
-    if(ImGui::CollapsingHeader("Directional Light"))
-    {
-        ImGui::ColorEdit4("Color", &directionalLight_.color.x);
-        ImGui::DragFloat3("Direction", &directionalLight_.direction.x, 0.01f);
-        ImGui::DragFloat("Intensity", &directionalLight_.intensity, 0.01f,0.0f);
-        bool isHalf = directionalLight_.isHalf;
-        ImGui::Checkbox("IsHalf", &isHalf);
-        directionalLight_.isHalf = isHalf;
-        dirty_ = true;
+        if (enablePointLight_) {
+            DrawPointLightsImGui();
+        }
+
+        if (enableSpotLight_) {
+            DrawSpotLightsImGui();
+        }
+
+        ImGui::End();
     }
+#endif // _DEBUG
+}
 
-    if (ImGui::CollapsingHeader("Point Light"))
-    {
-        dirty_ = true;
-        ImGui::InputText("create Light Name", addPointLightName_, sizeof(addPointLightName_));
-
-        if (ImGui::Button("Add"))
-        {
-            PointLight light = {};
-            std::string name = addPointLightName_;
-            AddPointLight(light, name);
-            strcpy_s(addPointLightName_, sizeof(addPointLightName_), "");
-            dirty_ = true;
-        }
-        ImGui::Separator();
-
-        if (ImGui::BeginTable("Point Light", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
-        {
-            uint32_t i = 0;
-            for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end(); it++)
-            {
-                ImGui::TableNextColumn();
-                ImGui::Selectable(it->name.c_str(), &(*it).select);
+void LightGroup::DrawDirectionalLightImGui()
+{
+#ifdef _DEBUG
+    if (ImGui::CollapsingHeader("Directional Light")) {
+        if (!directionalLight_) {
+            if (ImGui::Button("Create Directional Light")) {
+                auto light = std::make_shared<DirectionalLightComponent>();
+                SetDirectionalLight(light);
             }
-            ImGui::EndTable();
+            return;
         }
 
-        ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags_AutoSelectNewTabs;
-        tabBarFlags |= ImGuiTabBarFlags_TabListPopupButton;
+        DirectionalLight& data = directionalLight_->GetData();
 
-        ImGui::BeginTabBar("Point Light", tabBarFlags);
+        ImGui::ColorEdit4("Color", &data.color.x);
 
-        uint32_t i = 0;
-        for (auto it = selectablePointLights_.begin(); it != selectablePointLights_.end();)
-        {
-            if (ImGui::BeginTabItem(it->name.c_str(), &(*it).select, ImGuiTabItemFlags_None))
-            {
-                PointLight& pointLight = (*it).light;
-
-                ImGui::PushID(static_cast<int>(i));
-                ImGui::ColorEdit4("Color", &pointLight.color.x);
-                ImGui::DragFloat3("Position", &pointLight.position.x, 0.01f);
-                ImGui::DragFloat("Intensity", &pointLight.intensity, 0.01f, 0.0f);
-                ImGui::DragFloat("Radius", &pointLight.radius, 0.01f, 0.0f);
-                ImGui::DragFloat("Decay", &pointLight.decay, 0.01f, 0.0f);
-                bool isHalf = pointLight.isHalf;
-                ImGui::Checkbox("IsHalf", &isHalf);
-                pointLight.isHalf = isHalf;
-
-                if (ImGui::Button("Delete"))
-                {
-                    it = selectablePointLights_.erase(it);
-                    ImGui::PopID();
-                    ImGui::EndTabItem();
-                    continue;
-                }
-                ImGui::PopID();
-                ImGui::EndTabItem();
-            }
-            ++i;
-            ++it;
+        // Direction setting (before normalization)
+        Vector3 dir = data.direction;
+        if (ImGui::DragFloat3("Direction", &dir.x, 0.01f)) {
+            directionalLight_->SetDirection(dir); // Normalized internally
         }
-        ImGui::EndTabBar();
+
+        ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
+
+        bool isHalf = data.isHalf != 0;
+        if (ImGui::Checkbox("Half Lambert", &isHalf)) {
+            directionalLight_->SetIsHalf(isHalf);
+        }
+
+        bool castShadow = data.castShadow != 0;
+        if (ImGui::Checkbox("Cast Shadow", &castShadow)) {
+            directionalLight_->SetCastShadow(castShadow);
+        }
     }
-
-    ImGui::PushID("Spot Light");
-    if (ImGui::CollapsingHeader("Spot Light"))
-    {
-        dirty_ = true;
-        ImGui::InputText("create Light Name", addSpotLightName_, sizeof(addSpotLightName_));
-
-        if (ImGui::Button("Add"))
-        {
-            SpotLight light = {};
-            std::string name = addSpotLightName_;
-            AddSpotLight(light, name);
-            strcpy_s(addSpotLightName_, sizeof(addSpotLightName_), "");
-            dirty_ = true;
-        }
-
-        if (ImGui::BeginTable("Spot Light", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
-        {
-            uint32_t i = 0;
-            for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end(); it++)
-            {
-                ImGui::TableNextColumn();
-                ImGui::Selectable(it->name.c_str(), &(*it).select);
-            }
-            ImGui::EndTable();
-        }
-
-        ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags_AutoSelectNewTabs;
-        tabBarFlags |= ImGuiTabBarFlags_TabListPopupButton;
-
-        ImGui::BeginTabBar("Spot Light", tabBarFlags);
-
-        uint32_t i = 0;
-        for (auto it = selectableSpotLights_.begin(); it != selectableSpotLights_.end();)
-        {
-            if (ImGui::BeginTabItem(it->name.c_str(), &(*it).select, ImGuiTabItemFlags_None))
-            {
-                SpotLight& spotLight = (*it).light;
-
-                ImGui::PushID(static_cast<int>(i));
-                ImGui::ColorEdit4("Color", &spotLight.color.x);
-                ImGui::DragFloat3("Position", &spotLight.position.x, 0.01f);
-                ImGui::DragFloat("Intensity", &spotLight.intensity, 0.01f, 0.0f);
-                ImGui::DragFloat3("Direction", &spotLight.direction.x, 0.01f);
-                ImGui::DragFloat("Distance", &spotLight.distance, 0.01f, 0.0f);
-                ImGui::DragFloat("Decay", &spotLight.decay, 0.01f, 0.0f);
-                ImGui::DragFloat("CosAngle", &spotLight.cosAngle, 0.01f, 0.0f, 1.0f);
-                ImGui::DragFloat("FalloutStartAngle", &spotLight.falloutStartAngle, 0.01f, 0.0f, 1.0f);
-                bool isHalf = spotLight.isHalf;
-                ImGui::Checkbox("IsHalf", &isHalf);
-                spotLight.isHalf = isHalf;
-
-                if (ImGui::Button("Delete"))
-                {
-                    it = selectableSpotLights_.erase(it);
-                    ImGui::PopID();
-                    ImGui::EndTabItem();
-                    continue;
-                }
-
-                ImGui::PopID();
-                ImGui::EndTabItem();
-            }
-            ++i;
-            ++it;
-        }
-        ImGui::EndTabBar();
-    }
-    ImGui::PopID();
-    ImGui::PopStyleColor();
-
-    ImGui::End();
 #endif // _DEBUG
 
 }
 
-Matrix4x4 LightGroup::LookAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up)
+void LightGroup::DrawPointLightsImGui()
 {
-    Vector3 zaxis = (_at - _eye).Normalize();
-    Vector3 xaxis = _up.Cross(zaxis).Normalize();
-    if (xaxis.Length() == 0)
-    {
-        xaxis = { 1.0f,0.0f,0.0f };
-    }
-    Vector3 yaxis = zaxis.Cross(xaxis);
-    if (yaxis.Length() == 0)
-    {
-        yaxis = { 0.0f,1.0f,0.0f };
-    }
+#ifdef _DEBUG
+    if (ImGui::CollapsingHeader("Point Lights")) {
+        // Adding new point light
+        ImGui::InputText("New Light Name", newPointLightName_, sizeof(newPointLightName_));
 
-    Matrix4x4 result =
-    {
-        {
-            {xaxis.x, yaxis.x, zaxis.x, 0.0f},
-            {xaxis.y, yaxis.y, zaxis.y, 0.0f},
-            {xaxis.z, yaxis.z, zaxis.z, 0.0f},
-            { -xaxis.Dot(_eye), -yaxis.Dot(_eye), -zaxis.Dot(_eye), 1.0f }
+        ImGui::SameLine();
+        if (ImGui::Button("Add##PointLight")) {
+            if (newPointLightName_[0] != '\0') {
+                std::string name = newPointLightName_;
+                auto light = std::make_shared<PointLightComponent>();
+                AddPointLight(name, light);
+
+                // Clear input field
+                memset(newPointLightName_, 0, sizeof(newPointLightName_));
+            }
         }
-    };
 
-    return result;
+        if (pointLights_.empty()) {
+            ImGui::Text("No point lights available");
+            return;
+        }
+
+        // Displaying/editing existing point lights
+        if (ImGui::BeginTabBar("PointLightTabs")) {
+            // List to store lights to remove
+            std::vector<std::string> lightsToRemove;
+
+            for (auto& [name, light] : pointLights_) {
+                if (ImGui::BeginTabItem(name.c_str())) {
+                    PointLight& data = light->GetData();
+
+                    ImGui::PushID(name.c_str());
+                    ImGui::ColorEdit4("Color", &data.color.x);
+                    ImGui::DragFloat3("Position", &data.position.x, 0.1f);
+                    ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
+                    ImGui::DragFloat("Radius", &data.radius, 0.1f, 0.1f, 100.0f);
+                    ImGui::DragFloat("Decay", &data.decay, 0.01f, 0.1f, 5.0f);
+
+                    bool isHalf = data.isHalf != 0;
+                    if (ImGui::Checkbox("Half Lambert", &isHalf)) {
+                        light->SetIsHalf(isHalf);
+                    }
+
+                    bool castShadow = data.castShadow != 0;
+                    if (ImGui::Checkbox("Cast Shadow", &castShadow)) {
+                        light->SetCastShadow(castShadow);
+                    }
+
+                    if (ImGui::Button("Delete")) {
+                        lightsToRemove.push_back(name);
+                    }
+
+                    ImGui::PopID();
+                    ImGui::EndTabItem();
+                }
+            }
+
+            // Process lights to remove
+            for (const auto& name : lightsToRemove) {
+                RemovePointLight(name);
+            }
+
+            ImGui::EndTabBar();
+        }
+    }
+#endif // _DEBUG
 }
 
-LightGroup::LightTransferData LightGroup::GetDefaultLightData()
+void LightGroup::DrawSpotLightsImGui()
 {
-    LightTransferData data;
-    data.directionalLight = {
-        .color = {1.0f, 1.0f, 1.0f, 1.0f},
-        .direction = {0.0f, -1.0f, 0.0f},
-        .intensity = 1.0f,
-        .isHalf = 1
-    };
-    data.numPointLight = 0;
-    data.numSpotLight = 0;
-    return data;
+#ifdef _DEBUG
+    if (ImGui::CollapsingHeader("Spot Lights")) {
+        // Adding new spot light
+        ImGui::InputText("New Light Name", newSpotLightName_, sizeof(newSpotLightName_));
 
+        ImGui::SameLine();
+        if (ImGui::Button("Add##SpotLight")) {
+            if (newSpotLightName_[0] != '\0') {
+                std::string name = newSpotLightName_;
+                auto light = std::make_shared<SpotLightComponent>();
+                AddSpotLight(name, light);
+
+
+                // Clear input field
+                memset(newSpotLightName_, 0, sizeof(newSpotLightName_));
+            }
+        }
+
+        if (spotLights_.empty()) {
+            ImGui::Text("No spot lights available");
+            return;
+        }
+
+        // Displaying/editing existing spot lights
+        if (ImGui::BeginTabBar("SpotLightTabs")) {
+            // List to store lights to remove
+            std::vector<std::string> lightsToRemove;
+
+            for (auto& [name, light] : spotLights_) {
+                if (ImGui::BeginTabItem(name.c_str())) {
+                    SpotLight& data = light->GetData();
+
+                    ImGui::PushID(name.c_str());
+                    ImGui::ColorEdit4("Color", &data.color.x);
+                    ImGui::DragFloat3("Position", &data.position.x, 0.1f);
+                    ImGui::DragFloat3("Direction", &data.direction.x, 0.01f);
+                    light->SetDirection(data.direction); // Ensure normalization
+
+                    ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
+                    ImGui::DragFloat("Distance", &data.distance, 0.1f, 0.1f, 100.0f);
+                    ImGui::DragFloat("Decay", &data.decay, 0.01f, 0.1f, 5.0f);
+
+                    // Convert angles from radians to degrees
+                    float angleDegrees = acos(data.cosAngle) * 180.0f / 3.14159f;
+                    if (ImGui::SliderFloat("Angle", &angleDegrees, 1.0f, 90.0f)) {
+                        light->SetCosAngle(angleDegrees);
+                    }
+
+                    float falloutAngleDegrees = acos(data.falloutStartAngle) * 180.0f / 3.14159f;
+                    if (ImGui::SliderFloat("Fallout Start Angle", &falloutAngleDegrees, 1.0f, angleDegrees)) {
+                        light->SetFalloutStartAngle(falloutAngleDegrees);
+                    }
+
+                    bool isHalf = data.isHalf != 0;
+                    if (ImGui::Checkbox("Half Lambert", &isHalf)) {
+                        light->SetIsHalf(isHalf);
+                    }
+
+                    bool castShadow = data.castShadow != 0;
+                    if (ImGui::Checkbox("Cast Shadow", &castShadow)) {
+                        light->SetCastShadow(castShadow);
+                    }
+
+                    if (ImGui::Button("Delete")) {
+                        lightsToRemove.push_back(name);
+                    }
+
+                    ImGui::PopID();
+                    ImGui::EndTabItem();
+                }
+            }
+
+            // Process lights to remove
+            for (const auto& name : lightsToRemove) {
+                RemoveSpotLight(name);
+            }
+
+            ImGui::EndTabBar();
+        }
+    }
+#endif // _DEBUG
 }

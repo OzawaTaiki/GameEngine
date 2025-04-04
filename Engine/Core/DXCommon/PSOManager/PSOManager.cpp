@@ -162,7 +162,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
 #pragma region Sampler
     //Samplerの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[3] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -184,6 +184,17 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     staticSamplers[1].ShaderRegister = 1; // s1
     staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+    // pointLight用のサンプラ
+    staticSamplers[2].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT; // 比較用フィルタ
+    staticSamplers[2].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP; // 境界外を無効化
+    staticSamplers[2].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[2].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[2].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // 影の外は光が当たる
+    staticSamplers[2].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 深度比較
+    staticSamplers[2].MaxLOD = D3D12_FLOAT32_MAX;
+    staticSamplers[2].ShaderRegister = 2; // s1
+    staticSamplers[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
 
 
 #pragma endregion
@@ -203,12 +214,19 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
     D3D12_DESCRIPTOR_RANGE shadowMapRange[1] = {};
     shadowMapRange[0].BaseShaderRegister = 1;  // t1 にバインド
-    shadowMapRange[0].NumDescriptors = 1;
+    shadowMapRange[0].NumDescriptors = 1; // PointLightの最大数
     shadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     shadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+    D3D12_DESCRIPTOR_RANGE PLShadowMapRange[1] = {};
+    PLShadowMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
+    PLShadowMapRange[0].NumDescriptors = 32 * 6;
+    PLShadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    PLShadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[7] = {};
+    D3D12_ROOT_PARAMETER rootParameters[8] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -246,6 +264,12 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[6].DescriptorTable.pDescriptorRanges = shadowMapRange;
     rootParameters[6].DescriptorTable.NumDescriptorRanges = _countof(shadowMapRange);
+
+    // PLシャドウマップ
+    rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[7].DescriptorTable.pDescriptorRanges = PLShadowMapRange;
+    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(PLShadowMapRange);
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -1138,7 +1162,8 @@ void PSOManager::CreatePSOForPLShadowMap()
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[2].Descriptor.ShaderRegister = 2;
 
-
+    descriptionRootSignature.pStaticSamplers = nullptr;
+    descriptionRootSignature.NumStaticSamplers = 0;
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -1205,19 +1230,28 @@ void PSOManager::CreatePSOForPLShadowMap()
 #pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
-    blendDesc.RenderTarget[0].BlendEnable = FALSE;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
+    for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+        blendDesc.RenderTarget[i].BlendEnable = FALSE;
+        blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+    }
 #pragma endregion
 
 #pragma region RasterizerState
 
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_None);
-
-    //三角形を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+    rasterizerDesc.FrontCounterClockwise = FALSE;
+    rasterizerDesc.DepthBias = 100000;  // シャドウアクネ防止のための深度バイアス
+    rasterizerDesc.DepthBiasClamp = 0.0f;
+    rasterizerDesc.SlopeScaledDepthBias = 1.0f;
+    rasterizerDesc.DepthClipEnable = TRUE;
+    rasterizerDesc.MultisampleEnable = FALSE;
+    rasterizerDesc.AntialiasedLineEnable = FALSE;
+    rasterizerDesc.ForcedSampleCount = 0;
+    rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
 #pragma endregion
 
     // PSOを生成する
@@ -1240,6 +1274,8 @@ void PSOManager::CreatePSOForPLShadowMap()
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
     graphicsPipelineStateDesc.BlendState = blendDesc;
+
+    graphicsPipelineStateDesc.StreamOutput.RasterizedStream = 0;
 
 
     // PSOを生成
