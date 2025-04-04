@@ -20,7 +20,8 @@ enum class PSOFlags
     Type_LineDrawer			= 1 << 2,
     Type_Particle			= 1 << 3,
     Type_OffScreen          = 1 << 4,
-    Type_ShadowMap          = 1 << 5,
+    Type_DLShadowMap        = 1 << 5,
+    Type_PLShadowMap        = 1 << 6,
 
     Blend_Normal			= 1 << 11,
     Blend_Add				= 1 << 12,
@@ -89,15 +90,14 @@ constexpr PSOFlags& operator&=(PSOFlags& a, PSOFlags b)
 constexpr PSOFlags TypeMask =
 PSOFlags::Type_Model |
 PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
-| PSOFlags::Type_OffScreen | PSOFlags::Type_ShadowMap
-; // 0～4ビット
-
+| PSOFlags::Type_OffScreen | PSOFlags::Type_DLShadowMap | PSOFlags::Type_PLShadowMap
+;
 constexpr PSOFlags BlendMask =
 PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
-PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen; // 5～9ビット
+PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen;
 
 constexpr PSOFlags CullMask =
-PSOFlags::Cull_Back | PSOFlags::Cull_Front | PSOFlags::Cull_None; // 10～12ビット
+PSOFlags::Cull_Back | PSOFlags::Cull_Front | PSOFlags::Cull_None;
 
 
 #pragma endregion
@@ -136,7 +136,9 @@ private:
     void CreatePSOForParticle(PSOFlags _flags);
     void CreatePSOForOffScreen();
 
-    void CreatePSOForShadowMap();
+    void CreatePSOForDLShadowMap();
+    void CreatePSOForPLShadowMap();
+
 
 
 	D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);

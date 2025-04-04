@@ -24,8 +24,6 @@ cbuffer gID : register(b2)
     uint id;
 }
 
-SamplerState gSampler : register(s0);
-
 VertexShaderOutput ShadowMapVS(VertexShaderInput _input)
 {
 

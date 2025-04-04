@@ -2,10 +2,12 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 
-const uint32_t RTVManager::kMaxRTVIndex_ = 8;
-const uint32_t RTVManager::kMaxDSVIndex_ = 8;
+const uint32_t RTVManager::kMaxRTVIndex_ = 64;
+const uint32_t RTVManager::kMaxDSVIndex_ = 64;
  uint32_t RTVManager::winWidth_ = 0;
  uint32_t RTVManager::winHeight_ = 0;
+
+
 
 RTVManager* RTVManager::GetInstance()
 {
@@ -18,7 +20,8 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
     dxcommon_ = DXCommon::GetInstance();
     rtvDescriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kMaxRTVIndex_, false);
     dsvDescriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, kMaxDSVIndex_, false);
-    descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    rtvDescriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    dsvDescriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     winWidth_ = _winWidth;
     winHeight_ = _winHeight;
@@ -71,6 +74,16 @@ void RTVManager::DrawRenderTexture(uint32_t _index)
 
     it->second->Draw();
 
+}
+
+void RTVManager::ClearAllRenderTarget()
+{
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+    for (auto& rt : renderTargets_)
+    {
+        rt.second->Clear(commandList);
+    }
 }
 
 void RTVManager::DrawRenderTexture(const std::string& _name)
@@ -168,6 +181,47 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
 
 
     return rtvIndex;
+}
+
+
+void RTVManager::SetCubemapRenderTexture(uint32_t _handle)
+{
+    auto it = cubemaps_.find(_handle);
+    if (it == cubemaps_.end())
+    {
+        // Not a cubemap handle, treat as regular render texture
+        SetRenderTexture(_handle);
+        return;
+    }
+
+    // Set render target to the cubemap (all 6 faces)
+    auto renderTarget = renderTargets_[_handle].get();
+    if (renderTarget)
+    {
+        renderTarget->SetRenderTexture();
+    }
+}
+
+ID3D12Resource* RTVManager::GetCubemapResource(uint32_t _handle) const
+{
+    auto it = cubemaps_.find(_handle);
+    if (it != cubemaps_.end())
+    {
+        return it->second.resource.Get();
+    }
+    return nullptr;
+}
+
+const std::vector<uint32_t>& RTVManager::GetCubemapFaceHandles(uint32_t _handle) const
+{
+    static std::vector<uint32_t> emptyVector;
+
+    auto it = cubemaps_.find(_handle);
+    if (it != cubemaps_.end())
+    {
+        return it->second.faceHandles;
+    }
+    return emptyVector;
 }
 
 
@@ -272,6 +326,50 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
 
 }
 
+Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
+{
+    Microsoft::WRL::ComPtr<ID3D12Resource> cubemapResource = nullptr;
+
+    // Texture description for a cubemap (2D texture array with 6 slices)
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    resourceDesc.Width = _width;
+    resourceDesc.Height = _height;
+    resourceDesc.DepthOrArraySize = 6;  // 6 faces for a cubemap
+    resourceDesc.MipLevels = 1;
+    resourceDesc.Format = _format;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.SampleDesc.Quality = 0;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    // Heap properties
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    // Clear value
+    D3D12_CLEAR_VALUE clearValue{};
+    clearValue.Format = _format;
+    clearValue.Color[0] = _clearColor.x;
+    clearValue.Color[1] = _clearColor.y;
+    clearValue.Color[2] = _clearColor.z;
+    clearValue.Color[3] = _clearColor.w;
+
+    // Create the resource
+    auto device = dxcommon_->GetDevice();
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
+        &clearValue,
+        IID_PPV_ARGS(cubemapResource.GetAddressOf()));
+
+    assert(SUCCEEDED(hr));
+
+    return cubemapResource;
+}
+
 
 uint32_t RTVManager::AllocateRTVIndex()
 {
@@ -292,27 +390,27 @@ uint32_t RTVManager::AllocateDSVIndex()
 D3D12_CPU_DESCRIPTOR_HANDLE RTVManager::GetCPUDSVDescriptorHandle(uint32_t _index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += (descriptorSize_ * _index);
+    handleCPU.ptr += (dsvDescriptorSize_  * _index);
     return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE RTVManager::GetGPUDSVDescriptorHandle(uint32_t _index)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = dsvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += (descriptorSize_ * _index);
+    handleGPU.ptr += (dsvDescriptorSize_ * _index);
     return handleGPU;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE RTVManager::GetCPURTVDescriptorHandle(uint32_t _index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += (descriptorSize_ * _index);
+    handleCPU.ptr += (rtvDescriptorSize_ * _index);
     return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE RTVManager::GetGPURTVDescriptorHandle(uint32_t _index)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = rtvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += (descriptorSize_ * _index);
+    handleGPU.ptr += (rtvDescriptorSize_ * _index);
     return handleGPU;
 }

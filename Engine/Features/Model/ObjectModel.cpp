@@ -90,19 +90,55 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
     model_->ChangeAnimation(_name, _blendTime, _isLoop);
 }
 
-void ObjectModel::DrawShadow(const Camera* _camera, uint32_t _id)
+void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
 {
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+    if (lightGroup.get() == nullptr) return;
+
     if (idForGPU == nullptr)
         CreateIDResource();
 
     *idForGPU = _id;
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
-    _camera->QueueCommand(commandList, 0);
-    worldTransform_.QueueCommand(commandList, 1);
-    commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
-    model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
 
+    if (lightGroup->GetDirectionalLight()->IsCastShadow())
+    {
+        RTVManager::GetInstance()->SetRenderTexture("ShadowMap");
+
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_DLShadowMap);
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_DLShadowMap);
+
+        _camera->QueueCommand(commandList, 0);
+        worldTransform_.QueueCommand(commandList, 1);
+        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+        model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+    }
+
+    auto pointLights = lightGroup->GetAllPointLights();
+
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
+
+    for (auto& pointLight : pointLights)
+    {
+        auto handles = pointLight->GetShadowMapHandles();
+        if (!pointLight->IsCastShadow())
+            continue;
+
+        for (uint32_t i : handles)
+        {
+            RTVManager::GetInstance()->SetCubemapRenderTexture(i);
+
+            worldTransform_.QueueCommand(commandList, 0);
+            LightingSystem::GetInstance()->QueuePointLightShadowCommand(commandList, 1, pointLight.get());
+            commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+            model_->GetMeshPtr()->QueueCommand(commandList);
+
+            commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
+
+        }
+    }
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)

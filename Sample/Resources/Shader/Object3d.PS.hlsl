@@ -31,6 +31,9 @@ SamplerState gSampler : register(s0);
 Texture2D<float> gShadowMap : register(t1);
 SamplerComparisonState gShadowSampler : register(s1);
 
+//TextureCube<float> gPointLightShadowMap : register(t2);
+//SamplerState gPointLightShadowSampler : register(s2);
+
 float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
 float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, float3 _toEye, float4 _textureColor);
 float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _textureColor);

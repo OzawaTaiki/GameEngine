@@ -36,7 +36,6 @@ void ParticleTestScene::Initialize()
     lights_ = std::make_unique<LightGroup>();
     lights_->Initialize();
 
-    LightingSystem::GetInstance()->SetLightGroup(lights_.get());
 
 
 }
