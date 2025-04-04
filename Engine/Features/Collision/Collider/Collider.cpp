@@ -8,10 +8,13 @@
 
 #include <numbers>
 
-Collider::Collider()
+void Collider::Initialize()
 {
-    defaultTransform_.Initialize();
+    if (isInitialized_)
+        return;
 
+    defaultTransform_.Initialize();
+    isInitialized_ = true;
 }
 
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
@@ -51,10 +54,11 @@ CollisionState Collider::GetCollisionState(Collider* _other) const
     return CollisionState::None; // 衝突なし
 }
 
-const WorldTransform* Collider::GetWorldTransform() const
+const WorldTransform* Collider::GetWorldTransform()
 {
     if (worldTransform_ == nullptr)
     {
+        Initialize();
         return &defaultTransform_;
     }
 
@@ -213,12 +217,12 @@ void SphereCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
-bool SphereCollider::Contains(const Vector3& _point) const
+bool SphereCollider::Contains(const Vector3& _point)
 {
     return _point.Length() <= radius_;
 }
 
-Vector3 SphereCollider::GetClosestPoint(const Vector3& _point) const
+Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
 {
     return _point.Normalize() * radius_;
 }
@@ -290,14 +294,14 @@ void AABBCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
-bool AABBCollider::Contains(const Vector3& _point) const
+bool AABBCollider::Contains(const Vector3& _point)
 {
     return min_.x <= _point.x && _point.x <= max_.x &&
         min_.y <= _point.y && _point.y <= max_.y &&
         min_.z <= _point.z && _point.z <= max_.z;
 }
 
-Vector3 AABBCollider::GetClosestPoint(const Vector3& _point) const
+Vector3 AABBCollider::GetClosestPoint(const Vector3& _point)
 {
     return Vector3(
         std::clamp(_point.x, min_.x, max_.x),
@@ -383,7 +387,7 @@ void OBBCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
-bool OBBCollider::Contains(const Vector3& _point) const
+bool OBBCollider::Contains(const Vector3& _point)
 {
     Vector3 center = GetCenter();
     WorldTransform transform = *GetWorldTransform();
@@ -396,7 +400,7 @@ bool OBBCollider::Contains(const Vector3& _point) const
         std::abs(localPoint.z) <= halfExtents_.z;
 }
 
-Vector3 OBBCollider::GetClosestPoint(const Vector3& _point) const
+Vector3 OBBCollider::GetClosestPoint(const Vector3& _point)
 {
     Vector3 center = GetCenter();
     WorldTransform transform = *GetWorldTransform();
@@ -417,7 +421,7 @@ Vector3 OBBCollider::GetClosestPoint(const Vector3& _point) const
     return center + Transform(localClosest, rotMat);
 }
 
-std::vector<Vector3> OBBCollider::GetVertices() const
+std::vector<Vector3> OBBCollider::GetVertices()
 {
     std::vector<Vector3> corners(8);
     Vector3 center = GetCenter(); // ピボットではなく実際の中心を使用
@@ -445,7 +449,7 @@ std::vector<Vector3> OBBCollider::GetVertices() const
     return corners;
 }
 
-Vector3 OBBCollider::GetCenter() const
+Vector3 OBBCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
@@ -610,7 +614,7 @@ void CapsuleCollider::Save(const std::string& _name)
 }
 
 
-bool CapsuleCollider::Contains(const Vector3& _point) const
+bool CapsuleCollider::Contains(const Vector3& _point)
 {
     Vector3 start, end;
     GetCapsuleSegment(start, end);
@@ -623,7 +627,7 @@ bool CapsuleCollider::Contains(const Vector3& _point) const
     return distance <= radius_;
 }
 
-Vector3 CapsuleCollider::GetClosestPoint(const Vector3& _point) const
+Vector3 CapsuleCollider::GetClosestPoint(const Vector3& _point)
 {
     Vector3 start, end;
     GetCapsuleSegment(start, end);
@@ -664,7 +668,7 @@ Vector3 CapsuleCollider::GetClosestPoint(const Vector3& _point) const
     return closest + toPoint.Normalize() * radius_;
 }
 
-Vector3 CapsuleCollider::GetCenter() const
+Vector3 CapsuleCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
@@ -675,7 +679,7 @@ Vector3 CapsuleCollider::GetCenter() const
     return transform.transform_ + pivot;
 }
 
-void CapsuleCollider::GetCapsuleSegment(Vector3& _start, Vector3& _end) const
+void CapsuleCollider::GetCapsuleSegment(Vector3& _start, Vector3& _end)
 {
     Vector3 center = GetCenter();
 
