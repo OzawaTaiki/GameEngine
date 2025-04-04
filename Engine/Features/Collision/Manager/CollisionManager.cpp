@@ -177,11 +177,15 @@ void CollisionManager::DrawColliders()
 
 void CollisionManager::ImGui()
 {
+#ifdef _DEBUG
+
+
     ImGui::PushID(this);
     // デバッグ描画の有効/無効を設定
     ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
 
     ImGui::PopID();
+#endif // _DEBUG
 }
 
 void CollisionManager::ResolveCollision(const CollisionPair& _pair)
@@ -208,5 +212,9 @@ void CollisionManager::UpdateBroadPhase()
 
 CollisionManager::CollisionManager()
 {
+#ifdef _DEBUG
+
+
     ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
+#endif // DEBUG
 }
