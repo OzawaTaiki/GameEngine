@@ -79,9 +79,11 @@ class Collider
 {
 public:
     // コンストラクタ
-    Collider();
+    Collider() = default;
     // デストラクタ
     virtual ~Collider();
+
+    void Initialize();
 
     // 衝突イベント処理（CollisionManagerから呼ばれる）
     void OnCollision(Collider* _other, const ColliderInfo& _info);
@@ -135,13 +137,13 @@ public:
     void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
     // ワールドトランスフォームを取得する
-    const WorldTransform* GetWorldTransform() const;
+    const WorldTransform* GetWorldTransform();
 
     // _pointが内部に含まれているか
-    virtual bool Contains(const Vector3& _point) const = 0;
+    virtual bool Contains(const Vector3& _point) = 0;
 
     // _pointから最も近い点を求める
-    virtual Vector3 GetClosestPoint(const Vector3& _point) const = 0;
+    virtual Vector3 GetClosestPoint(const Vector3& _point) = 0;
 
     // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
@@ -184,6 +186,8 @@ private:
 
     WorldTransform defaultTransform_;
 
+    bool isInitialized_ = false; // 初期化フラグ
+
 };
 
 
@@ -208,9 +212,9 @@ public:
     float GetRadius() const { return radius_; }
 
     // 球の中に_pointが含まれているか
-    bool Contains(const Vector3& _point) const override;
+    bool Contains(const Vector3& _point)  override;
     // _pointから最も近い点を求める
-    Vector3 GetClosestPoint(const Vector3& _point) const override;
+    Vector3 GetClosestPoint(const Vector3& _point)  override;
 
 
     void ImGui();
@@ -243,9 +247,9 @@ public:
     Vector3 GetMax() const { return max_; }
 
     // AABBの中に_pointが含まれているか
-    bool Contains(const Vector3& _point) const override;
+    bool Contains(const Vector3& _point)  override;
     // _pointから最も近い点を求める
-    Vector3 GetClosestPoint(const Vector3& _point) const override;
+    Vector3 GetClosestPoint(const Vector3& _point)  override;
 
 
     void ImGui();
@@ -280,14 +284,14 @@ public:
     Vector3 GetLocalPivot() const { return localPivot_; }
 
     // OBBの中に_pointが含まれているか
-    bool Contains(const Vector3& _point) const override;
+    bool Contains(const Vector3& _point) override;
     // _pointから最も近い点を求める
-    Vector3 GetClosestPoint(const Vector3& _point) const override;
+    Vector3 GetClosestPoint(const Vector3& _point) override;
 
     // OBBの頂点を取得する
-    std::vector<Vector3> GetVertices() const;
+    std::vector<Vector3> GetVertices();
     // OBBの中心を取得する
-    Vector3 GetCenter() const;
+    Vector3 GetCenter();
 
     void ImGui();
 private:
@@ -330,15 +334,15 @@ public:
     float GetHeight() const { return height_; }
 
     // カプセルの中に_pointが含まれているか
-    bool Contains(const Vector3& _point) const override;
+    bool Contains(const Vector3& _point)  override;
     // _pointから最も近い点を求める
-    Vector3 GetClosestPoint(const Vector3& _point) const override;
+    Vector3 GetClosestPoint(const Vector3& _point)  override;
 
     // カプセルの中心を取得する
-    Vector3 GetCenter() const;
+    Vector3 GetCenter();
 
     // カプセルの中心線の両端を取得する
-    void GetCapsuleSegment(Vector3& _start, Vector3& _end) const ;
+    void GetCapsuleSegment(Vector3& _start, Vector3& _end);
 
     // 点と線分間の最近接点を計算
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
