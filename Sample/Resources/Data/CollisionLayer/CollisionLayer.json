@@ -1,0 +1,12 @@
+{
+    "CollisionLayer": {
+        "layerNames": [
+            "cube",
+            "cube2",
+            "cube",
+            "cube2",
+            "cube",
+            "cube2"
+        ]
+    }
+}
