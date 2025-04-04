@@ -1,65 +1,71 @@
 #pragma once
 
+#include <Features/Light/Light.h>
+
 #include <Math/Vector/Vector3.h>
-#include <Math/Vector/Vector4.h>
 
-#include <cstdint>
-#include <wrl.h>
-#include <d3d12.h>
+#include <numbers>
+#include <cmath>
 
-class SpotLight
+
+struct SpotLight
+{
+    Vector4 color = { 1,1,1,1 };		// ライトの色
+
+    Vector3 position = { 0,0,0 };	// ライトの位置
+    float intensity = 1.0f;	        // 輝度
+
+    Vector3 direction = { 0,-1,0 };	// ライトの向き
+    float distance = 4.0f;	        // ライトの有効距離
+
+    float decay = 1.0f;	            // 距離による減衰率
+    float cosAngle                        // 角度
+        = std::cosf(std::numbers::pi_v<float> / 3.0f);
+    float falloutStartAngle               // 開始角度
+        = std::cosf(std::numbers::pi_v<float> / 3.0f);
+    uint32_t isHalf = 1;            // ハーフランバートを使うか
+
+    uint32_t castShadow = 1;        // シャドウマップを生成するか
+    float pad[3] = {};
+
+    Matrix4x4 viewProjection = Matrix4x4::Identity();
+};
+
+
+class SpotLightComponent : public Light
 {
 public:
+    SpotLightComponent();
+    ~SpotLightComponent() = default;
 
-    SpotLight() = default;
-    ~SpotLight() = default;
+    void Update() override;
+    bool IsCastShadow() const override { return data_.castShadow == 1; }
 
-    void Initialize();
-    void Update();
-    void Draw();
+    SpotLight& GetData() { return data_; }
+    const SpotLight& GetData() const { return data_; }
 
-    void TransferData();
+    void SetColor(const Vector4& color) { data_.color = color; }
+    void SetPosition(const Vector3& position) { data_.position = position; }
+    void SetIntensity(float intensity) { data_.intensity = intensity; }
+    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); }
+    void SetDistance(float distance) { data_.distance = distance; }
+    void SetDecay(float decay) { data_.decay = decay; }
+    void SetCosAngle(float angleDegree);
+    void SetFalloutStartAngle(float angleDegree);
+    void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
+    void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
 
-    ID3D12Resource* GetResource() { return resource_.Get(); }
+    void UpdateViewProjection(uint32_t shadowMapSize);
 
-    void SetColor(const Vector4& _color) { color_ = _color; }
-    void SetPosition(const Vector3& _position) { position_ = _position; }
-    void SetDirection(const Vector3& _direction) { position_ = _direction; }
-    void SetIntensity(float _intensity) { intensity_ = _intensity; }
-    void SetDistance(float _distance) { distance_ = _distance; }
-    void SetDecay(float _decay) { decay_ = _decay; }
-    void SetCosAngle(float _cos) { cosAngle_ = _cos; }
-    void SetFalloutStartAngle(float _falloutStartAngle) { falloutStartAngle_ = _falloutStartAngle; }
+    void CreateShadowMap(uint32_t shadowMapSize);
+    void ReleaseShadowMap();
+    uint32_t GetShadowMapHandle() const { return shadowMapHandle_; }
 
-    void EnableHalfLambert() { useHalfLambert_ = true; }
-    void DisEnableHalfLambert() { useHalfLambert_ = false; }
 private:
+    SpotLight data_ = {};  
+    uint32_t shadowMapHandle_ = 0;
 
-    Vector4 color_;
-    Vector3 position_;
-    Vector3 direction_;
-    float   intensity_;
-    float   distance_;
-    float   decay_;
-    float   cosAngle_;
-    float   falloutStartAngle_;
-    uint32_t useHalfLambert_;
-
-
-    struct ConstantBufferData
-    {
-        Vector4 color;		//ライトの色
-        Vector3 position;
-        float intensity;	//輝度
-        Vector3 direction;
-        float distance;
-        float decay;	// 減衰率
-        float cosAngle;
-        float falloutStartAngle;
-        uint32_t isHalf;
-    };
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
-    ConstantBufferData* constMap_ = nullptr;
-
+    Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };
+
+

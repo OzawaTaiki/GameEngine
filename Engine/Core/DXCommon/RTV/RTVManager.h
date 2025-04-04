@@ -22,6 +22,7 @@ public:
     void DrawRenderTexture(const std::string& _name);
     void DrawRenderTexture(uint32_t _index);
 
+    void ClearAllRenderTarget();
 
     void SetRenderTexture(uint32_t _index);
     void SetRenderTexture(std::string _name);
@@ -36,7 +37,11 @@ public:
     RenderTarget* GetRenderTexture(std::string _name) { return renderTargets_[textureMap_[_name]].get(); }
     RenderTarget* GetRenderTexture(uint32_t _index) { return renderTargets_[_index].get(); }
 
+    uint32_t CreateCubemapRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV);
 
+    void SetCubemapRenderTexture(uint32_t _handle);
+    ID3D12Resource* GetCubemapResource(uint32_t _handle) const;
+    const std::vector<uint32_t>& GetCubemapFaceHandles(uint32_t _handle) const;
 
 private:
     //TODO : DXCommonのもろもろをRTVManagerにおきかえ
@@ -44,6 +49,12 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource(uint32_t _width, uint32_t _height,uint32_t _rtvindex, DXGI_FORMAT _format, const Vector4& _clearColor);
     void CreateDepthStencilTextureResource(uint32_t _width, uint32_t _height, uint32_t _dsvindex);
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateCubemapResource(
+        uint32_t _width,
+        uint32_t _height,
+        uint32_t _rtvIndex,
+        DXGI_FORMAT _format,
+        const Vector4& _clearColor);
 
     uint32_t AllocateRTVIndex();
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPURTVDescriptorHandle(uint32_t _index);
@@ -57,7 +68,9 @@ private:
     static uint32_t winHeight_;
     static const uint32_t kMaxRTVIndex_;
     static const uint32_t kMaxDSVIndex_;
-    uint32_t descriptorSize_;
+     uint32_t rtvDescriptorSize_;
+     uint32_t dsvDescriptorSize_;
+
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
@@ -75,6 +88,12 @@ private:
     std::map<std::string, uint32_t> textureMap_;
     std::map<uint32_t, std::unique_ptr<RenderTarget>> renderTargets_;
     std::map<uint32_t,Microsoft::WRL::ComPtr<ID3D12Resource>> dsvResources_;
+
+    struct CubemapData {
+        std::vector<uint32_t> faceHandles;  // Individual RTV handles for each face
+        Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+    };
+    std::map<uint32_t, CubemapData> cubemaps_;
 
     RTVManager() = default;
     ~RTVManager() = default;

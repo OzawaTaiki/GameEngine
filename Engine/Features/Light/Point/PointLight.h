@@ -1,56 +1,57 @@
 #pragma once
 
-#include <Math/Vector/Vector3.h>
-#include <Math/Vector/Vector4.h>
+#include <Features/Light/Light.h>
 
-#include <cstdint>
-#include <wrl.h>
-#include <d3d12.h>
-class PointLight
+#include <Math/Vector/Vector3.h>
+
+#include <vector>
+
+struct PointLight
+{
+    Vector4 color = { 1, 1, 1, 1 };     // ライトの色
+
+    Vector3 position = { 0, 1, 0 };     // ライトの位置
+    float intensity = 1.0f;           // 輝度
+
+    float radius = 5.0f;              // ライトの影響半径
+    float decay = 0.5f;               // 減衰率
+    uint32_t isHalf = 1;              // ハーフランバートを使うか
+    uint32_t castShadow = 1;          // シャドウマップを生成するか
+
+    Matrix4x4 viewProjection[6];      // シャドウマップのビュー射影行列（キューブマップの6面）
+};
+
+class PointLightComponent : public Light
 {
 public:
+    PointLightComponent();
+    ~PointLightComponent() = default;
 
-    PointLight() = default;
-    ~PointLight() = default;
+    void Update() override;
+    bool IsCastShadow() const override { return data_.castShadow == 1; }
 
-    void Initialize();
-    void Update();
-    void Draw();
+    PointLight& GetData() { return data_; }
+    const PointLight& GetData() const { return data_; }
+    void SetColor(const Vector4& color) { data_.color = color; }
 
-    void TransferData();
+    void SetPosition(const Vector3& position) { data_.position = position; }
+    void SetIntensity(float intensity) { data_.intensity = intensity; }
+    void SetRadius(float radius) { data_.radius = radius; }
+    void SetDecay(float decay) { data_.decay = decay; }
+    void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
+    void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
 
-    ID3D12Resource* GetResource() { return resource_.Get(); }
+    void UpdateViewProjections(uint32_t shadowMapSize);
 
-    void SetColor(const Vector4& _color) { color_ = _color; }
-    void SetPosition(const Vector3& _position) { position_ = _position; }
-    void SetIntensity(float _intensity) { intendity_ = _intensity; }
-    void SetRadius(float _radius) { radius_ = _radius; }
-    void SetDecay(float _decay) { decay_ = _decay; }
+    void CreateShadowMaps(uint32_t shadowMapSize);
+    void ReleaseShadowMaps();
+    const std::vector<uint32_t>& GetShadowMapHandles() const { return shadowMapHandles_; }
 
-    void EnableHalfLambert() { useHalfLambert_ = true; }
-    void DisEnableHalfLambert() { useHalfLambert_ = false; }
 private:
+    PointLight data_ = {};
+    std::vector<uint32_t> shadowMapHandles_;
 
-    Vector4 color_;
-    Vector3 position_;
-    float intendity_;
-    float radius_;
-    float decay_;
-    bool useHalfLambert_;
-
-
-    struct ConstantBufferData
-    {
-        Vector4 color;		//ライトの色
-        Vector3 position_;	//ライトの向き
-        float intensity;	//輝度
-        float radius;	// ライトの影響半径
-        float decay;	// 減衰率
-        uint32_t isHalf;
-        float pad;
-    };
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
-    ConstantBufferData* constMap_ = nullptr;
-
+    // キューブマップ各面のビュー行列計算ヘルパー
+    void CalculateCubemapViewProjections(uint32_t shadowMapSize);
+    Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };

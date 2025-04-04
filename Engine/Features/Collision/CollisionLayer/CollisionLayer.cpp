@@ -16,7 +16,7 @@ void CollisionLayer::SetLayer(const std::string& _layer)
 
 void CollisionLayer::SetLayerMask(const std::string& _layer)
 {
-    layerMask_ |= ~CollisionLayerManager::GetInstance()->GetLayer(_layer);
+    layerMask_ |= CollisionLayerManager::GetInstance()->GetLayer(_layer);
 }
 
 void CollisionLayer::RegisterLayer(JsonBinder* _jsonBinder)

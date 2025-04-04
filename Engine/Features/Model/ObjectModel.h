@@ -17,7 +17,7 @@ public:
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
-    void DrawShadow(const Camera* _camera, uint32_t _id);
+    void DrawShadow(const Camera* _camera,  uint32_t _id);
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
 
     void SetAnimation(const std::string& _name, bool _isLoop = false);

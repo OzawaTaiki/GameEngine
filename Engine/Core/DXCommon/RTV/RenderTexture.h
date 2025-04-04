@@ -31,8 +31,8 @@ public:
     void SetClearColor(float _color[4])                         { clearValue_[0] = _color[0];   clearValue_[1] = _color[1]; clearValue_[2] = _color[2]; clearValue_[3] = _color[3]; }
     void SetClearColor(const Vector4& _color)                   { clearValue_[0] = _color.x ;   clearValue_[1] = _color.y;  clearValue_[2] = _color.z;  clearValue_[3] = _color.w;  }
 
-    void SetRenderTexture() const;
-    void SetDepthStencil() ;
+    void SetRenderTexture();
+    void SetDepthStencil();
 
     void ChangeRTVState( D3D12_RESOURCE_STATES _after);
     void ChangeDSVState( D3D12_RESOURCE_STATES _after);
@@ -46,13 +46,16 @@ public:
     uint32_t GetSRVindexofRTV() const { return srvIndexofRTV_; }
     uint32_t GetSRVindexofDSV() const { return srvIndexofDSV_; }
 
-    void Draw() ;
+    void Draw();
 
     ID3D12Resource* GetRTVResource() const { return renderTextureResource_.Get(); }
     ID3D12Resource* GetDSVResource() const { return dsvResource_; }
 
+    void Clear(ID3D12GraphicsCommandList* _cmdList);
 
 private:
+
+
 
     D3D12_RESOURCE_STATES RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
     D3D12_RESOURCE_STATES DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
