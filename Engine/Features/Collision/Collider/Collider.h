@@ -127,6 +127,12 @@ public:
     // 自身のlayerMaskをセット設定する
     void SetLayerMask(const std::string& _layer) { collisionLayer_.SetLayerMask(_layer); }
 
+    // 自身のlayerを除外する
+    void ExcludeLayer(const std::string& _layer) { collisionLayer_.ExcludeLayer(_layer); }
+
+    // 自身のlayerMaskを除外する
+    void ExcludeLayerMask(const std::string& _layer) { collisionLayer_.ExcludeLayerMask(_layer); }
+
     // バウンディングボックスを取得する
     BoundingBox GetBoundingBox() const { return boundingBox_; }
     // バウンディングボックスを設定する
