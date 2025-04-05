@@ -24,6 +24,12 @@ public:
     // LayerMaskを設定する
     void SetLayerMask(const std::string& _layer);
 
+    // Layerを除外する
+    void ExcludeLayer(const std::string& _layer);
+
+    // LayerMaskを除外する
+    void ExcludeLayerMask(const std::string& _layer);
+
     // jsonBinderへの登録
     void RegisterLayer(JsonBinder* _jsonBinder);
 
