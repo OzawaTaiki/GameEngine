@@ -69,7 +69,7 @@ private:
     std::array <uint32_t, 24> obbIndices_;
     std::array <Vector3, 32> circleVertices_;
 
-    const float kDivision = 16;
+    const float kDivision = 8;
     std::vector <Vector3> sphereVertices_;
     std::vector <uint32_t> sphereIndices_;
 

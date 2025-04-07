@@ -202,7 +202,9 @@ void SphereCollider::Draw()
 
     // 球を描画
     // 球の中心をワールド空間に変換
-    Vector3 center = GetWorldTransform()->transform_ + offset_;
+    // オフセットをワールド変換（回転）で変換
+    Vector3 worldOffset = Transform(offset_, GetWorldTransform()->quaternion_.ToMatrix());
+    Vector3 center = GetWorldTransform()->transform_ + worldOffset;
     // 球の半径をスケール分拡大
     float scale = GetWorldTransform()->scale_.x;
     float radius = radius_ * scale;
@@ -229,12 +231,30 @@ void SphereCollider::Save(const std::string& _name)
 
 bool SphereCollider::Contains(const Vector3& _point)
 {
-    return _point.Length() <= radius_;
+    // オフセットとワールド変換を考慮した中心からの距離でチェックする
+    const WorldTransform* transform = GetWorldTransform();
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+    float radius = radius_ * transform->scale_.x;
+
+    return (_point - center).Length() <= radius;
 }
 
 Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
 {
-    return _point.Normalize() * radius_;
+    // 同様にオフセットとワールド変換を考慮
+    const WorldTransform* transform = GetWorldTransform();
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+    float radius = radius_ * transform->scale_.x;
+
+    Vector3 direction = _point - center;
+    float length = direction.Length();
+
+    if (length <= 0.0001f)
+        return center + Vector3(radius, 0, 0); // 適当な方向
+
+    return center + direction / length * radius;
 }
 
 void SphereCollider::ImGui()
@@ -264,7 +284,7 @@ void AABBCollider::Draw()
 
     // ワールド空間での頂点を計算
     WorldTransform transform = *GetWorldTransform();
-    Vector3 pos = transform.transform_ + offset_;
+    Vector3 pos = transform.transform_ + Transform(offset_, transform.quaternion_.ToMatrix());
     Vector3 scale = transform.scale_;
 
     // ローカル空間でのAABBの頂点

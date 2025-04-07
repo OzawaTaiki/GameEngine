@@ -232,19 +232,32 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
 bool CollisionDetector::IntersectSphereSphere(SphereCollider* _sphere1, SphereCollider* _sphere2, ColliderInfo& _info)
 {
     // 球の中心位置を取得
-    Vector3 center1 = _sphere1->GetWorldTransform()->GetWorldPosition() + _sphere1->GetOffset();
-    Vector3 center2 = _sphere2->GetWorldTransform()->GetWorldPosition() + _sphere2->GetOffset();
+    const WorldTransform* transform1 = _sphere1->GetWorldTransform();
+    const WorldTransform* transform2 = _sphere2->GetWorldTransform();
+
+    // オフセットをワールド変換（回転）で変換
+    Vector3 worldOffset1 = Transform(_sphere1->GetOffset(), transform1->quaternion_.ToMatrix());
+    Vector3 worldOffset2 = Transform(_sphere2->GetOffset(), transform2->quaternion_.ToMatrix());
+
+    // 球の中心位置 = ワールド位置 + 変換されたオフセット
+    Vector3 center1 = transform1->GetWorldPosition() + worldOffset1;
+    Vector3 center2 = transform2->GetWorldPosition() + worldOffset2;
+
+    // スケール適用
+    float radius1 = _sphere1->GetRadius() * transform1->scale_.x;
+    float radius2 = _sphere2->GetRadius() * transform2->scale_.x;
 
     // 2つの球の中心間の距離を計算
     Vector3 direction = center2 - center1;
     float distance = direction.Length();
-    float radiusSum = _sphere1->GetRadius() + _sphere2->GetRadius();
+    float radiusSum = radius1 + radius2;
 
     // 距離が半径の和より大きい場合は衝突していない
     if (distance * distance > radiusSum * radiusSum)
     {
         return false;
     }
+
 
     // 衝突情報を設定
     _info.hasCollision = true;
@@ -300,30 +313,33 @@ bool CollisionDetector::IntersectAABBAABB(AABBCollider* _aabb1, AABBCollider* _a
     float overlapY = std::min(max1.y, max2.y) - std::max(min1.y, min2.y);
     float overlapZ = std::min(max1.z, max2.z) - std::max(min1.z, min2.z);
 
-    // めり込みが最小の軸に沿った法線と衝突点を計算
+    // 中心位置を計算
+    Vector3 center1 = transform1->transform_ + offset1;
+    Vector3 center2 = transform2->transform_ + offset2;
+
+    // 最小の重なりを持つ軸を選択して法線方向を決定
     if (overlapX <= overlapY && overlapX <= overlapZ)
     {
-        // X軸でのめり込みが最小
         _info.penetration = overlapX;
-        _info.contactNormal = (transform1->transform_.x < transform2->transform_.x) ? Vector3(-1, 0, 0) : Vector3(1, 0, 0);
+        _info.contactNormal = (center1.x < center2.x) ? Vector3(-1, 0, 0) : Vector3(1, 0, 0);
     }
     else if (overlapY <= overlapX && overlapY <= overlapZ)
     {
         // Y軸でのめり込みが最小
         _info.penetration = overlapY;
-        _info.contactNormal = (transform1->transform_.y < transform2->transform_.y) ? Vector3(0, -1, 0) : Vector3(0, 1, 0);
+        _info.contactNormal = (center1.y < center2.y) ? Vector3(0, -1, 0) : Vector3(0, 1, 0);
     }
     else
     {
         // Z軸でのめり込みが最小
         _info.penetration = overlapZ;
-        _info.contactNormal = (transform1->transform_.z < transform2->transform_.z) ? Vector3(0, 0, -1) : Vector3(0, 0, 1);
+        _info.contactNormal = (center1.z < center2.z) ? Vector3(0, 0, -1) : Vector3(0, 0, 1);
     }
 
-    // 衝突点を計算（2つのAABBの中心からめり込み方向に半分移動した点）
-    Vector3 center1 = (min1 + max1) * 0.5f;
-    Vector3 center2 = (min2 + max2) * 0.5f;
-    _info.contactPoint = center1 - _info.contactNormal * (_info.penetration * 0.5f);
+    // 衝突点を計算（2つのAABBの中心間の中点）
+    Vector3 boxCenter1 = (min1 + max1) * 0.5f;
+    Vector3 boxCenter2 = (min2 + max2) * 0.5f;
+    _info.contactPoint = boxCenter1 - _info.contactNormal * (_info.penetration * 0.5f);
 
     return true;
 }
@@ -519,13 +535,21 @@ bool CollisionDetector::IntersectCapsuleCapsule(CapsuleCollider* _capsule1, Caps
 bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollider* _aabb, ColliderInfo& _info)
 {
     // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
-    float radius = _sphere->GetRadius();
+    // 球の中心をオフセットを考慮して計算
+    const WorldTransform* sphereTransform = _sphere->GetWorldTransform();
+    Vector3 worldOffset = Transform(_sphere->GetOffset(), sphereTransform->quaternion_.ToMatrix());
+    Vector3 sphereCenter = sphereTransform->GetWorldPosition() + worldOffset;
+
+    // スケールを適用した半径
+    float radius = _sphere->GetRadius() * sphereTransform->scale_.x;
 
     // AABBのワールド座標
     const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
-    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_ + _aabb->GetOffset();
-    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_ + _aabb->GetOffset();
+    Vector3 aabbOffset = Transform(_aabb->GetOffset(), aabbTransform->quaternion_.ToMatrix());
+
+    // スケールと位置を適用したAABBの最小・最大点
+    Vector3 aabbMin = _aabb->GetMin() * aabbTransform->scale_ + aabbTransform->GetWorldPosition() + aabbOffset;
+    Vector3 aabbMax = _aabb->GetMax() * aabbTransform->scale_ + aabbTransform->GetWorldPosition() + aabbOffset;
 
     // 球の中心からAABBへの最近接点を計算
     Vector3 closestPoint(
@@ -586,11 +610,15 @@ bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollide
 
 bool CollisionDetector::IntersectSphereOBB(SphereCollider* _sphere, OBBCollider* _obb, ColliderInfo& _info)
 {
-    // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
-    float radius = _sphere->GetRadius();
+    // 球の中心をオフセットを考慮して計算
+    const WorldTransform* sphereTransform = _sphere->GetWorldTransform();
+    Vector3 worldOffset = Transform(_sphere->GetOffset(), sphereTransform->quaternion_.ToMatrix());
+    Vector3 sphereCenter = sphereTransform->GetWorldPosition() + worldOffset;
 
-    // OBBの最近接点を計算
+    // スケールを適用した半径
+    float radius = _sphere->GetRadius() * sphereTransform->scale_.x;
+
+    // OBBの最近接点を計算（GetClosestPointがオフセットを適切に考慮していることを確認）
     Vector3 closestPoint = _obb->GetClosestPoint(sphereCenter);
 
     // 球の中心と最近接点の距離を計算
@@ -628,10 +656,14 @@ bool CollisionDetector::IntersectSphereOBB(SphereCollider* _sphere, OBBCollider*
 bool CollisionDetector::IntersectSphereCapsule(SphereCollider* _sphere, CapsuleCollider* _capsule, ColliderInfo& _info)
 {
     // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
-    float sphereRadius = _sphere->GetRadius();
+    const WorldTransform* sphereTransform = _sphere->GetWorldTransform();
+    Vector3 worldOffset = Transform(_sphere->GetOffset(), sphereTransform->quaternion_.ToMatrix());
+    Vector3 sphereCenter = sphereTransform->GetWorldPosition() + worldOffset;
 
-    // カプセルの線分端点を取得
+    // スケールを適用した半径
+    float sphereRadius = _sphere->GetRadius() * sphereTransform->scale_.x;
+
+    // カプセルの線分端点を取得（GetCapsuleSegmentがオフセットを適切に考慮していることを確認）
     Vector3 start, end;
     _capsule->GetCapsuleSegment(start, end);
 
@@ -700,8 +732,10 @@ bool CollisionDetector::IntersectAABBCapsule(AABBCollider* _aabb, CapsuleCollide
 
     // AABBのワールド座標
     const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
-    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_ + _aabb->GetOffset();
-    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_ + _aabb->GetOffset();
+    Vector3 aabbOffset = Transform(_aabb->GetOffset(), aabbTransform->quaternion_.ToMatrix());
+    Vector3 aabbMin = _aabb->GetMin() * aabbTransform->scale_ + aabbTransform->transform_ + aabbOffset;
+    Vector3 aabbMax = _aabb->GetMax() * aabbTransform->scale_ + aabbTransform->transform_ + aabbOffset;
+
 
     // 線分とAABBの最短距離を計算
     float minDistance = FLT_MAX;
