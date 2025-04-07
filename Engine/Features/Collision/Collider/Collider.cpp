@@ -125,6 +125,7 @@ void Collider::ImGui()
         ImGui::DragFloat4("Quaternion", &defaultTransform_.quaternion_.x, 0.01f);
     }
 
+    ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
     ImGui::Text("Layer      : %x", collisionLayer_.GetLayer());
     ImGui::Text("LayerMask  : %x", collisionLayer_.GetLayerMask());
     ImGui::Text("BoundingBox: %s", ToString(boundingBox_).c_str());
