@@ -232,8 +232,8 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
 bool CollisionDetector::IntersectSphereSphere(SphereCollider* _sphere1, SphereCollider* _sphere2, ColliderInfo& _info)
 {
     // 球の中心位置を取得
-    Vector3 center1 = _sphere1->GetWorldTransform()->GetWorldPosition();
-    Vector3 center2 = _sphere2->GetWorldTransform()->GetWorldPosition();
+    Vector3 center1 = _sphere1->GetWorldTransform()->GetWorldPosition() + _sphere1->GetOffset();
+    Vector3 center2 = _sphere2->GetWorldTransform()->GetWorldPosition() + _sphere2->GetOffset();
 
     // 2つの球の中心間の距離を計算
     Vector3 direction = center2 - center1;
@@ -274,8 +274,8 @@ bool CollisionDetector::IntersectAABBAABB(AABBCollider* _aabb1, AABBCollider* _a
     const WorldTransform* transform1 = _aabb1->GetWorldTransform();
     const WorldTransform* transform2 = _aabb2->GetWorldTransform();
 
-    Vector3 min1 = _aabb1->GetMin() * transform1->scale_ + transform1->transform_;
-    Vector3 max1 = _aabb1->GetMax() * transform1->scale_ + transform1->transform_;
+    Vector3 min1 = _aabb1->GetMin() * transform1->scale_ + transform1->transform_ + _aabb1->GetOffset();
+    Vector3 max1 = _aabb1->GetMax() * transform1->scale_ + transform1->transform_ + _aabb1->GetOffset();
     Vector3 min2 = _aabb2->GetMin() * transform2->scale_ + transform2->transform_;
     Vector3 max2 = _aabb2->GetMax() * transform2->scale_ + transform2->transform_;
 
@@ -514,13 +514,13 @@ bool CollisionDetector::IntersectCapsuleCapsule(CapsuleCollider* _capsule1, Caps
 bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollider* _aabb, ColliderInfo& _info)
 {
     // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_;
+    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
     float radius = _sphere->GetRadius();
 
     // AABBのワールド座標
     const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
-    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_;
-    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_;
+    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_ + _aabb->GetOffset();
+    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_ + _aabb->GetOffset();
 
     // 球の中心からAABBへの最近接点を計算
     Vector3 closestPoint(
@@ -582,7 +582,7 @@ bool CollisionDetector::IntersectSphereAABB(SphereCollider* _sphere, AABBCollide
 bool CollisionDetector::IntersectSphereOBB(SphereCollider* _sphere, OBBCollider* _obb, ColliderInfo& _info)
 {
     // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_;
+    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
     float radius = _sphere->GetRadius();
 
     // OBBの最近接点を計算
@@ -623,7 +623,7 @@ bool CollisionDetector::IntersectSphereOBB(SphereCollider* _sphere, OBBCollider*
 bool CollisionDetector::IntersectSphereCapsule(SphereCollider* _sphere, CapsuleCollider* _capsule, ColliderInfo& _info)
 {
     // 球の中心
-    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_;
+    Vector3 sphereCenter = _sphere->GetWorldTransform()->transform_ + _sphere->GetOffset();
     float sphereRadius = _sphere->GetRadius();
 
     // カプセルの線分端点を取得
@@ -695,8 +695,8 @@ bool CollisionDetector::IntersectAABBCapsule(AABBCollider* _aabb, CapsuleCollide
 
     // AABBのワールド座標
     const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
-    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_;
-    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_;
+    Vector3 aabbMin = _aabb->GetMin() + aabbTransform->transform_ + _aabb->GetOffset();
+    Vector3 aabbMax = _aabb->GetMax() + aabbTransform->transform_ + _aabb->GetOffset();
 
     // 線分とAABBの最短距離を計算
     float minDistance = FLT_MAX;

@@ -201,7 +201,7 @@ void SphereCollider::Draw()
 
     // 球を描画
     // 球の中心をワールド空間に変換
-    Vector3 center = GetWorldTransform()->transform_;
+    Vector3 center = GetWorldTransform()->transform_ + offset_;
     // 球の半径をスケール分拡大
     float scale = GetWorldTransform()->scale_.x;
     float radius = radius_ * scale;
@@ -263,7 +263,7 @@ void AABBCollider::Draw()
 
     // ワールド空間での頂点を計算
     WorldTransform transform = *GetWorldTransform();
-    Vector3 pos = transform.transform_;
+    Vector3 pos = transform.transform_ + offset_;
     Vector3 scale = transform.scale_;
 
     // ローカル空間でのAABBの頂点
@@ -464,7 +464,7 @@ Vector3 OBBCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
-    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, { 0,0,0 });
+    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, offset_);
 
     Vector3 pivot = Transform(localPivot_, affine);
 
@@ -683,7 +683,7 @@ Vector3 CapsuleCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
-    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, { 0,0,0 });
+    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, offset_);
 
     Vector3 pivot = Transform(localPivot_, affine);
 

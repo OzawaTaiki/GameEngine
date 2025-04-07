@@ -140,12 +140,17 @@ public:
     // バウンディングボックスを設定する
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
 
-
     // ワールドトランスフォームを設定する
     void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
     // ワールドトランスフォームを取得する
     const WorldTransform* GetWorldTransform();
+
+    // コライダーのオフセットを設定する
+    void SetOffset(const Vector3& _offset) { offset_ = _offset; }
+
+    // コライダーのオフセットを取得する
+    Vector3 GetOffset() const { return offset_; }
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) = 0;
@@ -169,6 +174,9 @@ protected:
     std::string name_;
 
     bool isDraw_ = true;
+
+    Vector3 offset_ = Vector3(0.0f, 0.0f, 0.0f); // コライダーのオフセット
+
 private:
     // 衝突状態の管理
     struct CollisionData
@@ -193,6 +201,7 @@ private:
     std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
 
     WorldTransform defaultTransform_;
+
 
     bool isInitialized_ = false; // 初期化フラグ
 
