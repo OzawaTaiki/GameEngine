@@ -163,6 +163,12 @@ public:
 
     std::string GetName() const { return name_; }
 
+    // Drawフラグを取得
+    bool GetDrawFlag() const { return isDraw_; }
+
+    // Drawフラグを設定
+    void SetDrawFlag(bool _isDraw) { isDraw_ = _isDraw; }
+
 protected:
 
     bool InitJsonBinder(const std::string& _name, const std::string& _folderPath="Resources/Data/Colliders/");
