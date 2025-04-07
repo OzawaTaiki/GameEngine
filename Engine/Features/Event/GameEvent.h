@@ -8,13 +8,17 @@ class GameEvent
 {
 
 public:
-    GameEvent(const std::string& eventType) : eventType_(eventType),eventTypeID_(0) {}
+    GameEvent(const std::string& eventType) : eventType_(eventType) , eventTypeID_(EventTypeRegistry::GetInstance()->GetEventTypeId(eventType)) {}
     ~GameEvent() = default;
 
     const std::string& GetEventType() const { return eventType_; }
 
     uint32_t GetEventTypeID() const { return eventTypeID_; }
-    uint32_t SetEventType(const std::string& eventType) { eventType_ = eventType; }
+    uint32_t SetEventType(const std::string& eventType) {
+        eventType_ = eventType;
+        eventTypeID_ = EventTypeRegistry::GetInstance()->GetEventTypeId(eventType);
+        return eventTypeID_;
+    }
 
 private:
 
