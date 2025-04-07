@@ -175,6 +175,29 @@ void CollisionManager::DrawColliders()
     }
 }
 
+void CollisionManager::UnregisterCollider(Collider* _collider)
+{
+    if (_collider == nullptr)
+        return;
+
+    // コライダーリストから削除
+    auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
+    if (it != colliders_.end()) {
+        colliders_.erase(it);
+    }
+
+    if (collisionPairs_.empty())
+        return;
+
+    // 衝突ペアからも削除
+    collisionPairs_.erase(
+        std::remove_if(collisionPairs_.begin(), collisionPairs_.end(),
+            [_collider](const CollisionPair& pair) {
+                return pair.colliderA == _collider || pair.colliderB == _collider;
+            }),
+        collisionPairs_.end());
+}
+
 void CollisionManager::ImGui()
 {
     ImGui::PushID(this);

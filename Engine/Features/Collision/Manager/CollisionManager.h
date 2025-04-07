@@ -43,6 +43,9 @@ public:
     // デバッグ描画の有効/無効を取得
     bool IsDrawEnabled() const { return isDrawEnabled_; }
 
+    void UnregisterCollider(Collider* _collider);
+
+
     void ImGui();
 
 private:

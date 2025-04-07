@@ -2,6 +2,7 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Math/Vector/VectorFunction.h>
 
+#include <Features/Collision/Manager/CollisionManager.h>
 #include <Features/LineDrawer/LineDrawer.h>
 
 #include <Debug/ImGuiDebugManager.h>
@@ -19,6 +20,8 @@ void Collider::Initialize()
 
 Collider::~Collider()
 {
+    CollisionManager::GetInstance()->UnregisterCollider(this);
+
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 }
 
