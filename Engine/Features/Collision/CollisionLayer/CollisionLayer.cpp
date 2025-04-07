@@ -19,6 +19,11 @@ void CollisionLayer::SetLayerMask(const std::string& _layer)
     layerMask_ |= CollisionLayerManager::GetInstance()->GetLayer(_layer);
 }
 
+void CollisionLayer::SetCollisionLayer(const std::string& _layer)
+{
+    ExcludeLayerMask(_layer);
+}
+
 void CollisionLayer::ExcludeLayer(const std::string& _layer)
 {
     layer_ &= ~CollisionLayerManager::GetInstance()->GetLayer(_layer);

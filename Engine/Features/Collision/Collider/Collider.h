@@ -127,6 +127,8 @@ public:
     // 自身のlayerMaskをセット設定する
     void SetLayerMask(const std::string& _layer) { collisionLayer_.SetLayerMask(_layer); }
 
+    void SetCollisionLayer(const std::string& _layer) { collisionLayer_.SetCollisionLayer(_layer); }
+
     // 自身のlayerを除外する
     void ExcludeLayer(const std::string& _layer) { collisionLayer_.ExcludeLayer(_layer); }
 
