@@ -812,5 +812,8 @@
     <ClInclude Include="Features\Event\EventTypeRegistry.h">
       <Filter>Features\Event</Filter>
     </ClInclude>
+    <ClInclude Include="Features\Event\EventData.h">
+      <Filter>Features\Event</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

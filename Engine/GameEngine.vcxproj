@@ -251,6 +251,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Effect\Manager\ParticleManager.h" />
     <ClInclude Include="Features\Effect\Particle\Particle.h" />
     <ClInclude Include="Features\Effect\ParticleInitParam.h" />
+    <ClInclude Include="Features\Event\EventData.h" />
     <ClInclude Include="Features\Event\EventListener.h" />
     <ClInclude Include="Features\Event\EventManager.h" />
     <ClInclude Include="Features\Event\EventTypeRegistry.h" />
