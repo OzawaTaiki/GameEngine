@@ -1,6 +1,12 @@
 #include <System/Audio/Audio.h>
 #include <cassert>
 
+Audio* Audio::GetInstance()
+{
+    static Audio instance;
+    return &instance;
+}
+
 Audio::~Audio()
 {
     xAudio2_.Reset();
@@ -23,67 +29,98 @@ void Audio::Initialize()
 
 uint32_t Audio::SoundLoadWave(const std::string& _filename)
 {
-    HRESULT hresult = S_FALSE;
-
     std::ifstream file;
-    //waveをバイナリ形式で開く
     file.open(_filename, std::ios_base::binary);
     if (!file.is_open())
     {
         throw std::runtime_error("Error: File not found - " + _filename);
     }
 
-    /// riffヘッダーの読み込み
+    // RIFFヘッダーの読み込み
     RiffHeader riff;
     file.read((char*)&riff, sizeof(riff));
-
-    // riffチェック
     if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
-        assert(0);
-    // waveチェック
-    if (strncmp(riff.type, "WAVE", 4) != 0)
-        assert(0);
-
-    /// formatチャンクの読み込み
-    FormatChunk format = {};
-
-    file.read((char*)&format, sizeof(ChunkHeader));
-    if (strncmp(format.chunk.id, "fmt ", 4) != 0)
-        assert(0);
-
-    assert(format.chunk.size <= sizeof(format.fmt));
-    file.read((char*)&format.fmt, format.chunk.size);
-
-    ///DATAチャンクの読み込み
-    ChunkHeader data;
-    file.read((char*)&data, sizeof(data));
-    // Junkファイルを見つけた時
-    if (strncmp(data.id, "JUNK", 4) == 0)
     {
-        // 読み取り位置をjunkの最後まですすめる
-        file.seekg(data.size, std::ios_base::cur);
-
-        file.read((char*)&data, sizeof(data));
+        throw std::runtime_error("Error: Not a RIFF file - " + _filename);
+    }
+    if (strncmp(riff.type, "WAVE", 4) != 0)
+    {
+        throw std::runtime_error("Error: Not a WAVE file - " + _filename);
     }
 
-    if (strncmp(data.id, "data", 4) != 0)
-        assert(0);
+    // フォーマットチャンクとデータチャンクを見つけるまで繰り返し
+    FormatChunk format = {};
+    ChunkHeader data = {};
+    bool foundFormat = false;
+    bool foundData = false;
 
+    while (!foundFormat || !foundData)
+    {
+        ChunkHeader header;
+        file.read((char*)&header, sizeof(ChunkHeader));
+
+        // ファイル終端チェック
+        if (file.eof())
+        {
+            throw std::runtime_error("Error: Unexpected end of file - " + _filename);
+        }
+
+        // フォーマットチャンク
+        if (strncmp(header.id, "fmt ", 4) == 0)
+        {
+            format.chunk = header;
+            // フォーマットデータのサイズチェック
+            if (header.size > sizeof(format.fmt))
+            {
+                // 追加データがある場合は一時バッファへ読み込む
+                std::vector<char> tempBuffer(header.size);
+                file.read(tempBuffer.data(), header.size);
+                memcpy(&format.fmt, tempBuffer.data(), sizeof(format.fmt));
+            }
+            else
+            {
+                file.read((char*)&format.fmt, header.size);
+            }
+            foundFormat = true;
+        }
+        // データチャンク
+        else if (strncmp(header.id, "data", 4) == 0)
+        {
+            data = header;
+            foundData = true;
+            break; // データチャンクが見つかったら終了
+        }
+        // その他のチャンク（スキップ）
+        else
+        {
+            file.seekg(header.size, std::ios_base::cur);
+        }
+    }
+
+    if (!foundFormat)
+    {
+        throw std::runtime_error("Error: No format chunk found - " + _filename);
+    }
+
+    if (!foundData)
+    {
+        throw std::runtime_error("Error: No data chunk found - " + _filename);
+    }
+
+    // データの読み込み
     char* pbuffer = new char[data.size];
     file.read(pbuffer, data.size);
-
     file.close();
 
     SoundData soundData = {};
-
     soundData.bufferSize = data.size;
     soundData.pBuffer = reinterpret_cast<BYTE*>(pbuffer);
     soundData.wfex = format.fmt;
-
     sounds_.push_back(soundData);
 
     return static_cast<uint32_t>(sounds_.size() - 1);
 }
+
 
 void Audio::SoundUnLoad(SoundData* _soundData)
 {
@@ -115,7 +152,6 @@ uint32_t Audio::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool
     hresult = xAudio2_->CreateSourceVoice(&pSourceVoice, &data.wfex);
     assert(SUCCEEDED(hresult));
 
-    sourceVoice_.push_back(pSourceVoice);
 
     XAUDIO2_BUFFER buf{};
     buf.pAudioData = data.pBuffer;
@@ -135,10 +171,12 @@ uint32_t Audio::SoundPlay(uint32_t _soundHandle, float _volume, bool _loop, bool
 
     uint32_t index = static_cast<uint32_t>(sourceVoice_.size() - 1);
     map_[_soundHandle] = index;
+    sourceVoice_[index] = pSourceVoice;
+
     return index;
 }
 
-bool Audio::IsPlaying(uint32_t _voiceHandle) const
+bool Audio::IsPlaying(uint32_t _voiceHandle)
 {
     if (sourceVoice_.size()==0||
         sourceVoice_.size() < _voiceHandle)

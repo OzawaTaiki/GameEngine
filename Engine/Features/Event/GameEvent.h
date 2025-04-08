@@ -15,6 +15,8 @@ public:
 
     const std::string& GetEventType() const { return eventType_; }
 
+    EventData* GetData() const { return data_; }
+
     uint32_t GetEventTypeID() const { return eventTypeID_; }
     void SetEventType(const std::string& eventType) {
         eventType_ = eventType;
