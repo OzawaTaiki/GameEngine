@@ -200,11 +200,13 @@ void CollisionManager::UnregisterCollider(Collider* _collider)
 
 void CollisionManager::ImGui()
 {
+#ifdef _DEBUG
     ImGui::PushID(this);
     // デバッグ描画の有効/無効を設定
     ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
 
     ImGui::PopID();
+#endif
 }
 
 void CollisionManager::ResolveCollision(const CollisionPair& _pair)
