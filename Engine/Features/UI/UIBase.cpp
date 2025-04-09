@@ -88,9 +88,9 @@ void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
     sprite_->SetTextureHandle(textureHandle_);
 }
 
-#ifdef _DEBUG
 void UIBase::ImGui()
 {
+#ifdef _DEBUG
     ImGui::BeginTabBar("UI");
     if (ImGui::BeginTabItem(label_.c_str()))
     {
@@ -137,7 +137,7 @@ void UIBase::ImGui()
     }
     ImGui::EndTabBar();
 
+#endif // _DEBUG
 }
 
-#endif // _DEBUG
 

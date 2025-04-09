@@ -1,5 +1,4 @@
 #pragma once
-#include <Features/Event/EventTypeRegistry.h>
 #include <Features/Event/EventListener.h>
 #include <Features/Event/GameEvent.h>
 
@@ -12,19 +11,18 @@ class EventManager
 public:
     static EventManager* GetInstance();
 
-    EventManager() : eventTypeRegistry_(EventTypeRegistry::GetInstance()) {}
+    EventManager() = default;
     ~EventManager() = default;
 
-    void AddEventListener(const std::string _eventType, iEventListener* _listener);
+    void AddEventListener(const std::string& _eventType, iEventListener* _listener);
 
-    void RemoveEventListener(const std::string _eventType, iEventListener* _listener);
+    void RemoveEventListener(const std::string& _eventType, iEventListener* _listener);
 
     void DispatchEvent(const GameEvent& _event);
 
 private:
 
-    std::map<uint32_t, std::vector<iEventListener*>> listeners_;
+    std::map<std::string, std::vector<iEventListener*>> listeners_;
 
-    EventTypeRegistry* eventTypeRegistry_;
 
 };

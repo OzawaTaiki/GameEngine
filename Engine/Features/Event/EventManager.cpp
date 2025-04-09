@@ -6,25 +6,23 @@ EventManager* EventManager::GetInstance()
     return &instance;
 }
 
-void EventManager::AddEventListener(const std::string _eventType, iEventListener* _listener)
+void EventManager::AddEventListener(const std::string& _eventType, iEventListener* _listener)
 {
     if (_listener == nullptr)
         return;
 
-    uint32_t eventTypeID = eventTypeRegistry_->GetEventTypeId(_eventType);
 
-    listeners_[eventTypeID].push_back(_listener);
+    listeners_[_eventType].push_back(_listener);
 
 }
 
-void EventManager::RemoveEventListener(const std::string _eventType, iEventListener* _listener)
+void EventManager::RemoveEventListener(const std::string& _eventType, iEventListener* _listener)
 {
     if (_listener == nullptr)
         return;
 
-    uint32_t eventTypeID = eventTypeRegistry_->GetEventTypeId(_eventType);
 
-    auto& listenerList = listeners_[eventTypeID];
+    auto& listenerList = listeners_[_eventType];
 
     auto it = std::remove(listenerList.begin(), listenerList.end(), _listener);
     if (it != listenerList.end())
@@ -35,9 +33,9 @@ void EventManager::RemoveEventListener(const std::string _eventType, iEventListe
 
 void EventManager::DispatchEvent(const GameEvent& _event)
 {
-    uint32_t eventTypeID = _event.GetEventTypeID();
+    std::string eventType = _event.GetEventType();
 
-    auto it = listeners_.find(eventTypeID);
+    auto it = listeners_.find(eventType);
 
     if (it != listeners_.end())
     {
