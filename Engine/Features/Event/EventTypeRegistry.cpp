@@ -9,7 +9,7 @@ EventTypeRegistry* EventTypeRegistry::GetInstance()
 }
 
 uint32_t EventTypeRegistry::GetEventTypeId(const std::string& _eventType)
-{
+{   
     if (eventTypes_.contains(_eventType))
     {
         return eventTypes_[_eventType];

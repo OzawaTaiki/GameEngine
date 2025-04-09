@@ -121,6 +121,18 @@ void SceneManager::ChangeScene()
 
 }
 
+void SceneManager::Finalize()
+{
+    if (currentScene_ != nullptr)
+    {
+        currentScene_.reset();
+    }
+    if (sceneFactory_ != nullptr)
+    {
+        sceneFactory_ = nullptr;
+    }
+}
+
 #ifdef _DEBUG
 #include <imgui.h>
 void SceneManager::ImGui()

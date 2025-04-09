@@ -45,6 +45,8 @@ public:
     // シーンの変更
     static void ChangeScene();
 
+    void Finalize();
+
 private:
     ISceneFactory* sceneFactory_ = nullptr;
 
