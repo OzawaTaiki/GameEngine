@@ -202,6 +202,9 @@
     <Filter Include="Features\Light\Base">
       <UniqueIdentifier>{8913d796-a4ed-4cd6-a1d5-7610ef8c711b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Event">
+      <UniqueIdentifier>{b1f78ddc-1814-4058-b94c-70a3db2be2b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -449,6 +452,12 @@
     </ClCompile>
     <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp">
       <Filter>Features\Collision\RayCast</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Event\EventManager.cpp">
+      <Filter>Features\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Event\EventTypeRegistry.cpp">
+      <Filter>Features\Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -790,6 +799,21 @@
     </ClInclude>
     <ClInclude Include="Features\Light\Light.h">
       <Filter>Features\Light\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Event\EventManager.h">
+      <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Event\GameEvent.h">
+      <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Event\EventListener.h">
+      <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Event\EventTypeRegistry.h">
+      <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Event\EventData.h">
+      <Filter>Features\Event</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

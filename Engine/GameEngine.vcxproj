@@ -163,6 +163,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Effect\Effect\ParticleEmitters.cpp" />
     <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp" />
     <ClCompile Include="Features\Effect\Particle\Particle.cpp" />
+    <ClCompile Include="Features\Event\EventManager.cpp" />
+    <ClCompile Include="Features\Event\EventTypeRegistry.cpp" />
     <ClCompile Include="Features\Json\JsonBinder.cpp" />
     <ClCompile Include="Features\Json\JsonHub.cpp" />
     <ClCompile Include="Features\Json\Loader\JsonLoader.cpp" />
@@ -249,6 +251,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Effect\Manager\ParticleManager.h" />
     <ClInclude Include="Features\Effect\Particle\Particle.h" />
     <ClInclude Include="Features\Effect\ParticleInitParam.h" />
+    <ClInclude Include="Features\Event\EventData.h" />
+    <ClInclude Include="Features\Event\EventListener.h" />
+    <ClInclude Include="Features\Event\EventManager.h" />
+    <ClInclude Include="Features\Event\EventTypeRegistry.h" />
+    <ClInclude Include="Features\Event\GameEvent.h" />
     <ClInclude Include="Features\Json\JsonBinder.h" />
     <ClInclude Include="Features\Json\JsonHub.h" />
     <ClInclude Include="Features\Json\Loader\JsonLoader.h" />

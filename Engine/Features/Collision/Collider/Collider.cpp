@@ -2,6 +2,7 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Math/Vector/VectorFunction.h>
 
+#include <Features/Collision/Manager/CollisionManager.h>
 #include <Features/LineDrawer/LineDrawer.h>
 
 #include <Debug/ImGuiDebugManager.h>
@@ -19,6 +20,8 @@ void Collider::Initialize()
 
 Collider::~Collider()
 {
+    CollisionManager::GetInstance()->UnregisterCollider(this);
+
 #ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 #endif // _DEBUG
@@ -125,6 +128,7 @@ void Collider::ImGui()
         ImGui::DragFloat4("Quaternion", &defaultTransform_.quaternion_.x, 0.01f);
     }
 
+    ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
     ImGui::Text("Layer      : %x", collisionLayer_.GetLayer());
     ImGui::Text("LayerMask  : %x", collisionLayer_.GetLayerMask());
     ImGui::Text("BoundingBox: %s", ToString(boundingBox_).c_str());
@@ -204,7 +208,9 @@ void SphereCollider::Draw()
 
     // 球を描画
     // 球の中心をワールド空間に変換
-    Vector3 center = GetWorldTransform()->transform_;
+    // オフセットをワールド変換（回転）で変換
+    Vector3 worldOffset = Transform(offset_, GetWorldTransform()->quaternion_.ToMatrix());
+    Vector3 center = GetWorldTransform()->transform_ + worldOffset;
     // 球の半径をスケール分拡大
     float scale = GetWorldTransform()->scale_.x;
     float radius = radius_ * scale;
@@ -231,12 +237,30 @@ void SphereCollider::Save(const std::string& _name)
 
 bool SphereCollider::Contains(const Vector3& _point)
 {
-    return _point.Length() <= radius_;
+    // オフセットとワールド変換を考慮した中心からの距離でチェックする
+    const WorldTransform* transform = GetWorldTransform();
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+    float radius = radius_ * transform->scale_.x;
+
+    return (_point - center).Length() <= radius;
 }
 
 Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
 {
-    return _point.Normalize() * radius_;
+    // 同様にオフセットとワールド変換を考慮
+    const WorldTransform* transform = GetWorldTransform();
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+    float radius = radius_ * transform->scale_.x;
+
+    Vector3 direction = _point - center;
+    float length = direction.Length();
+
+    if (length <= 0.0001f)
+        return center + Vector3(radius, 0, 0); // 適当な方向
+
+    return center + direction / length * radius;
 }
 
 void SphereCollider::ImGui()
@@ -268,7 +292,7 @@ void AABBCollider::Draw()
 
     // ワールド空間での頂点を計算
     WorldTransform transform = *GetWorldTransform();
-    Vector3 pos = transform.transform_;
+    Vector3 pos = transform.transform_ + Transform(offset_, transform.quaternion_.ToMatrix());
     Vector3 scale = transform.scale_;
 
     // ローカル空間でのAABBの頂点
@@ -472,7 +496,7 @@ Vector3 OBBCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
-    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, { 0,0,0 });
+    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, offset_);
 
     Vector3 pivot = Transform(localPivot_, affine);
 
@@ -694,7 +718,7 @@ Vector3 CapsuleCollider::GetCenter()
 {
     WorldTransform transform = *GetWorldTransform();
 
-    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, { 0,0,0 });
+    Matrix4x4 affine = MakeAffineMatrix(transform.scale_, transform.rotate_, offset_);
 
     Vector3 pivot = Transform(localPivot_, affine);
 

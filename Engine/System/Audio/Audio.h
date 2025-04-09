@@ -15,6 +15,10 @@
 
 class Audio
 {
+
+public:
+    static Audio* GetInstance();
+
 private:
 
     struct ChunkHeader
@@ -49,7 +53,7 @@ public:
 
     uint32_t SoundLoadWave(const std::string& _filename);
     uint32_t SoundPlay(uint32_t _soundHandle, float _volume, bool _loop = false, bool _enableOverlap = true);
-    bool IsPlaying(uint32_t _voiceHandle) const;
+    bool IsPlaying(uint32_t _voiceHandle);
     void SetVolume(uint32_t _voiceHandle, float _volume);
     void SoundStop(uint32_t _voiceHandle);
 
@@ -63,5 +67,5 @@ private:
     std::map <uint32_t, uint32_t> map_;
 
     std::vector<SoundData> sounds_;
-    std::vector<IXAudio2SourceVoice*> sourceVoice_;
+    std::map<uint32_t, IXAudio2SourceVoice*> sourceVoice_;
 };

@@ -196,10 +196,10 @@ void LineDrawer::SetVerties()
     obbVertices_[1] = { 0.5f, 0.5f ,-0.5f };
     obbVertices_[2] = { 0.5f,-0.5f , 0.5f };
     obbVertices_[3] = { 0.5f,-0.5f ,-0.5f };
-    obbVertices_[4] = {-0.5f, 0.5f , 0.5f };
-    obbVertices_[5] = {-0.5f, 0.5f ,-0.5f };
-    obbVertices_[6] = {-0.5f,-0.5f , 0.5f };
-    obbVertices_[7] = {-0.5f,-0.5f ,-0.5f };
+    obbVertices_[4] = { -0.5f, 0.5f , 0.5f };
+    obbVertices_[5] = { -0.5f, 0.5f ,-0.5f };
+    obbVertices_[6] = { -0.5f,-0.5f , 0.5f };
+    obbVertices_[7] = { -0.5f,-0.5f ,-0.5f };
 
     obbIndices_ = { 0,1,0,2,0,4,1,3,1,5,2,6,2,3,3,7,4,5,4,6,5,7,6,7 };
 
@@ -221,21 +221,22 @@ void LineDrawer::SetVerties()
 
             sphereVertices_.emplace_back(x, y, z);
         }
-    }
-    uint32_t div = static_cast<uint32_t> (kDivision);
-    for (uint32_t lat = 0; lat < div - 1; ++lat) {
-        for (uint32_t lon = 0; lon < div; ++lon) {
-            uint32_t current = lat * div + lon;
-            uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
 
-            uint32_t nextLat = (lat + 1) * div + lon;
-            uint32_t nextLonLat = (lat + 1) * div + nextLon;
+        uint32_t div = static_cast<uint32_t> (kDivision);
+        for (uint32_t lat = 0; lat < div - 1; ++lat) {
+            for (uint32_t lon = 0; lon < div; ++lon) {
+                uint32_t current = lat * div + lon;
+                uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
 
-            sphereIndices_.push_back(current);
-            sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
+                uint32_t nextLat = (lat + 1) * div + lon;
+                uint32_t nextLonLat = (lat + 1) * div + nextLon;
 
-            sphereIndices_.push_back(current);
-            sphereIndices_.push_back(nextLat);
+                sphereIndices_.push_back(current);
+                sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
+
+                sphereIndices_.push_back(current);
+                sphereIndices_.push_back(nextLat);
+            }
         }
     }
 }

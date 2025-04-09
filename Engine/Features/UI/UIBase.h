@@ -18,22 +18,33 @@ public:
     virtual void Update() {};
     virtual void Draw();
 
+    bool IsMousePointerInside() const;
+    bool IsPointInside(const Vector2& _point) const;
+
     bool IsActive() const { return isActive_; }
     void SetActive(bool _isActive) { isActive_ = _isActive; }
 
     bool IsVisible() const { return isVisible_; }
     void SetVisible(bool _isVisible) { isVisible_ = _isVisible; }
-    void SetColor(const Vector4& _color) { color_ = _color; }
-    bool IsMousePointerInside() const;
-    bool IsPointInside(const Vector2& _point) const;
 
+    Vector4 GetColor() const { return color_; }
+    void SetColor(const Vector4& _color) { color_ = _color; }
+
+    const Vector2& GetPos() const { return position_; }
     void SetPos(const Vector2& _pos) { position_ = _pos; };
+
+    const Vector2& GetSize() const { return size_; }
     void SetSize(const Vector2& _size) { size_ = _size; };
+
+    float GetRotate() const { return rotate_; }
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
 
-
+    uint32_t GetTextureHandle() const { return textureHandle_; }
     void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle;  }
+
+    const std::string& GetLabel() const { return label_; }
     void SetTextureName(const std::string& _textureName) { textureName_ = _textureName; }
+
     void SetTextureNameAndLoad(const std::string& _textureName);
 
 

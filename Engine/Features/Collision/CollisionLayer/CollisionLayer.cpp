@@ -19,6 +19,21 @@ void CollisionLayer::SetLayerMask(const std::string& _layer)
     layerMask_ |= CollisionLayerManager::GetInstance()->GetLayer(_layer);
 }
 
+void CollisionLayer::SetCollisionLayer(const std::string& _layer)
+{
+    ExcludeLayerMask(_layer);
+}
+
+void CollisionLayer::ExcludeLayer(const std::string& _layer)
+{
+    layer_ &= ~CollisionLayerManager::GetInstance()->GetLayer(_layer);
+}
+
+void CollisionLayer::ExcludeLayerMask(const std::string& _layer)
+{
+    layerMask_ &= ~CollisionLayerManager::GetInstance()->GetLayer(_layer);
+}
+
 void CollisionLayer::RegisterLayer(JsonBinder* _jsonBinder)
 {
     _jsonBinder->RegisterVariable("layer", &layer_);

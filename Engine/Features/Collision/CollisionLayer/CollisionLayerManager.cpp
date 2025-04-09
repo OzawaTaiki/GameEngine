@@ -35,6 +35,11 @@ void CollisionLayerManager::InitJsonBinder()
 CollisionLayerManager::CollisionLayerManager()
 {
     InitJsonBinder();
+    uint32_t index = 0;
+    for (const std::string& name : layerNames_)
+    {
+        layerMap_[name] = 1 << index++;
+    }
 }
 
 CollisionLayerManager::~CollisionLayerManager()

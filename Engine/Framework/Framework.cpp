@@ -68,6 +68,9 @@ void Framework::Initialize()
 
     Time::Initialize();
 
+    audio_ = Audio::GetInstance();
+    audio_->Initialize();
+
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
 
