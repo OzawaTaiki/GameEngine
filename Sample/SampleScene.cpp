@@ -49,7 +49,7 @@ void SampleScene::Initialize()
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
     sprite_ = Sprite::Create("uvChecker", textureHandle);
 
-    lights_ = std::make_unique<LightGroup>();
+    lights_ = std::make_shared<LightGroup>();
     lights_->Initialize();
 
     colors.push_back({ 0.0f,Vector4(1,0,0,1) });
@@ -110,7 +110,7 @@ void SampleScene::Update()
     ImGuiTool::TimeLine("TimeLine", sequence_.get());
     ImGuiTool::GradientEditor("GradientEditor", colors);
 
-    lights_->DrawDebugWindow();
+    lights_->ImGui();
 
     static bool play = false;
     if (ImGui::Button("Play"))
@@ -129,7 +129,7 @@ void SampleScene::Update()
         cubeCollider2_->Save("cube2");
     }
 #endif // _DEBUG
-    LightingSystem::GetInstance()->SetLightGroup(lights_.get());
+    LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
 
     oModel_->Update();
@@ -187,8 +187,6 @@ void SampleScene::Draw()
 
 void SampleScene::DrawShadow()
 {
-    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
-    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
 
     oModel_->DrawShadow(&SceneCamera_, 0);
     oModel2_->DrawShadow(&SceneCamera_, 1);
