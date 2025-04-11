@@ -11,7 +11,6 @@
 #include <System/Time/GameTime.h>
 #include <Features/UI/UIButton.h>
 #include <Features/Model/Primitive/Ring.h>
-#include <Features/Model/Primitive/Ellipse.h>
 #include <Features/Model/Primitive/Cylinder.h>
 #include <Features/UVTransform/SpriteSheetAnimetion.h>
 #include <Features/UVTransform/UVTransformAnimation.h>
@@ -49,6 +48,7 @@ private:
     std::unique_ptr<ObjectModel> oModel_= nullptr;
     std::unique_ptr<ObjectModel> oModel2_= nullptr;
     std::unique_ptr<ObjectModel> plane_ = nullptr;
+    std::unique_ptr<ObjectModel> test_= nullptr;
 
     std::unique_ptr <Sprite> sprite_ = nullptr;
 
@@ -57,10 +57,8 @@ private:
 
     std::unique_ptr<AnimationSequence> sequence_ = nullptr;
 
-    AABBCollider* bunnyCollider_ = nullptr;
-    SphereCollider* cubeCollider_ = nullptr;
-    CapsuleCollider* cubeCollider2_ = nullptr;
 
+    Vector4 testColor_ = { 1,1,1,1 };
 
 
 #ifdef _DEBUG

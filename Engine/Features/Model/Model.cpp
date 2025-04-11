@@ -140,6 +140,26 @@ Model* Model::CreateFromMesh(std::unique_ptr<Mesh> _mesh)
     return model;
 }
 
+Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<uint32_t> _indices, const std::string& _name)
+{
+    Model* model = ModelManager::GetInstance()->Create(_name);
+
+    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
+    mesh->Initialize(_vertices, _indices);
+    model->mesh_.push_back(std::move(mesh));
+
+    model->material_.push_back(std::make_unique<Material>());
+    model->material_[0]->Initialize("");
+
+    model->lightGroup_ = std::make_unique<LightGroup>();
+    model->lightGroup_->Initialize();
+
+    model->currentAnimation_ = std::make_unique<ModelAnimation>();
+    model->currentAnimation_->Initialize();
+
+    return model;
+}
+
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
 {
     QueueLightCommand(_commandList, 5);

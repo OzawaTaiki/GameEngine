@@ -61,3 +61,15 @@ Model* ModelManager::GetModelPtr()
     return FindSameModel(name);
 
 }
+
+Model* ModelManager::Create(const std::string& _name)
+{
+    auto it = models_.find(_name);
+    if (it != models_.end())
+        return models_[_name].get();
+    else
+    {
+        models_[_name] = std::make_unique<Model>();
+        return models_[_name].get();
+    }
+}

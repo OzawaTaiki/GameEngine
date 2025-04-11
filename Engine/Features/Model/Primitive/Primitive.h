@@ -1,34 +1,27 @@
 #pragma once
 
-#include <Math/Vector/Vector2.h>
-#include <Math/Vector/Vector3.h>
-#include <Math/Vector/Vector4.h>
+#include <Features/Model/Model.h>
 
-
-#include <Features/Model/Mesh/Mesh.h>
-
-#include <vector>
 #include <cstdint>
+#include <string>
 
 
-class Camera;
 
 class Primitive
 {
 public:
 
-    Primitive() = default;
     virtual ~Primitive() = default;
 
-    virtual void Update() = 0;
-    virtual void Draw() = 0;
-    virtual void Draw(const Camera& _camera, const Vector4& _color = { 1,1,1,1 }) = 0;
+    virtual Model* Generate(const std::string& _name) = 0;
+    virtual Primitive* Clone() = 0;
 
-    virtual void Generate() = 0;
+    void SetDivide(uint32_t _divide) { divide_ = (std::max)(3u, _divide); }
+
+    const std::string& GetName() const { return name_; }
 
 protected:
-
-    std::vector<VertexData> vertices_;
-    std::vector<uint32_t> indices_;
+    uint32_t divide_ = 16;
+    std::string name_ = "";
 };
 

@@ -321,9 +321,6 @@
     <ClCompile Include="Features\Model\Primitive\Cylinder.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Model\Primitive\Ellipse.cpp">
-      <Filter>Features\Model\Primitive</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Ring.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
@@ -639,9 +636,6 @@
       <Filter>Features\Model</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Cylinder.h">
-      <Filter>Features\Model\Primitive</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Model\Primitive\Ellipse.h">
       <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Primitive.h">

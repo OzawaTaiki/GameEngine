@@ -22,21 +22,22 @@ void ObjectModel::Initialize(const std::string& _filePath)
 {
     model_ = Model::CreateFromFile(_filePath);
 
-    worldTransform_.Initialize();
-    objectColor_ = std::make_unique<ObjectColor>();
-    objectColor_->Initialize();
-
-    gameTime_ = GameTime::GetInstance();
+    InitializeCommon();
 
 }
 
 void ObjectModel::Initialize(std::unique_ptr<Mesh>  _mesh)
 {
     model_ = Model::CreateFromMesh(std::move(_mesh));
-    worldTransform_.Initialize();
-    objectColor_ = std::make_unique<ObjectColor>();
-    objectColor_->Initialize();
-    gameTime_ = GameTime::GetInstance();
+
+    InitializeCommon();
+}
+
+void ObjectModel::Initialize(Model* _model)
+{
+    model_ = _model;
+
+    InitializeCommon();
 }
 
 void ObjectModel::Update()
@@ -168,6 +169,14 @@ void ObjectModel::ImGui()
     ImGui::PopID();
 
 #endif // _DEBUG
+}
+
+void ObjectModel::InitializeCommon()
+{
+    worldTransform_.Initialize();
+    objectColor_ = std::make_unique<ObjectColor>();
+    objectColor_->Initialize();
+    gameTime_ = GameTime::GetInstance();
 }
 
 void ObjectModel::CreateIDResource()
