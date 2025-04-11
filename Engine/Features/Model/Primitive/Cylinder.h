@@ -1,26 +1,17 @@
 #pragma once
 
 #include <Features/Model/Primitive/Primitive.h>
-#include <Math/Vector/Vector3.h>
-#include <Math/Vector/Vector4.h>
-#include <Math/Quaternion/Quaternion.h>
-#include <Features/Model/Transform/WorldTransform.h>
-#include <Features/Model/Mesh/Mesh.h>
-#include <Features/Model/Material/Material.h>
-#include <Features/Model/Color/ObjectColor.h>
-
 
 class Cylinder : public Primitive
 {
 public:
 
-    Cylinder() = delete;
     Cylinder(float _topRadius, float _bottomRadius, float _height, int32_t _divide = 16, bool _top = true, bool _bottom = true);
     ~Cylinder() = default;
-    void Generate() override;
-    void Update() override;
-    void Draw() override;
-    void Draw(const Camera& _camera, const Vector4& _color = { 1,1,1,1 }) override;
+
+    Model* Generate(const std::string& _name) override { return nullptr; };
+    Primitive* Clone() override { return new Cylinder(*this); }
+
 
     //============ setter ============
 
@@ -31,21 +22,9 @@ public:
     void SetTop(bool _top) { top_ = _top; }
     void SetBottom(bool _bottom) { bottom_ = _bottom; }
 
-    //=================================
-
-
-    // スケール
-    Vector3 scale_ = {};
-    // 回転
-    Vector3 rotation_ = {};
-    // 回転
-    Quaternion quternion_ = {};
-    // 位置
-    Vector3 translate_ = {};
-
+    
 
 private:
-    int32_t divide_ = 0;
 
     // 上半径
     float topRadius_ = 0;
@@ -59,21 +38,6 @@ private:
     // 下面の有無
     bool bottom_ = false;
 
-    // quaternionを使用するか
-    bool useQuaternion_ = false;
-
-    // ワールド変換行列
-    WorldTransform worldTransform_ = {};
-
-    // テクスチャハンドル
-    uint32_t textureHandle_ = 0;
-
-    // メッシュ
-    Mesh mesh_ = {};
-    // マテリアル
-    Material material_ = {};
-    // オブジェクトカラー
-    ObjectColor objectColor_ = {};
 
 
 };

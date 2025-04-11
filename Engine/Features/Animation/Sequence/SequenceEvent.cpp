@@ -271,23 +271,29 @@ void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
         }
         else if constexpr (std::is_same_v<T, float>) {
             ImGui::DragFloat("Speed", &speed, 0.01f,0.01f);
-            ImGui::DragFloat("Value", &arg,speed);
+            ImGui::DragFloat("Value", &arg,speed, 0.01f);
         }
         else if constexpr (std::is_same_v<T, Vector2>) {
             ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f,10.0f);
-            ImGui::DragFloat2("Value", &arg.x, speed);
+            ImGui::DragFloat2("Value", &arg.x, speed, 0.01f);
         }
         else if constexpr (std::is_same_v<T, Vector3>) {
             ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
-            ImGui::DragFloat3("Value", &arg.x, speed);
+            ImGui::DragFloat3("Value", &arg.x, speed, 0.01f);
         }
         else if constexpr (std::is_same_v<T, Vector4>) {
+            static bool color = false;
+            ImGui::Checkbox("Color", &color);
             ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
-            ImGui::DragFloat4("Value", &arg.x, speed);
+            if (color) {
+                ImGui::ColorEdit4("Value", &arg.x);
+            }
+            else
+                ImGui::DragFloat4("Value", &arg.x, speed, 0.01f);
         }
         else if constexpr (std::is_same_v<T, Quaternion>) {
             ImGui::DragFloat("Speed", &speed, 0.01f, 0.01f, 10.0f);
-            ImGui::DragFloat4("Value", &arg.x, speed);
+            ImGui::DragFloat4("Value", &arg.x, speed, 0.01f);
         }
         else {
             throw std::runtime_error("Invalid type");

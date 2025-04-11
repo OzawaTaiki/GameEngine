@@ -14,6 +14,7 @@ public:
 
     void Initialize(const std::string& _filePath);
     void Initialize(std::unique_ptr< Mesh> _mesh);
+    void Initialize(Model* _model);
     void Update();
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
@@ -51,6 +52,7 @@ public:
 
 
 private:
+    void InitializeCommon(); // 共通初期化
 
     WorldTransform worldTransform_;
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;

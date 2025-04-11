@@ -821,7 +821,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 
     float maxPlayTime = _sequence->GetMaxPlayTime();
     ImGui::SetNextItemWidth(120.0f);
-    if (ImGui::DragFloat("##MaxPlayTime", &maxPlayTime, 0.1f, 0.1f, 1000.0f, "%.1f s")) {
+    if (ImGui::DragFloat("##MaxPlayTime", &maxPlayTime, 0.01f, 0.1f, 1000.0f, "%.1f s")) {
         _sequence->SetMaxPlayTime(maxPlayTime);
     }
 

@@ -36,6 +36,7 @@ public:
 
     static Model* CreateFromFile(const std::string& _filePath);
     static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
+    static Model* CreateFromVertices(std::vector<VertexData> _vertices, std::vector<uint32_t> _indices, const std::string& _name);
 
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;

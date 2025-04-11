@@ -22,6 +22,7 @@ public:
 
     Model* FindSameModel(const std::string& _name);
     Model* GetModelPtr();
+    Model* Create(const std::string& _name);
 private:
 
     std::unordered_map < std::string, std::unique_ptr<Model>> models_ = {};
