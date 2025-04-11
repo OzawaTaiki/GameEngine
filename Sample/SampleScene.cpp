@@ -8,6 +8,7 @@
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImguITools.h>
 #include <Features/Model/Primitive/Ring.h>
+#include <Features/Model/Primitive/Cylinder.h>
 
 
 SampleScene::~SampleScene()
@@ -53,11 +54,11 @@ void SampleScene::Initialize()
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
 
-    Ring* ring = new Ring(1.7f, 2.0f);
+    Cylinder* ring = new Cylinder(1.0f, 2.0f,1.0f);
     ring->SetDivide(32);
 
-    test_ = std::make_unique<ObjectModel>("ring");
-    test_->Initialize(ring->Generate("ring"));
+    test_ = std::make_unique<ObjectModel>("cylinder");
+    test_->Initialize(ring->Generate("cylinder"));
 
 }
 
