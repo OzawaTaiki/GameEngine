@@ -23,7 +23,7 @@ Model* Ring::Generate(const std::string& _name)
     NormalizeAngles();
     NormalizeRadius();
 
-    // 内半径と外半径の比率を計算
+    // 内半径と外半径の比率を計算]// TODO
     float startOuterRadius = Lerp(innerRadius_, outerRadius_, startOuterRadiusRatio_);
     float endOuterRadius = Lerp(innerRadius_, outerRadius_, endOuterRadiusRatio_);
 
