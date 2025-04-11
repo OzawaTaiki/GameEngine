@@ -205,8 +205,8 @@ void LineDrawer::SetVerties()
 
 
     //sphere頂点の計算
-    const float kLatEvery = std::numbers::pi_v<float> / kDivision;
-    const float kLonEvery = std::numbers::pi_v<float> *2.0f / kDivision;
+    const float kLatEvery = std::numbers::pi_v<float> / kDivision;  // 緯度方向の間隔 上下
+    const float kLonEvery = std::numbers::pi_v<float> *2.0f / kDivision; // 経度方向の間隔 左右
 
     for (uint32_t lat = 0; lat < kDivision; ++lat)
     {
@@ -221,22 +221,22 @@ void LineDrawer::SetVerties()
 
             sphereVertices_.emplace_back(x, y, z);
         }
+    }
 
-        uint32_t div = static_cast<uint32_t> (kDivision);
-        for (uint32_t lat = 0; lat < div - 1; ++lat) {
-            for (uint32_t lon = 0; lon < div; ++lon) {
-                uint32_t current = lat * div + lon;
-                uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
+    uint32_t div = static_cast<uint32_t> (kDivision);
+    for (uint32_t lat = 0; lat < div - 1; ++lat) {
+        for (uint32_t lon = 0; lon < div; ++lon) {
+            uint32_t current = lat * div + lon;
+            uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
 
-                uint32_t nextLat = (lat + 1) * div + lon;
-                uint32_t nextLonLat = (lat + 1) * div + nextLon;
+            uint32_t nextLat = (lat + 1) * div + lon;
+            uint32_t nextLonLat = (lat + 1) * div + nextLon;
 
-                sphereIndices_.push_back(current);
-                sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());
 
-                sphereIndices_.push_back(current);
-                sphereIndices_.push_back(nextLat);
-            }
+            sphereIndices_.push_back(current);
+            sphereIndices_.push_back(nextLat);
         }
     }
 }
