@@ -205,6 +205,9 @@
     <Filter Include="Features\Event">
       <UniqueIdentifier>{b1f78ddc-1814-4058-b94c-70a3db2be2b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Effect\Editor">
+      <UniqueIdentifier>{222a3361-f0f8-4ba4-a39b-308b9e3b1b75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -455,6 +458,9 @@
     </ClCompile>
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp">
       <Filter>Features\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp">
+      <Filter>Features\Effect\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -808,6 +814,9 @@
     </ClInclude>
     <ClInclude Include="Features\Event\EventData.h">
       <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Editor\ParticleEditor.h">
+      <Filter>Features\Effect\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
