@@ -117,7 +117,7 @@ void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
 
     auto pointLights = lightGroup->GetAllPointLights();
 
-    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
+    /*PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
     PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
 
     for (auto& pointLight : pointLights)
@@ -138,7 +138,7 @@ void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
             commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
 
         }
-    }
+    }*/
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)

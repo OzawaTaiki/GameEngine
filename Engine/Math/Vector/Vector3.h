@@ -43,6 +43,8 @@ struct Vector3
    static Vector3 Min(const Vector3& _v1, const Vector3& _v2);
    static Vector3 Max(const Vector3& _v1, const Vector3& _v2);
 
+   static Vector3 Lerp(const Vector3& _v1, const Vector3& _v2, float _t);
+
 
 	inline bool operator==(const Vector3& _v)const {
 		return x == _v.x && y == _v.y && z == _v.z;
@@ -64,7 +66,7 @@ struct Vector3
     inline operator float* () { return &x; }
 	inline operator const float* () const { return &x; }
     //Vector3& operator= (const float arr[3]);
-	
+
 
 	friend Vector3 operator*(float _s, const Vector3& vec);
 	friend Vector3 operator/(float _s, const Vector3& vec);

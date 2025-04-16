@@ -65,6 +65,12 @@ Vector3 Vector3::Max(const Vector3& _v1, const Vector3& _v2)
     return result;
 }
 
+Vector3 Vector3::Lerp(const Vector3& _v1, const Vector3& _v2, float _t)
+{
+    Vector3 result;
+    result = _v1 + (_v2 - _v1) * _t;
+    return result;
+}
 
 Vector3 Vector3::operator+(const Vector3& _v) const
 {
