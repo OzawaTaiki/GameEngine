@@ -21,7 +21,17 @@ void CollisionLayer::SetLayerMask(const std::string& _layer)
 
 void CollisionLayer::SetCollisionLayer(const std::string& _layer)
 {
-    ExcludeLayerMask(_layer);
+    uint32_t layer = ~CollisionLayerManager::GetInstance()->GetLayer(_layer);
+    layerMask_ = layer;
+}
+
+void CollisionLayer::AddCollisionLayer(const std::string& _layer)
+{
+    uint32_t layer = ~CollisionLayerManager::GetInstance()->GetLayer(_layer);
+    uint32_t xnorMask = ~(layerMask_ ^ layer);
+
+
+    layerMask_ = xnorMask;
 }
 
 void CollisionLayer::ExcludeLayer(const std::string& _layer)

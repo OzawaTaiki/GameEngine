@@ -201,6 +201,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
+    <ClCompile Include="Math\BezierCurve3D.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Math\Matrix\Matrix4x4.cpp" />
     <ClCompile Include="Math\Matrix\MatrixFunction.cpp" />
@@ -297,6 +298,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="Framework\Framework.h" />
+    <ClInclude Include="Math\BezierCurve3D.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Math\Matrix\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix\Matrix4x4.h" />

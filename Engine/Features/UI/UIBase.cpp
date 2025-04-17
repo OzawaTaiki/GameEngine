@@ -6,6 +6,11 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <Features/Json/JsonHub.h>
 
+UIBase::~UIBase()
+{
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(label_);
+}
+
 void UIBase::Initialize(const std::string& _label)
 {
     label_ = _label;

@@ -76,6 +76,7 @@ const WorldTransform* Collider::GetWorldTransform()
     return worldTransform_;
 }
 
+
 void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
 {
     // 現在のフレームでの衝突を記録
@@ -451,11 +452,14 @@ Vector3 OBBCollider::GetClosestPoint(const Vector3& _point)
     Matrix4x4 invRotMat = Inverse(rotMat);
     Vector3 localPoint = Transform(_point - center, invRotMat);
 
-    // ローカル空間でクランプ
+    // スケールを適用したhalfExtentsを計算
+    Vector3 scaledHalfExtents = halfExtents_ * transform.scale_;
+
+    // ローカル空間でクランプ（スケール適用後のhalfExtentsを使用）
     Vector3 localClosest(
-        std::clamp(localPoint.x, -halfExtents_.x, halfExtents_.x),
-        std::clamp(localPoint.y, -halfExtents_.y, halfExtents_.y),
-        std::clamp(localPoint.z, -halfExtents_.z, halfExtents_.z)
+        std::clamp(localPoint.x, -scaledHalfExtents.x, scaledHalfExtents.x),
+        std::clamp(localPoint.y, -scaledHalfExtents.y, scaledHalfExtents.y),
+        std::clamp(localPoint.z, -scaledHalfExtents.z, scaledHalfExtents.z)
     );
 
     // ワールド空間に戻す

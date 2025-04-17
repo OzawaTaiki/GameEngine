@@ -1,6 +1,7 @@
 #include "CollisionManager.h"
 #include <Features/LineDrawer/LineDrawer.h>
 #include <Debug/ImGuiDebugManager.h>
+#include <Features/Collision/CollisionLayer/CollisionLayerManager.h>
 #include <algorithm>
 
 CollisionManager* CollisionManager::GetInstance()
@@ -82,6 +83,11 @@ void CollisionManager::CheckCollisions()
 
             // 衝突情報
             ColliderInfo info;
+#ifdef _DEBUG
+            //std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+            //std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+            //Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+#endif // _DEBUG
 
             // CollisionDetectorを使用して衝突判定を実行
             if (CollisionDetector::DetectCollision(colliderA, colliderB, info))

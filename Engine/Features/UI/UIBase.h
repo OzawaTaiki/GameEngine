@@ -12,7 +12,7 @@ class  UIBase
 public:
 
     UIBase() = default;
-    virtual ~UIBase() = default;
+    virtual ~UIBase();
 
     virtual void Initialize(const std::string& _label);
     virtual void Update() {};

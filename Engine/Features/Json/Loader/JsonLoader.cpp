@@ -151,6 +151,18 @@ std::vector<ValueVariant> JsonLoader::FromJson(const json& _j)
             {
                 vec.push_back(j.get<std::string>());
             }
+            else if (j.is_object() && j.size() == 2 && j.contains("x") && j.contains("y"))
+            {
+                vec.push_back(Vector2(j["x"].get<float>(), j["y"].get<float>()));
+            }
+            else if (j.is_object() && j.size() == 3 && j.contains("x") && j.contains("y") && j.contains("z"))
+            {
+                vec.push_back(Vector3(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>()));
+            }
+            else if (j.is_object() && j.size() == 4 && j.contains("x") && j.contains("y") && j.contains("z") && j.contains("w"))
+            {
+                vec.push_back(Vector4(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>(), j["w"].get<float>()));
+            }
         }
     }
 

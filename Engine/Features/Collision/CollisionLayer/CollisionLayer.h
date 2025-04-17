@@ -27,6 +27,8 @@ public:
     // 衝突するLayerを設定する
     void SetCollisionLayer(const std::string& _layer);
 
+    void AddCollisionLayer(const std::string& _layer);
+
     // Layerを除外する
     void ExcludeLayer(const std::string& _layer);
 
