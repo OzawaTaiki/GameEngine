@@ -107,7 +107,7 @@ void ParticleManager::DrawParticles()
     }
 }
 
-void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings)
+void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle)
 {
     ParticleKey key;
     key.modelName = _useModelName;
@@ -137,6 +137,8 @@ void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _p
 
         group.psoIndex = psoFlags;
 
+        group.textureHandle = _textureHandle;
+
         particles_[key] = group;
     }
     else
@@ -146,7 +148,7 @@ void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _p
 
 }
 
-void ParticleManager::AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings)
+void ParticleManager::AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle)
 {
     ParticleKey key;
     key.modelName = _useModelName;
@@ -177,6 +179,7 @@ void ParticleManager::AddParticles(const std::string& _useModelName, std::vector
             psoMap_[psoFlags] = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags).value();
 
         group.psoIndex = psoFlags;
+        group.textureHandle = _textureHandle;
 
         particles_[key] = group;
     }
