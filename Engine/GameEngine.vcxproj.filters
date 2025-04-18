@@ -214,6 +214,9 @@
     <Filter Include="Math\System\Time">
       <UniqueIdentifier>{EB11ED35-929B-4426-AE45-CCCC416EA607C077}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Effect\Modifier\Preset">
+      <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -462,11 +465,17 @@
     <ClCompile Include="Features\Scene\ParticleTestScene.cpp">
       <Filter>Features\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp">
+    <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp">
       <Filter>Features\Effect\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Math\BezierCurve3D.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Modifier\Preset\DecelerationModifier.cpp">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -818,17 +827,23 @@
     <ClInclude Include="Features\Scene\ParticleTestScene.h">
       <Filter>Features\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Effect\Manager\ParticleManager.h">
+    <ClInclude Include="Features\Effect\Manager\ParticleSystem.h">
       <Filter>Features\Effect\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Effect\Particle\Modifier\ParticleModifier.h">
-      <Filter>Features\Effect\Modifier</Filter>
-    </ClInclude>
-    <ClInclude Include="IPaticleMoifierFactory.h">
-      <Filter>Features\Effect\Modifier</Filter>
     </ClInclude>
     <ClInclude Include="Math\BezierCurve3D.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Modifier\IPaticleMoifierFactory.h">
+      <Filter>Features\Effect\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Modifier\ParticleModifier.h">
+      <Filter>Features\Effect\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Modifier\Preset\DecelerationModifier.h">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

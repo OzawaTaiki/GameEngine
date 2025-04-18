@@ -93,6 +93,8 @@ struct ParticleInitParamsForGenerator
 
     uint32_t textureHandle = 0; // テクスチャのハンドル
 
+    std::vector<std::string> modifiers; // モディファイアのリスト
+
 };
 
 class ParticleEmitter
@@ -136,13 +138,14 @@ private:
 
     std::string useModelName_ = "plane/plane.gltf"; // 使用するモデルの名前
 
+#ifdef _DEBUG
     char modelPath_[256];
     char modelName_[256];
     char nameBuf_[256];
     char texturePath_[256];
     char textureRoot_[256] = "Resources/images/"; // テクスチャのルートパス
-
-    bool isOpenTimeline = false;
+    char modifierName[256]; // モディファイアの名前
+#endif _DEBUG
 
 
 
@@ -173,6 +176,8 @@ private:
 
 
     //各パラメータごとの設定用imgui関数
+#ifdef _DEBUG
+
     void DebugWindowForSize();
     void DebugWindowForPosition();
     void DebugWindowForDirection();
@@ -181,6 +186,9 @@ private:
     void DebugWindowForLifeTime();
     void DebugWindowForColor();
 
+    void DebugWindowForModifier();
+
+#endif // _DEBUG
 
 
 

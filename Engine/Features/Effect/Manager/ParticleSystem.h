@@ -1,6 +1,8 @@
 #pragma once
 #include <Features/Model/Model.h>
 #include <Features/Effect/Particle/Particle.h>
+#include <Features/Effect/Modifier/ParticleModifier.h>
+#include <Features/Effect/Modifier/IPaticleMoifierFactory.h>
 #include <Core/BlendMode.h>
 #include <System/Time/GameTime.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
@@ -8,6 +10,8 @@
 
 #include <map>
 #include <list>
+#include <string>
+#include <memory>
 
 
 #include <d3d12.h>
@@ -53,27 +57,34 @@ struct ParticleRenderSettings
 };
 
 class SRVManager;
-class ParticleManager
+class ParticleSystem
 {
 public:
 
-    static ParticleManager* GetInstance();
+    static ParticleSystem* GetInstance();
 
-    ParticleManager() = default;
-    ~ParticleManager() = default;
+    ParticleSystem() = default;
+    ~ParticleSystem();
 
     void Initialize();
     void Update(float _deltaTime = 1.0f / 60.0f);
     void DrawParticles();
 
-    void AddParticle(const std::string& _useModelName, Particle* _particle,ParticleRenderSettings _settings, uint32_t _textureHandle);
-    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles,ParticleRenderSettings _settings, uint32_t _textureHandle);
+    void SetModifierFactory(IParticleMoifierFactory* _factory);
+
+    void AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
+    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
 
 
     void ClearParticles();
     void ClearParticles(const std::string& _useModelName);
 
     void SetCamera(Camera* _camera) { camera_ = _camera; }
+
+private:
+
+    // モディファイアをファクトリから生成する
+    void CreateModifier(const std::string& _name);
 
 private:
 
@@ -113,6 +124,7 @@ private:
         uint32_t instanceCount = 0;
         PSOFlags psoIndex = {};
         uint32_t textureHandle = 0;
+        std::map<std::string, uint32_t> useModifierName;
         Microsoft::WRL::ComPtr<ID3D12Resource> instanceBuffer;
         ParticleForGPU* mappedInstanceBuffer = nullptr;
     };
@@ -122,10 +134,13 @@ private:
     std::map<PSOFlags, ID3D12PipelineState*> psoMap_;
     ID3D12RootSignature* rootSignature_;
 
+    IParticleMoifierFactory* factory_ = nullptr;
+
     SRVManager* srvManager_ = nullptr;
 
     Camera* camera_ = nullptr;
 
+    std::map<std::string, std::unique_ptr<ParticleModifier>> modifierNames_;
 
 
 };
