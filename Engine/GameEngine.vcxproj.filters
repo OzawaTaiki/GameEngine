@@ -157,18 +157,6 @@
     <Filter Include="Math\Vector">
       <UniqueIdentifier>{8E58AB02-EFD3-45DC-A387-CCCCC0E0DD2ED4FB}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System">
-      <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\Audio">
-      <UniqueIdentifier>{2ED4BE9A-FF70-477D-B2A7-CCCCC56E17244C91}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\Input">
-      <UniqueIdentifier>{7E6CDDF1-8A35-4C40-8298-CCCC0EC4D13809CB}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\Time">
-      <UniqueIdentifier>{EB11ED35-929B-4426-AE45-CCCC416EA607C077}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{BD411FC0-779D-4F09-AF99-CCCC04886E0CD68A}</UniqueIdentifier>
     </Filter>
@@ -213,6 +201,18 @@
     </Filter>
     <Filter Include="Features\Effect\Modifier">
       <UniqueIdentifier>{ce54f5a3-3ee8-4f06-908a-4165a3ae6dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\System">
+      <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\System\Audio">
+      <UniqueIdentifier>{2ED4BE9A-FF70-477D-B2A7-CCCCC56E17244C91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\System\Input">
+      <UniqueIdentifier>{7E6CDDF1-8A35-4C40-8298-CCCC0EC4D13809CB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\System\Time">
+      <UniqueIdentifier>{EB11ED35-929B-4426-AE45-CCCC416EA607C077}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -385,19 +385,19 @@
       <Filter>Math\Vector</Filter>
     </ClCompile>
     <ClCompile Include="System\Audio\Audio.cpp">
-      <Filter>System\Audio</Filter>
+      <Filter>Math\System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="System\Input\Input.cpp">
-      <Filter>System\Input</Filter>
+      <Filter>Math\System\Input</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\GameTime.cpp">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\GameTimeChannel.cpp">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\Time.cpp">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClCompile>
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp">
       <Filter>Utility\ConvertString</Filter>
@@ -464,6 +464,9 @@
     </ClCompile>
     <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp">
       <Filter>Features\Effect\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\BezierCurve3D.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -723,19 +726,19 @@
       <Filter>Math\Vector</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\Audio.h">
-      <Filter>System\Audio</Filter>
+      <Filter>Math\System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="System\Input\Input.h">
-      <Filter>System\Input</Filter>
+      <Filter>Math\System\Input</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\GameTime.h">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\GameTimeChannel.h">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\Time.h">
-      <Filter>System\Time</Filter>
+      <Filter>Math\System\Time</Filter>
     </ClInclude>
     <ClInclude Include="Utility\ConvertString\ConvertString.h">
       <Filter>Utility\ConvertString</Filter>
@@ -823,6 +826,9 @@
     </ClInclude>
     <ClInclude Include="IPaticleMoifierFactory.h">
       <Filter>Features\Effect\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\BezierCurve3D.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

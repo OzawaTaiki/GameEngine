@@ -129,6 +129,8 @@ public:
 
     void SetCollisionLayer(const std::string& _layer) { collisionLayer_.SetCollisionLayer(_layer); }
 
+    void AddCollisionLayer(const std::string& _layer) { collisionLayer_.AddCollisionLayer(_layer); }
+
     // 自身のlayerを除外する
     void ExcludeLayer(const std::string& _layer) { collisionLayer_.ExcludeLayer(_layer); }
 
