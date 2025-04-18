@@ -1,6 +1,7 @@
 #include "ParticleEmitter.h"
 #include <Features/Effect/Manager/ParticleManager.h>
 #include <Features/Model/Manager/ModelManager.h>
+#include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImguITools.h>
 
 void ParticleEmitter::Initialize(const std::string& _name)
@@ -157,6 +158,20 @@ void ParticleEmitter::ShowDebugWindow()
                             useModelName_ = modelName_;
                             strcpy_s(modelPath_, 256, "");
                         }
+                    }
+                    ImGui::TreePop();
+                }
+
+                if (ImGui::TreeNode("Use Texture"))
+                {
+                    ImGui::Text("TextureRoot");
+                    ImGui::InputText("##TextureRoot", textureRoot_, 256);
+
+                    ImGui::Text("TexturePath");
+                    ImGui::InputText("##TexturePath", texturePath_, 256);
+                    if (ImGui::Button("Apply##TexturePath"))
+                    {
+                        initParams_.textureHandle = TextureManager::GetInstance()->Load(texturePath_, textureRoot_);
                     }
                     ImGui::TreePop();
                 }
@@ -335,7 +350,8 @@ void ParticleEmitter::GenerateParticles()
     if (useModelName_ == "")
         useModelName_ = "plane/plane.gltf";
 
-    ParticleManager::GetInstance()->AddParticles(useModelName_, particles, settings);
+
+    ParticleManager::GetInstance()->AddParticles(useModelName_, particles, settings,initParams_.textureHandle);
 }
 
 void ParticleEmitter::InitJsonBinder()

@@ -186,6 +186,7 @@ void ParticleManager::AddParticles(const std::string& _useModelName, std::vector
     else
     {
         it->second.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
+        particles_[key].textureHandle = _textureHandle;
     }
 }
 
