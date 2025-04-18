@@ -4,15 +4,13 @@
 #include <Math/Matrix/Matrix4x4.h>
 #include <Math/MyLib.h>
 #include <Math/Easing.h>
-#include <Features/Animation/Sequence/AnimationSequence.h>
+
 #include <list>
 #include <functional>
-
+#include <array>
 
 struct ParticleInitParam
 {
-    AnimationSequence* sequence = nullptr;
-
     // 有効時間
     float lifeTime = 1.0f;
     bool isInfiniteLife = false;
@@ -39,14 +37,8 @@ struct ParticleInitParam
     Vector3 acceleration = { 0,0,0 };
 
     Vector4 color = { 1,1,1,1 };
-    // 色 RGB
-    //ValueTransition<Vector3> colorTransition;
-    // 色 A
-    //ValueTransition<float> alphaTransition;
 
-    Matrix4x4 directionMatrix = Matrix4x4::Identity();
-
-    uint8_t billboard; // ビルボード zyx
+    std::array<bool, 3> isBillboard = { false,false,false }; // ビルボード xyz
 
     //TODO: UVTransform
     // 上下左右に移動

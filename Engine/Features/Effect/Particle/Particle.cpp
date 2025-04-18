@@ -28,15 +28,10 @@ void Particle::Initialize(const ParticleInitParam& _param)
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 
-    directionMatrix_ = _param.directionMatrix;
-
-    if(parameter_.sequence)
-        parameter_.sequence->SetCurrentTime(0);
 
     // ビルボードの初期化
-    isBillboard_[0] = (parameter_.billboard & 0x1) != 0;
-    isBillboard_[1] = (parameter_.billboard & 0x2) != 0;
-    isBillboard_[2] = (parameter_.billboard & 0x4) != 0;
+    isBillboard_ = parameter_.isBillboard;
+
 
     t_ = 0;
 }
@@ -53,43 +48,8 @@ void Particle::Update(float _deltaTime)
 
     t_ = currentTime_ / lifeTime_;
 
-    if (parameter_.sequence != nullptr)
-    {
-        auto sequence = parameter_.sequence;
-
-        sequence->Update(_deltaTime);
-
-        if (sequence->HasEvent("color_RGB"))
-            color_ = sequence->GetValue<Vector3>("color_RGB");
-        if (sequence->HasEvent("color_A"))
-            color_.w = sequence->GetValue<float>("color_A");
-
-        if (sequence->HasEvent("rotate"))
-            rotation_ = sequence->GetValue<Vector3>("rotate");
-        if (sequence->HasEvent("size"))
-            scale_ = sequence->GetValue<Vector3>("size");
-        if (sequence->HasEvent("speed"))
-            speed_ = sequence->GetValue<float>("speed");
-        if (sequence->HasEvent("direction"))
-            direction_ = sequence->GetValue<Vector3>("direction");
-        if (sequence->HasEvent("acceleration"))
-            acceleration_ = sequence->GetValue<Vector3>("acceleration");
-        if (sequence->HasEvent("position"))
-            translate_ = sequence->GetValue<Vector3>("position");
-
-        // TODO: シーケンスでUVを変更してもいいかも
-
-
-    }
-
 
     velocity_ = direction_.Normalize() * speed_;
-
-    velocity_ += acceleration_ * currentTime_;
-
-    if (deceleration_ != 0)
-        velocity_ -= velocity_ * deceleration_ * _deltaTime;
-
 
     translate_ += velocity_ * _deltaTime;
 
@@ -98,9 +58,6 @@ void Particle::Update(float _deltaTime)
 
 }
 
-void Particle::Draw()
-{
-}
 
 void Particle::ShowDebugWindow()
 {

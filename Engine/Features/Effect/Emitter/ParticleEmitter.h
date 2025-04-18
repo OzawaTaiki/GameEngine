@@ -3,6 +3,7 @@
 #include <Features/Effect/ParticleInitParam.h>
 #include <Core/BlendMode.h>
 #include <Features/Model/Transform/WorldTransform.h>
+#include <Features/Json/JsonBinder.h>
 #include <string>
 
 template<typename T>
@@ -85,8 +86,6 @@ struct ParticleInitParamsForGenerator
 
     std::array<bool, 3> billboard = { false, false, false }; // ビルボードのタイプ
 
-    bool enableSequence = false; // シーケンスを使用するか
-    std::unique_ptr<AnimationSequence> sequence = nullptr; // アニメーションシーケンス
 };
 
 class ParticleEmitter

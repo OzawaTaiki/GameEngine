@@ -8,20 +8,6 @@ void ParticleEmitter::Initialize(const std::string& _name)
     name_ = _name;
     isActive_ = false;
 
-    initParams_.sequence = std::make_unique<AnimationSequence>(name_ + "_ParticleInit");
-    initParams_.sequence->Initialize("Resources/Data/animationSeq/EmitterSeq/");
-
-    initParams_.sequence->CreateSequenceEvent<Vector3>("color_RGB", Vector3(1, 1, 1));
-    initParams_.sequence->CreateSequenceEvent<float>("color_A", float(1.0f));
-
-    initParams_.sequence->CreateSequenceEvent<Vector3>("rotate", Vector3(0, 0, 0));
-    initParams_.sequence->CreateSequenceEvent<Vector3>("size", Vector3(1, 1, 1));
-    initParams_.sequence->CreateSequenceEvent<float>("speed", float(1.0f));
-    initParams_.sequence->CreateSequenceEvent<Vector3>("direction", Vector3(0, 1, 0));
-    initParams_.sequence->CreateSequenceEvent<Vector3>("position", Vector3(0, 0, 0));
-
-
-
     InitJsonBinder();
 
 #ifdef _DEBUG
@@ -84,7 +70,6 @@ void ParticleEmitter::ShowDebugWindow()
             if (ImGui::Button("Save"))
             {
                 jsonBinder_->Save();
-                initParams_.sequence->Save();
             }
 
             if (ImGui::CollapsingHeader("Emitter Settings"))
@@ -253,15 +238,6 @@ void ParticleEmitter::ShowDebugWindow()
     ImGui::EndTabBar();
     ImGui::Separator();
 
-    if (isOpenTimeline)
-    {
-        ImGuiTool::TimeLine((name_ + "EmitterSeq").c_str(), initParams_.sequence.get());
-    }
-    if (initParams_.enableSequence)
-    {
-        if(initParams_.lifeTime.isRandom)           initParams_.sequence->SetMaxPlayTime(initParams_.lifeTime.max);
-        else                                        initParams_.sequence->SetMaxPlayTime(initParams_.lifeTime.value);
-    }
 
 }
 
@@ -276,12 +252,8 @@ void ParticleEmitter::GenerateParticles()
 
         //particle.acceleration;
 
-        initParam.billboard;
-        uint8_t billboard = 0;
-        if (initParams_.billboard[0]) billboard |= 0x01;
-        if (initParams_.billboard[1]) billboard |= 0x02;
-        if (initParams_.billboard[2]) billboard |= 0x04;
-        initParam.billboard = billboard;
+        initParam.isBillboard;
+        initParam.isBillboard = initParams_.billboard;
 
         initParam.color;
         Vector3 rgb = initParams_.colorRGB.GetValue();
@@ -343,12 +315,6 @@ void ParticleEmitter::GenerateParticles()
         }
 
         initParam.rotate;
-
-        initParam.sequence;
-        if (initParams_.enableSequence)
-        {
-            initParam.sequence = initParams_.sequence.get();
-        }
 
 
         initParam.size;
@@ -445,8 +411,6 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("alpha_Min", &initParams_.colorA.min);
     jsonBinder_->RegisterVariable("alpha_Max", &initParams_.colorA.max);
     jsonBinder_->RegisterVariable("alpha_Value", &initParams_.colorA.value);
-
-    jsonBinder_->RegisterVariable("enable_Seq", &initParams_.enableSequence);
 
     jsonBinder_->RegisterVariable("cullBack", &cullBack_);
     jsonBinder_->RegisterVariable("blendMode", reinterpret_cast<uint32_t*>(&blendMode_));
