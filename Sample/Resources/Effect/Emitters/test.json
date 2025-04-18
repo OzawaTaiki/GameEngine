@@ -141,7 +141,8 @@
         "lifeTime_Type": 2,
         "lifeTime_Value": 1.0,
         "modifiers": [
-            "DecelerationModifier"
+            "DecelerationModifier",
+            "AlphaOverLifetime"
         ],
         "offset": {
             "x": 0.0,
@@ -230,7 +231,7 @@
         "speed_Max": 2.0,
         "speed_Min": 0.5,
         "speed_Random": false,
-        "speed_Value": 1.0,
+        "speed_Value": 5.0,
         "sphereRadius": 1.0,
         "textureHandle": 0,
         "useModelName": "plane/plane.gltf"

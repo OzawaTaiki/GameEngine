@@ -60,6 +60,9 @@ void ParticleEmitter::Update(float _deltaTime)
 
 void ParticleEmitter::ShowDebugWindow()
 {
+#ifdef _DEBUG
+
+
     ImGui::Separator();
     ImGui::BeginTabBar("Emitter");
     {
@@ -258,6 +261,7 @@ void ParticleEmitter::ShowDebugWindow()
     ImGui::EndTabBar();
     ImGui::Separator();
 
+#endif // _DEBUG
 
 }
 
@@ -443,6 +447,8 @@ void ParticleEmitter::InitJsonBinder()
 }
 
 #pragma region DebugWindow
+
+#ifdef _DEBUG
 
 void ParticleEmitter::DebugWindowForSize()
 {
@@ -713,5 +719,5 @@ void ParticleEmitter::DebugWindowForModifier()
 
     ImGui::Separator();
 }
-
+#endif // _DEBUG
 #pragma endregion
