@@ -60,7 +60,7 @@ void SampleScene::Initialize()
     cylinder->SetDivide(32);
     cylinder->SetEndAngle(3.14f);
     cylinder->SetLoop(true);
-    
+
 
     test_ = std::make_unique<ObjectModel>("cylinder");
     test_->Initialize(cylinder->Generate("cylinder"));
@@ -68,7 +68,7 @@ void SampleScene::Initialize()
     emitter_ = std::make_unique<ParticleEmitter>();
     emitter_->Initialize("test");
 
-    ParticleManager::GetInstance()->SetCamera(&SceneCamera_);
+    ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 }
 
 void SampleScene::Update()
@@ -131,7 +131,7 @@ void SampleScene::Update()
         SceneCamera_.UpdateMatrix();
     }
 
-    ParticleManager::GetInstance()->Update();
+    ParticleSystem::GetInstance()->Update();
     CollisionManager::GetInstance()->Update();
 }
 
@@ -152,7 +152,7 @@ void SampleScene::Draw()
 
     //button_->Draw();
 
-    ParticleManager::GetInstance()->DrawParticles();
+    ParticleSystem::GetInstance()->DrawParticles();
 
 }
 

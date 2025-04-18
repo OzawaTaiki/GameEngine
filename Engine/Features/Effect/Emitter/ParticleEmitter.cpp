@@ -1,5 +1,5 @@
 #include "ParticleEmitter.h"
-#include <Features/Effect/Manager/ParticleManager.h>
+#include <Features/Effect/Manager/ParticleSystem.h>
 #include <Features/Model/Manager/ModelManager.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImguITools.h>
@@ -237,6 +237,11 @@ void ParticleEmitter::ShowDebugWindow()
                     DebugWindowForColor();
                     ImGui::TreePop();
                 }
+                if (ImGui::TreeNode("Modifiers"))
+                {
+                    DebugWindowForModifier();
+                    ImGui::TreePop();
+                }
                /* if (ImGui::TreeNode("Sequence"))
                 {
                     ImGui::Text("Sequence For Particle");
@@ -350,8 +355,7 @@ void ParticleEmitter::GenerateParticles()
     if (useModelName_ == "")
         useModelName_ = "plane/plane.gltf";
 
-
-    ParticleManager::GetInstance()->AddParticles(useModelName_, particles, settings,initParams_.textureHandle);
+    ParticleSystem::GetInstance()->AddParticles(useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
 }
 
 void ParticleEmitter::InitJsonBinder()
@@ -427,6 +431,10 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("alpha_Min", &initParams_.colorA.min);
     jsonBinder_->RegisterVariable("alpha_Max", &initParams_.colorA.max);
     jsonBinder_->RegisterVariable("alpha_Value", &initParams_.colorA.value);
+
+    jsonBinder_->RegisterVariable("textureHandle", &initParams_.textureHandle);
+
+    jsonBinder_->RegisterVariable("modifiers", &initParams_.modifiers);
 
     jsonBinder_->RegisterVariable("cullBack", &cullBack_);
     jsonBinder_->RegisterVariable("blendMode", reinterpret_cast<uint32_t*>(&blendMode_));
@@ -668,6 +676,41 @@ void ParticleEmitter::DebugWindowForColor()
         }
         ImGui::TreePop();
     }
+    ImGui::Separator();
+}
+
+void ParticleEmitter::DebugWindowForModifier()
+{
+    ImGui::Text("Modifier Name");
+    ImGui::InputText("##ModifierName", modifierName, 256);
+    if (ImGui::Button("Add Modifier"))
+    {
+        initParams_.modifiers.push_back(modifierName);
+        strcpy_s(modifierName, 256, "");
+    }
+    static int removeIndex = -1;
+    ImGui::InputInt("Remove Index", &removeIndex);
+    if (ImGui::Button("Remove Modifier"))
+    {
+        if (removeIndex >= 0 && removeIndex < static_cast<int>(initParams_.modifiers.size()))
+        {
+            initParams_.modifiers.erase(initParams_.modifiers.begin() + removeIndex);
+            removeIndex = -1;
+        }
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::TreeNode("Modifier List"))
+    {
+
+        for (auto& modifier : initParams_.modifiers)
+        {
+            ImGui::Text(modifier.c_str());
+        }
+        ImGui::TreePop();
+    }
+
     ImGui::Separator();
 }
 

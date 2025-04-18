@@ -1,4 +1,4 @@
-#include <Features/Effect/Manager/ParticleManager.h>
+#include <Features/Effect/Manager/ParticleSystem.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
@@ -10,16 +10,23 @@
 #include <cassert>
 
 // 静的メンバ変数の初期化
-uint32_t ParticleManager::maxInstancesPerGroup = 1024;
+uint32_t ParticleSystem::maxInstancesPerGroup = 1024;
 
 
-ParticleManager* ParticleManager::GetInstance()
+ParticleSystem* ParticleSystem::GetInstance()
 {
-    static ParticleManager instance;
+    static ParticleSystem instance;
     return &instance;
 }
 
-void ParticleManager::Initialize()
+ParticleSystem::~ParticleSystem()
+{
+    ClearParticles();
+
+    delete factory_;
+}
+
+void ParticleSystem::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
 
@@ -28,7 +35,7 @@ void ParticleManager::Initialize()
     rootSignature_ = rootsig.value();
 }
 
-void ParticleManager::Update(float _deltaTime)
+void ParticleSystem::Update(float _deltaTime)
 {
     if (camera_ == nullptr)
     {
@@ -53,6 +60,21 @@ void ParticleManager::Update(float _deltaTime)
             if (billboard[2])                rot.z = camera_->rotate_.z;
 
         Matrix4x4 billboardMatrix = MakeRotateMatrix(rot);
+
+        if (!particleList.useModifierName.empty())
+        {
+            for (auto& [name, modifier] : particleList.useModifierName)
+            {
+                auto it = modifierNames_.find(name);
+                if (it == modifierNames_.end())
+                {
+                    CreateModifier(name);
+                    it = modifierNames_.find(name);
+                }
+
+                it->second->Apply(particles, _deltaTime);
+            }
+        }
 
         for (auto it = particles.begin(); it != particles.end();)
         {
@@ -81,7 +103,7 @@ void ParticleManager::Update(float _deltaTime)
     }
 }
 
-void ParticleManager::DrawParticles()
+void ParticleSystem::DrawParticles()
 {
     auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
@@ -107,7 +129,19 @@ void ParticleManager::DrawParticles()
     }
 }
 
-void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle)
+void ParticleSystem::SetModifierFactory(IParticleMoifierFactory* _factory)
+{
+    if (factory_ == _factory ||
+        _factory == nullptr)
+        return;
+
+    if (factory_ != nullptr)
+        delete factory_;
+
+    factory_ = _factory;
+}
+
+void ParticleSystem::AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
     ParticleKey key;
     key.modelName = _useModelName;
@@ -139,6 +173,12 @@ void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _p
 
         group.textureHandle = _textureHandle;
 
+        // モディファイアの登録
+        for (const std::string& name : _modifiers)
+        {
+            group.useModifierName[name] = 1;
+        }
+
         particles_[key] = group;
     }
     else
@@ -146,9 +186,14 @@ void ParticleManager::AddParticle(const std::string& _useModelName, Particle* _p
         it->second.particles.push_back(_particle);
     }
 
+    // モディファイアの登録
+    for (const std::string& name : _modifiers)
+    {
+        particles_[key].useModifierName[name] = 1;
+    }
 }
 
-void ParticleManager::AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle)
+void ParticleSystem::AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
     ParticleKey key;
     key.modelName = _useModelName;
@@ -188,9 +233,14 @@ void ParticleManager::AddParticles(const std::string& _useModelName, std::vector
         it->second.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
         particles_[key].textureHandle = _textureHandle;
     }
+    // モディファイアの登録
+    for (const std::string& name : _modifiers)
+    {
+        particles_[key].useModifierName[name] = 1;
+    }
 }
 
-void ParticleManager::ClearParticles()
+void ParticleSystem::ClearParticles()
 {
     for (auto& [key, particleList] : particles_)
     {
@@ -203,7 +253,7 @@ void ParticleManager::ClearParticles()
     particles_.clear();
 }
 
-void ParticleManager::ClearParticles(const std::string& _useModelName)
+void ParticleSystem::ClearParticles(const std::string& _useModelName)
 {
     for (auto& [key, particleList] : particles_)
     {
@@ -216,6 +266,24 @@ void ParticleManager::ClearParticles(const std::string& _useModelName)
             particleList.particles.clear();
             particles_.erase(key);
             break;
+        }
+    }
+}
+
+void ParticleSystem::CreateModifier(const std::string& _name)
+{
+    if (factory_ == nullptr)
+    {
+        throw std::runtime_error("IParticleMoifierFactoryが設定されていません。");
+        return;
+    }
+
+    if (modifierNames_.find(_name) == modifierNames_.end())
+    {
+        auto modifier = factory_->CreateModifier(_name);
+        if (modifier)
+        {
+            modifierNames_[_name] = std::move(modifier);
         }
     }
 }

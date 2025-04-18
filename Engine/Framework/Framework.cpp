@@ -63,7 +63,7 @@ void Framework::Initialize()
     input_ = Input::GetInstance();
     input_->Initilize(winApp_);
 
-    particleManager_ = ParticleManager::GetInstance();
+    particleManager_ = ParticleSystem::GetInstance();
     particleManager_->Initialize();
 
     Time::Initialize();
