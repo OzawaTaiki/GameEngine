@@ -28,7 +28,9 @@ public:
 
     void SetFlipU(bool _flip) { flipU_ = _flip; }
     void SetFlipV(bool _flip) { flipV_ = _flip; }
-    
+
+    void SetLoop(bool _loop) { loop_ = _loop; }
+
 
 private:
     void NormalizeAngles();
@@ -53,6 +55,7 @@ private:
     bool flipU_ = false;
     bool flipV_ = false;
 
+    bool loop_ = false;
 
 
 };

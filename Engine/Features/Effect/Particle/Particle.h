@@ -5,6 +5,7 @@
 #include <Math/Vector/Vector4.h>
 #include <Math/Matrix/Matrix4x4.h>
 #include <Features/Effect/ParticleInitParam.h>
+#include <Features/Camera/Camera/Camera.h>
 
 class Particle
 {
@@ -25,6 +26,8 @@ public:
     Vector3 GetScale() const { return scale_; }
     Vector4 GetColor() const { return color_; }
     Matrix4x4 GetDirectionMatrix() const { return directionMatrix_; }
+
+    std::array<bool, 3> GetBillboard() const { return isBillboard_; }
 
     void ShowDebugWindow();
 
@@ -50,6 +53,9 @@ private:
     Vector3 acceleration_ = {};
 
     float deceleration_ = 0.0f;
+
+
+    std::array<bool, 3> isBillboard_ = { false ,false ,false }; // ビルボード xyz
 
     Matrix4x4 matWorld_ = Matrix4x4::Identity();
     Matrix4x4 directionMatrix_ = Matrix4x4::Identity();

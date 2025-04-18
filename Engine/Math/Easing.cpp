@@ -8,6 +8,10 @@ constexpr float pi_f = std::numbers::pi_v<float>;
 
 const char* Easing::easingFuncs[] = {
     "Linear",
+
+    "HalfThresholdStep",
+    "FullThresholdStep",
+
     "EaseInsine",
     "EaseInQuad",
     "EaseInCubic",
@@ -44,6 +48,9 @@ const char* Easing::easingFuncs[] = {
 
 float (*Easing::pEasingFunc[])(float) = {
     &Linear,
+    &HalfThresholdStep,
+    &fullThresholdStep,
+
     &EaseInsine,
     &EaseInQuad,
     &EaseInCubic,
@@ -83,6 +90,17 @@ float Easing::Linear(float _t)
 {
     return _t;
 }
+
+float Easing::HalfThresholdStep(float _t)
+{
+    return (_t < 0.5f) ? 0.0f : 1.0f;
+}
+
+float Easing::fullThresholdStep(float _t)
+{
+    return (_t >= 1.0f) ? 1.0f : 0.0f;
+}
+
 
 float Easing::EaseInsine(float _t)
 {

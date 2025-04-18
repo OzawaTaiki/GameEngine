@@ -50,9 +50,6 @@ void Framework::Initialize()
     imguiManager_ = new ImGuiManager();
     imguiManager_->Initialize();
 
-    particleManager_ = ParticleManager::GetInstance();
-    particleManager_->Initialize();
-
     TextureManager* instance = TextureManager::GetInstance();
     instance->Initialize();
 
@@ -66,6 +63,8 @@ void Framework::Initialize()
     input_ = Input::GetInstance();
     input_->Initilize(winApp_);
 
+    particleManager_ = ParticleManager::GetInstance();
+    particleManager_->Initialize();
 
     Time::Initialize();
 
