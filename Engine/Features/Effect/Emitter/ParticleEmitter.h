@@ -176,6 +176,8 @@ private:
 
 
     //各パラメータごとの設定用imgui関数
+#ifdef _DEBUG
+
     void DebugWindowForSize();
     void DebugWindowForPosition();
     void DebugWindowForDirection();
@@ -186,6 +188,7 @@ private:
 
     void DebugWindowForModifier();
 
+#endif // _DEBUG
 
 
 
