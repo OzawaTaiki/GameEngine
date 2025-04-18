@@ -4,7 +4,12 @@
 #include <Core/BlendMode.h>
 #include <Features/Model/Transform/WorldTransform.h>
 #include <Features/Json/JsonBinder.h>
+
 #include <string>
+#include <array>
+#include <memory>
+#include <cstdint>
+
 
 template<typename T>
 struct Range {
@@ -86,6 +91,8 @@ struct ParticleInitParamsForGenerator
 
     std::array<bool, 3> billboard = { false, false, false }; // ビルボードのタイプ
 
+    uint32_t textureHandle = 0; // テクスチャのハンドル
+
 };
 
 class ParticleEmitter
@@ -132,6 +139,8 @@ private:
     char modelPath_[256];
     char modelName_[256];
     char nameBuf_[256];
+    char texturePath_[256];
+    char textureRoot_[256] = "Resources/images/"; // テクスチャのルートパス
 
     bool isOpenTimeline = false;
 
