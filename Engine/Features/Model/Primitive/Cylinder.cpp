@@ -23,11 +23,13 @@ Cylinder::Cylinder(float _topRadius, float _bottomRadius, float _height) :
 Model* Cylinder::Generate(const std::string& _name)
 {
     NormalizeAngles();
-
+    NormalizeRadius();
 
     // 円環の頂点数を計算
     int32_t vertexCount = (divide_) * 2;
     int32_t indexCount = divide_ * 6;
+    if (!loop_)
+        indexCount -= 6;
     std::vector<VertexData> vertices(vertexCount);
     std::vector<uint32_t> indices(indexCount);
 
@@ -80,7 +82,7 @@ Model* Cylinder::Generate(const std::string& _name)
         }
     }
 
-    for (uint32_t index = 0; index < divide_; index++)
+    for (uint32_t index = 0; index < indexCount / 6u; index++)
     {
         // インデックスの設定
         indices[index * 6 + 0] = index * 2;
@@ -118,6 +120,7 @@ void Cylinder::NormalizeAngles()
     // 開始角度と終了角度が同じ場合、完全な円にする
     if (std::abs(startAngle_ - endAngle_) < 0.0001f) {
         endAngle_ = startAngle_ + 2.0f * PI;
+        loop_ = true;
     }
     // 終了角度が開始角度より小さい場合、2π加える
     else if (endAngle_ < startAngle_) {

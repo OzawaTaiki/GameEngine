@@ -193,6 +193,15 @@
     <Filter Include="Features\Event">
       <UniqueIdentifier>{b1f78ddc-1814-4058-b94c-70a3db2be2b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Effect\Editor">
+      <UniqueIdentifier>{222a3361-f0f8-4ba4-a39b-308b9e3b1b75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Effect\Emitter">
+      <UniqueIdentifier>{8618e4ff-0a47-4acf-b58d-74b1fd32aa3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Effect\Modifier">
+      <UniqueIdentifier>{ce54f5a3-3ee8-4f06-908a-4165a3ae6dd1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Math\System">
       <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
     </Filter>
@@ -245,15 +254,6 @@
     </ClCompile>
     <ClCompile Include="Features\Collision\Shapes.cpp">
       <Filter>Features\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Effect\Effect\Effect.cpp">
-      <Filter>Features\Effect\Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Effect\Effect\ParticleEmitters.cpp">
-      <Filter>Features\Effect\Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp">
-      <Filter>Features\Effect\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Features\Effect\Particle\Particle.cpp">
       <Filter>Features\Effect\Particle</Filter>
@@ -329,9 +329,6 @@
     </ClCompile>
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp">
       <Filter>Features\Scene\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Scene\ParticleTestScene.cpp">
-      <Filter>Features\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Features\Sprite\Sprite.cpp">
       <Filter>Features\Sprite</Filter>
@@ -456,6 +453,18 @@
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp">
       <Filter>Features\Event</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp">
+      <Filter>Features\Effect\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp">
+      <Filter>Features\Effect\Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Scene\ParticleTestScene.cpp">
+      <Filter>Features\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp">
+      <Filter>Features\Effect\Manager</Filter>
+    </ClCompile>
     <ClCompile Include="Math\BezierCurve3D.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -563,15 +572,6 @@
     <ClInclude Include="Features\Collision\Shapes.h">
       <Filter>Features\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Effect\Effect\Effect.h">
-      <Filter>Features\Effect\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Effect\Effect\ParticleEmitters.h">
-      <Filter>Features\Effect\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Effect\Manager\ParticleManager.h">
-      <Filter>Features\Effect\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Effect\Particle\Particle.h">
       <Filter>Features\Effect\Particle</Filter>
     </ClInclude>
@@ -658,9 +658,6 @@
     </ClInclude>
     <ClInclude Include="Features\Scene\Manager\SceneManager.h">
       <Filter>Features\Scene\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Scene\ParticleTestScene.h">
-      <Filter>Features\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Features\Sprite\Sprite.h">
       <Filter>Features\Sprite</Filter>
@@ -811,6 +808,24 @@
     </ClInclude>
     <ClInclude Include="Features\Event\EventData.h">
       <Filter>Features\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Editor\ParticleEditor.h">
+      <Filter>Features\Effect\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h">
+      <Filter>Features\Effect\Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Scene\ParticleTestScene.h">
+      <Filter>Features\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Manager\ParticleManager.h">
+      <Filter>Features\Effect\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Particle\Modifier\ParticleModifier.h">
+      <Filter>Features\Effect\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="IPaticleMoifierFactory.h">
+      <Filter>Features\Effect\Modifier</Filter>
     </ClInclude>
     <ClInclude Include="Math\BezierCurve3D.h">
       <Filter>Math</Filter>

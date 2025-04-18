@@ -18,6 +18,7 @@ public:
 
     void Save();
 
+    bool HasEvent(const std::string& _label) const;
 
     void AddSequenceEvent(SequenceEvent* _sequenceEvent);
 
@@ -51,6 +52,10 @@ public:
         {
             if (sequenceEvent.second->GetLabel() == _label)
             {
+                // keyframeが空のとき
+                if (sequenceEvent.second->GetKeyFrames().empty())
+                    return T();
+
                 return sequenceEvent.second->GetValue<T>();
             }
         }

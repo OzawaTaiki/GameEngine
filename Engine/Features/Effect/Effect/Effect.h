@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Features/Effect/Effect/ParticleEmitters.h>
 #include <System/Time/GameTime.h>
 #include <Features/Json/JsonBinder.h>
 #include <string>

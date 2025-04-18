@@ -9,11 +9,11 @@ class RandomGenerator {
 public:
     static RandomGenerator* GetInstance() { static RandomGenerator instance; return &instance; };
 
-    int GetUniformInt(int min, int max);
-    float GetUniformFloat(float _min, float _max);
-    Vector2 GetUniformVec2(const Vector2& _min, const Vector2& _max);
-    Vector3 GetUniformVec3(const Vector3& _min, const Vector3& _max);
-    Vector4 GetUniformVec4(const Vector4& _min, const Vector4& _max);
+    int GetRandValue(int min, int max);
+    float GetRandValue(float _min, float _max);
+    Vector2 GetRandValue(const Vector2& _min, const Vector2& _max);
+    Vector3 GetRandValue(const Vector3& _min, const Vector3& _max);
+    Vector4 GetRandValue(const Vector4& _min, const Vector4& _max);
     Vector4 GetUniformColor();
     float GetUniformAngle();
     double GetUniformDouble();

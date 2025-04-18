@@ -43,33 +43,20 @@ Model* ModelManager::FindSameModel(const std::string& _name)
     auto it = models_.find(_name);
     if (it != models_.end())
         return models_[_name].get();
-    else
-    {
-        models_[_name] = std::make_unique<Model>();
-        return models_[_name].get();
-    }
-}
 
-Model* ModelManager::GetModelPtr()
-{
-    std::string name = "hmm_";
-
-    size_t index = models_.size();
-
-    name += std::to_string(index);
-
-    return FindSameModel(name);
-
+    return nullptr;
 }
 
 Model* ModelManager::Create(const std::string& _name)
 {
-    auto it = models_.find(_name);
+    std::string name = _name;
+
+    auto it = models_.find(name);
     if (it != models_.end())
-        return models_[_name].get();
-    else
     {
-        models_[_name] = std::make_unique<Model>();
-        return models_[_name].get();
+        name = name + std::to_string(models_.size());
     }
+
+    models_[name] = std::make_unique<Model>();
+    return models_[name].get();
 }

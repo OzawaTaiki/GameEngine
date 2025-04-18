@@ -11,6 +11,8 @@ public:
     enum class EasingFunc
     {
         Linear,
+        HalfThresholdStep,
+        FullThresholdStep,
         EaseInsine,
         EaseInQuad,
         EaseInCubic,
@@ -45,6 +47,8 @@ public:
 
     // 定量
     static float Linear(float _t);
+    static float HalfThresholdStep(float _t);
+    static float fullThresholdStep(float _t);
 
     // イーズイン
     static float EaseInsine(float _t);

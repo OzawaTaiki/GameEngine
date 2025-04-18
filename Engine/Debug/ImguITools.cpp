@@ -61,7 +61,7 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     ImGui::PushID(_label);
 
     // タイムラインウィンドウの設定
-    ImGui::Begin("Timeline", nullptr, ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin(_label, nullptr, ImGuiWindowFlags_NoScrollbar);
 
     // タイムラインウィンドウの情報
     ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -245,6 +245,9 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
     {
         float tracksStartY = timelineBase.y + kControlPanelHeight + kTimeScaleHeaderHeight;
         float tracksHeight = contentSize.y - kControlPanelHeight - kTimeScaleHeaderHeight - kStatusBarHeight - kTimelineHeightPadding;
+
+        if (tracksHeight <= 0.0f)
+            tracksHeight = 1.0f;
 
         ImVec2 tracksAreaPos = ImVec2(windowPos.x, tracksStartY);
         // トラックエリアのサイズを調整（値表示分を減らす）
