@@ -11,11 +11,11 @@
 #include <System/Time/GameTime.h>
 #include <Features/UI/UIButton.h>
 #include <Features/Model/Primitive/Ring.h>
-#include <Features/Model/Primitive/Ellipse.h>
 #include <Features/Model/Primitive/Cylinder.h>
 #include <Features/UVTransform/SpriteSheetAnimetion.h>
 #include <Features/UVTransform/UVTransformAnimation.h>
 #include <Features/Animation/Sequence/AnimationSequence.h>
+#include <Features/Effect/Emitter/ParticleEmitter.h>
 
 #include <Features/Collision/Manager/CollisionManager.h>
 
@@ -38,8 +38,6 @@ private:
     DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 
-    std::vector<Particle> particles_;
-
     LineDrawer* lineDrawer_ = nullptr;
     Input* input_ = nullptr;
     ParticleManager* particleManager_ = nullptr;
@@ -49,18 +47,19 @@ private:
     std::unique_ptr<ObjectModel> oModel_= nullptr;
     std::unique_ptr<ObjectModel> oModel2_= nullptr;
     std::unique_ptr<ObjectModel> plane_ = nullptr;
+    std::unique_ptr<ObjectModel> test_= nullptr;
 
     std::unique_ptr <Sprite> sprite_ = nullptr;
 
-    std::unique_ptr<LightGroup> lights_;
+    std::shared_ptr<LightGroup> lights_;
     std::list<std::pair<float, Vector4>> colors;
 
     std::unique_ptr<AnimationSequence> sequence_ = nullptr;
 
-    AABBCollider* bunnyCollider_ = nullptr;
-    SphereCollider* cubeCollider_ = nullptr;
-    CapsuleCollider* cubeCollider2_ = nullptr;
+    std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
 
+
+    Vector4 testColor_ = { 1,1,1,1 };
 
 
 #ifdef _DEBUG

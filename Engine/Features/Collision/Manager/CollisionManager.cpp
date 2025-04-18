@@ -212,7 +212,7 @@ void CollisionManager::ImGui()
     ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
 
     ImGui::PopID();
-#endif
+#endif // _DEBUG
 }
 
 void CollisionManager::ResolveCollision(const CollisionPair& _pair)
@@ -239,5 +239,9 @@ void CollisionManager::UpdateBroadPhase()
 
 CollisionManager::CollisionManager()
 {
+#ifdef _DEBUG
+
+
     ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
+#endif // DEBUG
 }

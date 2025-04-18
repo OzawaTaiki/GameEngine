@@ -22,7 +22,10 @@ Collider::~Collider()
 {
     CollisionManager::GetInstance()->UnregisterCollider(this);
 
+#ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+#endif // _DEBUG
+
 }
 
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
@@ -191,9 +194,12 @@ void Collider::UpdateCollisionState()
 SphereCollider::SphereCollider(const std::string& _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Sphere_3D);
+#ifdef _DEBUG
 
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
+#endif // _DEBUG
 }
+
 
 
 void SphereCollider::Draw()
@@ -271,8 +277,10 @@ void SphereCollider::ImGui()
 AABBCollider::AABBCollider(const std::string& _name) : Collider()
 {
     SetBoundingBox(BoundingBox::AABB_3D);
-
+#ifdef _DEBUG
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
+#endif // _DEBUG
+
 }
 
 void AABBCollider::Draw()
@@ -373,8 +381,11 @@ void AABBCollider::ImGui()
 OBBCollider::OBBCollider(const std::string& _name) : Collider()
 {
     SetBoundingBox(BoundingBox::OBB_3D);
+#ifdef _DEBUG
+
 
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
+#endif // _DEBUG
 }
 
 void OBBCollider::Draw()
@@ -511,8 +522,11 @@ void OBBCollider::ImGui()
 CapsuleCollider::CapsuleCollider(const std::string& _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Capsule_3D);
-
+#ifdef _DEBUG
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
+
+#endif // _DEBUG
+
 }
 
 void CapsuleCollider::Draw()

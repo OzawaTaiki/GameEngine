@@ -4,12 +4,55 @@
 #include <Core/BlendMode.h>
 #include <System/Time/GameTime.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Features/Camera/Camera/Camera.h>
 
-#include <unordered_map>
+#include <map>
+#include <list>
+
+
 #include <d3d12.h>
 
+struct ParticleRenderSettings
+{
+    BlendMode blendMode = BlendMode::Add;
+    bool cullBack = false;
+
+    PSOFlags GetPSOFlags() const
+    {
+        PSOFlags flags = PSOFlags::None;
+
+        switch (blendMode)
+        {
+        case BlendMode::Normal:
+            flags |= PSOFlags::Blend_Normal;
+            break;
+        case BlendMode::Add:
+            flags |= PSOFlags::Blend_Add;
+            break;
+        case BlendMode::Sub:
+            flags |= PSOFlags::Blend_Sub;
+            break;
+        case BlendMode::Multiply:
+            flags |= PSOFlags::Blend_Multiply;
+            break;
+        case BlendMode::Screen:
+            flags |= PSOFlags::Blend_Screen;
+            break;
+        default:
+            break;
+        }
+
+        if (cullBack)
+            flags |= PSOFlags::Cull_Back;
+        else
+            flags |= PSOFlags::Cull_None;
+
+
+        return flags;
+    }
+};
+
 class SRVManager;
-class ParticleEmitter;
 class ParticleManager
 {
 public:
@@ -17,61 +60,72 @@ public:
     static ParticleManager* GetInstance();
 
     ParticleManager() = default;
-    ~ParticleManager();
-
-    void ClearGroup();
-    void ClearGroup(const std::string& _groupName);
+    ~ParticleManager() = default;
 
     void Initialize();
-    void Update(const Vector3& _cRotate);
-    void Draw(const Camera* _camera);
+    void Update(float _deltaTime = 1.0f / 60.0f);
+    void DrawParticles();
 
-    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, BlendMode _blendMode = BlendMode::Add, uint32_t _textureHandle = UINT32_MAX);
-    void CreateParticleGroup(const std::string& _groupName, const std::string& _modelPath, ParticleEmitter* _emitterPtr, PSOFlags _flags, uint32_t _textureHandle = UINT32_MAX);
-    void DeleteParticleGroup(const std::string& _groupName);
+    void AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings);
+    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings);
 
-    void SetGroupModel(const std::string& _groupName, const std::string& _modelPath);
-    void SetGroupTexture(const std::string& _groupName, uint32_t _textureHandle);
 
-    void AddParticleToGroup(const std::string& _groupName, const Particle& _particles);
-    void AddParticleToGroup(const std::string& _groupName, const std::vector<Particle>& _particles);
+    void ClearParticles();
+    void ClearParticles(const std::string& _useModelName);
 
-    void SetAllGroupTimeChannel(const std::string& _channel);
-    void SetGroupTimeChannel(const std::string& _groupName, const std::string& _channel);
-
+    void SetCamera(Camera* _camera) { camera_ = _camera; }
 
 private:
 
-    static const uint32_t kGroupMaxInstance;
+    static uint32_t maxInstancesPerGroup;
 
-    struct constantBufferData
+    struct ParticleKey
     {
-        Matrix4x4 matWorld;
+        std::string modelName;
+        ParticleRenderSettings settings;
+
+        bool operator<(const ParticleKey& other) const
+        {
+            // まずモデル名で比較
+            if (modelName != other.modelName)
+                return modelName < other.modelName;
+
+            // モデル名が同じ場合は設定で比較
+            if (settings.blendMode != other.settings.blendMode)
+                return settings.blendMode < other.settings.blendMode;
+
+            // 最後にcullBackで比較
+            return settings.cullBack < other.settings.cullBack;
+        }
+    };
+
+    struct ParticleForGPU
+    {
+        Matrix4x4 worldMatrix;
         Vector4 color;
     };
-    struct Group
+
+    struct ParticleGroup
     {
-        Model* model;
-        std::list<Particle>  particles;
-        Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-        constantBufferData* constMap;
-        uint32_t textureHandle;
-        uint32_t srvIndex;
-        uint32_t instanceNum;
-        ParticleEmitter* emitterPtr;
-        BlendMode blendMode;
-        PSOFlags psoFlags;
+        Model* model = nullptr;
+        std::list<Particle*> particles;
+        uint32_t srvIndex = 0;
+        uint32_t instanceCount = 0;
+        PSOFlags psoIndex = {};
+        uint32_t textureHandle = 0;
+        Microsoft::WRL::ComPtr<ID3D12Resource> instanceBuffer;
+        ParticleForGPU* mappedInstanceBuffer = nullptr;
     };
 
-    void PreDraw();
+    std::map<ParticleKey, ParticleGroup> particles_;
 
-    std::unordered_map <std::string, Group> groups_;
-
-    GameTime* gameTime_ = nullptr;
-
-
-    std::map<BlendMode,ID3D12PipelineState*> pipelineState_;
-    ID3D12RootSignature* rootsignature_;
+    std::map<PSOFlags, ID3D12PipelineState*> psoMap_;
+    ID3D12RootSignature* rootSignature_;
 
     SRVManager* srvManager_ = nullptr;
+
+    Camera* camera_ = nullptr;
+
+
+
 };

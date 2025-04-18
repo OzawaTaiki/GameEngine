@@ -1,163 +1,149 @@
-#include <Features/Model/Primitive/Ring.h>
-#include <Features/LineDrawer/LineDrawer.h>
-#include <Core/DXCommon/TextureManager/TextureManager.h>
-#include <Core/DXCommon/DXCommon.h>
-#include <Features/Model/Manager/ModelManager.h>
-#include <Features/Light/System/LightingSystem.h>
+#include "Ring.h"
 
+#include <Math/MyLib.h>
+#include <Features/Model/Manager/ModelManager.h>
+
+#include <algorithm>
 #include <numbers>
 
-Ring::Ring() :
-    innerRadius_(0.0f),
-    outerRadius_(0.0f),
-    divide_(16),
-    billboard_({ true,true,true }),
-    scale_({ 1,1,1 }),
-    rotation_({ 0,0,0 }),
-    quternion_({ 0,0,0,1 }),
-    translate_({ 0,0,0 }),
-    textureHandle_(2)
-{
-    objectColor_.Initialize();
-    material_.Initialize("");
-    worldTransform.Initialize();
-}
-
-Ring::Ring(float _innerRadius, float _outerRadius, uint32_t _divide, std::array<bool, 3> _billboard) :
+Ring::Ring(float _innerRadius, float _outerRadius) :
     innerRadius_(_innerRadius),
     outerRadius_(_outerRadius),
-    divide_(_divide),
-    billboard_(_billboard),
-    scale_({ 1,1,1 }),
-    rotation_({ 0,0,0 }),
-    quternion_({ 0,0,0,1 }),
-    translate_({ 0,0,0 }),
-    textureHandle_(2)
+    startAngle_(0.0f),
+    endAngle_(0.0f),
+    startOuterRadiusRatio_(1.0f),
+    endOuterRadiusRatio_(1.0f),
+    flipU_(false),
+    flipV_(false)
 {
-    objectColor_.Initialize();
-    material_.Initialize("");
-    worldTransform.Initialize();
 }
 
-void Ring::Generate()
+Model* Ring::Generate(const std::string& _name)
 {
-    vertices_.clear();
-    indices_.clear();
+    NormalizeAngles();
+    NormalizeRadius();
 
-    if (divide_ < 3)
-        divide_ = 3;
+    // 内半径と外半径の比率を計算]// TODO
+    float startOuterRadius = Lerp(innerRadius_, outerRadius_, startOuterRadiusRatio_);
+    float endOuterRadius = Lerp(innerRadius_, outerRadius_, endOuterRadiusRatio_);
 
-    // 頂点ごとの角度
-    float kDivideAngle = std::numbers::pi_v<float> *2.0f / divide_;
-    // 一頂点ごとのUV座標の割合
-    float kDivideUV = 1.0f / divide_;
+    // 円環の頂点数を計算
+    int32_t vertexCount = (divide_) * 2;
+    int32_t indexCount = divide_ * 6;
+    std::vector<VertexData> vertices(vertexCount);
+    std::vector<uint32_t> indices(indexCount);
 
-    // 頂点の計算　頂点の数 ＝ 分割数
-    for (int32_t index = 0; index <= divide_; ++index)
+    const float kRadianPerDivide = (endAngle_ - startAngle_) / divide_;
+
+    // 頂点の座標を計算
+    for (int32_t index = 0; index < vertexCount; index += 2)
     {
+        float angle = startAngle_ + kRadianPerDivide * (index / 2.0f);
+
+        float cos = std::cos(angle);
+        float sin = std::sin(angle);
+
+
         // 外側の頂点
-        VertexData outerVertex;
+        vertices[index].position.x = cos * outerRadius_;
+        vertices[index].position.y = sin * outerRadius_;
+        vertices[index].position.z = 0.0f;
+        vertices[index].position.w = 1.0f;
+
+        vertices[index].normal = { 0.0f,1.0f,0.0f };
+
+        vertices[index].texcoord = { static_cast<float>(index) / static_cast<float>(divide_),0.0f };
+
         // 内側の頂点
-        VertexData innerVertex;
+        vertices[index + 1].position.x = cos * innerRadius_;
+        vertices[index + 1].position.y = sin * innerRadius_;
+        vertices[index + 1].position.z = 0.0f;
+        vertices[index + 1].position.w = 1.0f;
 
-        float angle = kDivideAngle * static_cast<float>(index);
+        vertices[index + 1].normal = { 0.0f,1.0f,0.0f };
 
-        outerVertex.position = Vector4(std::cosf(angle) * outerRadius_, std::sinf(angle) * outerRadius_, 0.0f,1.0f);
-        outerVertex.normal = Vector3(0.0f, 0.0f, 1.0f);
-        outerVertex.texcoord = { kDivideUV * static_cast<float>(index),1.0f };
+        vertices[index + 1].texcoord = { static_cast<float>(index + 1) / static_cast<float>(divide_),1.0f };
 
 
-        innerVertex.position = Vector4(std::cosf(angle) * innerRadius_, std::sinf(angle) * innerRadius_, 0.0f, 1.0f);
-        innerVertex.normal = Vector3(0.0f, 0.0f, 1.0f);
-        innerVertex.texcoord = { kDivideUV * static_cast<float>(index),0.0f };
-
-        vertices_.push_back(outerVertex);
-        vertices_.push_back(innerVertex);
+        if (flipU_)
+        {
+            vertices[index].texcoord.x = 1.0f - vertices[index].texcoord.x;
+            vertices[index + 1].texcoord.x = 1.0f - vertices[index + 1].texcoord.x;
+        }
+        if (flipV_)
+        {
+            vertices[index].texcoord.y = 1.0f - vertices[index].texcoord.y;
+            vertices[index + 1].texcoord.y = 1.0f - vertices[index + 1].texcoord.y;
+        }
     }
 
-    // インデックスの計算
-    for (int32_t index = 0; index < divide_ * 2; index += 2)
+    for (uint32_t index = 0; index < divide_; index++)
     {
-        //  021 123 243 345 465...
-        indices_.push_back((index + 2));
-        indices_.push_back((index + 0));
-        indices_.push_back((index + 1));
+        // インデックスの設定
+        indices[index * 6 + 0] = index * 2;
+        indices[index * 6 + 1] = index * 2 + 1;
+        indices[index * 6 + 2] = (index * 2 + 2) % (vertexCount);
 
-        indices_.push_back((index + 3));
-        indices_.push_back((index + 2));
-        indices_.push_back((index + 1));
+        indices[index * 6 + 3] = (index * 2 + 2) % (vertexCount);
+        indices[index * 6 + 4] = index * 2 + 1;
+        indices[index * 6 + 5] = (index * 2 + 3) % (vertexCount);
     }
 
-    mesh_.Initialize(vertices_, indices_);
+    // TODO: 開始終了半径を考慮した頂点座標の補完
+    // スプラインで外径を補完する
 
+
+    Model* model = Model::CreateFromVertices(vertices, indices, _name);
+
+    return model;
 }
 
-void Ring::Update()
+
+void Ring::NormalizeAngles()
 {
-#ifdef _DEBUG
+    // 開始角度が終了角度より大きい場合はスワップ
+    if (startAngle_ > endAngle_) {
+        std::swap(startAngle_, endAngle_);
+        std::swap(startOuterRadiusRatio_, endOuterRadiusRatio_);
+    }
 
-    ImGui::Begin("Ring");
-    if(ImGui::DragFloat("innerRadius", &innerRadius_,0.01f))
-        Generate();
-    if(ImGui::DragFloat("outerRadius", &outerRadius_, 0.01f))
-        Generate();
-    if (ImGui::DragInt("divide", reinterpret_cast<int*>(&divide_)))
-        Generate();
-    ImGui::Checkbox("billboardX", &billboard_[0]);
-    ImGui::Checkbox("billboardY", &billboard_[1]);
-    ImGui::Checkbox("billboardZ", &billboard_[2]);
-    ImGui::DragFloat3("scale", &scale_.x, 0.01f);
-    ImGui::DragFloat3("rotation", &rotation_.x, 0.01f);
-    ImGui::DragFloat3("translate", &translate_.x, 0.01f);
-    ImGui::Checkbox("useQuaternion", &useQuaternion_);
-    ImGui::End();
+    float PI = std::numbers::pi_v<float>;
 
+    // 角度が完全な円（2π）より大きい場合、2πで割った余りに正規化
+    startAngle_ = std::fmod(startAngle_, 2.0f * PI);
+    if (startAngle_ < 0) startAngle_ += 2.0f * PI;
 
-#endif
+    endAngle_ = std::fmod(endAngle_, 2.0f * PI);
+    if (endAngle_ < 0) endAngle_ += 2.0f * PI;
 
-    worldTransform.transform_ = translate_;
-    worldTransform.scale_ = scale_;
-    if (useQuaternion_)
-        worldTransform.quaternion_ = quternion_;
-    else
-        worldTransform.rotate_ = rotation_;
+    // 開始角度と終了角度が同じ場合、完全な円にする
+    if (std::abs(startAngle_ - endAngle_) < 0.0001f) {
+        endAngle_ = startAngle_ + 2.0f * PI;
+    }
+    // 終了角度が開始角度より小さい場合、2π加える
+    else if (endAngle_ < startAngle_) {
+        endAngle_ += 2.0f * PI;
+    }
 
-    worldTransform.UpdateData(useQuaternion_);
+    startOuterRadiusRatio_ = std::clamp(startOuterRadiusRatio_, 0.0f, 1.0f);
+    endOuterRadiusRatio_ = std::clamp(endOuterRadiusRatio_, 0.0f, 1.0f);
 }
 
-void Ring::Draw()
+void Ring::NormalizeRadius()
 {
-    for (uint32_t index = 0; index < indices_.size(); index += 3)
+    // 内半径と外半径の大小を比較し、必要に応じてスワップ
+    if (innerRadius_ > outerRadius_)
     {
-        uint32_t index0 = indices_[index + 0];
-        uint32_t index1 = indices_[index + 1];
-        uint32_t index2 = indices_[index + 2];
-
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index0].position.xyz(), vertices_[index1].position.xyz());
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index1].position.xyz(), vertices_[index2].position.xyz());
-        LineDrawer::GetInstance()->RegisterPoint(vertices_[index2].position.xyz(), vertices_[index0].position.xyz());
+        std::swap(innerRadius_, outerRadius_);
     }
-}
-
-void Ring::Draw(const Camera& _camera, const Vector4& _color)
-{
-    ID3D12GraphicsCommandList* commandList = DXCommon::GetInstance()->GetCommandList();
-    ModelManager::GetInstance()->PreDrawForObjectModel();
-
-    mesh_.QueueCommand(commandList);
-    _camera.QueueCommand(commandList, 0);//
-    worldTransform.QueueCommand(commandList, 1);//
-    material_.MaterialQueueCommand(commandList, 2);//
-    objectColor_.SetColor(_color);
-    objectColor_.QueueCommand(commandList, 3);//
-    commandList->SetGraphicsRootDescriptorTable(4, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
-    LightingSystem::GetInstance()->QueueGraphicsCommand(commandList,5);//
-
-    commandList->DrawIndexedInstanced(mesh_.GetIndexNum(), 1, 0, 0, 0);
-
-}
-
-void Ring::SetTexture(const std::string& _path)
-{
-    textureHandle_ = TextureManager::GetInstance()->Load(_path);
+    // 内半径が0未満の場合、0に設定
+    if (innerRadius_ < 0.0f)
+    {
+        innerRadius_ = 0.0f;
+    }
+    // 外半径が内半径より小さい場合、内半径を外半径に設定
+    if (outerRadius_ < innerRadius_)
+    {
+        outerRadius_ = innerRadius_;
+    }
 }

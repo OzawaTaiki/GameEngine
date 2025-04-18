@@ -108,9 +108,10 @@ Model* Model::CreateFromFile(const std::string& _filePath)
 {
     Model* model = ModelManager::GetInstance()->FindSameModel(_filePath);
 
-    if (model->mesh_.size() == 0|| model->material_.size() == 0)
+    if (model == nullptr)
     {
-       model-> LoadFile(_filePath);
+        model = ModelManager::GetInstance()->Create(_filePath);
+        model->LoadFile(_filePath);
     }
 
     model->lightGroup_ = std::make_unique<LightGroup>();
@@ -124,12 +125,32 @@ Model* Model::CreateFromFile(const std::string& _filePath)
 
 Model* Model::CreateFromMesh(std::unique_ptr<Mesh> _mesh)
 {
-    Model* model = ModelManager::GetInstance()->GetModelPtr();
+    Model* model = ModelManager::GetInstance()->Create("MeshGene");
 
     model->mesh_.push_back(std::move(_mesh));
     model->material_.push_back(std::make_unique<Material>());
     model->material_[0]->Initialize("");
 
+
+    model->lightGroup_ = std::make_unique<LightGroup>();
+    model->lightGroup_->Initialize();
+
+    model->currentAnimation_ = std::make_unique<ModelAnimation>();
+    model->currentAnimation_->Initialize();
+
+    return model;
+}
+
+Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<uint32_t> _indices, const std::string& _name)
+{
+    Model* model = ModelManager::GetInstance()->Create(_name);
+
+    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
+    mesh->Initialize(_vertices, _indices);
+    model->mesh_.push_back(std::move(mesh));
+
+    model->material_.push_back(std::make_unique<Material>());
+    model->material_[0]->Initialize("");
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();

@@ -128,7 +128,7 @@ void Camera::UpdateShake()
     }
     else
     {
-        shakeOffset_ = RandomGenerator::GetInstance()->GetUniformVec2(shakeRangeMin_, shakeRangeMax_);
+        shakeOffset_ = RandomGenerator::GetInstance()->GetRandValue(shakeRangeMin_, shakeRangeMax_);
     }
 }
 

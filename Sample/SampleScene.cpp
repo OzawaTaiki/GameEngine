@@ -7,13 +7,14 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImguITools.h>
+#include <Features/Model/Primitive/Ring.h>
+#include <Features/Model/Primitive/Cylinder.h>
+
+#include <Features/Effect/Emitter/ParticleEmitter.h>
 
 
 SampleScene::~SampleScene()
 {
-    delete bunnyCollider_;
-    delete cubeCollider_;
-    delete cubeCollider2_;
 }
 
 void SampleScene::Initialize()
@@ -32,7 +33,7 @@ void SampleScene::Initialize()
     input_ = Input::GetInstance();
 
     oModel_ = std::make_unique<ObjectModel>("plane");
-    oModel_->Initialize("bunny.gltf");
+    oModel_->Initialize("plane/plane.gltf");
     oModel_->translate_.x = 3;
 
     oModel2_ = std::make_unique<ObjectModel>("cube");
@@ -49,44 +50,25 @@ void SampleScene::Initialize()
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
     sprite_ = Sprite::Create("uvChecker", textureHandle);
 
-    lights_ = std::make_unique<LightGroup>();
+    lights_ = std::make_shared<LightGroup>();
     lights_->Initialize();
-
-    colors.push_back({ 0.0f,Vector4(1,0,0,1) });
-    colors.push_back({ 1.0f,Vector4(0,0,1,1) });
-    colors.push_back({ 0.5f,Vector4(0,1,0,1) });
-    colors.push_back({ 0.1f,Vector4(0,1,0,1) });
-    colors.push_back({ 0.532f,Vector4(0,1,0,1) });
-    colors.push_back({ 0.12f,Vector4(1,1,0,1) });
 
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
 
-    bunnyCollider_ = new AABBCollider("bunny");
-    bunnyCollider_->Load("bunny");
-    /*bunnyCollider_->SetLayer("bunny");
-    bunnyCollider_->SetMinMax({ -1,-1,-1 }, { 1,1,1 });
-    bunnyCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
-        Debug::Log("bunny Collision\n");
-        });*/
+    Cylinder* cylinder = new Cylinder(1.0f, 2.0f,1.0f);
+    cylinder->SetDivide(32);
+    cylinder->SetEndAngle(3.14f);
+    cylinder->SetLoop(true);
+    
 
-    cubeCollider_ = new SphereCollider();
-    cubeCollider_->SetLayer("cube");
-    cubeCollider_->SetRadius(.5f);
-    cubeCollider_->SetWorldTransform(oModel2_->GetWorldTransform());
-    cubeCollider_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
-        });
+    test_ = std::make_unique<ObjectModel>("cylinder");
+    test_->Initialize(cylinder->Generate("cylinder"));
 
-    cubeCollider2_ = new CapsuleCollider();
-    cubeCollider2_->SetLayer("cube2");
-    cubeCollider2_->SetRadius(1);
-    cubeCollider2_->SetHeight(5);
-    cubeCollider2_->SetWorldTransform(aModel_->GetWorldTransform());
-    cubeCollider2_->SetOnCollisionCallback([](Collider* _other, const ColliderInfo& _info) {
-        Debug::Log("cube2 Collision\n");
-        });
+    emitter_ = std::make_unique<ParticleEmitter>();
+    emitter_->Initialize("test");
 
-
+    ParticleManager::GetInstance()->SetCamera(&SceneCamera_);
 }
 
 void SampleScene::Update()
@@ -108,30 +90,23 @@ void SampleScene::Update()
     }
 
     ImGuiTool::TimeLine("TimeLine", sequence_.get());
-    ImGuiTool::GradientEditor("GradientEditor", colors);
 
-    lights_->DrawDebugWindow();
+    lights_->ImGui();
 
     static bool play = false;
-    if (ImGui::Button("Play"))
-    {
-        //play = !play;
-        sequence_->Save();
-    }
+    ImGui::Checkbox("Play", &play);
+
     if (play)
-        oModel_->translate_ = sequence_->GetValue<Vector3>("a");
+        testColor_= sequence_->GetValue<Vector4>("color");
+
+    emitter_->ShowDebugWindow();
 
 
-    if (ImGui::Button("Save"))
-    {
-        bunnyCollider_->Save("bunny");
-        cubeCollider_->Save("cube");
-        cubeCollider2_->Save("cube2");
-    }
 #endif // _DEBUG
-    LightingSystem::GetInstance()->SetLightGroup(lights_.get());
+    LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
 
+    test_->Update();
     oModel_->Update();
     oModel2_->Update();
     aModel_->Update();
@@ -140,7 +115,7 @@ void SampleScene::Update()
 
     if (input_->IsKeyTriggered(DIK_TAB))
     {
-        SceneManager::GetInstance()->ReserveScene("ParticleTest");
+        //SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }
 
     if (enableDebugCamera_)
@@ -148,20 +123,15 @@ void SampleScene::Update()
         debugCamera_.Update();
         SceneCamera_.matView_ = debugCamera_.matView_;
         SceneCamera_.TransferData();
-        ParticleManager::GetInstance()->Update(debugCamera_.rotate_);
+        //ParticleManager::GetInstance()->Update(debugCamera_.rotate_);
     }
     else
     {
         SceneCamera_.Update();
         SceneCamera_.UpdateMatrix();
-        ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
 
-
-    CollisionManager::GetInstance()->RegisterCollider(bunnyCollider_);
-    CollisionManager::GetInstance()->RegisterCollider(cubeCollider_);
-    CollisionManager::GetInstance()->RegisterCollider(cubeCollider2_);
-
+    ParticleManager::GetInstance()->Update();
     CollisionManager::GetInstance()->Update();
 }
 
@@ -169,30 +139,29 @@ void SampleScene::Draw()
 {
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
-    oModel_->Draw(&SceneCamera_, { 1,1,1,1 });
-    oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
+    oModel_->Draw(&SceneCamera_, testColor_);
+    //oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
     plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
+    test_->Draw(&SceneCamera_, { 1,1,1,1 });
     Sprite::PreDraw();
     sprite_->Draw();
 
 
     //button_->Draw();
 
-    ParticleManager::GetInstance()->Draw(&SceneCamera_);
+    ParticleManager::GetInstance()->DrawParticles();
 
 }
 
 void SampleScene::DrawShadow()
 {
-    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_ShadowMap);
-    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_ShadowMap);
 
-    oModel_->DrawShadow(&SceneCamera_, 0);
-    oModel2_->DrawShadow(&SceneCamera_, 1);
-    aModel_->DrawShadow(&SceneCamera_, 2);
+    //oModel_->DrawShadow(&SceneCamera_, 0);
+    //oModel2_->DrawShadow(&SceneCamera_, 1);
+    //aModel_->DrawShadow(&SceneCamera_, 2);
 
 }
 
