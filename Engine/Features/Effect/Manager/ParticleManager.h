@@ -66,8 +66,8 @@ public:
     void Update(float _deltaTime = 1.0f / 60.0f);
     void DrawParticles();
 
-    void AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings);
-    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings);
+    void AddParticle(const std::string& _useModelName, Particle* _particle,ParticleRenderSettings _settings, uint32_t _textureHandle);
+    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles,ParticleRenderSettings _settings, uint32_t _textureHandle);
 
 
     void ClearParticles();
