@@ -161,7 +161,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Collision\Shapes.cpp" />
     <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp" />
     <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp" />
-    <ClCompile Include="Features\Effect\Manager\ParticleManager.cpp" />
+    <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp" />
+    <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp" />
+    <ClCompile Include="Features\Effect\Modifier\Preset\DecelerationModifier.cpp" />
     <ClCompile Include="Features\Effect\Particle\Particle.cpp" />
     <ClCompile Include="Features\Event\EventManager.cpp" />
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp" />
@@ -248,8 +250,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Collision\Shapes.h" />
     <ClInclude Include="Features\Effect\Editor\ParticleEditor.h" />
     <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h" />
-    <ClInclude Include="Features\Effect\Manager\ParticleManager.h" />
-    <ClInclude Include="Features\Effect\Particle\Modifier\ParticleModifier.h" />
+    <ClInclude Include="Features\Effect\Manager\ParticleSystem.h" />
+    <ClInclude Include="Features\Effect\Modifier\IPaticleMoifierFactory.h" />
+    <ClInclude Include="Features\Effect\Modifier\ParticleModifier.h" />
+    <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h" />
+    <ClInclude Include="Features\Effect\Modifier\Preset\DecelerationModifier.h" />
     <ClInclude Include="Features\Effect\Particle\Particle.h" />
     <ClInclude Include="Features\Effect\ParticleInitParam.h" />
     <ClInclude Include="Features\Event\EventData.h" />
@@ -299,7 +304,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="Framework\Framework.h" />
-    <ClInclude Include="IPaticleMoifierFactory.h" />
     <ClInclude Include="Math\BezierCurve3D.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Math\Matrix\Matrix3x3.h" />

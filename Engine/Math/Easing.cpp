@@ -368,6 +368,13 @@ std::string Easing::GetEasingFuncName(int _funcNum)
     return easingFuncs[_funcNum];
 }
 
+std::function<float(float)> Easing::Func(EasingFunc _type)
+{
+    int num = static_cast<int>(_type);
+
+    return pEasingFunc[num];
+}
+
 std::function<float(float)> Easing::SelectFuncPtr(int _funcNum)
 {
 #ifdef _DEBUG

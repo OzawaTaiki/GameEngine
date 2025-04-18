@@ -21,6 +21,9 @@ public:
 
     Matrix4x4 GetWorldMatrix() const { return matWorld_; }
 
+
+    float GetCurrentTime() const { return currentTime_; }
+
     Vector3 GetPosition() const { return translate_; }
     void SetPosition(const Vector3& _pos) { translate_ = _pos; }
 

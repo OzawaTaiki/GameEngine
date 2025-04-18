@@ -4,7 +4,7 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
 #include <Debug/ImGuiManager.h>
-#include <Features/Effect/Manager/ParticleManager.h>
+#include <Features/Effect/Manager/ParticleSystem.h>
 #include <Features/LineDrawer/LineDrawer.h>
 #include <System/Input/Input.h>
 #include <Features/Scene/Manager/SceneManager.h>
@@ -41,7 +41,7 @@ protected:
     SRVManager*             srvManager_             = nullptr;//
     RTVManager*             rtvManager_             = nullptr;//
     ImGuiManager*           imguiManager_           = nullptr;//
-    ParticleManager*        particleManager_        = nullptr;//
+    ParticleSystem*        particleManager_        = nullptr;//
     LineDrawer*             lineDrawer_             = nullptr;//
     Input*                  input_                  = nullptr;//
     SceneManager*           sceneManager_           = nullptr;//
