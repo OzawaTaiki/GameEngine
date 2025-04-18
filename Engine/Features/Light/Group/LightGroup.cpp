@@ -1,6 +1,6 @@
 #include "LightGroup.h"
 
-uint32_t LightGroup::shadowMapSize_ = 1024;
+uint32_t LightGroup::shadowMapSize_ = 4096;
 
 void LightGroup::Initialize()
 {
