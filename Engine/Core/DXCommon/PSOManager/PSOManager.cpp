@@ -589,7 +589,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     depthStencilDesc.DepthEnable = true;
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
     depthStencilDesc.StencilEnable = false;
 #pragma endregion
 
