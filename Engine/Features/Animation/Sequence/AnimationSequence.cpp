@@ -63,6 +63,11 @@ void AnimationSequence::Save()
 
 }
 
+bool AnimationSequence::HasEvent(const std::string& _label) const
+{
+    return sequenceEvents_.contains(_label);
+}
+
 void AnimationSequence::AddSequenceEvent(SequenceEvent* _sequenceEvent)
 {
     if (_sequenceEvent)

@@ -21,7 +21,6 @@ public:
 
 
     Model* FindSameModel(const std::string& _name);
-    Model* GetModelPtr();
     Model* Create(const std::string& _name);
 private:
 

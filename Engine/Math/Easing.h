@@ -11,6 +11,8 @@ public:
     enum class EasingFunc
     {
         Linear,
+        HalfThresholdStep,
+        FullThresholdStep,
         EaseInsine,
         EaseInQuad,
         EaseInCubic,
@@ -45,6 +47,8 @@ public:
 
     // 定量
     static float Linear(float _t);
+    static float HalfThresholdStep(float _t);
+    static float fullThresholdStep(float _t);
 
     // イーズイン
     static float EaseInsine(float _t);
@@ -84,6 +88,7 @@ public:
 
     static std::string GetEasingFuncName(int _funcNum);
 
+    static std::function<float(float)> Func(EasingFunc _type);
     static std::function<float(float)> SelectFuncPtr(int _funcNum);
     static int SelectEasingFunc(int _funcNum);
 

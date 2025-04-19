@@ -47,7 +47,42 @@ std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags 
         return graphicsPipelineStates_[index].Get();
     // なかったらnullを返す
     else
+    {
+        size_t type = GetType(_flag);
+        size_t index = static_cast<size_t>(_flag);
+
+        switch (type)
+        {
+        case 1 << 0 : // Model
+            CreatePSOForModel(_flag);
+            return graphicsPipelineStates_[index].Get();
+            break;
+        case 1 << 1 : // Sprite
+            CreatePSOForSprite(_flag);
+            return graphicsPipelineStates_[index].Get();
+            break;
+        case 1 << 2: // LineDrawer
+            CreatePSOForLineDrawer(_flag);
+            return graphicsPipelineStates_[index].Get();
+            break;
+        case 1 << 3: // Particle
+            CreatePSOForParticle(_flag);
+            return graphicsPipelineStates_[index].Get();
+            break;
+        case 1 << 4: // OffScreen
+            CreatePSOForOffScreen();
+            return graphicsPipelineStates_[index].Get();
+            break;
+        case 1 << 5: // DLShadowMap
+            CreatePSOForDLShadowMap();
+            return graphicsPipelineStates_[index].Get();
+            break;
+        default:
+            break;
+        }
+
         return std::nullopt;
+    }
 }
 
 std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(PSOFlags _flag)
@@ -1365,7 +1400,7 @@ size_t PSOManager::GetType(PSOFlags _flag)
 {
     if(!IsSingleBitSetInMask(_flag,TypeMask))
     {
-        assert("Typeが複数設定されています" && false);
+        assert("Typeが複数設定されているか，Typeが設定されていません" && false);
     }
 
     if (HasFlag(_flag, PSOFlags::Type_Model))

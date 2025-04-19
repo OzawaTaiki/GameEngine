@@ -1,0 +1,239 @@
+{
+    "test": {
+        "BoxOffset_Max": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "BoxOffset_Min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "BoxOffset_Random": false,
+        "IsLooping": true,
+        "MaxPlayTime": 3.799999952316284,
+        "RGB_Max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "RGB_Min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "RGB_Random": false,
+        "RGB_Value": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "SequenceSize": 3,
+        "SphereOffset_Max": 0.0,
+        "SphereOffset_Min": 0.0,
+        "SphereOffset_Random": false,
+        "SphereOffset_Value": 0.0,
+        "a_keyFrames": [
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.0,
+                "value": {
+                    "type": "int",
+                    "value": 0
+                }
+            },
+            {
+                "easingType": 30,
+                "isDelete": false,
+                "isSelect": true,
+                "time": 3.049999952316284,
+                "value": {
+                    "type": "int",
+                    "value": -242
+                }
+            }
+        ],
+        "a_variableType": 0,
+        "alpha_Max": 1.0,
+        "alpha_Min": 0.0,
+        "alpha_Random": false,
+        "alpha_Value": 1.0,
+        "billboard_x": false,
+        "billboard_y": false,
+        "billboard_z": false,
+        "blendMode": 1,
+        "boxSize": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "cullBack": false,
+        "deceleration_Max": 1.0,
+        "deceleration_Min": 0.0,
+        "deceleration_Random": false,
+        "deceleration_Value": 0.0,
+        "delayTime": 0.0,
+        "dfh_keyFrames": [
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.5,
+                "value": {
+                    "type": "float",
+                    "value": 57.20000076293945
+                }
+            },
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.9000000357627869,
+                "value": {
+                    "type": "float",
+                    "value": 0.0
+                }
+            },
+            {
+                "easingType": 4,
+                "isDelete": false,
+                "isSelect": true,
+                "time": 3.1000001430511475,
+                "value": {
+                    "type": "float",
+                    "value": -22.0
+                }
+            }
+        ],
+        "dfh_variableType": 1,
+        "direction_Max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "direction_Min": {
+            "x": -1.0,
+            "y": -1.0,
+            "z": -1.0
+        },
+        "direction_Random": false,
+        "direction_Type": 0,
+        "direction_Value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "emitCount": 1,
+        "emitPerSecond": 10,
+        "isLoop": false,
+        "labels": [
+            "a",
+            "dfh",
+            "qe"
+        ],
+        "lifeTime": 0.0,
+        "lifeTime_Max": 2.0,
+        "lifeTime_Min": 0.5,
+        "lifeTime_Random": false,
+        "lifeTime_Type": 2,
+        "lifeTime_Value": 1.0,
+        "modifiers": [
+            "DecelerationModifier",
+            "AlphaOverLifetime"
+        ],
+        "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "qe_keyFrames": [
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.0,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            },
+            {
+                "easingType": 28,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.6000000238418579,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            },
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 2.299999952316284,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 47.0,
+                        "x": 31.0,
+                        "y": 0.0,
+                        "z": -11.0
+                    }
+                }
+            },
+            {
+                "easingType": 24,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 3.5,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            }
+        ],
+        "qe_variableType": 5,
+        "rotation": {
+            "w": 1.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "shape": 0,
+        "size_Max": 2.0,
+        "size_Min": 0.5,
+        "size_Random": false,
+        "size_Value": 1.0,
+        "speed_Max": 2.0,
+        "speed_Min": 0.5,
+        "speed_Random": false,
+        "speed_Value": 5.0,
+        "sphereRadius": 1.0,
+        "textureHandle": 0,
+        "useModelName": "plane/plane.gltf"
+    }
+}

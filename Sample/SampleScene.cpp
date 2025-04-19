@@ -10,6 +10,8 @@
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
 
+#include <Features/Effect/Emitter/ParticleEmitter.h>
+
 
 SampleScene::~SampleScene()
 {
@@ -31,7 +33,7 @@ void SampleScene::Initialize()
     input_ = Input::GetInstance();
 
     oModel_ = std::make_unique<ObjectModel>("plane");
-    oModel_->Initialize("bunny.gltf");
+    oModel_->Initialize("plane/plane.gltf");
     oModel_->translate_.x = 3;
 
     oModel2_ = std::make_unique<ObjectModel>("cube");
@@ -54,12 +56,19 @@ void SampleScene::Initialize()
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
 
-    Cylinder* ring = new Cylinder(1.0f, 2.0f,1.0f);
-    ring->SetDivide(32);
+    Cylinder* cylinder = new Cylinder(1.0f, 2.0f,1.0f);
+    cylinder->SetDivide(32);
+    cylinder->SetEndAngle(3.14f);
+    cylinder->SetLoop(true);
+
 
     test_ = std::make_unique<ObjectModel>("cylinder");
-    test_->Initialize(ring->Generate("cylinder"));
+    test_->Initialize(cylinder->Generate("cylinder"));
 
+    emitter_ = std::make_unique<ParticleEmitter>();
+    emitter_->Initialize("test");
+
+    ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 }
 
 void SampleScene::Update()
@@ -90,6 +99,9 @@ void SampleScene::Update()
     if (play)
         testColor_= sequence_->GetValue<Vector4>("color");
 
+    emitter_->ShowDebugWindow();
+
+
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
@@ -103,7 +115,7 @@ void SampleScene::Update()
 
     if (input_->IsKeyTriggered(DIK_TAB))
     {
-        SceneManager::GetInstance()->ReserveScene("ParticleTest");
+        //SceneManager::GetInstance()->ReserveScene("ParticleTest");
     }
 
     if (enableDebugCamera_)
@@ -111,15 +123,15 @@ void SampleScene::Update()
         debugCamera_.Update();
         SceneCamera_.matView_ = debugCamera_.matView_;
         SceneCamera_.TransferData();
-        ParticleManager::GetInstance()->Update(debugCamera_.rotate_);
+        //ParticleManager::GetInstance()->Update(debugCamera_.rotate_);
     }
     else
     {
         SceneCamera_.Update();
         SceneCamera_.UpdateMatrix();
-        ParticleManager::GetInstance()->Update(SceneCamera_.rotate_);
     }
 
+    ParticleSystem::GetInstance()->Update();
     CollisionManager::GetInstance()->Update();
 }
 
@@ -140,7 +152,7 @@ void SampleScene::Draw()
 
     //button_->Draw();
 
-    ParticleManager::GetInstance()->Draw(&SceneCamera_);
+    ParticleSystem::GetInstance()->DrawParticles();
 
 }
 

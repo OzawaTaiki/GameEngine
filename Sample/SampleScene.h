@@ -5,7 +5,7 @@
 #include <Features/Model/ObjectModel.h>
 #include <Features/Model/AnimationModel.h>
 
-#include <Features/Effect/Manager/ParticleManager.h>
+#include <Features/Effect/Manager/ParticleSystem.h>
 #include <Features/LineDrawer/LineDrawer.h>
 #include <System/Input/Input.h>
 #include <System/Time/GameTime.h>
@@ -15,6 +15,7 @@
 #include <Features/UVTransform/SpriteSheetAnimetion.h>
 #include <Features/UVTransform/UVTransformAnimation.h>
 #include <Features/Animation/Sequence/AnimationSequence.h>
+#include <Features/Effect/Emitter/ParticleEmitter.h>
 
 #include <Features/Collision/Manager/CollisionManager.h>
 
@@ -37,11 +38,9 @@ private:
     DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 
-    std::vector<Particle> particles_;
-
     LineDrawer* lineDrawer_ = nullptr;
     Input* input_ = nullptr;
-    ParticleManager* particleManager_ = nullptr;
+    ParticleSystem* particleManager_ = nullptr;
 
     std::unique_ptr<ObjectModel> aModel_ = nullptr;
 
@@ -56,6 +55,8 @@ private:
     std::list<std::pair<float, Vector4>> colors;
 
     std::unique_ptr<AnimationSequence> sequence_ = nullptr;
+
+    std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
 
 
     Vector4 testColor_ = { 1,1,1,1 };
