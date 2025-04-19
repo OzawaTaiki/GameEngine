@@ -215,6 +215,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="System\Input\Input.cpp" />
     <ClCompile Include="System\Time\GameTime.cpp" />
     <ClCompile Include="System\Time\GameTimeChannel.cpp" />
+    <ClCompile Include="System\Time\Stopwatch.cpp" />
     <ClCompile Include="System\Time\Time.cpp" />
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp" />
   </ItemGroup>
@@ -315,6 +316,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Time\GameTime.h" />
     <ClInclude Include="System\Time\GameTimeChannel.h" />
+    <ClInclude Include="System\Time\Stopwatch.h" />
     <ClInclude Include="System\Time\Time.h" />
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
   </ItemGroup>
