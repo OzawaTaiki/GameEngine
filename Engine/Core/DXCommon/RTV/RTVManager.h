@@ -41,7 +41,6 @@ public:
 
     void SetCubemapRenderTexture(uint32_t _handle);
     ID3D12Resource* GetCubemapResource(uint32_t _handle) const;
-    const std::vector<uint32_t>& GetCubemapFaceHandles(uint32_t _handle) const;
 
 private:
     //TODO : DXCommonのもろもろをRTVManagerにおきかえ
@@ -90,7 +89,8 @@ private:
     std::map<uint32_t,Microsoft::WRL::ComPtr<ID3D12Resource>> dsvResources_;
 
     struct CubemapData {
-        std::vector<uint32_t> faceHandles;  // Individual RTV handles for each face
+        //std::vector<uint32_t> faceHandles;
+        uint32_t srvIndex = 0;
         Microsoft::WRL::ComPtr<ID3D12Resource> resource;
     };
     std::map<uint32_t, CubemapData> cubemaps_;
