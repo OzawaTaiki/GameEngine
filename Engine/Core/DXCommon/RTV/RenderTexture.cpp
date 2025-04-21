@@ -277,6 +277,19 @@ void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
         DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
     }
 
+    if (RTVCurrentState_ != D3D12_RESOURCE_STATE_RENDER_TARGET)
+    {
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = renderTextureResource_.Get();
+        barrier.Transition.StateBefore = RTVCurrentState_;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        _cmdList->ResourceBarrier(1, &barrier);
+        RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    }
+
     _cmdList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
     _cmdList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 

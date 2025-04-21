@@ -301,6 +301,60 @@ uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _widt
     return rtvIndex;
 }
 
+void RTVManager::QueuePointLightShadowMapToSRV(const std::string& _name, uint32_t _index)
+{
+    auto it = textureMap_.find(_name);
+    if (it == textureMap_.end())
+        return;
+
+    uint32_t handle = it->second;
+    QueuePointLightShadowMapToSRV(handle, _index);
+
+}
+
+void RTVManager::QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index)
+{
+    // キューブマップの存在確認
+    auto it = cubemaps_.find(_handle);
+    if (it == cubemaps_.end()) {
+        return; // シャドウマップが存在しない
+    }
+
+    auto& cubemapData = it->second;
+    auto renderTarget = renderTargets_[_handle].get();
+
+    if (!renderTarget || !cubemapData.resource) {
+        return; // レンダーターゲットまたはリソースが存在しない
+    }
+
+    //renderTarget->QueueCommandDSVtoSRV(_index);
+
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+    auto srvManager = SRVManager::GetInstance();
+
+    renderTarget->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+    //// リソース状態の遷移（必要な場合）
+    //if (renderTarget->GetDSVCurrentState() != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    //{
+    //    D3D12_RESOURCE_BARRIER barrier = {};
+    //    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    //    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    //    barrier.Transition.pResource = renderTarget->GetDSVResource();
+    //    barrier.Transition.StateBefore = renderTarget->GetDSVCurrentState();
+    //    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    //    commandList->ResourceBarrier(1, &barrier);
+
+    //    // レンダーターゲットの状態を更新
+    //    renderTarget->ChangeDSVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    //}
+
+    //// SRVハンドルを取得してセット
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(cubemapData.srvIndex);
+    commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
+}
+
 void RTVManager::SetCubemapRenderTexture(uint32_t _handle)
 {
     auto it = cubemaps_.find(_handle);

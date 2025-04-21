@@ -39,6 +39,10 @@ public:
 
     uint32_t CreateCubemapRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV);
 
+    void QueuePointLightShadowMapToSRV(const std::string& _name, uint32_t _index);
+    void QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index);
+
+
     void SetCubemapRenderTexture(uint32_t _handle);
     ID3D12Resource* GetCubemapResource(uint32_t _handle) const;
 

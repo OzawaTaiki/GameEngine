@@ -1167,7 +1167,7 @@ void PSOManager::CreatePSOForDLShadowMap()
 void PSOManager::CreatePSOForPLShadowMap()
 {
 
-    HRESULT hr = S_FALSE; 
+    HRESULT hr = S_FALSE;
 
     size_t type = GetType(PSOFlags::Type_PLShadowMap);
 

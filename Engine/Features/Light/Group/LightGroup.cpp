@@ -285,14 +285,17 @@ void LightGroup::DrawPointLightsImGui()
             std::vector<std::string> lightsToRemove;
 
             for (auto& [name, light] : pointLights_) {
+                bool dirty = false;
                 if (ImGui::BeginTabItem(name.c_str())) {
                     PointLight& data = light->GetData();
 
                     ImGui::PushID(name.c_str());
                     ImGui::ColorEdit4("Color", &data.color.x);
-                    ImGui::DragFloat3("Position", &data.position.x, 0.1f);
+                    if(ImGui::DragFloat3("Position", &data.position.x, 0.1f))
+                        dirty = true;
                     ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
-                    ImGui::DragFloat("Radius", &data.radius, 0.1f, 0.1f, 100.0f);
+                    if (ImGui::DragFloat("Radius", &data.radius, 0.1f, 0.1f, 100.0f))
+                       dirty = true;
                     ImGui::DragFloat("Decay", &data.decay, 0.01f, 0.1f, 5.0f);
 
                     bool isHalf = data.isHalf != 0;
@@ -307,6 +310,11 @@ void LightGroup::DrawPointLightsImGui()
 
                     if (ImGui::Button("Delete")) {
                         lightsToRemove.push_back(name);
+                    }
+
+                    if (dirty)
+                    {
+                        light->UpdateViewProjections(shadowMapSize_);
                     }
 
                     ImGui::PopID();
