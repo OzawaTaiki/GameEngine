@@ -13,6 +13,7 @@ PointLightComponent::PointLightComponent()
     data_.decay = 0.5f;
     data_.isHalf = 1;
     data_.castShadow = 1;
+    data_.shadowFactor = 0.2f;
 }
 
 void PointLightComponent::Update()

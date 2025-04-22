@@ -241,6 +241,8 @@ void LightGroup::DrawDirectionalLightImGui()
 
         ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
 
+        ImGui::DragFloat("Shadow Factor", &data.shadowFactor, 0.01f, 0.0f, 1.0f);
+
         bool isHalf = data.isHalf != 0;
         if (ImGui::Checkbox("Half Lambert", &isHalf)) {
             directionalLight_->SetIsHalf(isHalf);
@@ -297,6 +299,8 @@ void LightGroup::DrawPointLightsImGui()
                     if (ImGui::DragFloat("Radius", &data.radius, 0.1f, 0.1f, 100.0f))
                        dirty = true;
                     ImGui::DragFloat("Decay", &data.decay, 0.01f, 0.1f, 5.0f);
+
+                    ImGui::DragFloat("Shadow Factor", &data.shadowFactor, 0.01f, 0.0f, 1.0f);
 
                     bool isHalf = data.isHalf != 0;
                     if (ImGui::Checkbox("Half Lambert", &isHalf)) {
@@ -376,6 +380,8 @@ void LightGroup::DrawSpotLightsImGui()
                     ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
                     ImGui::DragFloat("Distance", &data.distance, 0.1f, 0.1f, 100.0f);
                     ImGui::DragFloat("Decay", &data.decay, 0.01f, 0.1f, 5.0f);
+
+                    //ImGui::DragFloat("Shadow Factor", &data.shadowFactor, 0.01f, 0.0f, 1.0f);
 
                     // Convert angles from radians to degrees
                     float angleDegrees = acos(data.cosAngle) * 180.0f / 3.14159f;

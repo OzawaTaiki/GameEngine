@@ -10,6 +10,7 @@ DirectionalLightComponent::DirectionalLightComponent()
     data_.intensity = 1.0f;
     data_.isHalf = 1;
     data_.castShadow = 1;
+    data_.shadowFactor = 0.2f;
 }
 
 void DirectionalLightComponent::Update()
