@@ -159,7 +159,7 @@ private:
 
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> graphicsPipelineStates_;
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
-    std::unordered_map<const std::string&, Microsoft::WRL::ComPtr<ID3D12PipelineState>> postEffectPipelineStates_;
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> postEffectPipelineStates_;
 
 
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
