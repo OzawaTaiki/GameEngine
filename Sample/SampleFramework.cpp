@@ -18,6 +18,7 @@ void SampleFramework::Initialize()
 
     PSOManager::GetInstance()->CreatePSOForPostEffect("GrayScale", L"GrayScale.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("Vignette", L"Vignetting.hlsl");
+    PSOManager::GetInstance()->CreatePSOForPostEffect("BoxFilter", L"BoxFilter.hlsl");
 
 
     sceneManager_->SetSceneFactory(new SceneFactory());
@@ -59,7 +60,7 @@ void SampleFramework::Draw()
     //=============================
 
     rtvManager_->SetRenderTexture("postEffect");
-    PSOManager::GetInstance()->SetPSOForPostEffect("Vignette");
+    PSOManager::GetInstance()->SetPSOForPostEffect("BoxFilter");
     rtvManager_->DrawRenderTexture("default");
 
 
