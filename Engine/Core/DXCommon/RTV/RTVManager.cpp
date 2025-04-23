@@ -61,16 +61,9 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
 
 void RTVManager::DrawRenderTexture(uint32_t _index)
 {
-
     auto it = renderTargets_.find(_index);
     if (it == renderTargets_.end())
         assert(false && "not found RenderTarget");
-
-    auto psoManager = PSOManager::GetInstance();
-
-    psoManager->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
-    psoManager->SetRootSignature(PSOFlags::Type_OffScreen);
-
 
     it->second->Draw();
 

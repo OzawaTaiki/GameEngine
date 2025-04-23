@@ -204,8 +204,8 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
 
 void PSOManager::CreatePSOForPostEffect(const std::string& _name,
     const std::wstring& _psFileName,
-    const std::wstring& _entryFuncName = L"main",
-    const std::wstring& _dirPath = L"Resources/Shader/")
+    const std::wstring& _entryFuncName,
+    const std::wstring& _dirPath)
 {
     HRESULT hr = S_FALSE;
 

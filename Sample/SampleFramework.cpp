@@ -15,6 +15,9 @@ void SampleFramework::Initialize()
     rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
     rtvManager_->CreateRenderTarget("ShadowMap", 4096, 4096, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  Vector4(1.0f, 1.0f, 1.0f, 1.0f),true);
 
+    PSOManager::GetInstance()->CreatePSOForPostEffect("GrayScale", L"GrayScale.hlsl");
+
+
     sceneManager_->SetSceneFactory(new SceneFactory());
     particleManager_->SetModifierFactory(new ParticleModifierFactory());
 
@@ -53,10 +56,17 @@ void SampleFramework::Draw()
     lineDrawer_->Draw();
     //=============================
 
+    PSOManager::GetInstance()->SetPSOForPostEffect("GrayScale");
+    rtvManager_->DrawRenderTexture("default");
+
 
     dxCommon_->PreDraw();
     // スワップチェインに戻す
     rtvManager_->SetSwapChainRenderTexture(dxCommon_->GetSwapChain());
+
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_OffScreen);
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
+
     // レンダーテクスチャを描画
     rtvManager_->DrawRenderTexture("default");
 
