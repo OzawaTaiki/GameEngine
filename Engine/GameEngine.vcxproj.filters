@@ -530,6 +530,9 @@
     <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
