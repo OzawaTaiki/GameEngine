@@ -62,6 +62,10 @@ std::shared_ptr<PointLightComponent> LightGroup::GetPointLight(const std::string
 
 std::vector<std::shared_ptr<PointLightComponent>> LightGroup::GetAllPointLights() const
 {
+    if (pointLights_.empty()) {
+        return {};
+    }
+
     std::vector<std::shared_ptr<PointLightComponent>> lights;
     for (auto& light : pointLights_) {
         lights.push_back(light.second);
