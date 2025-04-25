@@ -192,8 +192,8 @@ void LightGroup::ImGui()
 {
 #ifdef _DEBUG
 
-    if (ImGui::Begin("Light Settings")) {
-        // Light group overall settings
+    ImGui::Begin("Light Settings"); 
+    {
         if (ImGui::CollapsingHeader("Light Group Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Enable Directional Light", &enableDirectionalLight_);
             ImGui::Checkbox("Enable Point Lights", &enablePointLight_);

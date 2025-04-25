@@ -51,18 +51,30 @@ void SampleFramework::Draw()
     rtvManager_->SetDepthStencil("ShadowMap");
     sceneManager_->DrawShadow();
 
-    rtvManager_->SetRenderTexture("default");
 
     // ========== 描画処理 ==========
+    rtvManager_->SetRenderTexture("default");
 
     sceneManager_->Draw();
 
     lineDrawer_->Draw();
     //=============================
+    static bool is = false;
+    ImGui::Checkbox("postEffect", &is);
 
-    rtvManager_->SetRenderTexture("postEffect");
-    PSOManager::GetInstance()->SetPSOForPostEffect("Gauss");
-    rtvManager_->DrawRenderTexture("default");
+    if(is)
+    {
+        rtvManager_->SetRenderTexture("postEffect");
+        PSOManager::GetInstance()->SetPSOForPostEffect("Gauss");
+        rtvManager_->DrawRenderTexture("default");
+    }
+    else
+    {
+        rtvManager_->SetRenderTexture("postEffect");
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_OffScreen);
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
+        rtvManager_->DrawRenderTexture("default");
+    }
 
 
     dxCommon_->PreDraw();
