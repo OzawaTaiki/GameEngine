@@ -100,8 +100,8 @@ struct ParticleInitParamsForGenerator
 class ParticleEmitter
 {
 public:
-    ParticleEmitter() = default;
-    ~ParticleEmitter() = default;
+    ParticleEmitter() {};
+    ~ParticleEmitter() {};
 
     void Initialize(const std::string& _name);
     void Update(float _deltaTime);
