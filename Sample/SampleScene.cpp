@@ -9,6 +9,7 @@
 #include <Debug/ImguITools.h>
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
+#include <Features/Model/Primitive/Triangle.h>
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
@@ -61,9 +62,15 @@ void SampleScene::Initialize()
     cylinder->SetEndAngle(3.14f);
     cylinder->SetLoop(true);
 
+    Triangle* triangle = new Triangle();
+    triangle->SetVertices(
+        Vector3(0.0f, 1.0f, 0.0f),
+        Vector3(-1.0f, -1.0f, 0.0f),
+        Vector3(1.0f, -1.0f, 0.0f)
+    );
 
-    test_ = std::make_unique<ObjectModel>("cylinder");
-    test_->Initialize(cylinder->Generate("cylinder"));
+    test_ = std::make_unique<ObjectModel>("Triangle");
+    test_->Initialize(triangle->Generate("Triangle"));
 
     emitter_ = std::make_unique<ParticleEmitter>();
     emitter_->Initialize("test");
@@ -145,7 +152,7 @@ void SampleScene::Draw()
 
     //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    test_->Draw(&SceneCamera_, { 1,1,1,1 });
+    test_->Draw(&SceneCamera_, 2, { 1,1,1,1 });
     Sprite::PreDraw();
     sprite_->Draw();
 
