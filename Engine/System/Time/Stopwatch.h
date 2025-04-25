@@ -43,10 +43,9 @@ public:
     /// </summary>
     template<typename T>
     T GetElapsedTime() const { return static_cast<T>(elapsedTime_); }
-    
 
 
-    float GetElapsedTime() const;
+    void ShowDebugWindow();
 
 private:
 

@@ -359,7 +359,8 @@ void ParticleEmitter::GenerateParticles()
     if (useModelName_ == "")
         useModelName_ = "plane/plane.gltf";
 
-    ParticleSystem::GetInstance()->AddParticles(useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
+    // groupnameには仮でエミッターの名前を入れている
+    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
 }
 
 void ParticleEmitter::InitJsonBinder()

@@ -43,7 +43,7 @@ void ParticleSystem::Update(float _deltaTime)
         return;
     }
 
-    for (auto& [key, particleList] : particles_)
+    for (auto& [groupName, particleList] : particles_)
     {
         if (particleList.particles.empty())
             continue;
@@ -141,16 +141,17 @@ void ParticleSystem::SetModifierFactory(IParticleMoifierFactory* _factory)
     factory_ = _factory;
 }
 
-void ParticleSystem::AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
+void ParticleSystem::AddParticle(const std::string& _groupName, const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
     ParticleKey key;
     key.modelName = _useModelName;
     key.settings = _settings;
 
-    auto it = particles_.find(key);
+    auto it = particles_.find(_groupName);
     if (it == particles_.end())
     {
         ParticleGroup group;
+        group.key = key;
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
         group.particles.push_back(_particle);
@@ -179,7 +180,7 @@ void ParticleSystem::AddParticle(const std::string& _useModelName, Particle* _pa
             group.useModifierName[name] = 1;
         }
 
-        particles_[key] = group;
+        particles_[_groupName] = group;
     }
     else
     {
@@ -189,20 +190,23 @@ void ParticleSystem::AddParticle(const std::string& _useModelName, Particle* _pa
     // モディファイアの登録
     for (const std::string& name : _modifiers)
     {
-        particles_[key].useModifierName[name] = 1;
+        particles_[_groupName].useModifierName[name] = 1;
+        //particles_[key].useModifierName[name] = 1;
     }
 }
 
-void ParticleSystem::AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
+void ParticleSystem::AddParticles(const std::string& _groupName, const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
     ParticleKey key;
     key.modelName = _useModelName;
     key.settings = _settings;
 
-    auto it = particles_.find(key);
+    auto it = particles_.find(_groupName);
     if (it == particles_.end())
     {
         ParticleGroup group;
+        group.key = key;
+
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
         group.particles = std::list<Particle*>(_particles.begin(), _particles.end());
@@ -226,17 +230,19 @@ void ParticleSystem::AddParticles(const std::string& _useModelName, std::vector<
         group.psoIndex = psoFlags;
         group.textureHandle = _textureHandle;
 
-        particles_[key] = group;
+        particles_[_groupName] = group;
     }
     else
     {
         it->second.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
-        particles_[key].textureHandle = _textureHandle;
+        particles_[_groupName].textureHandle = _textureHandle;
     }
+
     // モディファイアの登録
     for (const std::string& name : _modifiers)
     {
-        particles_[key].useModifierName[name] = 1;
+        particles_[_groupName].useModifierName[name] = 1;
+        //particles_[key].useModifierName[name] = 1;
     }
 }
 
@@ -253,21 +259,18 @@ void ParticleSystem::ClearParticles()
     particles_.clear();
 }
 
-void ParticleSystem::ClearParticles(const std::string& _useModelName)
+void ParticleSystem::ClearParticles(const std::string& _groupName)
 {
-    for (auto& [key, particleList] : particles_)
+    auto it = particles_.find(_groupName);
+    if (it == particles_.end())
+        return;
+
+    ParticleGroup& particleList = it->second;
+    for (auto& particle : particleList.particles)
     {
-        if (key.modelName == _useModelName)
-        {
-            for (auto& particle : particleList.particles)
-            {
-                delete particle;
-            }
-            particleList.particles.clear();
-            particles_.erase(key);
-            break;
-        }
+        delete particle;
     }
+    particleList.particles.clear();
 }
 
 void ParticleSystem::CreateModifier(const std::string& _name)
