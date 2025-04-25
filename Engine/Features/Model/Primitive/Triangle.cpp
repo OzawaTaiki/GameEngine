@@ -1,23 +1,17 @@
 #include "Triangle.h"
 
+
+#include <Math/Quaternion/Quaternion.h>
+#include <Math/Vector/VectorFunction.h>
+#include <Math/Matrix/MatrixFunction.h>
+
 Model* Triangle::Generate(const std::string& _name)
 {
     CalculateNormal();
+    CalculateVertices();
 
     std::vector<VertexData> vertices(3);
     std::vector<uint32_t> indices(3);
-
-    vertices[0].position = vertices_[0];
-    vertices[0].normal = normal_;
-    vertices[0].texcoord = { 0.0f,0.0f };
-
-    vertices[1].position = vertices_[1];
-    vertices[1].normal = normal_;
-    vertices[1].texcoord = { 0.0f,1.0f };
-
-    vertices[2].position = vertices_[2];
-    vertices[2].normal = normal_;
-    vertices[2].texcoord = { 1.0f,1.0f };
 
     for (uint32_t index = 0; index < indices.size(); ++index)
     {
@@ -58,10 +52,6 @@ void Triangle::SetVertices(const Vector3& _v0, const Vector3& _v1, const Vector3
     vertices_[0] = _v0;
     vertices_[1] = _v1;
     vertices_[2] = _v2;
-    if (autoNormal_)
-    {
-        CalculateNormal();
-    }
 }
 
 void Triangle::SetVertices(const std::array<Vector3, 3>& _vertices)
@@ -69,14 +59,24 @@ void Triangle::SetVertices(const std::array<Vector3, 3>& _vertices)
     SetVertices(_vertices[0], _vertices[1], _vertices[2]);
 }
 
+void Triangle::CalculateVertices()
+{
+    Vector3 v0 = vertices_[1] - vertices_[0];
+    Vector3 v1 = vertices_[2] - vertices_[0];
+
+    Vector3 normal = v0.Cross(v1);
+
+    Quaternion q = Quaternion::FromToRotation(normal, normal_);
+    Matrix4x4 rotationMatrix = q.Normalize().ToMatrix();
+
+    for (size_t i = 0; i < vertices_.size(); ++i)
+    {
+        vertices_[i] = Transform(vertices_[i], rotationMatrix);
+    }
+
+}
+
 void Triangle::CalculateNormal()
 {
-    if (autoNormal_)
-    {
-        Vector3 v0 = vertices_[1] - vertices_[0];
-        Vector3 v1 = vertices_[2] - vertices_[0];
-
-        normal_ = v0.Cross(v1);
-    }
     normal_ = normal_.Normalize();
 }

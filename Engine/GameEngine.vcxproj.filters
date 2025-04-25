@@ -486,6 +486,9 @@
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Plane.cpp">
+      <Filter>Features\Model\Primitive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -858,6 +861,9 @@
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Triangle.h">
+      <Filter>Features\Model\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Plane.h">
       <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,6 +10,8 @@
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
 #include <Features/Model/Primitive/Triangle.h>
+#include <Features/Model/Primitive/Plane.h>
+
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
@@ -65,12 +67,17 @@ void SampleScene::Initialize()
     Triangle* triangle = new Triangle();
     triangle->SetVertices(
         Vector3(0.0f, 1.0f, 0.0f),
-        Vector3(-1.0f, -1.0f, 0.0f),
-        Vector3(1.0f, -1.0f, 0.0f)
+        Vector3(1.0f, -1.0f, 0.0f),
+        Vector3(-1.0f, -1.0f, 0.0f)
     );
+    triangle->SetNormal(Vector3(0.0f, 1.0f, 0.0f).Normalize());
 
-    test_ = std::make_unique<ObjectModel>("Triangle");
-    test_->Initialize(triangle->Generate("Triangle"));
+    Plane* plane = new Plane();
+    plane->SetNormal(Vector3(1.0f, 1.0f, 0.0f).Normalize());
+
+
+    test_ = std::make_unique<ObjectModel>("triangle");
+    test_->Initialize(triangle->Generate("triangle"));
 
     emitter_ = std::make_unique<ParticleEmitter>();
     emitter_->Initialize("test");
