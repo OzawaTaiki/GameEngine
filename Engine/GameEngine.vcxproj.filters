@@ -489,6 +489,9 @@
     <ClCompile Include="Features\Model\Primitive\Plane.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
+    <ClCompile Include="System\Time\Time_MT.cpp">
+      <Filter>System\Time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -865,6 +868,9 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Plane.h">
       <Filter>Features\Model\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Time\Time_MT.h">
+      <Filter>System\Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

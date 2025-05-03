@@ -16,6 +16,11 @@ public:
     void Initialize();
     void Update();
 
+    double GetDeltaTime() const { return deltaTime_; }
+    double GetFramerate() const { return framerate_; }
+
+    void BeginFrame();
+    void EndFrame();
 
     void CreateChannel(const std::string& _name);
     void EraseChannel(const std::string& _name);
@@ -32,6 +37,15 @@ private:
 
     std::map<std::string, GameTimeChannel> channels_;
 
+    double lastFrameTime_;    // 前回フレームの時間
+    double currentFrameTime_; // 現在フレームの時間
+
+    double deltaTime_ = 0.0f;
+
+    float updateInterval_ = 1.0f;
+    float fpsAccumulator_ = 0.0f; // フレームレートの更新頻度
+    double framerate_ = 0.0f;
+    uint32_t frameCount_ = 0;
 
 private:
     GameTime();

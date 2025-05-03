@@ -8,7 +8,7 @@ public:
     GameTimeChannel();
 
     void Initialize();
-    void Update();
+    void Update(double _deltaTime = 1.0f / 60.0f);
 
     void ApplyHitStop(float _time) { hitStopTime_ = _time; }
 

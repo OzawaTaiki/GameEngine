@@ -43,7 +43,7 @@ void Stopwatch::Update()
     }
     else
     {
-        elapsedTime_ += Time::GetDeltaTime<double>();
+        elapsedTime_ += GameTime::GetInstance()->GetDeltaTime();
     }
 }
 

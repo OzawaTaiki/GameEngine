@@ -12,13 +12,13 @@ void GameTimeChannel::Initialize()
 {
 }
 
-void GameTimeChannel::Update()
+void GameTimeChannel::Update(double _deltaTime)
 {
     if (hitStopTime_ > 0.0f)
     {
         // ヒットストップ中
         // カウントダウン
-        hitStopTime_ -= Time::GetDeltaTime<float>();
+        hitStopTime_ -= static_cast<float>(_deltaTime);
 
         if (hitStopTime_ <= 0.0f)
             hitStopTime_ = 0.0f;
@@ -34,6 +34,6 @@ void GameTimeChannel::Update()
     else
     {
         // 通常時
-        deltaTime_ = Time::GetDeltaTime<double>() * gameSpeed_;
+        deltaTime_ = _deltaTime * gameSpeed_;
     }
 }
