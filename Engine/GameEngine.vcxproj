@@ -236,6 +236,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Debug\ImGuiHelper.h" />
     <ClInclude Include="Debug\ImGuiManager.h" />
     <ClInclude Include="Debug\ImguITools.h" />
+    <ClInclude Include="DepthBasedOutLine.h" />
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h" />
     <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h" />
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
@@ -377,6 +378,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

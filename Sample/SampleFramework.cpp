@@ -20,6 +20,7 @@ void SampleFramework::Initialize()
     PSOManager::GetInstance()->CreatePSOForPostEffect("Vignette", L"Vignetting.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("BoxFilter", L"BoxFilter.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("Gauss", L"GaussianFilter.hlsl");
+    PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
 
 
     sceneManager_->SetSceneFactory(new SceneFactory());
@@ -65,7 +66,7 @@ void SampleFramework::Draw()
     if(is)
     {
         rtvManager_->SetRenderTexture("postEffect");
-        PSOManager::GetInstance()->SetPSOForPostEffect("Gauss");
+        PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
         rtvManager_->DrawRenderTexture("default");
     }
     else

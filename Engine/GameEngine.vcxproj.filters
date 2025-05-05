@@ -217,6 +217,12 @@
     <Filter Include="Features\Effect\Modifier\Preset">
       <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\postEffects">
+      <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\PsotEffects">
+      <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -521,17 +527,20 @@
     <FxCompile Include="PointLightShadowMap.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\postEffects</Filter>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -858,6 +867,9 @@
     </ClInclude>
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthBasedOutLine.h">
+      <Filter>Features\PsotEffects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

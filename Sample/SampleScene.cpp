@@ -43,8 +43,8 @@ void SampleScene::Initialize()
     aModel_ = std::make_unique<ObjectModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
-    plane_ = std::make_unique<ObjectModel>("plane2");
-    plane_->Initialize("Tile/Tile.gltf");
+    plane_ = std::make_unique<ObjectModel>("ground");
+    plane_->Initialize("terrain.obj");
     plane_->GetUVTransform().SetScale({ 100,100 });
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
@@ -81,7 +81,7 @@ void SampleScene::Update()
 
     if (ImGui::Button("rot"))
     {
-        aModel_->ChangeAnimation("RotateAnim", 0.5f,true);
+        aModel_->ChangeAnimation("RotateAnim", 0.5f, true);
     }
 
     if (ImGui::Button("scale"))
