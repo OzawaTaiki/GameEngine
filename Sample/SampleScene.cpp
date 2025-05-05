@@ -79,8 +79,8 @@ void SampleScene::Initialize()
     test_ = std::make_unique<ObjectModel>("triangle");
     test_->Initialize(triangle->Generate("triangle"));
 
-    emitter_ = std::make_unique<ParticleEmitter>();
-    emitter_->Initialize("test");
+    //emitter_ = std::make_unique<ParticleEmitter>();
+    //emitter_->Initialize("test");
 
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 }
@@ -113,7 +113,7 @@ void SampleScene::Update()
     if (play)
         testColor_= sequence_->GetValue<Vector4>("color");
 
-    emitter_->ShowDebugWindow();
+    //emitter_->ShowDebugWindow();
 
 
 #endif // _DEBUG
