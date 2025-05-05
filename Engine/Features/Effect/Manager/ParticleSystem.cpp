@@ -234,8 +234,29 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
     }
     else
     {
-        it->second.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
+        auto& group = it->second;
+
+        group.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
+        group.key = key;
         particles_[_groupName].textureHandle = _textureHandle;
+
+
+        group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
+        if (group.model == nullptr)
+            throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
+
+        PSOFlags psoFlags = _settings.GetPSOFlags();
+        psoFlags |= PSOFlags::Type_Particle;
+
+        // PSOFlagsが未登録の場合は登録する
+        if (!psoMap_.contains(psoFlags))
+            psoMap_[psoFlags] = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags).value();
+
+        group.psoIndex = psoFlags;
+        group.textureHandle = _textureHandle;
+
+        particles_[_groupName] = group;
+
     }
 
     // モディファイアの登録

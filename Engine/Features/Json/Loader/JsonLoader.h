@@ -3,6 +3,7 @@
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector3.h>
 #include <Math/Vector/Vector4.h>
+#include <Math/Quaternion/Quaternion.h>
 #include <Debug/Debug.h>
 #include <string>
 #include <vector>
@@ -12,7 +13,7 @@
 
 using json = nlohmann::json;
 
-using ValueVariant = std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, std::string>;
+using ValueVariant = std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4,Quaternion, std::string>;
 class JsonLoader {
 
 public:
@@ -89,6 +90,7 @@ void JsonLoader::GetValue(std::string _gName, std::string _vName, T& _v)
                        std::is_same_v<T, Vector2> ||
                        std::is_same_v<T, Vector3> ||
                        std::is_same_v<T, Vector4> ||
+                       std::is_same_v<T, Quaternion> ||
                        std::is_same_v<T, std::string>)
     {
         _v = std::get<T>(values_[_gName][_vName][0]);
@@ -122,7 +124,8 @@ void JsonLoader::GetValue(std::string _gName, std::string _vName, std::vector<T>
                        std::is_same_v<T, Vector2> ||
                        std::is_same_v<T, Vector3> ||
                        std::is_same_v<T, Vector4> ||
-                       std::is_same_v<T, std::string>)
+        std::is_same_v<T, Vector4> ||
+        std::is_same_v<T, std::string>)
     {
         std::vector<T> vec;
         for (auto& v : values_[_gName][_vName])
@@ -157,7 +160,8 @@ void JsonLoader::GetValue(std::string _gName, std::string _vName, std::list<T>& 
                        std::is_same_v<T, Vector2> ||
                        std::is_same_v<T, Vector3> ||
                        std::is_same_v<T, Vector4> ||
-                       std::is_same_v<T, std::string>)
+        std::is_same_v<T, Vector4> ||
+        std::is_same_v<T, std::string>)
     {
         std::list<T> list;
         for (auto& v : values_[_gName][_vName])
