@@ -2,6 +2,7 @@
 
 #include "SampleScene.h"
 #include <Features/Scene/ParticleTestScene.h>
+#include <Features/PostEffects/DepthBasedOutLine.h>
 #include "SceneFactory.h"
 #include "ParticleModifierFactory.h"
 
@@ -12,7 +13,7 @@ void SampleFramework::Initialize()
 
     JsonHub::GetInstance()->Initialize("Resources/Data/");
 
-    rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
+    rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), true);
     rtvManager_->CreateRenderTarget("postEffect", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
     rtvManager_->CreateRenderTarget("ShadowMap", 4096, 4096, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  Vector4(1.0f, 1.0f, 1.0f, 1.0f),true);
 
@@ -22,6 +23,7 @@ void SampleFramework::Initialize()
     PSOManager::GetInstance()->CreatePSOForPostEffect("Gauss", L"GaussianFilter.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
 
+    DepthBasedOutLine::GetInstance()->Initialize();
 
     sceneManager_->SetSceneFactory(new SceneFactory());
     particleManager_->SetModifierFactory(new ParticleModifierFactory());
@@ -66,7 +68,8 @@ void SampleFramework::Draw()
     if(is)
     {
         rtvManager_->SetRenderTexture("postEffect");
-        PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
+        //PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
+        DepthBasedOutLine::GetInstance()->Set("default");
         rtvManager_->DrawRenderTexture("default");
     }
     else

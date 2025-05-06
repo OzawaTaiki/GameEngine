@@ -220,7 +220,7 @@
     <Filter Include="HLSL\postEffects">
       <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\PsotEffects">
+    <Filter Include="Features\PosttEffects">
       <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -483,6 +483,9 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -540,6 +543,9 @@
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
   </ItemGroup>
@@ -868,8 +874,8 @@
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
-    <ClInclude Include="DepthBasedOutLine.h">
-      <Filter>Features\PsotEffects</Filter>
+    <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h">
+      <Filter>Features\PosttEffects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@
 #include <Debug/ImguITools.h>
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
+#include <Features/PostEffects/DepthBasedOutLine.h>
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
@@ -67,6 +68,8 @@ void SampleScene::Initialize()
 
     emitter_ = std::make_unique<ParticleEmitter>();
     emitter_->Initialize("test");
+
+    DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
 
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 }

@@ -120,6 +120,10 @@ public:
 
     void SetPSOForPostEffect(const std::string& _name);
 
+    void SetRegisterPSO(const std::string& _name);
+    void SetRegisterRootSignature(const std::string& _name);
+
+
 
 	Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
 		//Complierするshaderファイルへのパス
@@ -135,6 +139,9 @@ public:
         const std::wstring& _psFileName,
         const std::wstring& _entryFuncName = L"main",
         const std::wstring& _dirPath = L"Resources/Shader/");
+
+    void RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso);
+    void RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs);
 
 private:
 
@@ -160,6 +167,9 @@ private:
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> graphicsPipelineStates_;
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> postEffectPipelineStates_;
+
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> registerPSO_;
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> regiterRootSignature_;
 
 
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;

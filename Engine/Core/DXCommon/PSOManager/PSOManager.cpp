@@ -138,6 +138,24 @@ void PSOManager::SetPSOForPostEffect(const std::string& _name)
     dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
 }
 
+void PSOManager::SetRegisterPSO(const std::string& _name)
+{
+    auto it = registerPSO_.find(_name);
+    if (it == registerPSO_.end())
+        assert(false && "PSOがみつかりません");
+
+    dxCommon_->GetCommandList()->SetPipelineState(registerPSO_[_name].Get());
+    //dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
+}
+
+void PSOManager::SetRegisterRootSignature(const std::string& _name)
+{
+    auto it = regiterRootSignature_.find(_name);
+    if (it == regiterRootSignature_.end())
+        assert(false && "RootSignatureがみつかりません");
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(regiterRootSignature_[_name].Get());
+}
+
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
     const std::wstring& _filePath,
@@ -330,6 +348,16 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
 
     postEffectPipelineStates_[_name] = pipelineState;
 
+}
+
+void PSOManager::RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso)
+{
+    registerPSO_[_name] = _pso;
+}
+
+void PSOManager::RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs)
+{
+    regiterRootSignature_[_name] = _rs;
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
