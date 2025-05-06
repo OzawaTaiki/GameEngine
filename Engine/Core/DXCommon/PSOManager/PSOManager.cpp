@@ -125,6 +125,37 @@ void PSOManager::SetRootSignature(PSOFlags _flag)
 
 }
 
+void PSOManager::SetPSOForPostEffect(const std::string& _name)
+{
+    // 要素があるか確認
+    auto it = postEffectPipelineStates_.find(_name);
+    if (it == postEffectPipelineStates_.end())
+    {
+        assert(false && "PostEffectPSOが見つかりません");
+    }
+
+    dxCommon_->GetCommandList()->SetPipelineState(postEffectPipelineStates_[_name].Get());
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
+}
+
+void PSOManager::SetRegisterPSO(const std::string& _name)
+{
+    auto it = registerPSO_.find(_name);
+    if (it == registerPSO_.end())
+        assert(false && "PSOがみつかりません");
+
+    dxCommon_->GetCommandList()->SetPipelineState(registerPSO_[_name].Get());
+    //dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
+}
+
+void PSOManager::SetRegisterRootSignature(const std::string& _name)
+{
+    auto it = regiterRootSignature_.find(_name);
+    if (it == regiterRootSignature_.end())
+        assert(false && "RootSignatureがみつかりません");
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(regiterRootSignature_[_name].Get());
+}
+
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
     const std::wstring& _filePath,
@@ -187,6 +218,146 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
 
  	//実行用バイナリを返却
  	return shaderBlob;
+}
+
+void PSOManager::CreatePSOForPostEffect(const std::string& _name,
+    const std::wstring& _psFileName,
+    const std::wstring& _entryFuncName,
+    const std::wstring& _dirPath)
+{
+    HRESULT hr = S_FALSE;
+
+    size_t rootSignatureType = static_cast<size_t>(PSOFlags::Type_OffScreen);
+
+#pragma region Sampler
+    //Samplerの設定
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
+    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
+    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 比較しない
+    staticSamplers[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
+    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
+    staticSamplers[0].ShaderRegister = 0;
+    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // PixelShaderで使う
+#pragma endregion
+
+#pragma region RootSignature
+
+    ///// RootSignatrueを生成する
+    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+
+    //descriptorRange
+    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].NumDescriptors = 1;//数は１つ
+    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
+    //RootParameter作成
+    D3D12_ROOT_PARAMETER rootParameters[1] = {};
+
+    // テクスチャ
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+    rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+    descriptionRootSignature.pParameters = rootParameters;
+    descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
+
+    descriptionRootSignature.pStaticSamplers = staticSamplers;
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+
+    ////シリアライズしてバイナリする
+    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    if (FAILED(hr))
+    {
+        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        assert(false);
+    }
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[rootSignatureType]));
+    assert(SUCCEEDED(hr));
+
+#pragma endregion
+
+#pragma region DepthStencilState
+    //DepthStencilStateの設定
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    depthStencilDesc.DepthEnable = false;
+#pragma endregion
+
+#pragma region InputLayout
+    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+    inputLayoutDesc.pInputElementDescs = nullptr;
+    inputLayoutDesc.NumElements = 0;
+#pragma endregion
+
+#pragma region Shader
+    /// shaderをコンパイルする
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ComplieShader(L"FullScreen.VS.hlsl", L"vs_6_0");
+    assert(vertexShaderBlob != nullptr);
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = ComplieShader(_psFileName, L"ps_6_0", _entryFuncName, _dirPath);
+    assert(pixelShaderBlob != nullptr);
+#pragma endregion
+
+#pragma region BlendState
+    /// BlendStateの設定
+    D3D12_BLEND_DESC blendDesc{};
+    //すべての色要素を書き込む
+    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+#pragma endregion
+
+#pragma region RasterizerState
+    /// RasterizerStateの設定
+    D3D12_RASTERIZER_DESC rasterizerDesc{};
+    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_None);
+#pragma endregion
+
+    // PSOを生成する
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[rootSignatureType].Get();                                         // RootSignature
+    graphicsPipelineStateDesc.BlendState = blendDesc;                                                               // BlendState
+    graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
+    graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
+    graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
+    graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                                     // RasterizerState
+    // 追加の DRTV の情報
+    graphicsPipelineStateDesc.NumRenderTargets = 1;
+    graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+    graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
+    graphicsPipelineStateDesc.SampleDesc.Count = 1;
+    graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+    graphicsPipelineStateDesc.BlendState = blendDesc;
+
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
+
+    postEffectPipelineStates_[_name] = pipelineState;
+
+}
+
+void PSOManager::RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso)
+{
+    registerPSO_[_name] = _pso;
+}
+
+void PSOManager::RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs)
+{
+    regiterRootSignature_[_name] = _rs;
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
@@ -872,7 +1043,7 @@ void PSOManager::CreatePSOForOffScreen()
 #pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC; // バイリニアフィルタ
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;

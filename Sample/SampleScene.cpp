@@ -9,9 +9,7 @@
 #include <Debug/ImguITools.h>
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
-#include <Features/Model/Primitive/Triangle.h>
-#include <Features/Model/Primitive/Plane.h>
-
+#include <Features/PostEffects/DepthBasedOutLine.h>
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
@@ -46,8 +44,8 @@ void SampleScene::Initialize()
     aModel_ = std::make_unique<ObjectModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
-    plane_ = std::make_unique<ObjectModel>("plane2");
-    plane_->Initialize("Tile/Tile.gltf");
+    plane_ = std::make_unique<ObjectModel>("ground");
+    plane_->Initialize("terrain.obj");
     plane_->GetUVTransform().SetScale({ 100,100 });
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
@@ -82,6 +80,8 @@ void SampleScene::Initialize()
     //emitter_ = std::make_unique<ParticleEmitter>();
     //emitter_->Initialize("test");
 
+    DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
+
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 }
 
@@ -95,7 +95,7 @@ void SampleScene::Update()
 
     if (ImGui::Button("rot"))
     {
-        aModel_->ChangeAnimation("RotateAnim", 0.5f,true);
+        aModel_->ChangeAnimation("RotateAnim", 0.5f, true);
     }
 
     if (ImGui::Button("scale"))

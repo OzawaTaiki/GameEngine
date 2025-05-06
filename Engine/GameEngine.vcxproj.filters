@@ -220,6 +220,12 @@
     <Filter Include="Features\Effect\Modifier\Preset">
       <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\postEffects">
+      <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\PosttEffects">
+      <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -483,6 +489,9 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
@@ -530,7 +539,27 @@
     <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="PointLightShadowMap.hlsl" />
+    <FxCompile Include="PointLightShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -859,6 +888,9 @@
     </ClInclude>
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h">
+      <Filter>Features\PosttEffects</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Triangle.h">
       <Filter>Features\Model\Primitive</Filter>
