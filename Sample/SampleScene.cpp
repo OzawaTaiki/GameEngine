@@ -62,12 +62,23 @@ void SampleScene::Initialize()
     cylinder->SetEndAngle(3.14f);
     cylinder->SetLoop(true);
 
+    Triangle* triangle = new Triangle();
+    triangle->SetVertices(
+        Vector3(0.0f, 1.0f, 0.0f),
+        Vector3(1.0f, -1.0f, 0.0f),
+        Vector3(-1.0f, -1.0f, 0.0f)
+    );
+    triangle->SetNormal(Vector3(0.0f, 1.0f, 0.0f).Normalize());
 
-    test_ = std::make_unique<ObjectModel>("cylinder");
-    test_->Initialize(cylinder->Generate("cylinder"));
+    Plane* plane = new Plane();
+    plane->SetNormal(Vector3(1.0f, 1.0f, 0.0f).Normalize());
 
-    emitter_ = std::make_unique<ParticleEmitter>();
-    emitter_->Initialize("test");
+
+    test_ = std::make_unique<ObjectModel>("triangle");
+    test_->Initialize(triangle->Generate("triangle"));
+
+    //emitter_ = std::make_unique<ParticleEmitter>();
+    //emitter_->Initialize("test");
 
     DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
 
@@ -102,7 +113,7 @@ void SampleScene::Update()
     if (play)
         testColor_= sequence_->GetValue<Vector4>("color");
 
-    emitter_->ShowDebugWindow();
+    //emitter_->ShowDebugWindow();
 
 
 #endif // _DEBUG
@@ -148,7 +159,7 @@ void SampleScene::Draw()
 
     //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    test_->Draw(&SceneCamera_, { 1,1,1,1 });
+    test_->Draw(&SceneCamera_, 2, { 1,1,1,1 });
     Sprite::PreDraw();
     sprite_->Draw();
 

@@ -212,8 +212,8 @@ void LightGroup::ImGui()
             DrawSpotLightsImGui();
         }
 
-        ImGui::End();
     }
+    ImGui::End();
 #endif // _DEBUG
 }
 

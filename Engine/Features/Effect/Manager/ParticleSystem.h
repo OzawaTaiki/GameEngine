@@ -72,12 +72,12 @@ public:
 
     void SetModifierFactory(IParticleMoifierFactory* _factory);
 
-    void AddParticle(const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
-    void AddParticles(const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
+    void AddParticle(const std::string& _groupName,const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
+    void AddParticles(const std::string& _groupName,const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
 
 
     void ClearParticles();
-    void ClearParticles(const std::string& _useModelName);
+    void ClearParticles(const std::string& _groupName);
 
     void SetCamera(Camera* _camera) { camera_ = _camera; }
 
@@ -118,6 +118,7 @@ private:
 
     struct ParticleGroup
     {
+        ParticleKey key;
         Model* model = nullptr;
         std::list<Particle*> particles;
         uint32_t srvIndex = 0;
@@ -129,7 +130,7 @@ private:
         ParticleForGPU* mappedInstanceBuffer = nullptr;
     };
 
-    std::map<ParticleKey, ParticleGroup> particles_;
+    std::map<std::string, ParticleGroup> particles_;
 
     std::map<PSOFlags, ID3D12PipelineState*> psoMap_;
     ID3D12RootSignature* rootSignature_;

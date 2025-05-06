@@ -189,7 +189,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Model\Model.cpp" />
     <ClCompile Include="Features\Model\ObjectModel.cpp" />
     <ClCompile Include="Features\Model\Primitive\Cylinder.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Plane.cpp" />
     <ClCompile Include="Features\Model\Primitive\Ring.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Triangle.cpp" />
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp" />
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp" />
@@ -218,6 +220,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="System\Input\Input.cpp" />
     <ClCompile Include="System\Time\GameTime.cpp" />
     <ClCompile Include="System\Time\GameTimeChannel.cpp" />
+    <ClCompile Include="System\Time\Stopwatch.cpp" />
     <ClCompile Include="System\Time\Time.cpp" />
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp" />
   </ItemGroup>
@@ -286,8 +289,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Model\Model.h" />
     <ClInclude Include="Features\Model\ObjectModel.h" />
     <ClInclude Include="Features\Model\Primitive\Cylinder.h" />
+    <ClInclude Include="Features\Model\Primitive\Plane.h" />
     <ClInclude Include="Features\Model\Primitive\Primitive.h" />
     <ClInclude Include="Features\Model\Primitive\Ring.h" />
+    <ClInclude Include="Features\Model\Primitive\Triangle.h" />
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h" />
     <ClInclude Include="Features\Scene\Interface\BaseScene.h" />
@@ -323,6 +328,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Time\GameTime.h" />
     <ClInclude Include="System\Time\GameTimeChannel.h" />
+    <ClInclude Include="System\Time\Stopwatch.h" />
     <ClInclude Include="System\Time\Time.h" />
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
   </ItemGroup>
