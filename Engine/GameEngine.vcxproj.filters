@@ -193,6 +193,9 @@
     <Filter Include="Features\Event">
       <UniqueIdentifier>{b1f78ddc-1814-4058-b94c-70a3db2be2b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Features\Effect\Editor">
       <UniqueIdentifier>{222a3361-f0f8-4ba4-a39b-308b9e3b1b75}</UniqueIdentifier>
     </Filter>
@@ -205,17 +208,23 @@
     <Filter Include="Math\System">
       <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\System\Audio">
+    <Filter Include="System\Audio">
       <UniqueIdentifier>{2ED4BE9A-FF70-477D-B2A7-CCCCC56E17244C91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\System\Input">
+    <Filter Include="System\Input">
       <UniqueIdentifier>{7E6CDDF1-8A35-4C40-8298-CCCC0EC4D13809CB}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\System\Time">
+    <Filter Include="System\Time">
       <UniqueIdentifier>{EB11ED35-929B-4426-AE45-CCCC416EA607C077}</UniqueIdentifier>
     </Filter>
     <Filter Include="Features\Effect\Modifier\Preset">
       <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\postEffects">
+      <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\PosttEffects">
+      <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -388,19 +397,19 @@
       <Filter>Math\Vector</Filter>
     </ClCompile>
     <ClCompile Include="System\Audio\Audio.cpp">
-      <Filter>Math\System\Audio</Filter>
+      <Filter>System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="System\Input\Input.cpp">
-      <Filter>Math\System\Input</Filter>
+      <Filter>System\Input</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\GameTime.cpp">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\GameTimeChannel.cpp">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClCompile>
     <ClCompile Include="System\Time\Time.cpp">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClCompile>
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp">
       <Filter>Utility\ConvertString</Filter>
@@ -471,11 +480,23 @@
     <ClCompile Include="Math\BezierCurve3D.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="System\Time\Stopwatch.cpp">
+      <Filter>System\Time</Filter>
+    </ClCompile>
     <ClCompile Include="Features\Effect\Modifier\Preset\DecelerationModifier.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Triangle.cpp">
+      <Filter>Features\Model\Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Plane.cpp">
+      <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -521,17 +542,26 @@
     <FxCompile Include="PointLightShadowMap.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\postEffects</Filter>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\RadialBlur.hlsl">
+      <Filter>HLSL\postEffects</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -749,19 +779,19 @@
       <Filter>Math\Vector</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\Audio.h">
-      <Filter>Math\System\Audio</Filter>
+      <Filter>System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="System\Input\Input.h">
-      <Filter>Math\System\Input</Filter>
+      <Filter>System\Input</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\GameTime.h">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\GameTimeChannel.h">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClInclude>
     <ClInclude Include="System\Time\Time.h">
-      <Filter>Math\System\Time</Filter>
+      <Filter>System\Time</Filter>
     </ClInclude>
     <ClInclude Include="Utility\ConvertString\ConvertString.h">
       <Filter>Utility\ConvertString</Filter>
@@ -847,6 +877,9 @@
     <ClInclude Include="Math\BezierCurve3D.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="System\Time\Stopwatch.h">
+      <Filter>System\Time</Filter>
+    </ClInclude>
     <ClInclude Include="Features\Effect\Modifier\IPaticleMoifierFactory.h">
       <Filter>Features\Effect\Modifier</Filter>
     </ClInclude>
@@ -858,6 +891,15 @@
     </ClInclude>
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Triangle.h">
+      <Filter>Features\Model\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Plane.h">
+      <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

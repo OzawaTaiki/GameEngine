@@ -151,6 +151,75 @@
             "y": 0.0,
             "z": 0.0
         },
+        "qe_keyFrames": [
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.0,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            },
+            {
+                "easingType": 28,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 0.6000000238418579,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            },
+            {
+                "easingType": 0,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 2.299999952316284,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 47.0,
+                        "x": 31.0,
+                        "y": 0.0,
+                        "z": -11.0
+                    }
+                }
+            },
+            {
+                "easingType": 24,
+                "isDelete": false,
+                "isSelect": false,
+                "time": 3.5,
+                "value": {
+                    "type": "class Quaternion",
+                    "value": {
+                        "w": 0.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                }
+            }
+        ],
+        "qe_variableType": 5,
+        "rotation": {
+            "w": 1.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "shape": 0,
         "size_Max": 2.0,
         "size_Min": 0.5,

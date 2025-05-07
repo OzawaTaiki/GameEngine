@@ -138,6 +138,24 @@ void PSOManager::SetPSOForPostEffect(const std::string& _name)
     dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
 }
 
+void PSOManager::SetRegisterPSO(const std::string& _name)
+{
+    auto it = registerPSO_.find(_name);
+    if (it == registerPSO_.end())
+        assert(false && "PSOがみつかりません");
+
+    dxCommon_->GetCommandList()->SetPipelineState(registerPSO_[_name].Get());
+    //dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
+}
+
+void PSOManager::SetRegisterRootSignature(const std::string& _name)
+{
+    auto it = regiterRootSignature_.find(_name);
+    if (it == regiterRootSignature_.end())
+        assert(false && "RootSignatureがみつかりません");
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(regiterRootSignature_[_name].Get());
+}
+
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::ComplieShader(
     const std::wstring& _filePath,
@@ -214,7 +232,7 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
 #pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC; // バイリニアフィルタ
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -252,7 +270,7 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
 
     descriptionRootSignature.pStaticSamplers = staticSamplers;
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);;
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
     ////シリアライズしてバイナリする
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
@@ -330,6 +348,16 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
 
     postEffectPipelineStates_[_name] = pipelineState;
 
+}
+
+void PSOManager::RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso)
+{
+    registerPSO_[_name] = _pso;
+}
+
+void PSOManager::RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs)
+{
+    regiterRootSignature_[_name] = _rs;
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
@@ -767,7 +795,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     depthStencilDesc.DepthEnable = true;
     depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
     depthStencilDesc.StencilEnable = false;
 #pragma endregion
 
@@ -1015,7 +1043,7 @@ void PSOManager::CreatePSOForOffScreen()
 #pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC; // バイリニアフィルタ
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;

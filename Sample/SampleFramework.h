@@ -15,5 +15,10 @@ public:
     void Finalize() override;
 
 private:
+    // 動画用
+    void RenderUI();
+    std::map<std::string, std::string> redertextureName_;
+    std::string currentTex_;
+    std::vector<std::string> activeEffects;
 
 };

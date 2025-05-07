@@ -359,12 +359,13 @@ void ParticleEmitter::GenerateParticles()
     if (useModelName_ == "")
         useModelName_ = "plane/plane.gltf";
 
-    ParticleSystem::GetInstance()->AddParticles(useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
+    // groupnameには仮でエミッターの名前を入れている
+    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
 }
 
 void ParticleEmitter::InitJsonBinder()
 {
-    jsonBinder_ = std::make_unique<JsonBinder>(name_, "Resources/Effect/Emitters/");
+    jsonBinder_ = std::make_unique<JsonBinder>(name_, "Resources/data/Effect/Emitters/");
 
     jsonBinder_->RegisterVariable("offset", &offset_);
     jsonBinder_->RegisterVariable("shape", reinterpret_cast<uint32_t*>(&shape_));
@@ -376,7 +377,7 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("lifeTime", &lifeTime);
 
     jsonBinder_->RegisterVariable("position", &position_);
-    jsonBinder_->RegisterVariable("rotation", &rotation_);
+    jsonBinder_->RegisterVariable("rotation", &rotation_); // TODO
     jsonBinder_->RegisterVariable("boxSize", &boxSize_);
     jsonBinder_->RegisterVariable("sphereRadius", &sphereRadius_);
 
