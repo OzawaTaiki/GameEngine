@@ -12,6 +12,8 @@
 #include <Features/PostEffects/DepthBasedOutLine.h>
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
+#include <Features/Model/Primitive/Triangle.h>
+#include <Features/Model/Primitive/Plane.h>
 
 
 SampleScene::~SampleScene()
