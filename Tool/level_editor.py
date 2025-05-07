@@ -129,10 +129,7 @@ class MYADDON_OT_add_filename(bpy.types.Operator):
         #['file_name']カスタムプロパティを追加
         context.object["file_name"] = ""
 
-        return {'FINISHED'}
-
-
-            
+        return {'FINISHED'}            
     
 
 #トップバーの拡張メニュー
