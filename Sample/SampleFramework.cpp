@@ -22,6 +22,8 @@ void SampleFramework::Initialize()
     PSOManager::GetInstance()->CreatePSOForPostEffect("BoxFilter", L"BoxFilter.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("Gauss", L"GaussianFilter.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
+    PSOManager::GetInstance()->CreatePSOForPostEffect("RadialBlur", L"RadialBlur.hlsl");
+
 
     DepthBasedOutLine::GetInstance()->Initialize();
 
@@ -99,6 +101,14 @@ void SampleFramework::Draw()
             // depthBasedOutlineの処理
              DepthBasedOutLine::GetInstance()->Set("default");
         }
+        else if (eff == "RadialBlur") {
+            // radialBlurの処理
+            PSOManager::GetInstance()->SetPSOForPostEffect("RadialBlur");
+        }
+        else {
+            // 未知のエフェクト名の場合は何もしない
+            continue;
+        }
         rtvManager_->DrawRenderTexture(currentTex_);
         currentTex_ = redertextureName_[currentTex_];
     }
@@ -130,7 +140,7 @@ void SampleFramework::RenderUI()
     // 利用可能なエフェクトリスト
     static const char* availableEffects[] = {
         "BoxFilter", "GrayScale", "Vignette",
-        "Gauss", "LuminanceBasedOutline", "DepthBasedOutline"
+        "Gauss", "LuminanceBasedOutline", "DepthBasedOutline","RadialBlur"
     };
     static const int numAvailableEffects = IM_ARRAYSIZE(availableEffects);
 

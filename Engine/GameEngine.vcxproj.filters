@@ -560,6 +560,9 @@
     <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\RadialBlur.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
