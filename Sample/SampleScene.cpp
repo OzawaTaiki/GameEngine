@@ -13,6 +13,9 @@
 
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
+#include <Features/Model/Primitive/Plane.h>
+#include <Features/Model/Primitive/Triangle.h>
+
 
 SampleScene::~SampleScene()
 {
@@ -68,7 +71,7 @@ void SampleScene::Initialize()
         Vector3(1.0f, -1.0f, 0.0f),
         Vector3(-1.0f, -1.0f, 0.0f)
     );
-    triangle->SetNormal(Vector3(0.0f, 1.0f, 0.0f).Normalize());
+    triangle->SetNormal(Vector3(0.0f, 0.0f, -1.0f).Normalize());
 
     Plane* plane = new Plane();
     plane->SetNormal(Vector3(1.0f, 1.0f, 0.0f).Normalize());
@@ -76,6 +79,7 @@ void SampleScene::Initialize()
 
     test_ = std::make_unique<ObjectModel>("triangle");
     test_->Initialize(triangle->Generate("triangle"));
+    test_->translate_.y = 1.0f;
 
     //emitter_ = std::make_unique<ParticleEmitter>();
     //emitter_->Initialize("test");
