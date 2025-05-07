@@ -30,6 +30,10 @@ void SampleFramework::Initialize()
 
     // 最初のシーンで初期化
     sceneManager_->Initialize("Sample");
+
+    currentTex_ = "default";
+    redertextureName_["default"] = "postEffect";
+    redertextureName_["postEffect"] = "default";
 }
 
 void SampleFramework::Update()
@@ -45,6 +49,7 @@ void SampleFramework::Update()
     //particleManager_->Update(); TODO ; 引数のカメラの回転をなんとかしたい
 
     //=============================
+    RenderUI();
 }
 
 void SampleFramework::Draw()
@@ -65,21 +70,38 @@ void SampleFramework::Draw()
     static bool is = false;
     ImGui::Checkbox("postEffect", &is);
 
-    if(is)
-    {
-        rtvManager_->SetRenderTexture("postEffect");
-        //PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
-        DepthBasedOutLine::GetInstance()->Set("default");
-        rtvManager_->DrawRenderTexture("default");
-    }
-    else
-    {
-        rtvManager_->SetRenderTexture("postEffect");
-        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_OffScreen);
-        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
-        rtvManager_->DrawRenderTexture("default");
-    }
+    currentTex_ = "default";
 
+    for (std::string& eff : activeEffects) {
+        rtvManager_->SetRenderTexture(redertextureName_[currentTex_]);
+
+        if (eff == "BoxFilter") {
+            // boxfilterの処理
+             PSOManager::GetInstance()->SetPSOForPostEffect("BoxFilter");
+        }
+        else if (eff == "GrayScale") {
+            // grayscaleの処理
+             PSOManager::GetInstance()->SetPSOForPostEffect("GrayScale");
+        }
+        else if (eff == "Vignette") {
+            // vignetteの処理
+             PSOManager::GetInstance()->SetPSOForPostEffect("Vignette");
+        }
+        else if (eff == "Gauss") {
+            // gaussの処理
+             PSOManager::GetInstance()->SetPSOForPostEffect("Gauss");
+        }
+        else if (eff == "LuminanceBasedOutline") {
+            // luminanceBasedOutlineの処理
+             PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
+        }
+        else if (eff == "DepthBasedOutline") {
+            // depthBasedOutlineの処理
+             DepthBasedOutLine::GetInstance()->Set("default");
+        }
+        rtvManager_->DrawRenderTexture(currentTex_);
+        currentTex_ = redertextureName_[currentTex_];
+    }
 
     dxCommon_->PreDraw();
     // スワップチェインに戻す
@@ -89,7 +111,7 @@ void SampleFramework::Draw()
     PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
 
     // レンダーテクスチャを描画
-    rtvManager_->DrawRenderTexture("postEffect");
+    rtvManager_->DrawRenderTexture(currentTex_);
 
     Framework::PostDraw();
 
@@ -101,4 +123,85 @@ void SampleFramework::Draw()
 void SampleFramework::Finalize()
 {
     Framework::Finalize();
+}
+
+void SampleFramework::RenderUI()
+{
+    // 利用可能なエフェクトリスト
+    static const char* availableEffects[] = {
+        "BoxFilter", "GrayScale", "Vignette",
+        "Gauss", "LuminanceBasedOutline", "DepthBasedOutline"
+    };
+    static const int numAvailableEffects = IM_ARRAYSIZE(availableEffects);
+
+
+    // 現在コンボボックスで選択中のエフェクトインデックス
+    static int currentItem = 0;
+
+    // ウィンドウを作成
+    ImGui::Begin("Post Effect Manager");
+
+    // エフェクト選択用コンボボックス
+    ImGui::Text("Select Effect:");
+    ImGui::Combo("##EffectCombo", &currentItem, availableEffects, numAvailableEffects);
+
+    // エフェクト追加ボタン
+    if (ImGui::Button("Apply Effect")) {
+        // 選択されたエフェクトをアクティブリストに追加
+        std::string selectedEffect = availableEffects[currentItem];
+        activeEffects.push_back(selectedEffect);
+    }
+
+    ImGui::SameLine();
+
+    // エフェクトリストをクリアするボタン
+    if (ImGui::Button("Clear All")) {
+        activeEffects.clear();
+    }
+
+    // 現在アクティブなエフェクトの表示
+    ImGui::Separator();
+    ImGui::Text("Active Effects (in order):");
+
+    // 削除するエフェクトのインデックス (-1は削除なし)
+    static int effectToRemove = -1;
+
+    // アクティブエフェクトのリスト表示と管理
+    for (int i = 0; i < activeEffects.size(); i++) {
+        ImGui::PushID(i);
+
+        // エフェクト名の表示
+        ImGui::BulletText("%d: %s", i + 1, activeEffects[i].c_str());
+
+        ImGui::SameLine();
+
+        // エフェクトを上に移動するボタン
+        if (i > 0 && ImGui::Button("up")) {
+            std::swap(activeEffects[i], activeEffects[i - 1]);
+        }
+
+        ImGui::SameLine();
+
+        // エフェクトを下に移動するボタン
+        if (i < activeEffects.size() - 1 && ImGui::Button("dowm")) {
+            std::swap(activeEffects[i], activeEffects[i + 1]);
+        }
+
+        ImGui::SameLine();
+
+        // エフェクトを削除するボタン
+        if (ImGui::Button("X")) {
+            effectToRemove = i;
+        }
+
+        ImGui::PopID();
+    }
+
+    // 削除処理（forループの外で行う）
+    if (effectToRemove >= 0) {
+        activeEffects.erase(activeEffects.begin() + effectToRemove);
+        effectToRemove = -1;
+    }
+
+    ImGui::End();
 }
