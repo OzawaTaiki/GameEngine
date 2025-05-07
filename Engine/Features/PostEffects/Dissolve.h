@@ -22,7 +22,7 @@ public:
     void SetMaskColor(const Vector3& _color) { thresholdData_->maskColor = _color; }
     void SetEnableEdgeColor(bool _enable) { thresholdData_->enableEdgeColor = _enable; }
     void SetEdgeColor(const Vector3& _color) { thresholdData_->edgeColor = _color; }
-    void SetEdgeDitectRange(const Vector2& _range) { thresholdData_->edgeDitectRange = _range; }
+    void SetEdgeDitectRange(float _range) { thresholdData_->edgeDitectRange = _range; }
     void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle; }
 
 private:

@@ -71,8 +71,6 @@ void SampleFramework::Draw()
 
     lineDrawer_->Draw();
     //=============================
-    static bool is = false;
-    ImGui::Checkbox("postEffect", &is);
 
     currentTex_ = "default";
 
@@ -143,6 +141,9 @@ void SampleFramework::Finalize()
 
 void SampleFramework::RenderUI()
 {
+
+#ifdef _DEBUG
+
     // 利用可能なエフェクトリスト
     static const char* availableEffects[] = {
         "BoxFilter", "GrayScale", "Vignette",
@@ -217,15 +218,15 @@ void SampleFramework::RenderUI()
             static Vector3 maskColor = { 0.0f, 0.0f, 0.0f };
             static bool enableEdgeColor = false;
             static Vector3 edgeColor = { 0.0f, 0.0f, 0.0f };
-            static Vector2 edgeDitectRange = { 0.0f, 0.3f };
+            static float edgeDitectRange = 0.03f;
 
             ImGui::SliderFloat("Dissolve Threshold", &threshold, 0.0f, 1.0f);
-            ImGui::ColorEdit3("Dissolve Mask Color", (float*)&maskColor);
+            ImGui::ColorEdit3("Dissolve Mask Color", &maskColor.x);
             ImGui::Checkbox("Enable Edge Color", &enableEdgeColor);
             if (enableEdgeColor)
             {
-                ImGui::ColorEdit3("Edge Color", (float*)&edgeColor);
-                ImGui::SliderFloat2("Edge Ditect Range", (float*)&edgeDitectRange, 0.0f, 1.0f);
+                ImGui::ColorEdit3("Edge Color", &edgeColor.x);
+                ImGui::SliderFloat("Edge Range", &edgeDitectRange, 0.0f, 1.0f, "%.5f");
             }
 
             Dissolve::GetInstance()->SetThreshold(threshold);
@@ -249,4 +250,6 @@ void SampleFramework::RenderUI()
     }
 
     ImGui::End();
+#endif // _DEBUG
+
 }
