@@ -3,6 +3,7 @@
 #include "SampleScene.h"
 #include <Features/Scene/ParticleTestScene.h>
 #include <Features/PostEffects/DepthBasedOutLine.h>
+#include <Features/PostEffects/Dissolve.h>
 #include "SceneFactory.h"
 #include "ParticleModifierFactory.h"
 
@@ -26,6 +27,7 @@ void SampleFramework::Initialize()
 
 
     DepthBasedOutLine::GetInstance()->Initialize();
+    Dissolve::GetInstance()->Initialize();
 
     sceneManager_->SetSceneFactory(new SceneFactory());
     particleManager_->SetModifierFactory(new ParticleModifierFactory());
@@ -69,8 +71,6 @@ void SampleFramework::Draw()
 
     lineDrawer_->Draw();
     //=============================
-    static bool is = false;
-    ImGui::Checkbox("postEffect", &is);
 
     currentTex_ = "default";
 
@@ -105,6 +105,10 @@ void SampleFramework::Draw()
             // radialBlurの処理
             PSOManager::GetInstance()->SetPSOForPostEffect("RadialBlur");
         }
+        else if (eff == "Dissolve") {
+            // Dissolveの処理
+            Dissolve::GetInstance()->Set();
+        }
         else {
             // 未知のエフェクト名の場合は何もしない
             continue;
@@ -137,10 +141,14 @@ void SampleFramework::Finalize()
 
 void SampleFramework::RenderUI()
 {
+
+#ifdef _DEBUG
+
     // 利用可能なエフェクトリスト
     static const char* availableEffects[] = {
         "BoxFilter", "GrayScale", "Vignette",
-        "Gauss", "LuminanceBasedOutline", "DepthBasedOutline","RadialBlur"
+        "Gauss", "LuminanceBasedOutline",
+        "DepthBasedOutline","RadialBlur","Dissolve"
     };
     static const int numAvailableEffects = IM_ARRAYSIZE(availableEffects);
 
@@ -204,6 +212,34 @@ void SampleFramework::RenderUI()
             effectToRemove = i;
         }
 
+        if (activeEffects[i] == "Dissolve")
+        {
+            static float threshold = 0.0f;
+            static Vector3 maskColor = { 0.0f, 0.0f, 0.0f };
+            static bool enableEdgeColor = false;
+            static Vector3 edgeColor = { 0.0f, 0.0f, 0.0f };
+            static float edgeDitectRange = 0.03f;
+
+            ImGui::SliderFloat("Dissolve Threshold", &threshold, 0.0f, 1.0f);
+            ImGui::ColorEdit3("Dissolve Mask Color", &maskColor.x);
+            ImGui::Checkbox("Enable Edge Color", &enableEdgeColor);
+            if (enableEdgeColor)
+            {
+                ImGui::ColorEdit3("Edge Color", &edgeColor.x);
+                ImGui::SliderFloat("Edge Range", &edgeDitectRange, 0.0f, 1.0f, "%.5f");
+            }
+
+            Dissolve::GetInstance()->SetThreshold(threshold);
+            Dissolve::GetInstance()->SetMaskColor(maskColor);
+            Dissolve::GetInstance()->SetEnableEdgeColor(enableEdgeColor);
+            Dissolve::GetInstance()->SetEdgeColor(edgeColor);
+            Dissolve::GetInstance()->SetEdgeDitectRange(edgeDitectRange);
+        }
+        else if (activeEffects[i] == "DepthBasedOutline")
+        {
+            //DepthBasedOutLine::GetInstance()->Set("default");
+        }
+
         ImGui::PopID();
     }
 
@@ -214,4 +250,6 @@ void SampleFramework::RenderUI()
     }
 
     ImGui::End();
+#endif // _DEBUG
+
 }

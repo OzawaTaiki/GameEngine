@@ -498,6 +498,9 @@
     <ClCompile Include="Features\Model\Primitive\Plane.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\Dissolve.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -561,6 +564,9 @@
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\RadialBlur.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Dissolve.hlsl">
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
   </ItemGroup>
@@ -900,6 +906,9 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Plane.h">
       <Filter>Features\Model\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\Dissolve.h">
+      <Filter>Features\PosttEffects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
