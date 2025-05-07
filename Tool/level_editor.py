@@ -3,6 +3,7 @@ import math
 import bpy_extras
 import gpu
 import gpu_extras.batch
+import copy
 
 bl_info = {
     "name": "レベルエディタ",
@@ -191,14 +192,59 @@ class DrawCollider:
 
     def draw_collider():
         #頂点データ
-        vertices ={"pos":[[0,0,0],[2,2,2]]}
+        vertices ={"pos":[]}
         #インデックスデータ
-        indices = [0,1]
+        indices = []
+
+        offsets=[
+            [-0.5,-0.5,-0.5],#左下前
+            [+0.5,-0.5,-0.5],#右下前
+            [-0.5,+0.5,-0.5],#左上前
+            [+0.5,+0.5,-0.5],#右上前
+            [-0.5,-0.5,+0.5],#左下奥
+            [+0.5,-0.5,+0.5],#右下奥
+            [-0.5,+0.5,+0.5],#左上奥
+            [+0.5,+0.5,+0.5]#右上奥            
+        ]
+        size = [2,2,2]
+
+        for object in bpy.context.scene.objects:
+            #追加前の頂点数
+            start = len(vertices["pos"])
+
+            #boxの8頂点分回す
+            for offset in offsets:
+                #オブジェクトの中心座標をコピー
+                pos = copy.copy(object.location)
+                #中心座標を基準に各頂点ごとにずらす
+                pos[0] += offset[0] * size[0]
+                pos[1] += offset[1] * size[1]
+                pos[2] += offset[2] * size[2]
+                #頂点データに追加
+                vertices["pos"].append(pos)
+
+                indices.append([start+0,start+1])
+                indices.append([start+2,start+3])
+                indices.append([start+0,start+2])
+                indices.append([start+1,start+3])
+
+                indices.append([start+4,start+5])
+                indices.append([start+6,start+7])
+                indices.append([start+4,start+6])
+                indices.append([start+5,start+7])
+
+                indices.append([start+0,start+4])
+                indices.append([start+1,start+5])
+                indices.append([start+2,start+6])
+                indices.append([start+3,start+7])
+
 
         #ビルトインのシェーダーを使用
-        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin("UNIFORM_COLOR")
         #バッチを作成
-        batch = gpu_extras.batch.batch_for_shader(shader, 'LINES', vertices,indices = indices)
+        batch = gpu_extras.batch.batch_for_shader(shader, 'LINES', vertices, indices=indices)
+
+
 
         #シェーダーのパラメータを設定
         color = {0.5, 1.0, 1.0, 1.0}
@@ -225,11 +271,15 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.types.TOPBAR_MT_editor_menus.append(TOPBAR_MT_my_menu.submenu)
+    # 3Dビューに描画関数を追加
+    DrawCollider.handler = bpy.types.SpaceView3D.draw_handler_add(DrawCollider.draw_collider, (), 'WINDOW', 'POST_VIEW')
     print("レベルエディタが有効化されました")
 
 #アドオン無効化時のコールバック
 def unregister():
     bpy.types.TOPBAR_MT_editor_menus.remove(TOPBAR_MT_my_menu.submenu)
+    # 3Dビューから描画関数を削除
+    bpy.types.SpaceView3D.draw_handler_remove(DrawCollider.handler, 'WINDOW')
 
     for cls in classes:
         bpy.utils.unregister_class(cls)
