@@ -11,8 +11,6 @@ public:
         return &instance;
     }
 
-    DepthBasedOutLine() = default;
-    ~DepthBasedOutLine() = default;
 
     void Initialize();
 
@@ -37,4 +35,9 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> inverseMatrixBuffer_ = nullptr;
     Matrix4x4* inverseMatrixData_ = nullptr;
 
+private:
+    DepthBasedOutLine() = default;
+    ~DepthBasedOutLine() = default;
+    DepthBasedOutLine(const DepthBasedOutLine&) = delete;
+    DepthBasedOutLine& operator=(const DepthBasedOutLine&) = delete;
 };
