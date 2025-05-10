@@ -89,6 +89,10 @@ void SampleScene::Initialize()
     DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
 
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
+
+    soundInstance_ = AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
+    voiceInstance_ = soundInstance_->Play(1.0f, true);
+
 }
 
 void SampleScene::Update()
@@ -109,9 +113,15 @@ void SampleScene::Update()
         aModel_->ChangeAnimation("ScaleAnim", 0.5f);
     }
 
-    ImGuiTool::TimeLine("TimeLine", sequence_.get());
+    //ImGuiTool::TimeLine("TimeLine", sequence_.get());
 
-    lights_->ImGui();
+    //lights_->ImGui();
+    static float volume = 1.0f;
+    ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f);
+    if (ImGui::Button("Apply##volme"))
+    {
+        voiceInstance_->SetVolume(volume);
+    }
 
     static bool play = false;
     ImGui::Checkbox("Play", &play);
