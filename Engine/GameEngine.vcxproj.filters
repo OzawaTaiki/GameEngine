@@ -501,6 +501,11 @@
     <ClCompile Include="Features\PostEffects\Dissolve.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\AudioSystem.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\SoundInstance.cpp" />
+    <ClCompile Include="System\Audio\VoiceInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -909,6 +914,15 @@
     </ClInclude>
     <ClInclude Include="Features\PostEffects\Dissolve.h">
       <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SoundInstance.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VoiceInstance.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioSystem.h">
+      <Filter>System\Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
