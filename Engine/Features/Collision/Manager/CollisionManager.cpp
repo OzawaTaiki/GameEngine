@@ -29,7 +29,7 @@ void CollisionManager::Update()
     CheckCollisions();
 
     // 衝突応答を実行
-    ResolveCollisions();
+    //ResolveCollisions();
 
     // 衝突状態を更新
     UpdateCollisionStates();
