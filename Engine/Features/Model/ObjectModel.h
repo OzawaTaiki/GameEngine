@@ -27,7 +27,7 @@ public:
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
-    const WorldTransform* GetWorldTransform() { return &worldTransform_; }
+    WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
     uint32_t GetVertexSrvIndex() { return model_->GetVertexSrvIndex(); }
 

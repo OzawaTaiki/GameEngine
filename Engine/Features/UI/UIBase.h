@@ -39,6 +39,10 @@ public:
     float GetRotate() const { return rotate_; }
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
 
+    void SetUVTranslate(const Vector2& _uvTranslate) { sprite_->uvTranslate_ = _uvTranslate; }
+    void SetUVScale(const Vector2& _uvScale) { sprite_->uvScale_ = _uvScale; }
+    void SetUVRotate(float _uvRotate) { sprite_->uvRotate_ = _uvRotate; }
+
     uint32_t GetTextureHandle() const { return textureHandle_; }
     void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle;  }
 
