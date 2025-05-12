@@ -143,10 +143,10 @@ public:
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
 
     // ワールドトランスフォームを設定する
-    void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
+    void SetWorldTransform(WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
     // ワールドトランスフォームを取得する
-    const WorldTransform* GetWorldTransform();
+    WorldTransform* GetWorldTransform();
 
     // コライダーのオフセットを設定する
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
@@ -197,7 +197,7 @@ private:
     bool isStatic_ = false; // 静的かどうか 動かない物体
     CollisionLayer collisionLayer_; // 衝突判定の属性
     BoundingBox boundingBox_ = BoundingBox::NONE; // 衝突判定の形状
-    const WorldTransform* worldTransform_ = nullptr; // ワールド行列
+    WorldTransform* worldTransform_ = nullptr; // ワールド行列
 
     // 衝突状態の記録
     std::unordered_map<Collider*, CollisionData> collisionMap_;

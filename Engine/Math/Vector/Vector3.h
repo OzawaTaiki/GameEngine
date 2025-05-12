@@ -13,19 +13,19 @@ struct Vector3
 
 	// コンストラクタ
 
-	inline Vector3()									:x(), y(), z() {};
+	Vector3()									:x(), y(), z() {};
     // 3つの値が同じ場合
-	inline Vector3(float _xyz)							:x(_xyz), y(_xyz), z(_xyz) {};
+	Vector3(float _xyz)							:x(_xyz), y(_xyz), z(_xyz) {};
     // 3つの値が異なる場合
-	inline Vector3(float _f0, float _f1, float _f2)		:x(_f0), y(_f1), z(_f2) {};
+	Vector3(float _f0, float _f1, float _f2)		:x(_f0), y(_f1), z(_f2) {};
     // 配列からの初期化
-    inline Vector3(const float arr[3])					:x(arr[0]), y(arr[1]), z(arr[2]) {};
+    Vector3(const float arr[3])					:x(arr[0]), y(arr[1]), z(arr[2]) {};
     // 2次元ベクトルからの初期化
-    inline Vector3(const Vector2& _v)					:x(_v.x), y(_v.y), z(0.0f) {};
+    Vector3(const Vector2& _v)					:x(_v.x), y(_v.y), z(0.0f) {};
     // 2次元ベクトルと1つの値からの初期化
-	inline Vector3(const Vector2& _v, float _f)			:x(_v.x), y(_v.y), z(_f) {};
+	Vector3(const Vector2& _v, float _f)			:x(_v.x), y(_v.y), z(_f) {};
     // コピーコンストラクタ
-    inline Vector3(const Vector3& _v)					:x(_v.x), y(_v.y), z(_v.z) {};
+    Vector3(const Vector3& _v)					:x(_v.x), y(_v.y), z(_v.z) {};
 
 
     // メンバ関数

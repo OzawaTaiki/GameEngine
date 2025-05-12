@@ -65,7 +65,7 @@ CollisionState Collider::GetCollisionState(Collider* _other) const
     return CollisionState::None; // 衝突なし
 }
 
-const WorldTransform* Collider::GetWorldTransform()
+WorldTransform* Collider::GetWorldTransform()
 {
     if (worldTransform_ == nullptr)
     {
