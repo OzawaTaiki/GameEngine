@@ -32,7 +32,7 @@ void CollisionManager::Update()
     //ResolveCollisions();
 
     // 衝突状態を更新
-    UpdateCollisionStates();
+    //UpdateCollisionStates();
 
     // デバッグ描画が有効なら描画
     if (isDrawEnabled_)
@@ -99,13 +99,19 @@ void CollisionManager::CheckCollisions()
                 pair.info = info;
                 collisionPairs_.push_back(pair);
 
-                // 各コライダーに現在の衝突を記録
-                colliderA->AddCurrentCollision(colliderB, info);
+                colliderA->OnCollision(colliderB, info);
+
 
                 // 衝突情報を反転して相手側にも記録
                 ColliderInfo reversedInfo = info;
                 reversedInfo.contactNormal = -info.contactNormal;
+                colliderB->OnCollision(colliderA, reversedInfo);
+
+                // 各コライダーに現在の衝突を記録
+                colliderA->AddCurrentCollision(colliderB, info);
                 colliderB->AddCurrentCollision(colliderA, reversedInfo);
+
+
             }
         }
     }
