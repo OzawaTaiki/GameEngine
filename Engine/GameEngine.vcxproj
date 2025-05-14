@@ -192,6 +192,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Model\Primitive\Plane.cpp" />
     <ClCompile Include="Features\Model\Primitive\Ring.cpp" />
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp" />
+    <ClCompile Include="Features\Model\SkyBox.cpp" />
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
@@ -297,6 +298,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Model\Primitive\Primitive.h" />
     <ClInclude Include="Features\Model\Primitive\Ring.h" />
     <ClInclude Include="Features\Model\Primitive\Triangle.h" />
+    <ClInclude Include="Features\Model\SkyBox.h" />
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
@@ -441,6 +443,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

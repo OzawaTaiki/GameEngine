@@ -76,7 +76,15 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 
 	textures_[index].srvIndex = srvIndex;
 
-	srvManager_->CreateSRVForTextrue2D(srvIndex, textures_[index].resource.Get(), metadata.format, UINT(metadata.mipLevels));
+    std::string ext = _filepath.substr(_filepath.find_last_of(".") + 1);
+	if (ext == "dds")
+    {
+        srvManager_->CreateSRVForCubeMap(srvIndex, textures_[index].resource.Get(), metadata.format);
+    }
+    else
+    {
+        srvManager_->CreateSRVForTextrue2D(srvIndex, textures_[index].resource.Get(), metadata.format, UINT(metadata.mipLevels));
+    }
 
 	//dxCommon_->GetDevice()->CreateShaderResourceView(, &srvDesc, srvManager_->GetCPUSRVDescriptorHandle(index));
 
@@ -97,9 +105,19 @@ std::optional<uint32_t>  TextureManager::IsTextureLoaded(const std::string& _fil
 
 DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 {
-	DirectX::ScratchImage image{};
+	DirectX::ScratchImage image{}
+	;
 	std::wstring filePathw = ConvertString(_filepath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+    HRESULT hr = S_FALSE;
+	if (filePathw.ends_with(L".dds"))
+	{
+        hr = DirectX::LoadFromDDSFile(filePathw.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, nullptr, image);
+	}
+	else
+	{
+		hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	}
+
 	assert(SUCCEEDED(hr));
 
     auto metadata = image.GetMetadata();
@@ -107,10 +125,17 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
     {
 		return image;
     }
-
+	
 	//ミップマップの生成
 	DirectX::ScratchImage mipImage{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImage);
+	if (DirectX::IsCompressed(image.GetMetadata().format))
+	{
+		mipImage = std::move(image);
+	}
+	else 
+	{
+		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 4, mipImage);
+	}
 	assert(SUCCEEDED(hr));
 
 	//ミップマップ付きのデータを返す

@@ -22,6 +22,7 @@ enum class PSOFlags
     Type_OffScreen          = 1 << 4,
     Type_DLShadowMap        = 1 << 5,
     Type_PLShadowMap        = 1 << 6,
+    Type_SkyBox             = 1 << 7,
 
     Blend_Normal			= 1 << 11,
     Blend_Add				= 1 << 12,
@@ -91,6 +92,7 @@ constexpr PSOFlags TypeMask =
 PSOFlags::Type_Model |
 PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
 | PSOFlags::Type_OffScreen | PSOFlags::Type_DLShadowMap | PSOFlags::Type_PLShadowMap
+| PSOFlags::Type_SkyBox
 ;
 constexpr PSOFlags BlendMask =
 PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
@@ -142,6 +144,8 @@ public:
 
     void RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso);
     void RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs);
+
+    void CreatePSOForSkyBox();
 
 private:
 
