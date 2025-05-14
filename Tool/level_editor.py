@@ -7,6 +7,7 @@ import copy
 import mathutils
 import json
 
+
 bl_info = {
     "name": "レベルエディタ",
     "author": "Taiki Ozawa",
