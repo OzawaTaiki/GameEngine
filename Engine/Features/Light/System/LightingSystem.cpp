@@ -31,7 +31,7 @@ void LightingSystem::Initialize()
     *shadowSpotLightData_ = {}; // 0で初期化
 
     // シャドウマップのサイズを設定
-    shadowMapSize_ = 1024;
+    shadowMapSize_ = 256;
     if (LightGroup::GetShadowMapSize() != shadowMapSize_) {
         LightGroup::SetShadowMapSize(shadowMapSize_);
     }

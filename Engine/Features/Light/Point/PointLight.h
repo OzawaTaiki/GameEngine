@@ -16,7 +16,10 @@ struct PointLight
     float radius = 5.0f;              // ライトの影響半径
     float decay = 0.5f;               // 減衰率
     uint32_t isHalf = 1;              // ハーフランバートを使うか
-    uint32_t castShadow = 1;          // シャドウマップを生成するか
+    uint32_t castShadow = 1;            // シャドウマップを生成するか
+
+    float shadowFactor = 0.2f;          // 影の濃さ 1.0f = 影なし
+    float pad[3];
 
     Matrix4x4 viewProjection[6];      // シャドウマップのビュー射影行列（キューブマップの6面）
 };
@@ -40,6 +43,7 @@ public:
     void SetDecay(float decay) { data_.decay = decay; }
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
+    void SetShadowFactor(float shadowFactor) { data_.shadowFactor = shadowFactor; }
 
     void UpdateViewProjections(uint32_t shadowMapSize);
 

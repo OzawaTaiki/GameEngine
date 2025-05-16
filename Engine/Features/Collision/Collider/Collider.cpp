@@ -30,7 +30,7 @@ Collider::~Collider()
 
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
 {
-    // 衝突コールバックを実行（状態はColliderInfo内で提供）
+    // 従来のコールバック（あれば）
     if (fOnCollision_) {
         fOnCollision_(_other, _info);
     }
@@ -65,7 +65,7 @@ CollisionState Collider::GetCollisionState(Collider* _other) const
     return CollisionState::None; // 衝突なし
 }
 
-const WorldTransform* Collider::GetWorldTransform()
+WorldTransform* Collider::GetWorldTransform()
 {
     if (worldTransform_ == nullptr)
     {
@@ -164,22 +164,22 @@ void Collider::UpdateCollisionState()
         if (data.isColliding && !data.wasColliding) {
             // 衝突開始
             info.state = CollisionState::Enter;
-            if (fOnCollision_) {
-                fOnCollision_(other, info);
+            if (fOnCollisionEnter_) {
+                fOnCollisionEnter_(other, info);
             }
         }
         else if (data.isColliding && data.wasColliding) {
             // 衝突中
             info.state = CollisionState::Stay;
-            if (fOnCollision_) {
-                fOnCollision_(other, info);
+            if (fOnCollisionStay_) {
+                fOnCollisionStay_(other, info);
             }
         }
         else if (!data.isColliding && data.wasColliding) {
             // 衝突終了
             info.state = CollisionState::Exit;
-            if (fOnCollision_) {
-                fOnCollision_(other, info);
+            if (fOnCollisionExit_) {
+                fOnCollisionExit_(other, info);
             }
         }
 

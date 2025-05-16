@@ -46,10 +46,15 @@ public:
     uint32_t GetSRVindexofRTV() const { return srvIndexofRTV_; }
     uint32_t GetSRVindexofDSV() const { return srvIndexofDSV_; }
 
+    D3D12_RESOURCE_STATES GetRTVCurrentState() const { return RTVCurrentState_; }
+    D3D12_RESOURCE_STATES GetDSVCurrentState() const { return DSVCurrentState_; }
+
     void Draw();
 
     ID3D12Resource* GetRTVResource() const { return renderTextureResource_.Get(); }
     ID3D12Resource* GetDSVResource() const { return dsvResource_; }
+
+
 
     void Clear(ID3D12GraphicsCommandList* _cmdList);
 

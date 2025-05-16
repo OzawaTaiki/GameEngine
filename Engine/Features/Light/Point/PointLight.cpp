@@ -13,6 +13,7 @@ PointLightComponent::PointLightComponent()
     data_.decay = 0.5f;
     data_.isHalf = 1;
     data_.castShadow = 1;
+    data_.shadowFactor = 0.2f;
 }
 
 void PointLightComponent::Update()
@@ -38,15 +39,15 @@ void PointLightComponent::CreateShadowMaps(uint32_t shadowMapSize)
     // 6面分のシャドウマップを作成
     std::string mapName = name_ + "_ShadowMap";
 
-    uint32_t handle = 0;
-        /*RTVManager::GetInstance()->CreateCubemapRenderTarget(
-        mapName,
-        shadowMapSize,
-        shadowMapSize,
-        DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        true
-    );*/
+    uint32_t handle =
+        RTVManager::GetInstance()->CreateCubemapRenderTarget(
+            mapName,
+            shadowMapSize,
+            shadowMapSize,
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+            { 1.0f, 1.0f, 1.0f, 1.0f },
+            true
+        );
 
     shadowMapHandles_.push_back(handle);
 

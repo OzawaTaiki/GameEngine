@@ -8,7 +8,7 @@ void UISprite::Initialize(const std::string& _label)
 void UISprite::Update()
 {
 #ifdef _DEBUG
-    UIBase::ImGui();
+    //UIBase::ImGui();
 #endif // _DEBUG
 }
 

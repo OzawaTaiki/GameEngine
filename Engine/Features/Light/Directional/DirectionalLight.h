@@ -13,7 +13,8 @@ struct DirectionalLight
 
     uint32_t isHalf = 1;            // ハーフランバートを使うか
     uint32_t castShadow = 1;        // シャドウマップを生成するか
-    float pad[2] = {};
+    float shadowFactor = 0.2f;        // 影の濃さ 1.0f = 影なし
+    float pad;
 };
 
 class DirectionalLightComponent : public Light
@@ -35,6 +36,7 @@ public:
     void SetIntensity(float intensity) { data_.intensity = intensity; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
+    void SetShadowFactor(float shadowFactor) { data_.shadowFactor = shadowFactor; }
 
 
     void UpdateViewProjection(uint32_t shadowMapSize);

@@ -58,6 +58,15 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 {
     objectColor_->SetColor(_color);
 
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+
+    auto pointLights = lightGroup->GetAllPointLights();
+    if (!pointLights.empty())
+    {
+        auto handles = pointLights[0]->GetShadowMapHandles();
+        uint32_t handle = handles[0];
+        RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+    }
 
     RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -71,6 +80,16 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
 {
     objectColor_->SetColor(_color);
+
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+
+    auto pointLights = lightGroup->GetAllPointLights();
+    if (!pointLights.empty())
+    {
+        auto handles = pointLights[0]->GetShadowMapHandles();
+        uint32_t handle = handles[0];
+        RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+    }
 
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -118,28 +137,28 @@ void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
 
     auto pointLights = lightGroup->GetAllPointLights();
 
-    /*PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
-    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
 
     for (auto& pointLight : pointLights)
     {
-        auto handles = pointLight->GetShadowMapHandles();
         if (!pointLight->IsCastShadow())
             continue;
 
-        for (uint32_t i : handles)
-        {
-            RTVManager::GetInstance()->SetCubemapRenderTexture(i);
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
 
-            worldTransform_.QueueCommand(commandList, 0);
-            LightingSystem::GetInstance()->QueuePointLightShadowCommand(commandList, 1, pointLight.get());
-            commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
-            model_->GetMeshPtr()->QueueCommand(commandList);
+        auto handles = pointLight->GetShadowMapHandles();
+        uint32_t handle = handles[0];
 
-            commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
+        RTVManager::GetInstance()->SetCubemapRenderTexture(handle);
 
-        }
-    }*/
+        worldTransform_.QueueCommand(commandList, 0);
+        LightingSystem::GetInstance()->QueuePointLightShadowCommand(commandList, 1, pointLight.get());
+        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
+        model_->GetMeshPtr()->QueueCommand(commandList);//
+
+        commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
+
+    }
 }
 
 void ObjectModel::SetModel(const std::string& _filePath)

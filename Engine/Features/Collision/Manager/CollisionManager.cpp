@@ -29,7 +29,7 @@ void CollisionManager::Update()
     CheckCollisions();
 
     // 衝突応答を実行
-    ResolveCollisions();
+    //ResolveCollisions();
 
     // 衝突状態を更新
     UpdateCollisionStates();
@@ -84,9 +84,9 @@ void CollisionManager::CheckCollisions()
             // 衝突情報
             ColliderInfo info;
 #ifdef _DEBUG
-            //std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
-            //std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
-            //Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+            std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+            std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+            Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
 #endif // _DEBUG
 
             // CollisionDetectorを使用して衝突判定を実行
@@ -99,13 +99,19 @@ void CollisionManager::CheckCollisions()
                 pair.info = info;
                 collisionPairs_.push_back(pair);
 
-                // 各コライダーに現在の衝突を記録
-                colliderA->AddCurrentCollision(colliderB, info);
+                colliderA->OnCollision(colliderB, info);
+
 
                 // 衝突情報を反転して相手側にも記録
                 ColliderInfo reversedInfo = info;
                 reversedInfo.contactNormal = -info.contactNormal;
+                colliderB->OnCollision(colliderA, reversedInfo);
+
+                // 各コライダーに現在の衝突を記録
+                colliderA->AddCurrentCollision(colliderB, info);
                 colliderB->AddCurrentCollision(colliderA, reversedInfo);
+
+
             }
         }
     }
