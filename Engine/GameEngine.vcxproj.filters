@@ -506,6 +506,9 @@
     </ClCompile>
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
+    <ClCompile Include="Features\Model\SkyBox.cpp">
+      <Filter>Features\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -573,6 +576,9 @@
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\Dissolve.hlsl">
       <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
+      <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -923,6 +929,9 @@
     </ClInclude>
     <ClInclude Include="System\Audio\AudioSystem.h">
       <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\SkyBox.h">
+      <Filter>Features\Model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

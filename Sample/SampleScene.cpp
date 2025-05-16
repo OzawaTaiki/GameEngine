@@ -64,7 +64,6 @@ void SampleScene::Initialize()
 
     Cylinder* cylinder = new Cylinder(1.0f, 2.0f,1.0f);
     cylinder->SetDivide(32);
-    cylinder->SetEndAngle(3.14f);
     cylinder->SetLoop(true);
 
     Triangle* triangle = new Triangle();
@@ -79,8 +78,8 @@ void SampleScene::Initialize()
     plane->SetNormal(Vector3(1.0f, 1.0f, 0.0f).Normalize());
 
 
-    test_ = std::make_unique<ObjectModel>("triangle");
-    test_->Initialize(triangle->Generate("triangle"));
+    test_ = std::make_unique<ObjectModel>("Cylinder");
+    test_->Initialize(cylinder->Generate("Cylinder"));
     test_->translate_.y = 1.0f;
 
     //emitter_ = std::make_unique<ParticleEmitter>();
@@ -91,7 +90,11 @@ void SampleScene::Initialize()
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
 
     soundInstance_ = AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
-    voiceInstance_ = soundInstance_->Play(1.0f, true);
+    //voiceInstance_ = soundInstance_->Play(1.0f, true);
+
+    skyBox_ = std::make_unique<SkyBox>();
+    skyBox_->Initialize(30.0f);
+    skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
 }
 
@@ -115,7 +118,7 @@ void SampleScene::Update()
 
     //ImGuiTool::TimeLine("TimeLine", sequence_.get());
 
-    //lights_->ImGui();
+    lights_->ImGui();
     static float volume = 1.0f;
     ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f);
     if (ImGui::Button("Apply##volme"))
@@ -167,17 +170,22 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
+    skyBox_->Draw(&SceneCamera_);
+
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
-    oModel_->Draw(&SceneCamera_, testColor_);
-    //oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
-    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+    skyBox_->QueueCmdCubeTexture();
 
-    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //oModel_->Draw(&SceneCamera_, testColor_);
+    oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
+    //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
-    test_->Draw(&SceneCamera_, 2, { 1,1,1,1 });
-    Sprite::PreDraw();
-    sprite_->Draw();
+    ////aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+
+    //test_->Draw(&SceneCamera_, 0, { 1,1,1,1 });
+
+    //Sprite::PreDraw();
+    //sprite_->Draw();
 
 
     //button_->Draw();

@@ -34,6 +34,7 @@ void PSOManager::Initialize()
     CreatePSOForOffScreen       ();
     CreatePSOForDLShadowMap();
     CreatePSOForPLShadowMap();
+    //CreatePSOForSkyBox();
 
 }
 
@@ -360,6 +361,154 @@ void PSOManager::RegisterRootSignature(const std::string& _name, ID3D12RootSigna
     regiterRootSignature_[_name] = _rs;
 }
 
+void PSOManager::CreatePSOForSkyBox()
+{
+
+    HRESULT hr = S_FALSE;
+
+#pragma region Sampler
+    //Samplerの設定
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
+    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
+    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
+    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
+    staticSamplers[0].ShaderRegister = 0;
+    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+
+
+#pragma endregion
+
+#pragma region RootSignature
+
+    /// RootSignatrueを生成する
+    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    //descriptorRange
+    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+    descriptorRange[0].BaseShaderRegister = 0;
+    descriptorRange[0].NumDescriptors = 1;//数は１つ
+    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
+
+    //RootParameter作成
+    D3D12_ROOT_PARAMETER rootParameters[4] = {};
+
+    // transform
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[0].Descriptor.ShaderRegister = 0;
+
+    // camera
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[1].Descriptor.ShaderRegister = 1;
+
+    // color
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[2].Descriptor.ShaderRegister = 2;
+
+    // テクスチャ
+    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[3].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+    rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+
+
+    descriptionRootSignature.pParameters = rootParameters;
+    descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
+
+    descriptionRootSignature.pStaticSamplers = staticSamplers;
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+
+    size_t type = static_cast<size_t>(PSOFlags::Type_SkyBox);
+
+    //シリアライズしてバイナリする
+    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    if (FAILED(hr))
+    {
+        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        assert(false);
+    }
+    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
+    assert(SUCCEEDED(hr));
+
+#pragma endregion
+
+#pragma region DepthStencilState
+    //DepthStencilStateの設定
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    //Depthの機能を有効にする
+    depthStencilDesc.DepthEnable = true;
+    //書き込みします
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    //比較関数はLessEqeul つまり近ければ描画される
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+#pragma endregion
+
+
+#pragma region Shader
+    /// shaderをコンパイルする
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"SkyBox.hlsl", L"vs_6_0",L"VSmain");
+    assert(vertexShaderBlob != nullptr);
+    Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"SkyBox.hlsl", L"ps_6_0", L"PSmain");
+    assert(pixelShaderBlob != nullptr);
+#pragma endregion
+
+#pragma region BlendState
+    /// BlendStateの設定
+    D3D12_BLEND_DESC blendDesc{};
+    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+#pragma endregion
+
+#pragma region RasterizerState
+
+    /// RasterizerStateの設定
+    D3D12_RASTERIZER_DESC rasterizerDesc{};
+    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_Back);
+
+    //三角形を塗りつぶす
+    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+#pragma endregion
+
+    // PSOを生成する
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                         // RootSignature
+    graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
+    graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
+    graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                                     // RasterizerState
+    // 追加の DRTV の情報
+    graphicsPipelineStateDesc.NumRenderTargets = 1;
+    graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+    graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
+    graphicsPipelineStateDesc.SampleDesc.Count = 1;
+    graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+    graphicsPipelineStateDesc.BlendState = blendDesc;
+
+
+    // PSOを生成
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
+    assert(SUCCEEDED(hr));
+
+    PSOFlags flag = PSOFlags::Type_SkyBox | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
+
+    graphicsPipelineStates_[static_cast<size_t>(flag)] = pipelineState;
+}
+
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
@@ -420,15 +569,21 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
     D3D12_DESCRIPTOR_RANGE shadowMapRange[1] = {};
     shadowMapRange[0].BaseShaderRegister = 1;  // t1 にバインド
-    shadowMapRange[0].NumDescriptors = 1; // PointLightの最大数
+    shadowMapRange[0].NumDescriptors = 1; 
     shadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     shadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    D3D12_DESCRIPTOR_RANGE PLShadowMapRange[1] = {};
-    PLShadowMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
-    PLShadowMapRange[0].NumDescriptors = 32 * 6;
-    PLShadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    PLShadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    D3D12_DESCRIPTOR_RANGE enviromentMapRange[1] = {};
+    enviromentMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
+    enviromentMapRange[0].NumDescriptors = 1; 
+    enviromentMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    enviromentMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    //D3D12_DESCRIPTOR_RANGE PLShadowMapRange[1] = {};
+    //PLShadowMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
+    //PLShadowMapRange[0].NumDescriptors = 32 * 6;
+    //PLShadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    //PLShadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 
     //RootParameter作成
@@ -472,10 +627,18 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     rootParameters[6].DescriptorTable.NumDescriptorRanges = _countof(shadowMapRange);
 
     // PLシャドウマップ
-    rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+   /* rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[7].DescriptorTable.pDescriptorRanges = PLShadowMapRange;
-    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(PLShadowMapRange);
+    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(PLShadowMapRange);*/
+
+    // 環境マップ用のテクスチャ
+    rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[7].DescriptorTable.pDescriptorRanges = enviromentMapRange;
+    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(enviromentMapRange);
+
+    
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -1601,6 +1764,10 @@ size_t PSOManager::GetType(PSOFlags _flag)
     else if (HasFlag(_flag, PSOFlags::Type_PLShadowMap))
     {
         return static_cast<size_t>(PSOFlags::Type_PLShadowMap);
+    }
+    else if (HasFlag(_flag, PSOFlags::Type_SkyBox))
+    {
+        return static_cast<size_t>(PSOFlags::Type_SkyBox);
     }
 
 
