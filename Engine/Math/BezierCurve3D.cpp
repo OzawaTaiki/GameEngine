@@ -273,6 +273,7 @@ std::vector<Vector3> BezierCurve3D::GenerateCurvePoints() const
 
     // 計算結果をキャッシュに保存
     cachedPoints_ = points;
+    isCacheValid_ = true;
 
     return points;
 }
@@ -396,6 +397,7 @@ std::vector<Vector3> BezierCurve3D::GenerateEquallySpacedPoints(int _numPoints) 
 
     // 計算結果をキャッシュに保存
     cachedEquallySpacedPoints_ = equallySpacedPoints;
+    isCacheValid_ = true;
 
     return equallySpacedPoints;
 }
@@ -542,6 +544,7 @@ std::vector<float> BezierCurve3D::GenerateEquallySpacedTValues(int _numPoints) c
 
     // 計算結果をキャッシュに保存
     cachedEquallySpacedTValues_ = tValues;
+    isCacheValid_ = true;
 
     return tValues;
 }
