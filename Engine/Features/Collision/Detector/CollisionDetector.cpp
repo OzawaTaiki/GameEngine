@@ -483,8 +483,13 @@ bool CollisionDetector::IntersectOBBOBB(OBBCollider* _obb1, OBBCollider* _obb2, 
     _info.contactNormal = bestAxis;
     _info.penetration = minOverlap;
 
-    // 衝突点を近似的に求める（OBB1とOBB2の中間点）
-    _info.contactPoint = center1 + T * 0.5f;
+
+    // OBB同士の最近接点を計算して衝突点とする
+    Vector3 closestPoint1 = _obb1->GetClosestPoint(center2);
+    Vector3 closestPoint2 = _obb2->GetClosestPoint(center1);
+
+    // 2つの最近接点の中点を衝突点として使用
+    _info.contactPoint = (closestPoint1 + closestPoint2) * 0.5f;
 
     return true;
 }

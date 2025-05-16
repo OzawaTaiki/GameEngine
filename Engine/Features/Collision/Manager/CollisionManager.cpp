@@ -32,7 +32,7 @@ void CollisionManager::Update()
     //ResolveCollisions();
 
     // 衝突状態を更新
-    //UpdateCollisionStates();
+    UpdateCollisionStates();
 
     // デバッグ描画が有効なら描画
     if (isDrawEnabled_)
@@ -84,9 +84,9 @@ void CollisionManager::CheckCollisions()
             // 衝突情報
             ColliderInfo info;
 #ifdef _DEBUG
-            //std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
-            //std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
-            //Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+            std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+            std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+            Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
 #endif // _DEBUG
 
             // CollisionDetectorを使用して衝突判定を実行

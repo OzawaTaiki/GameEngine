@@ -109,11 +109,15 @@ public:
     // ファイルに保存
     virtual void Save(const std::string& _name) = 0;
 
+    using CollisionCallBack = std::function<void(Collider*, const ColliderInfo&)>;
+
     // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
-    void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
-    {
-        fOnCollision_ = _callback;
-    }
+    void SetOnCollisionCallback(const CollisionCallBack& _callback) { fOnCollision_ = _callback; }
+
+    // トリガーコールバック設定
+    void SetOnTriggerEnterCallback(const CollisionCallBack& _callback) { fOnCollisionEnter_ = _callback; }
+    void SetOnTriggerStayCallback(const CollisionCallBack& _callback) { fOnCollisionStay_ = _callback; }
+    void SetOnTriggerExitCallback(const CollisionCallBack& _callback) { fOnCollisionExit_ = _callback; }
 
     // 自身のlayerを取得する
     uint32_t GetLayer() const { return collisionLayer_.GetLayer(); }
@@ -206,7 +210,11 @@ private:
     std::vector<Collider*> currentCollisions_;
 
     // 衝突コールバック関数
-    std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
+    CollisionCallBack fOnCollision_;
+
+    CollisionCallBack fOnCollisionEnter_; // トリガー衝突時
+    CollisionCallBack fOnCollisionStay_; // トリガー衝突中
+    CollisionCallBack fOnCollisionExit_;// トリガー衝突離脱時
 
     WorldTransform defaultTransform_;
 
