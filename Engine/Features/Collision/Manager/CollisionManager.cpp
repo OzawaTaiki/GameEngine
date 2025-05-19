@@ -3,7 +3,6 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <Features/Collision/CollisionLayer/CollisionLayerManager.h>
 #include <algorithm>
-#include <future>
 
 CollisionManager* CollisionManager::GetInstance()
 {
@@ -63,108 +62,59 @@ void CollisionManager::RegisterCollider(Collider* _collider)
 
 void CollisionManager::CheckCollisions()
 {
-    // 結果バッファをクリア
-    threadCollisionResults_.clear();
-    collisionPairs_.clear();
+    // ブロードフェーズの更新（空間分割等の最適化）
+    UpdateBroadPhase();
 
-    // 処理する衝突ペアの総数を計算
-    size_t totalColliders = colliders_.size();
-    size_t totalPairs = totalColliders * (totalColliders - 1) / 2; // 組み合わせの総数
-
-    if (totalPairs == 0) return;
-
-    // スレッドあたりの処理数を計算（最低でも100ペアを確保）
-    size_t pairsPerThread = (std::max)(totalPairs / threadCount_, size_t(100));
-
-    // 各スレッドの処理を非同期で実行
-    std::vector<std::future<void>> futures;
-
-    for (size_t startIdx = 0; startIdx < totalPairs; startIdx += pairsPerThread)
+    // 全てのコライダー同士の組み合わせで衝突判定を実行
+    for (size_t i = 0; i < colliders_.size(); ++i)
     {
-        size_t endIdx = (std::min)(startIdx + pairsPerThread, totalPairs);
+        Collider* colliderA = colliders_[i];
 
-        futures.push_back(std::async(std::launch::async, [this, startIdx, endIdx, totalColliders]() {
-            // ローカル結果バッファ
-            std::vector<CollisionPair> localResults;
+        for (size_t j = i + 1; j < colliders_.size(); ++j)
+        {
+            Collider* colliderB = colliders_[j];
 
-            // 範囲内のペアインデックスを処理
-            for (size_t pairIdx = startIdx; pairIdx < endIdx; ++pairIdx)
+            // レイヤーマスクでフィルタリング
+            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
             {
-                // インデックスから実際のi, jを逆算（三角数の逆計算）
-                size_t i, j;
-                CalculateIndicesFromPairIndex(pairIdx, totalColliders, i, j);
-
-                if (i >= colliders_.size() || j >= colliders_.size() || i == j)
-                    continue;
-
-                Collider* a = colliders_[i];
-                Collider* b = colliders_[j];
-
-                // レイヤーマスクによるフィルタリング
-                if ((a->GetLayer() & b->GetLayerMask()) != 0 ||
-                    (b->GetLayer() & a->GetLayerMask()) != 0)
-                {
-                    continue;
-                }
-
-                // 詳細な衝突判定
-                ColliderInfo info;
-                if (CollisionDetector::DetectCollision(a, b, info))
-                {
-                    // 衝突情報を記録
-                    CollisionPair pair;
-                    pair.colliderA = a;
-                    pair.colliderB = b;
-                    pair.info = info;
-                    localResults.push_back(pair);
-                }
+                continue; // 衝突しないように設定されている
             }
 
-            // ローカル結果をグローバル結果にマージ
-            if (!localResults.empty())
+            // 衝突情報
+            ColliderInfo info;
+#ifdef _DEBUG
+            std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+            std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+            Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+#endif // _DEBUG
+
+            // CollisionDetectorを使用して衝突判定を実行
+            if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
             {
-                std::lock_guard<std::mutex> lock(collisionResultsMutex_);
-                threadCollisionResults_.insert(
-                    threadCollisionResults_.end(),
-                    localResults.begin(),
-                    localResults.end()
-                );
+                // 衝突情報を保存
+                CollisionPair pair;
+                pair.colliderA = colliderA;
+                pair.colliderB = colliderB;
+                pair.info = info;
+                collisionPairs_.push_back(pair);
+
+                colliderA->OnCollision(colliderB, info);
+
+
+                // 衝突情報を反転して相手側にも記録
+                ColliderInfo reversedInfo = info;
+                reversedInfo.contactNormal = -info.contactNormal;
+                colliderB->OnCollision(colliderA, reversedInfo);
+
+                // 各コライダーに現在の衝突を記録
+                colliderA->AddCurrentCollision(colliderB, info);
+                colliderB->AddCurrentCollision(colliderA, reversedInfo);
+
+
             }
-            }));
+        }
     }
-
-    // すべてのスレッドの完了を待機
-    for (auto& future : futures)
-    {
-        future.wait();
-    }
-
-    // 結果を確定
-    collisionPairs_ = std::move(threadCollisionResults_);
-
-    // 衝突通知を実行
-    for (const auto& pair : collisionPairs_)
-    {
-        // 各コライダーに衝突を通知
-        pair.colliderA->OnCollision(pair.colliderB, pair.info);
-
-        ColliderInfo reversedInfo = pair.info;
-        reversedInfo.contactNormal = -pair.info.contactNormal;
-        pair.colliderB->OnCollision(pair.colliderA, reversedInfo);
-
-        // 現在の衝突を記録
-        pair.colliderA->AddCurrentCollision(pair.colliderB, pair.info);
-        pair.colliderB->AddCurrentCollision(pair.colliderA, reversedInfo);
-    }
-}
-
-
-// ペアインデックスからi, jを計算する補助関数
-void CollisionManager::CalculateIndicesFromPairIndex(size_t pairIdx, size_t n, size_t& i, size_t& j)
-{
-    // 三角数列の逆算（二次方程式を解く）
-    i = n - 2 - std::floor(std::sqrt(-8 * pairIdx + 4 * n * (n - 1) - 7) / 2.0 - 0.5);
-    j = pairIdx + i + 1 - n * (n - 1) / 2 + (n - i) * ((n - i) - 1) / 2;
 }
 
 void CollisionManager::ResolveCollisions()

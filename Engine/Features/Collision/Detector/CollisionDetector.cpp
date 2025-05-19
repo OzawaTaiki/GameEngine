@@ -27,20 +27,21 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
             _info
         );
     }
-    // AABB vs AABB
-    else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::AABB_3D)
-    {
-        return IntersectAABBAABB(
-            static_cast<AABBCollider*>(_colliderA),
-            static_cast<AABBCollider*>(_colliderB),
-            _info
-        );
-    }
     else if (CheckBoundingSpheres(_colliderA, _colliderB, 1.00f))
     {
 
+        // AABB vs AABB
+        if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::AABB_3D)
+        {
+            return IntersectAABBAABB(
+                static_cast<AABBCollider*>(_colliderA),
+                static_cast<AABBCollider*>(_colliderB),
+                _info
+            );
+        }
+
         // OBB vs OBB
-        if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::OBB_3D)
+        else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::OBB_3D)
         {
             return IntersectOBBOBB(
                 static_cast<OBBCollider*>(_colliderA),
@@ -226,10 +227,6 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
 
             return result;
         }
-    }
-    else
-    {
-        Debug::Log("\tSkip");
     }
 
     // サポートされていない組み合わせ

@@ -9,9 +9,6 @@ public:
     // 各コライダー同士の衝突判定
     static bool DetectCollision(Collider* _colliderA, Collider* _colliderB, ColliderInfo& _info);
 
-    // 球の半径を取得
-    static float GetBoundingSphereRadius(Collider* _collider);
-
 private:
     // 球と球の衝突判定
     static bool IntersectSphereSphere(SphereCollider* _sphere1, SphereCollider* _sphere2, ColliderInfo& _info);
@@ -51,5 +48,8 @@ private:
 
     static bool CheckBoundingSpheres(Collider* _colliderA, Collider* _colliderB, float expansionFactor);
 
+
+    // 球の半径を取得
+    static float GetBoundingSphereRadius(Collider* _collider);
 
 };
