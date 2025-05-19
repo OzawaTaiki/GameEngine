@@ -52,6 +52,8 @@ public:
     float CalculateTotalLength() const;
     float CalculateTotalLength(const std::vector<Vector3>& _points) const;
 
+    void SetWorldPosition(const Vector3& _position) { worldPosition_ = _position; InvalidateCache(); }
+
     // 等間隔の点を生成
     std::vector<Vector3> GenerateEquallySpacedPoints(int _numPoints = 50) const;
 
@@ -75,6 +77,9 @@ public:
 private:
     // 制御点
     std::vector<Vector3> controlPoints_;
+
+    // ワールド空間での位置
+    Vector3 worldPosition_;
 
     // 曲線の解像度（分割数）
     int resolution_;
