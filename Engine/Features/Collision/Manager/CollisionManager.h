@@ -5,6 +5,8 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <thread>
+#include <mutex>
 
 // 衝突判定の管理を行うクラス
 class CollisionManager
@@ -54,7 +56,7 @@ private:
 
     // 空間分割などの最適化のためのユーティリティ
     void UpdateBroadPhase();
-
+    void CalculateIndicesFromPairIndex(size_t pairIdx, size_t n, size_t& i, size_t& j);
 private:
     // コライダーのリスト
     std::vector<Collider*> colliders_;
@@ -67,6 +69,16 @@ private:
 
     // 空間分割のためのグリッド（将来的な拡張のために用意）
     // std::unordered_map<int, std::vector<Collider*>> grid_;
+
+    // スレッド数（CPUコア数-1が一般的）
+    int threadCount_ = std::thread::hardware_concurrency() - 1;
+
+    // 衝突結果保護用ミューテックス
+    std::mutex collisionResultsMutex_;
+
+    // マルチスレッド用一時保存バッファ
+    std::vector<CollisionPair> threadCollisionResults_;
+
 
 private:
     // コンストラクタ

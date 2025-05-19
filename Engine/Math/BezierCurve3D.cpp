@@ -6,7 +6,7 @@
 // デフォルトコンストラクタ
 BezierCurve3D::BezierCurve3D(const std::string& _name)
     : resolution_(100)  // デフォルトの解像度を100に設定
-    , isCacheValid_(false)
+    , isCacheValid_(true)
 {
     name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {
         ImGui();
@@ -17,7 +17,7 @@ BezierCurve3D::BezierCurve3D(const std::string& _name)
 BezierCurve3D::BezierCurve3D(const std::string& _name,const std::vector<Vector3>& _controlPoints)
     : controlPoints_(_controlPoints)
     , resolution_(100)  // デフォルトの解像度を100に設定
-    , isCacheValid_(false)
+    , isCacheValid_(true)
 {
     name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {
         ImGui();
