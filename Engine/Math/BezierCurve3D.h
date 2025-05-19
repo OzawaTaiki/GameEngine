@@ -23,6 +23,15 @@ public:
     void Draw(const Vector4& _color = { 1.0f, 0.0f, 0.0f, 1.0f }) const;
     void DrawWithControlPoints(const Vector4& _curveColor = { 1.0f, 0.0f, 0.0f, 1.0f },
         const Vector4& _controlPointColor = { 0.0f, 0.0f, 1.0f, 1.0f }) const;
+    // 動作確認用 十字がライン上を動く
+    void DrawMovingCross(float _progress, float _crossSize = 0.4f, const Vector4& _color = { 1.0f, 1.0f, 0.0f, 1.0f }) const;
+
+
+    void Draw(const Vector3& _worldPos, const Vector4& _color = { 1.0f, 0.0f, 0.0f, 1.0f }) const;
+    void DrawWithControlPoints(const Vector3& _worldPos, const Vector4& _curveColor = { 1.0f, 0.0f, 0.0f, 1.0f },
+        const Vector4& _controlPointColor = { 0.0f, 0.0f, 1.0f, 1.0f }) const;
+    // 動作確認用 十字がライン上を動く
+    void DrawMovingCross(const Vector3& _worldPos, float _progress, float _crossSize = 0.4f, const Vector4& _color = { 1.0f, 1.0f, 0.0f, 1.0f }) const;
 
     void Load(const std::string& _filePath = "Resources/data/Bezier/");
 
@@ -71,8 +80,6 @@ public:
     // キャッシュを無効化
     void InvalidateCache();
 
-    // 動作確認用 十字がライン上を動く
-    void DrawMovingCross(float _progress, float _crossSize = 0.4f, const Vector4& _color = { 1.0f, 1.0f, 0.0f, 1.0f }) const;
 
 private:
     // 制御点

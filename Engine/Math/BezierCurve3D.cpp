@@ -76,6 +76,108 @@ void BezierCurve3D::DrawWithControlPoints(const Vector4& _curveColor, const Vect
     }
 }
 
+
+void BezierCurve3D::DrawMovingCross(float _progress, float _crossSize, const Vector4& _color) const
+{
+    // 等速移動のためのt値が必要
+    static std::vector<float> equallySpacedTValues;
+
+    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
+    if (equallySpacedTValues.empty())
+    {
+        equallySpacedTValues = GenerateEquallySpacedTValues(100);
+    }
+
+    // 進行度を0〜1の範囲に制限
+    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
+
+    // 等速移動の位置を計算
+    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues);
+
+    // 十字を描画
+    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
+    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
+    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
+    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
+
+    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
+    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
+}
+
+void BezierCurve3D::Draw(const Vector3& _worldPos, const Vector4& _color) const
+{
+    if (!isDraw_)  return;
+
+    // 曲線上の点を生成
+    std::vector<Vector3> points = GenerateCurvePoints();
+
+    // 連続する点間に線を描画
+    for (size_t i = 1; i < points.size(); ++i)
+    {
+        LineDrawer::GetInstance()->RegisterPoint(points[i - 1], points[i], _color);
+    }
+}
+
+void BezierCurve3D::DrawWithControlPoints(const Vector3& _worldPos, const Vector4& _curveColor, const Vector4& _controlPointColor) const
+{
+    if (!isDraw_)  return;
+
+    // 曲線を描画
+    Draw(_curveColor);
+
+    // 制御点間に線を描画（制御多角形）
+    for (size_t i = 1; i < controlPoints_.size(); ++i)
+    {
+        Vector3 worldPos1 = controlPoints_[i - 1] + _worldPos;
+        Vector3 worldPos2 = controlPoints_[i] + _worldPos;
+
+        LineDrawer::GetInstance()->RegisterPoint(worldPos1, worldPos2, { 0.0f, 1.0f, 0.0f, 0.5f }); // 半透明の緑色
+    }
+
+    // 制御点を視覚化
+    const float pointSize = 0.1f; // 十字のサイズ
+
+    for (const auto& point : controlPoints_)
+    {
+        // 各制御点に小さな十字を描画
+        Vector3 horizontal1 = point + _worldPos + Vector3(-pointSize, 0.0f, 0.0f);
+        Vector3 horizontal2 = point + _worldPos + Vector3(pointSize, 0.0f, 0.0f);
+        Vector3 vertical1 = point + _worldPos + Vector3(0.0f, -pointSize, 0.0f);
+        Vector3 vertical2 = point + _worldPos + Vector3(0.0f, pointSize, 0.0f);
+
+        LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _controlPointColor);
+        LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _controlPointColor);
+    }
+}
+
+void BezierCurve3D::DrawMovingCross(const Vector3& _worldPos, float _progress, float _crossSize, const Vector4& _color) const
+{
+    // 等速移動のためのt値が必要
+    static std::vector<float> equallySpacedTValues;
+
+    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
+    if (equallySpacedTValues.empty())
+    {
+        equallySpacedTValues = GenerateEquallySpacedTValues(100);
+    }
+
+    // 進行度を0〜1の範囲に制限
+    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
+
+    // 等速移動の位置を計算
+    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues) + _worldPos;
+
+    // 十字を描画
+    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
+    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
+    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
+    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
+
+    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
+    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
+}
+
+
 void BezierCurve3D::Load(const std::string& _filePath)
 {
     if (jsonBinder_ == nullptr)
@@ -617,32 +719,6 @@ void BezierCurve3D::InvalidateCache()
     cachedEquallySpacedTValues_.clear();
 }
 
-void BezierCurve3D::DrawMovingCross(float _progress, float _crossSize, const Vector4& _color) const
-{
-    // 等速移動のためのt値が必要
-    static std::vector<float> equallySpacedTValues;
-
-    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
-    if (equallySpacedTValues.empty())
-    {
-        equallySpacedTValues = GenerateEquallySpacedTValues(100);
-    }
-
-    // 進行度を0〜1の範囲に制限
-    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
-
-    // 等速移動の位置を計算
-    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues);
-
-    // 十字を描画
-    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
-    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
-    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
-    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
-
-    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
-    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
-}
 
 void BezierCurve3D::ImGui()
 {
