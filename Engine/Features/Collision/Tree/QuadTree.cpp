@@ -13,13 +13,14 @@ QuadTree::~QuadTree()
     cells_.clear();
 }
 
-void QuadTree::Initialize(const Vector2& _rootSize, uint32_t _level)
+void QuadTree::Initialize(const Vector2& _rootSize, uint32_t _level, const Vector2& _leftBottom)
 {
     if (_rootSize.x <= 0 || _rootSize.y <= 0 || _level > kMaxLevel_)
         return;
 
     rootSize_ = _rootSize;
     level_ = _level;
+    leftBottom_ = _leftBottom;
 
     quadNodesPerLevel_[0] = 1;
     for (uint32_t i = 1; i <= kMaxLevel_; ++i)
@@ -52,8 +53,8 @@ void QuadTree::RegisterObj(Collider* _obj)
     auto oft = std::make_shared<ObjectForTree>();
     oft->SetData(_obj);
 
-    Vector2 pos(_obj->GetWorldTransform()->GetWorldPosition().x, _obj->GetWorldTransform()->GetWorldPosition().y);
-    Vector2 size(_obj->GetSize().x, _obj->GetSize().y);
+    Vector2 pos(_obj->GetWorldTransform()->GetWorldPosition().x, _obj->GetWorldTransform()->GetWorldPosition().z);
+    Vector2 size(_obj->GetSize().x, _obj->GetSize().z);
 
     MortonResult result = CalculateObjectMortonNumberAndLevel(pos, size);
     uint32_t belongingSpaceIndex = CalculateLinearIndexFromLevelAndNumber(result);
@@ -127,13 +128,13 @@ void QuadTree::GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*
     }
 }
 
-uint32_t QuadTree::ConvertPointToMortonCode(const Vector2& _pos) const
+int32_t QuadTree::ConvertPointToMortonCode(const Vector2& _pos) const
 {
-    uint32_t index = 0;
-    uint32_t x = static_cast<uint32_t>(_pos.x / minSpaceSize_.x);
-    uint32_t y = static_cast<uint32_t>(_pos.y / minSpaceSize_.y);
+    int32_t index = 0;
+    int32_t x = static_cast<int32_t>((_pos.x - leftBottom_.x) / minSpaceSize_.x);
+    int32_t y = static_cast<int32_t>((_pos.y -leftBottom_.y) / minSpaceSize_.y);
 
-    for (uint32_t i = 0; i < level_; ++i)
+    for (int32_t i = 0; i < level_; ++i)
     {
         index |= ((x & (1 << i)) << i) | ((y & (1 << i)) << (i + 1));
     }
@@ -144,13 +145,21 @@ uint32_t QuadTree::ConvertPointToMortonCode(const Vector2& _pos) const
 MortonResult QuadTree::CalculateObjectMortonNumberAndLevel(const Vector2& _pos, const Vector2& _size)
 {
     Vector2 halfSize = _size / 2.0f;
-    uint32_t lt_index = ConvertPointToMortonCode(_pos - halfSize);
-    uint32_t rb_index = ConvertPointToMortonCode(_pos + halfSize);
+    int32_t lt_index = ConvertPointToMortonCode(_pos - halfSize);
+    int32_t rb_index = ConvertPointToMortonCode(_pos + halfSize);
 
     std::cout << "Left Top Index: " << lt_index << "\n";
     std::cout << "Right Bottom Index: " << rb_index << "\n";
 
-    uint32_t xorResult = lt_index ^ rb_index;
+    if (lt_index < 0 || rb_index < 0)
+    {
+        Debug::Log(std::format("Invalid Morton code: lt_index = {}, rb_index = {}\n", lt_index, rb_index));
+        Debug::Log(std::format("Object Pos:x_{},y_{}", _pos.x, _pos.y));
+        Debug::Log(std::format("Object Size:x_{},y_{}", _size.x, _size.y));
+        return { 0, 0 };
+    }
+
+    int32_t xorResult = lt_index ^ rb_index;
     if (xorResult == 0)
         return { lt_index , level_ };
 
@@ -167,7 +176,7 @@ MortonResult QuadTree::CalculateObjectMortonNumberAndLevel(const Vector2& _pos, 
 
     uint32_t levelDiff = shiftCount / 2;
     uint32_t objectLevel = level_ - levelDiff;
-    uint32_t belongingNumber = rb_index >> shiftCount;
+    int32_t belongingNumber = rb_index >> shiftCount;
 
     return { belongingNumber, objectLevel };
 }

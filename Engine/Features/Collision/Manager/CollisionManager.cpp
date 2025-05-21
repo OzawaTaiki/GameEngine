@@ -10,7 +10,7 @@ CollisionManager* CollisionManager::GetInstance()
     return &instance;
 }
 
-void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level)
+void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, const Vector2& _leftTop)
 {
     colliders_.clear();
     collisionPairs_.clear();
@@ -18,7 +18,7 @@ void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level)
 
     // QuadTreeの初期化
     quadTree_ = std::make_unique<QuadTree>();
-    quadTree_->Initialize(_fieldSize, _level);
+    quadTree_->Initialize(_fieldSize, _level, _leftTop);
 }
 
 void CollisionManager::Finalize()
@@ -50,7 +50,7 @@ void CollisionManager::Update()
 
     quadTree_.reset();
     quadTree_ = std::make_unique<QuadTree>();
-    quadTree_->Initialize(Vector2(100.0f, 100.0f), 5); // フィールドサイズとレベルを指定
+    quadTree_->Initialize(Vector2(60.0f, 100.0f), 2,{-15.0f,-80.0f}); // フィールドサイズとレベルを指定
 }
 
 void CollisionManager::RegisterCollider(Collider* _collider)
@@ -67,27 +67,44 @@ void CollisionManager::RegisterCollider(Collider* _collider)
     // コライダーを登録
     colliders_.push_back(_collider);
 
-    quadTree_->RegisterObj(_collider); // QuadTreeに登録
 }
 
 void CollisionManager::CheckCollisions()
 {
+    auto now = std::chrono::high_resolution_clock::now();
+
     // ブロードフェーズの更新（空間分割等の最適化）
     UpdateBroadPhase();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
+    Debug::Log(std::format("Broad Phase Duration: {} microseconds\n", duration));
+    now = std::chrono::high_resolution_clock::now();
+
+    uint32_t potential = potentialCollisions_.size();
+    uint32_t count = 0;
+    uint32_t hitCount = 0;
 
     for (const auto& pair : potentialCollisions_)
     {
         Collider* colliderA = pair.first;
         Collider* colliderB = pair.second;
 
-        // レイヤーマスクでフィルタリング
+         //レイヤーマスクでフィルタリング
         if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
             (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
         {
             continue; // 衝突しないように設定されている
         }
 
+        ++count;
         ColliderInfo info;
+
+#ifdef _DEBUG
+        //std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+        //std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+        //Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+#endif // _DEBUG
 
         // CollisionDetectorを使用して衝突判定を実行
         if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
@@ -110,8 +127,18 @@ void CollisionManager::CheckCollisions()
             // 各コライダーに現在の衝突を記録
             colliderA->AddCurrentCollision(colliderB, info);
             colliderB->AddCurrentCollision(colliderA, reversedInfo);
+
+            ++hitCount;
+
         }
     }
+
+    Debug::Log(std::format("Potential Collisions: {}\n Actual Collisions: {}\n hitCount:{}\n----------\n", potential, count, hitCount));
+
+    end= std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
+    Debug::Log(std::format("Narrow Phase Duration: {} microseconds\n", duration));
+
 }
 
 void CollisionManager::ResolveCollisions()
@@ -238,6 +265,11 @@ void CollisionManager::UpdateBroadPhase()
 {
 
     // 空間分割などの最適化を行う場合はここに実装
+
+    for (auto& collider : colliders_)
+    {
+        quadTree_->RegisterObj(collider);
+    }
 
     potentialCollisions_.clear();
 

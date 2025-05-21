@@ -76,6 +76,26 @@ WorldTransform* Collider::GetWorldTransform()
     return worldTransform_;
 }
 
+Vector3 Collider::GetSize() const
+{
+    Vector3 scale;
+    if (worldTransform_ != nullptr)
+    {
+        scale = worldTransform_->scale_;
+    }
+    else
+    {
+        scale = defaultTransform_.scale_;
+    }
+
+    return Vector3
+    {
+        size_.x * scale.x,
+        size_.y * scale.y,
+        size_.z * scale.z
+    };
+}
+
 
 void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
 {

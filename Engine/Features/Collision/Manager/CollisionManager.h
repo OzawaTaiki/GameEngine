@@ -15,7 +15,7 @@ public:
     static CollisionManager* GetInstance();
 
     // 初期化
-    void Initialize(const Vector2& _fieldSize,uint32_t _level);
+    void Initialize(const Vector2& _fieldSize,uint32_t _level, const Vector2& _leftBottom);
 
     // 終了処理
     void Finalize();

@@ -158,7 +158,8 @@ public:
     // コライダーのオフセットを取得する
     Vector3 GetOffset() const { return offset_; }
 
-    Vector3 GetSize() const { return size_; } // コライダーのサイズを取得する
+    Vector3 GetSize() const;
+
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) = 0;
