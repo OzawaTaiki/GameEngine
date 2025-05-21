@@ -45,4 +45,11 @@ private:
         const Vector3& _start1, const Vector3& _end1,
         const Vector3& _start2, const Vector3& _end2,
         Vector3& _closestPoint1, Vector3& _closestPoint2);
+
+    static bool CheckBoundingSpheres(Collider* _colliderA, Collider* _colliderB, float expansionFactor);
+
+
+    // 球の半径を取得
+    static float GetBoundingSphereRadius(Collider* _collider);
+
 };
