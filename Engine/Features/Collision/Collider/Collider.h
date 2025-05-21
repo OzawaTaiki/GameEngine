@@ -158,6 +158,8 @@ public:
     // コライダーのオフセットを取得する
     Vector3 GetOffset() const { return offset_; }
 
+    Vector3 GetSize() const { return size_; } // コライダーのサイズを取得する
+
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) = 0;
 
@@ -184,6 +186,8 @@ protected:
     JsonBinder* jsonBinder_ = nullptr;
 
     std::string name_;
+
+    Vector3 size_ = Vector3(1.0f, 1.0f, 1.0f); // コライダーのサイズ
 
     bool isDraw_ = true;
 
@@ -240,7 +244,7 @@ public:
     void Save(const std::string& _name) override;
 
     // 球の半径を設定する
-    void SetRadius(float _radius) { radius_ = _radius; }
+    void SetRadius(float _radius);
     // 球の半径を取得する
     float GetRadius() const { return radius_; }
 
@@ -272,7 +276,7 @@ public:
 
 
     // AABBの最小値と最大値を設定する
-    void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
+    void SetMinMax(const Vector3& _min, const Vector3& _max);
 
     // AABBの最小値を取得する
     Vector3 GetMin() const { return min_; }
@@ -307,7 +311,7 @@ public:
     void Save(const std::string& _name) override;
 
     // OBBの半分の大きさを設定する
-    void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
+    void SetHalfExtents(const Vector3& _halfExtents);
     // OBBの半分の大きさを取得する
     Vector3 GetHalfExtents() const { return halfExtents_; }
 
@@ -347,7 +351,7 @@ public:
     void Save(const std::string& _name) override;
 
     // カプセルの半径を設定する
-    void SetRadius(float _radius) { radius_ = _radius; }
+    void SetRadius(float _radius);
     // カプセルの半径を取得する
     float GetRadius() const { return radius_; }
 
@@ -362,7 +366,7 @@ public:
     Vector3 GetLocalPivot() const { return localPivot_; }
 
     // カプセルの高さを設定する
-    void SetHeight(float _height) { height_ = _height; }
+    void SetHeight(float _height);
     // カプセルの高さを取得する
     float GetHeight() const { return height_; }
 
@@ -381,6 +385,8 @@ public:
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
 
     void ImGui();
+
+    Vector3 GetCapsuleAABBSize();
 
 private:
     float radius_ = 0.0f; // カプセルの半径

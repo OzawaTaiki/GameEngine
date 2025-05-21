@@ -10,11 +10,15 @@ CollisionManager* CollisionManager::GetInstance()
     return &instance;
 }
 
-void CollisionManager::Initialize()
+void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level)
 {
     colliders_.clear();
     collisionPairs_.clear();
     isDrawEnabled_ = true;
+
+    // QuadTreeの初期化
+    quadTree_ = std::make_unique<QuadTree>();
+    quadTree_->Initialize(_fieldSize, _level);
 }
 
 void CollisionManager::Finalize()
@@ -43,6 +47,10 @@ void CollisionManager::Update()
     // 全てのコライダーをクリア（次のフレームのために）
     colliders_.clear();
     collisionPairs_.clear();
+
+    quadTree_.reset();
+    quadTree_ = std::make_unique<QuadTree>();
+    quadTree_->Initialize(Vector2(100.0f, 100.0f), 5); // フィールドサイズとレベルを指定
 }
 
 void CollisionManager::RegisterCollider(Collider* _collider)
@@ -58,6 +66,8 @@ void CollisionManager::RegisterCollider(Collider* _collider)
 
     // コライダーを登録
     colliders_.push_back(_collider);
+
+    quadTree_->RegisterObj(_collider); // QuadTreeに登録
 }
 
 void CollisionManager::CheckCollisions()
@@ -65,54 +75,41 @@ void CollisionManager::CheckCollisions()
     // ブロードフェーズの更新（空間分割等の最適化）
     UpdateBroadPhase();
 
-    // 全てのコライダー同士の組み合わせで衝突判定を実行
-    for (size_t i = 0; i < colliders_.size(); ++i)
+    for (const auto& pair : potentialCollisions_)
     {
-        Collider* colliderA = colliders_[i];
+        Collider* colliderA = pair.first;
+        Collider* colliderB = pair.second;
 
-        for (size_t j = i + 1; j < colliders_.size(); ++j)
+        // レイヤーマスクでフィルタリング
+        if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+            (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
         {
-            Collider* colliderB = colliders_[j];
+            continue; // 衝突しないように設定されている
+        }
 
-            // レイヤーマスクでフィルタリング
-            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
-                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
-            {
-                continue; // 衝突しないように設定されている
-            }
+        ColliderInfo info;
 
-            // 衝突情報
-            ColliderInfo info;
-#ifdef _DEBUG
-            std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
-            std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
-            Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
-#endif // _DEBUG
+        // CollisionDetectorを使用して衝突判定を実行
+        if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
+        {
+            // 衝突情報を保存
+            CollisionPair pair;
+            pair.colliderA = colliderA;
+            pair.colliderB = colliderB;
+            pair.info = info;
+            collisionPairs_.push_back(pair);
 
-            // CollisionDetectorを使用して衝突判定を実行
-            if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
-            {
-                // 衝突情報を保存
-                CollisionPair pair;
-                pair.colliderA = colliderA;
-                pair.colliderB = colliderB;
-                pair.info = info;
-                collisionPairs_.push_back(pair);
-
-                colliderA->OnCollision(colliderB, info);
+            colliderA->OnCollision(colliderB, info);
 
 
-                // 衝突情報を反転して相手側にも記録
-                ColliderInfo reversedInfo = info;
-                reversedInfo.contactNormal = -info.contactNormal;
-                colliderB->OnCollision(colliderA, reversedInfo);
+            // 衝突情報を反転して相手側にも記録
+            ColliderInfo reversedInfo = info;
+            reversedInfo.contactNormal = -info.contactNormal;
+            colliderB->OnCollision(colliderA, reversedInfo);
 
-                // 各コライダーに現在の衝突を記録
-                colliderA->AddCurrentCollision(colliderB, info);
-                colliderB->AddCurrentCollision(colliderA, reversedInfo);
-
-
-            }
+            // 各コライダーに現在の衝突を記録
+            colliderA->AddCurrentCollision(colliderB, info);
+            colliderB->AddCurrentCollision(colliderA, reversedInfo);
         }
     }
 }
@@ -239,8 +236,16 @@ void CollisionManager::ResolveCollision(const CollisionPair& _pair)
 
 void CollisionManager::UpdateBroadPhase()
 {
+
     // 空間分割などの最適化を行う場合はここに実装
-    // 現在は単純な総当たりで実装
+
+    potentialCollisions_.clear();
+
+    std::list<Collider*> stac;
+
+    // QuadTreeを使用して衝突ペアを取得
+    quadTree_->GetCollisionPair(0, potentialCollisions_, stac);
+
 }
 
 CollisionManager::CollisionManager()
@@ -251,3 +256,58 @@ CollisionManager::CollisionManager()
     ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
 #endif // DEBUG
 }
+
+#pragma region 既存のコード
+/*
+// 全てのコライダー同士の組み合わせで衝突判定を実行
+for (size_t i = 0; i < colliders_.size(); ++i)
+{
+    Collider* colliderA = colliders_[i];
+
+    for (size_t j = i + 1; j < colliders_.size(); ++j)
+    {
+        Collider* colliderB = colliders_[j];
+
+        // レイヤーマスクでフィルタリング
+        if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+            (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
+        {
+            continue; // 衝突しないように設定されている
+        }
+
+        // 衝突情報
+        ColliderInfo info;
+#ifdef _DEBUG
+        std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+        std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+        Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+#endif // _DEBUG
+
+        // CollisionDetectorを使用して衝突判定を実行
+        if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
+        {
+            // 衝突情報を保存
+            CollisionPair pair;
+            pair.colliderA = colliderA;
+            pair.colliderB = colliderB;
+            pair.info = info;
+            collisionPairs_.push_back(pair);
+
+            colliderA->OnCollision(colliderB, info);
+
+
+            // 衝突情報を反転して相手側にも記録
+            ColliderInfo reversedInfo = info;
+            reversedInfo.contactNormal = -info.contactNormal;
+            colliderB->OnCollision(colliderA, reversedInfo);
+
+            // 各コライダーに現在の衝突を記録
+            colliderA->AddCurrentCollision(colliderB, info);
+            colliderB->AddCurrentCollision(colliderA, reversedInfo);
+
+
+        }
+    }
+}
+*/
+#pragma endregion

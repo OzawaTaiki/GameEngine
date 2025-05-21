@@ -71,6 +71,10 @@ private:
 
     Vector4 testColor_ = { 1,1,1,1 };
 
+    std::vector<ObjectModel*> models_;
+    std::vector<AABBCollider*> colliders_;
+
+    void Create();
 
 #ifdef _DEBUG
     void ImGui();

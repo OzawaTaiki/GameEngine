@@ -2,6 +2,7 @@
 
 #include <Features/Collision/Collider/Collider.h>
 #include <Features/Collision/Detector/CollisionDetector.h>
+#include <Features/Collision/Tree/QuadTree.h>
 #include <vector>
 #include <unordered_map>
 #include <functional>
@@ -14,7 +15,7 @@ public:
     static CollisionManager* GetInstance();
 
     // 初期化
-    void Initialize();
+    void Initialize(const Vector2& _fieldSize,uint32_t _level);
 
     // 終了処理
     void Finalize();
@@ -67,6 +68,11 @@ private:
 
     // 空間分割のためのグリッド（将来的な拡張のために用意）
     // std::unordered_map<int, std::vector<Collider*>> grid_;
+
+    // 衝突ペアのリスト（衝突する可能性があるpair）
+    std::vector<std::pair<Collider*, Collider*>> potentialCollisions_;
+
+    std::unique_ptr<QuadTree> quadTree_; // 空間分割のための四分木
 
 private:
     // コンストラクタ

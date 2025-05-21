@@ -21,6 +21,20 @@
 
 SampleScene::~SampleScene()
 {
+    for (auto& col : colliders_)
+    {
+        CollisionManager::GetInstance()->UnregisterCollider(col);
+        delete col;
+        col = nullptr;
+    }
+    colliders_.clear();
+
+    for (auto& model : models_)
+    {
+        delete model;
+        model = nullptr;
+    }
+    models_.clear();
 }
 
 void SampleScene::Initialize()
@@ -96,6 +110,8 @@ void SampleScene::Initialize()
     skyBox_->Initialize(30.0f);
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
+    Create();
+
 }
 
 void SampleScene::Update()
@@ -138,6 +154,10 @@ void SampleScene::Update()
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
+    for (auto& col : colliders_)
+    {
+        CollisionManager::GetInstance()->RegisterCollider(col);
+    }
 
     test_->Update();
     oModel_->Update();
@@ -170,14 +190,19 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
-    skyBox_->Draw(&SceneCamera_);
+    //skyBox_->Draw(&SceneCamera_);
 
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
     skyBox_->QueueCmdCubeTexture();
 
+    for (auto& model : models_)
+    {
+        model->Draw(&SceneCamera_, 0, { 1,1,1,1 });
+    }
+
     //oModel_->Draw(&SceneCamera_, testColor_);
-    oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
+    //oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
     //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ////aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
@@ -203,8 +228,31 @@ void SampleScene::DrawShadow()
 
 }
 
+void SampleScene::Create()
+{
+    auto rand = RandomGenerator::GetInstance();
+
+    for (int i = 0; i < 50; ++i)
+    {
+        ObjectModel* model = new ObjectModel("test");
+        model->Initialize("Cube/Cube.obj");
+        model->translate_.x = rand->GetRandValue(-0.0f, 25.0f);
+        model->translate_.y = 0.0f;
+        model->translate_.z = rand->GetRandValue(-0.0f, 25.0f);
+
+        model->Update();
+
+        AABBCollider* collider = new AABBCollider("test");
+        collider->SetLayer("temp");
+        collider->SetWorldTransform(model->GetWorldTransform());
+        collider->SetMinMax(model->GetMin(), model->GetMax());
+
+        models_.push_back(model);
+        colliders_.push_back(collider);
+    }
+}
+
 #ifdef _DEBUG
-#include <imgui.h>
 void SampleScene::ImGui()
 {
 
