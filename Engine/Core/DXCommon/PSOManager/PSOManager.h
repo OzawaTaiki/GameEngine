@@ -22,6 +22,7 @@ enum class PSOFlags
     Type_OffScreen          = 1 << 4,
     Type_DLShadowMap        = 1 << 5,
     Type_PLShadowMap        = 1 << 6,
+    Type_SkyBox             = 1 << 7,
 
     Blend_Normal			= 1 << 11,
     Blend_Add				= 1 << 12,
@@ -91,6 +92,7 @@ constexpr PSOFlags TypeMask =
 PSOFlags::Type_Model |
 PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
 | PSOFlags::Type_OffScreen | PSOFlags::Type_DLShadowMap | PSOFlags::Type_PLShadowMap
+| PSOFlags::Type_SkyBox
 ;
 constexpr PSOFlags BlendMask =
 PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
@@ -118,6 +120,12 @@ public:
     void SetPipeLineStateObject(PSOFlags _flag);
     void SetRootSignature(PSOFlags _flag);
 
+    void SetPSOForPostEffect(const std::string& _name);
+
+    void SetRegisterPSO(const std::string& _name);
+    void SetRegisterRootSignature(const std::string& _name);
+
+
 
 	Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
 		//Complierするshaderファイルへのパス
@@ -127,6 +135,17 @@ public:
         const std::wstring& _entryFuncName = L"main",
 		const std::wstring& _dirPath = L"Resources/Shader/"
         );
+
+
+    void CreatePSOForPostEffect(const std::string& _name,
+        const std::wstring& _psFileName,
+        const std::wstring& _entryFuncName = L"main",
+        const std::wstring& _dirPath = L"Resources/Shader/");
+
+    void RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso);
+    void RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs);
+
+    void CreatePSOForSkyBox();
 
 private:
 
@@ -151,6 +170,10 @@ private:
 
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> graphicsPipelineStates_;
 	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> postEffectPipelineStates_;
+
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> registerPSO_;
+    std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> regiterRootSignature_;
 
 
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;

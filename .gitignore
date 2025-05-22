@@ -19,7 +19,7 @@
 mono_crash.*
 
 Generated/
-
+*.bat
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -326,3 +326,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/copybat.bat

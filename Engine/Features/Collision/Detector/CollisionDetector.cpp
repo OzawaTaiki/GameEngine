@@ -17,6 +17,7 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
     // 衝突判定を実行
     // 各バウンディングボックスの組み合わせに対して適切な判定処理を呼び出す
 
+
     // Sphere vs Sphere
     if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::Sphere_3D)
     {
@@ -26,203 +27,206 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
             _info
         );
     }
-
-    // AABB vs AABB
-    else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::AABB_3D)
+    else if (CheckBoundingSpheres(_colliderA, _colliderB, 1.00f))
     {
-        return IntersectAABBAABB(
-            static_cast<AABBCollider*>(_colliderA),
-            static_cast<AABBCollider*>(_colliderB),
-            _info
-        );
-    }
 
-    // OBB vs OBB
-    else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::OBB_3D)
-    {
-        return IntersectOBBOBB(
-            static_cast<OBBCollider*>(_colliderA),
-            static_cast<OBBCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // Capsule vs Capsule
-    else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::Capsule_3D)
-    {
-        return IntersectCapsuleCapsule(
-            static_cast<CapsuleCollider*>(_colliderA),
-            static_cast<CapsuleCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // Sphere vs AABB
-    else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::AABB_3D)
-    {
-        return IntersectSphereAABB(
-            static_cast<SphereCollider*>(_colliderA),
-            static_cast<AABBCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // AABB vs Sphere
-    else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::Sphere_3D)
-    {
-        bool result = IntersectSphereAABB(
-            static_cast<SphereCollider*>(_colliderB),
-            static_cast<AABBCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // AABB vs AABB
+        if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::AABB_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            return IntersectAABBAABB(
+                static_cast<AABBCollider*>(_colliderA),
+                static_cast<AABBCollider*>(_colliderB),
+                _info
+            );
         }
 
-        return result;
-    }
-
-    // Sphere vs OBB
-    else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::OBB_3D)
-    {
-        return IntersectSphereOBB(
-            static_cast<SphereCollider*>(_colliderA),
-            static_cast<OBBCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // OBB vs Sphere
-    else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::Sphere_3D)
-    {
-        bool result = IntersectSphereOBB(
-            static_cast<SphereCollider*>(_colliderB),
-            static_cast<OBBCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // OBB vs OBB
+        else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::OBB_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            return IntersectOBBOBB(
+                static_cast<OBBCollider*>(_colliderA),
+                static_cast<OBBCollider*>(_colliderB),
+                _info
+            );
         }
 
-        return result;
-    }
-
-    // Sphere vs Capsule
-    else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::Capsule_3D)
-    {
-        return IntersectSphereCapsule(
-            static_cast<SphereCollider*>(_colliderA),
-            static_cast<CapsuleCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // Capsule vs Sphere
-    else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::Sphere_3D)
-    {
-        bool result = IntersectSphereCapsule(
-            static_cast<SphereCollider*>(_colliderB),
-            static_cast<CapsuleCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // Capsule vs Capsule
+        else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::Capsule_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            return IntersectCapsuleCapsule(
+                static_cast<CapsuleCollider*>(_colliderA),
+                static_cast<CapsuleCollider*>(_colliderB),
+                _info
+            );
         }
 
-        return result;
-    }
-
-    // AABB vs OBB
-    else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::OBB_3D)
-    {
-        return IntersectAABBOBB(
-            static_cast<AABBCollider*>(_colliderA),
-            static_cast<OBBCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // OBB vs AABB
-    else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::AABB_3D)
-    {
-        bool result = IntersectAABBOBB(
-            static_cast<AABBCollider*>(_colliderB),
-            static_cast<OBBCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // Sphere vs AABB
+        else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::AABB_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            return IntersectSphereAABB(
+                static_cast<SphereCollider*>(_colliderA),
+                static_cast<AABBCollider*>(_colliderB),
+                _info
+            );
         }
 
-        return result;
-    }
-
-    // AABB vs Capsule
-    else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::Capsule_3D)
-    {
-        return IntersectAABBCapsule(
-            static_cast<AABBCollider*>(_colliderA),
-            static_cast<CapsuleCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // Capsule vs AABB
-    else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::AABB_3D)
-    {
-        bool result = IntersectAABBCapsule(
-            static_cast<AABBCollider*>(_colliderB),
-            static_cast<CapsuleCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // AABB vs Sphere
+        else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::Sphere_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            bool result = IntersectSphereAABB(
+                static_cast<SphereCollider*>(_colliderB),
+                static_cast<AABBCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
         }
 
-        return result;
-    }
-
-    // OBB vs Capsule
-    else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::Capsule_3D)
-    {
-        return IntersectOBBCapsule(
-            static_cast<OBBCollider*>(_colliderA),
-            static_cast<CapsuleCollider*>(_colliderB),
-            _info
-        );
-    }
-
-    // Capsule vs OBB
-    else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::OBB_3D)
-    {
-        bool result = IntersectOBBCapsule(
-            static_cast<OBBCollider*>(_colliderB),
-            static_cast<CapsuleCollider*>(_colliderA),
-            _info
-        );
-
-        // 法線方向を反転
-        if (result)
+        // Sphere vs OBB
+        else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::OBB_3D)
         {
-            _info.contactNormal = -_info.contactNormal;
+            return IntersectSphereOBB(
+                static_cast<SphereCollider*>(_colliderA),
+                static_cast<OBBCollider*>(_colliderB),
+                _info
+            );
         }
 
-        return result;
+        // OBB vs Sphere
+        else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::Sphere_3D)
+        {
+            bool result = IntersectSphereOBB(
+                static_cast<SphereCollider*>(_colliderB),
+                static_cast<OBBCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
+        }
+
+        // Sphere vs Capsule
+        else if (typeA == BoundingBox::Sphere_3D && typeB == BoundingBox::Capsule_3D)
+        {
+            return IntersectSphereCapsule(
+                static_cast<SphereCollider*>(_colliderA),
+                static_cast<CapsuleCollider*>(_colliderB),
+                _info
+            );
+        }
+
+        // Capsule vs Sphere
+        else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::Sphere_3D)
+        {
+            bool result = IntersectSphereCapsule(
+                static_cast<SphereCollider*>(_colliderB),
+                static_cast<CapsuleCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
+        }
+
+        // AABB vs OBB
+        else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::OBB_3D)
+        {
+            return IntersectAABBOBB(
+                static_cast<AABBCollider*>(_colliderA),
+                static_cast<OBBCollider*>(_colliderB),
+                _info
+            );
+        }
+
+        // OBB vs AABB
+        else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::AABB_3D)
+        {
+            bool result = IntersectAABBOBB(
+                static_cast<AABBCollider*>(_colliderB),
+                static_cast<OBBCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
+        }
+
+        // AABB vs Capsule
+        else if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::Capsule_3D)
+        {
+            return IntersectAABBCapsule(
+                static_cast<AABBCollider*>(_colliderA),
+                static_cast<CapsuleCollider*>(_colliderB),
+                _info
+            );
+        }
+
+        // Capsule vs AABB
+        else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::AABB_3D)
+        {
+            bool result = IntersectAABBCapsule(
+                static_cast<AABBCollider*>(_colliderB),
+                static_cast<CapsuleCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
+        }
+
+        // OBB vs Capsule
+        else if (typeA == BoundingBox::OBB_3D && typeB == BoundingBox::Capsule_3D)
+        {
+            return IntersectOBBCapsule(
+                static_cast<OBBCollider*>(_colliderA),
+                static_cast<CapsuleCollider*>(_colliderB),
+                _info
+            );
+        }
+
+        // Capsule vs OBB
+        else if (typeA == BoundingBox::Capsule_3D && typeB == BoundingBox::OBB_3D)
+        {
+            bool result = IntersectOBBCapsule(
+                static_cast<OBBCollider*>(_colliderB),
+                static_cast<CapsuleCollider*>(_colliderA),
+                _info
+            );
+
+            // 法線方向を反転
+            if (result)
+            {
+                _info.contactNormal = -_info.contactNormal;
+            }
+
+            return result;
+        }
     }
 
     // サポートされていない組み合わせ
@@ -483,8 +487,13 @@ bool CollisionDetector::IntersectOBBOBB(OBBCollider* _obb1, OBBCollider* _obb2, 
     _info.contactNormal = bestAxis;
     _info.penetration = minOverlap;
 
-    // 衝突点を近似的に求める（OBB1とOBB2の中間点）
-    _info.contactPoint = center1 + T * 0.5f;
+
+    // OBB同士の最近接点を計算して衝突点とする
+    Vector3 closestPoint1 = _obb1->GetClosestPoint(center2);
+    Vector3 closestPoint2 = _obb2->GetClosestPoint(center1);
+
+    // 2つの最近接点の中点を衝突点として使用
+    _info.contactPoint = (closestPoint1 + closestPoint2) * 0.5f;
 
     return true;
 }
@@ -925,4 +934,73 @@ float CollisionDetector::SegmentSegmentDistance(const Vector3& _start1, const Ve
 
     // 距離を返す
     return (_closestPoint1 - _closestPoint2).Length();
+}
+
+bool CollisionDetector::CheckBoundingSpheres(Collider* _colliderA, Collider* _colliderB, float expansionFactor)
+{
+    // 各コライダーの中心位置を取得
+    const WorldTransform* transformA = _colliderA->GetWorldTransform();
+    const WorldTransform* transformB = _colliderB->GetWorldTransform();
+
+    // オフセットをワールド変換
+    Vector3 worldOffsetA = Transform(_colliderA->GetOffset(), transformA->quaternion_.ToMatrix());
+    Vector3 worldOffsetB = Transform(_colliderB->GetOffset(), transformB->quaternion_.ToMatrix());
+
+    // 中心位置 = ワールド位置 + 変換されたオフセット
+    Vector3 centerA = transformA->GetWorldPosition() + worldOffsetA;
+    Vector3 centerB = transformB->GetWorldPosition() + worldOffsetB;
+
+    // コライダータイプに応じた境界球半径を取得して拡大
+    float radiusA = GetBoundingSphereRadius(_colliderA) * expansionFactor;
+    float radiusB = GetBoundingSphereRadius(_colliderB) * expansionFactor;
+
+    // 中心間の距離を計算
+    Vector3 direction = centerB - centerA;
+    float distanceSquared = direction.LengthSquared();
+    float radiusSum = radiusA + radiusB;
+
+    // 距離が半径の和より小さい場合は衝突の可能性あり
+    return distanceSquared <= (radiusSum * radiusSum);
+}
+
+float CollisionDetector::GetBoundingSphereRadius(Collider* _collider)
+{
+    BoundingBox type = _collider->GetBoundingBox();
+    const WorldTransform* transform = _collider->GetWorldTransform();
+    float maxScale = std::max({ transform->scale_.x, transform->scale_.y, transform->scale_.z });
+
+    switch (type)
+    {
+    case BoundingBox::Sphere_3D:
+        return static_cast<SphereCollider*>(_collider)->GetRadius() * maxScale;
+
+    case BoundingBox::AABB_3D:
+    {
+        AABBCollider* aabb = static_cast<AABBCollider*>(_collider);
+        Vector3 min = aabb->GetMin();
+        Vector3 max = aabb->GetMax();
+        Vector3 extents = (max - min) * 0.5f * transform->scale_;
+        return extents.Length();
+    }
+
+    case BoundingBox::OBB_3D:
+    {
+        OBBCollider* obb = static_cast<OBBCollider*>(_collider);
+        Vector3 halfExtents = obb->GetHalfExtents() * transform->scale_;
+        return halfExtents.Length();
+    }
+
+    case BoundingBox::Capsule_3D:
+    {
+        CapsuleCollider* capsule = static_cast<CapsuleCollider*>(_collider);
+        Vector3 start, end;
+        capsule->GetCapsuleSegment(start, end);
+        float halfLength = (end - start).Length() * 0.5f;
+        float radius = capsule->GetRadius() * maxScale;
+        return halfLength + radius;
+    }
+
+    default:
+        return 0.0f;
+    }
 }

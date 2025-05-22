@@ -61,16 +61,9 @@ void RTVManager::Initialize(size_t _backBufferCount, uint32_t _winWidth, uint32_
 
 void RTVManager::DrawRenderTexture(uint32_t _index)
 {
-
     auto it = renderTargets_.find(_index);
     if (it == renderTargets_.end())
         assert(false && "not found RenderTarget");
-
-    auto psoManager = PSOManager::GetInstance();
-
-    psoManager->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
-    psoManager->SetRootSignature(PSOFlags::Type_OffScreen);
-
 
     it->second->Draw();
 
@@ -184,6 +177,177 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
 }
 
 
+uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV)
+{
+    // 既存のキューブマップがあるか確認
+    auto it = textureMap_.find(_name);
+    if (it != textureMap_.end())
+        return it->second;
+
+    // レンダーターゲットインデックスを確保
+    uint32_t rtvIndex = AllocateRTVIndex();
+
+    // キューブマップリソースを作成
+    auto cubemapResource = CreateCubemapResource(_width, _height, rtvIndex, _colorFormat, _clearColor);
+    if (!cubemapResource) {
+        return 0; // リソース作成失敗
+    }
+
+    // キューブマップ全体に対するRTVを作成
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = _colorFormat;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+    rtvDesc.Texture2DArray.MipSlice = 0;
+    rtvDesc.Texture2DArray.FirstArraySlice = 0;  // 最初の面から
+    rtvDesc.Texture2DArray.ArraySize = 6;        // 全6面
+
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPURTVDescriptorHandle(rtvIndex);
+    dxcommon_->GetDevice()->CreateRenderTargetView(
+        cubemapResource.Get(),
+        &rtvDesc,
+        rtvHandle);
+
+    // キューブマップ用のSRVを作成
+    uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
+    SRVManager::GetInstance()->CreateSRVForCubemap(srvIndex, cubemapResource.Get(), _colorFormat);
+
+    // キューブマップデータを保存
+    CubemapData cubemapData;
+    cubemapData.resource = cubemapResource;
+    cubemapData.srvIndex = srvIndex;
+    cubemaps_[rtvIndex] = cubemapData;
+
+    // 名前とハンドルのマッピング
+    textureMap_[_name] = rtvIndex;
+
+    // RenderTargetオブジェクトの作成と初期化
+    renderTargets_[rtvIndex] = std::make_unique<RenderTarget>();
+    renderTargets_[rtvIndex]->Initialize(
+        cubemapResource,
+        rtvHandle,
+        _colorFormat,
+        _width,
+        _height);
+    renderTargets_[rtvIndex]->SetViewport(viewport_);
+    renderTargets_[rtvIndex]->SetScissorRect(scissorRect_);
+    renderTargets_[rtvIndex]->SetClearColor(_clearColor);
+
+    // 深度バッファを作成（必要な場合）
+    uint32_t dsvIndex = 0;
+    if (_createDSV) {
+        dsvIndex = AllocateDSVIndex();
+
+        // キューブマップ用の深度バッファを作成
+        D3D12_RESOURCE_DESC depthDesc{};
+        depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        depthDesc.Width = _width;
+        depthDesc.Height = _height;
+        depthDesc.DepthOrArraySize = 6;  // 6面用
+        depthDesc.MipLevels = 1;
+        depthDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+        depthDesc.SampleDesc.Count = 1;
+        depthDesc.SampleDesc.Quality = 0;
+        depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+        // ヒーププロパティ
+        D3D12_HEAP_PROPERTIES heapProps{};
+        heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+        // 深度クリア値
+        D3D12_CLEAR_VALUE depthClearValue{};
+        depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+        depthClearValue.DepthStencil.Depth = 1.0f;
+
+        // 深度リソース作成
+        Microsoft::WRL::ComPtr<ID3D12Resource> depthResource;
+        HRESULT hr = dxcommon_->GetDevice()->CreateCommittedResource(
+            &heapProps,
+            D3D12_HEAP_FLAG_NONE,
+            &depthDesc,
+            D3D12_RESOURCE_STATE_DEPTH_WRITE,
+            &depthClearValue,
+            IID_PPV_ARGS(depthResource.GetAddressOf()));
+
+        if (SUCCEEDED(hr)) {
+            dsvResources_[dsvIndex] = depthResource;
+
+            // 深度ステンシルビューの作成
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.Texture2DArray.MipSlice = 0;
+            dsvDesc.Texture2DArray.FirstArraySlice = 0;
+            dsvDesc.Texture2DArray.ArraySize = 6;
+
+            D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDSVDescriptorHandle(dsvIndex);
+            dxcommon_->GetDevice()->CreateDepthStencilView(
+                depthResource.Get(),
+                &dsvDesc,
+                dsvHandle);
+
+            renderTargets_[rtvIndex]->SetDepthStencilResource(depthResource.Get());
+            renderTargets_[rtvIndex]->SetDepthStencilResource(dsvHandle);
+        }
+    }
+
+    return rtvIndex;
+}
+
+void RTVManager::QueuePointLightShadowMapToSRV(const std::string& _name, uint32_t _index)
+{
+    auto it = textureMap_.find(_name);
+    if (it == textureMap_.end())
+        return;
+
+    uint32_t handle = it->second;
+    QueuePointLightShadowMapToSRV(handle, _index);
+
+}
+
+void RTVManager::QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index)
+{
+    // キューブマップの存在確認
+    auto it = cubemaps_.find(_handle);
+    if (it == cubemaps_.end()) {
+        return; // シャドウマップが存在しない
+    }
+
+    auto& cubemapData = it->second;
+    auto renderTarget = renderTargets_[_handle].get();
+
+    if (!renderTarget || !cubemapData.resource) {
+        return; // レンダーターゲットまたはリソースが存在しない
+    }
+
+    //renderTarget->QueueCommandDSVtoSRV(_index);
+
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+    auto srvManager = SRVManager::GetInstance();
+
+    renderTarget->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+    //// リソース状態の遷移（必要な場合）
+    //if (renderTarget->GetDSVCurrentState() != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    //{
+    //    D3D12_RESOURCE_BARRIER barrier = {};
+    //    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    //    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    //    barrier.Transition.pResource = renderTarget->GetDSVResource();
+    //    barrier.Transition.StateBefore = renderTarget->GetDSVCurrentState();
+    //    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    //    commandList->ResourceBarrier(1, &barrier);
+
+    //    // レンダーターゲットの状態を更新
+    //    renderTarget->ChangeDSVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    //}
+
+    //// SRVハンドルを取得してセット
+    auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(cubemapData.srvIndex);
+    commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
+}
+
 void RTVManager::SetCubemapRenderTexture(uint32_t _handle)
 {
     auto it = cubemaps_.find(_handle);
@@ -210,18 +374,6 @@ ID3D12Resource* RTVManager::GetCubemapResource(uint32_t _handle) const
         return it->second.resource.Get();
     }
     return nullptr;
-}
-
-const std::vector<uint32_t>& RTVManager::GetCubemapFaceHandles(uint32_t _handle) const
-{
-    static std::vector<uint32_t> emptyVector;
-
-    auto it = cubemaps_.find(_handle);
-    if (it != cubemaps_.end())
-    {
-        return it->second.faceHandles;
-    }
-    return emptyVector;
 }
 
 

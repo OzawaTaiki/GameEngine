@@ -109,11 +109,15 @@ public:
     // ファイルに保存
     virtual void Save(const std::string& _name) = 0;
 
+    using CollisionCallBack = std::function<void(Collider*, const ColliderInfo&)>;
+
     // 衝突コールバック設定（状態はColliderInfoのstateフィールドで判別）
-    void SetOnCollisionCallback(const std::function<void(Collider*, const ColliderInfo&)>& _callback)
-    {
-        fOnCollision_ = _callback;
-    }
+    void SetOnCollisionCallback(const CollisionCallBack& _callback) { fOnCollision_ = _callback; }
+
+    // トリガーコールバック設定
+    void SetOnTriggerEnterCallback(const CollisionCallBack& _callback) { fOnCollisionEnter_ = _callback; }
+    void SetOnTriggerStayCallback(const CollisionCallBack& _callback) { fOnCollisionStay_ = _callback; }
+    void SetOnTriggerExitCallback(const CollisionCallBack& _callback) { fOnCollisionExit_ = _callback; }
 
     // 自身のlayerを取得する
     uint32_t GetLayer() const { return collisionLayer_.GetLayer(); }
@@ -143,16 +147,19 @@ public:
     void SetBoundingBox(BoundingBox _boundingBox) { boundingBox_ = _boundingBox; }
 
     // ワールドトランスフォームを設定する
-    void SetWorldTransform(const WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
+    void SetWorldTransform(WorldTransform* _worldTransform) { worldTransform_ = _worldTransform; }
 
     // ワールドトランスフォームを取得する
-    const WorldTransform* GetWorldTransform();
+    WorldTransform* GetWorldTransform();
 
     // コライダーのオフセットを設定する
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
 
     // コライダーのオフセットを取得する
     Vector3 GetOffset() const { return offset_; }
+
+    Vector3 GetSize() const;
+
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) = 0;
@@ -181,6 +188,8 @@ protected:
 
     std::string name_;
 
+    Vector3 size_ = Vector3(1.0f, 1.0f, 1.0f); // コライダーのサイズ
+
     bool isDraw_ = true;
 
     Vector3 offset_ = Vector3(0.0f, 0.0f, 0.0f); // コライダーのオフセット
@@ -197,7 +206,7 @@ private:
     bool isStatic_ = false; // 静的かどうか 動かない物体
     CollisionLayer collisionLayer_; // 衝突判定の属性
     BoundingBox boundingBox_ = BoundingBox::NONE; // 衝突判定の形状
-    const WorldTransform* worldTransform_ = nullptr; // ワールド行列
+    WorldTransform* worldTransform_ = nullptr; // ワールド行列
 
     // 衝突状態の記録
     std::unordered_map<Collider*, CollisionData> collisionMap_;
@@ -206,7 +215,11 @@ private:
     std::vector<Collider*> currentCollisions_;
 
     // 衝突コールバック関数
-    std::function<void(Collider*, const ColliderInfo&)> fOnCollision_;
+    CollisionCallBack fOnCollision_;
+
+    CollisionCallBack fOnCollisionEnter_; // トリガー衝突時
+    CollisionCallBack fOnCollisionStay_; // トリガー衝突中
+    CollisionCallBack fOnCollisionExit_;// トリガー衝突離脱時
 
     WorldTransform defaultTransform_;
 
@@ -232,7 +245,7 @@ public:
     void Save(const std::string& _name) override;
 
     // 球の半径を設定する
-    void SetRadius(float _radius) { radius_ = _radius; }
+    void SetRadius(float _radius);
     // 球の半径を取得する
     float GetRadius() const { return radius_; }
 
@@ -264,7 +277,7 @@ public:
 
 
     // AABBの最小値と最大値を設定する
-    void SetMinMax(const Vector3& _min, const Vector3& _max) { min_ = _min; max_ = _max; }
+    void SetMinMax(const Vector3& _min, const Vector3& _max);
 
     // AABBの最小値を取得する
     Vector3 GetMin() const { return min_; }
@@ -299,7 +312,7 @@ public:
     void Save(const std::string& _name) override;
 
     // OBBの半分の大きさを設定する
-    void SetHalfExtents(const Vector3& _halfExtents) { halfExtents_ = _halfExtents; }
+    void SetHalfExtents(const Vector3& _halfExtents);
     // OBBの半分の大きさを取得する
     Vector3 GetHalfExtents() const { return halfExtents_; }
 
@@ -339,7 +352,7 @@ public:
     void Save(const std::string& _name) override;
 
     // カプセルの半径を設定する
-    void SetRadius(float _radius) { radius_ = _radius; }
+    void SetRadius(float _radius);
     // カプセルの半径を取得する
     float GetRadius() const { return radius_; }
 
@@ -354,7 +367,7 @@ public:
     Vector3 GetLocalPivot() const { return localPivot_; }
 
     // カプセルの高さを設定する
-    void SetHeight(float _height) { height_ = _height; }
+    void SetHeight(float _height);
     // カプセルの高さを取得する
     float GetHeight() const { return height_; }
 
@@ -373,6 +386,8 @@ public:
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
 
     void ImGui();
+
+    Vector3 GetCapsuleAABBSize();
 
 private:
     float radius_ = 0.0f; // カプセルの半径

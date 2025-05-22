@@ -9,15 +9,32 @@
 #include <Debug/ImguITools.h>
 #include <Features/Model/Primitive/Ring.h>
 #include <Features/Model/Primitive/Cylinder.h>
+#include <Features/PostEffects/DepthBasedOutLine.h>
+
+#include <Features/Effect/Emitter/ParticleEmitter.h>
 #include <Features/Model/Primitive/Triangle.h>
 #include <Features/Model/Primitive/Plane.h>
 
-
-#include <Features/Effect/Emitter/ParticleEmitter.h>
+#include <Features/Model/Primitive/Plane.h>
+#include <Features/Model/Primitive/Triangle.h>
 
 
 SampleScene::~SampleScene()
 {
+    for (auto& col : colliders_)
+    {
+        CollisionManager::GetInstance()->UnregisterCollider(col);
+        delete col;
+        col = nullptr;
+    }
+    colliders_.clear();
+
+    for (auto& model : models_)
+    {
+        delete model;
+        model = nullptr;
+    }
+    models_.clear();
 }
 
 void SampleScene::Initialize()
@@ -46,8 +63,8 @@ void SampleScene::Initialize()
     aModel_ = std::make_unique<ObjectModel>("sample");
     aModel_->Initialize("AnimSample/AnimSample.gltf");
 
-    plane_ = std::make_unique<ObjectModel>("plane2");
-    plane_->Initialize("Tile/Tile.gltf");
+    plane_ = std::make_unique<ObjectModel>("ground");
+    plane_->Initialize("terrain.obj");
     plane_->GetUVTransform().SetScale({ 100,100 });
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load("uvChecker.png");
@@ -61,7 +78,6 @@ void SampleScene::Initialize()
 
     Cylinder* cylinder = new Cylinder(1.0f, 2.0f,1.0f);
     cylinder->SetDivide(32);
-    cylinder->SetEndAngle(3.14f);
     cylinder->SetLoop(true);
 
     Triangle* triangle = new Triangle();
@@ -70,19 +86,32 @@ void SampleScene::Initialize()
         Vector3(1.0f, -1.0f, 0.0f),
         Vector3(-1.0f, -1.0f, 0.0f)
     );
-    triangle->SetNormal(Vector3(0.0f, 1.0f, 0.0f).Normalize());
+    triangle->SetNormal(Vector3(0.0f, 0.0f, -1.0f).Normalize());
 
     Plane* plane = new Plane();
     plane->SetNormal(Vector3(1.0f, 1.0f, 0.0f).Normalize());
 
 
-    test_ = std::make_unique<ObjectModel>("triangle");
-    test_->Initialize(triangle->Generate("triangle"));
+    test_ = std::make_unique<ObjectModel>("Cylinder");
+    test_->Initialize(cylinder->Generate("Cylinder"));
+    test_->translate_.y = 1.0f;
 
-    emitter_ = std::make_unique<ParticleEmitter>();
-    emitter_->Initialize("test");
+    //emitter_ = std::make_unique<ParticleEmitter>();
+    //emitter_->Initialize("test");
+
+    DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
 
     ParticleSystem::GetInstance()->SetCamera(&SceneCamera_);
+
+    soundInstance_ = AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
+    //voiceInstance_ = soundInstance_->Play(1.0f, true);
+
+    skyBox_ = std::make_unique<SkyBox>();
+    skyBox_->Initialize(30.0f);
+    skyBox_->SetTexture("rosendal_plains_2_2k.dds");
+
+    Create();
+
 }
 
 void SampleScene::Update()
@@ -95,7 +124,7 @@ void SampleScene::Update()
 
     if (ImGui::Button("rot"))
     {
-        aModel_->ChangeAnimation("RotateAnim", 0.5f,true);
+        aModel_->ChangeAnimation("RotateAnim", 0.5f, true);
     }
 
     if (ImGui::Button("scale"))
@@ -103,9 +132,15 @@ void SampleScene::Update()
         aModel_->ChangeAnimation("ScaleAnim", 0.5f);
     }
 
-    ImGuiTool::TimeLine("TimeLine", sequence_.get());
+    //ImGuiTool::TimeLine("TimeLine", sequence_.get());
 
     lights_->ImGui();
+    static float volume = 1.0f;
+    ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f);
+    if (ImGui::Button("Apply##volme"))
+    {
+        voiceInstance_->SetVolume(volume);
+    }
 
     static bool play = false;
     ImGui::Checkbox("Play", &play);
@@ -113,12 +148,16 @@ void SampleScene::Update()
     if (play)
         testColor_= sequence_->GetValue<Vector4>("color");
 
-    emitter_->ShowDebugWindow();
+    //emitter_->ShowDebugWindow();
 
 
 #endif // _DEBUG
     LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
+    for (auto& col : colliders_)
+    {
+        CollisionManager::GetInstance()->RegisterCollider(col);
+    }
 
     test_->Update();
     oModel_->Update();
@@ -151,17 +190,27 @@ void SampleScene::Update()
 
 void SampleScene::Draw()
 {
+    //skyBox_->Draw(&SceneCamera_);
+
     ModelManager::GetInstance()->PreDrawForObjectModel();
 
-    oModel_->Draw(&SceneCamera_, testColor_);
-    //oModel2_->Draw(&SceneCamera_, { 1,1,1,1 });
-    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+    skyBox_->QueueCmdCubeTexture();
 
-    //aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+    for (auto& model : models_)
+    {
+        model->Draw(&SceneCamera_, 0, { 1,1,1,1 });
+    }
 
-    test_->Draw(&SceneCamera_, 2, { 1,1,1,1 });
-    Sprite::PreDraw();
-    sprite_->Draw();
+    //oModel_->Draw(&SceneCamera_, testColor_);
+    //oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
+    //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+
+    ////aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
+
+    //test_->Draw(&SceneCamera_, 0, { 1,1,1,1 });
+
+    //Sprite::PreDraw();
+    //sprite_->Draw();
 
 
     //button_->Draw();
@@ -179,8 +228,31 @@ void SampleScene::DrawShadow()
 
 }
 
+void SampleScene::Create()
+{
+    auto rand = RandomGenerator::GetInstance();
+
+    for (int i = 0; i < 50; ++i)
+    {
+        ObjectModel* model = new ObjectModel("test");
+        model->Initialize("Cube/Cube.obj");
+        model->translate_.x = rand->GetRandValue(-0.0f, 25.0f);
+        model->translate_.y = 0.0f;
+        model->translate_.z = rand->GetRandValue(-0.0f, 25.0f);
+
+        model->Update();
+
+        AABBCollider* collider = new AABBCollider("test");
+        collider->SetLayer("temp");
+        collider->SetWorldTransform(model->GetWorldTransform());
+        collider->SetMinMax(model->GetMin(), model->GetMax());
+
+        models_.push_back(model);
+        colliders_.push_back(collider);
+    }
+}
+
 #ifdef _DEBUG
-#include <imgui.h>
 void SampleScene::ImGui()
 {
 

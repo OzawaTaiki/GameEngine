@@ -19,6 +19,12 @@
 
 #include <Features/Collision/Manager/CollisionManager.h>
 
+#include <System/Audio/AudioSystem.h>
+#include <System/Audio/SoundInstance.h>
+#include <system/Audio/VoiceInstance.h>
+
+#include <Features/Model/SkyBox.h>
+
 #include <memory>
 
 class SampleScene : public BaseScene
@@ -58,9 +64,17 @@ private:
 
     std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
 
+    std::shared_ptr<SoundInstance> soundInstance_ = nullptr;
+    std::shared_ptr<VoiceInstance> voiceInstance_ = nullptr;
+
+    std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
     Vector4 testColor_ = { 1,1,1,1 };
 
+    std::vector<ObjectModel*> models_;
+    std::vector<AABBCollider*> colliders_;
+
+    void Create();
 
 #ifdef _DEBUG
     void ImGui();

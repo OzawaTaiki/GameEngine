@@ -31,6 +31,8 @@ SamplerState gSampler : register(s0);
 Texture2D<float> gShadowMap : register(t1);
 SamplerComparisonState gShadowSampler : register(s1);
 
+TextureCube<float4> gEnviromentTexture : register(t2);
+
 //TextureCube<float> gPointLightShadowMap : register(t2);
 //SamplerState gPointLightShadowSampler : register(s2);
 
@@ -40,6 +42,8 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
 
 float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
 float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
+
+float3 CalculateEnViromentColor(VertexShaderOutput _input, float3 _cameraPos);
 
 float ComputeShadow(float4 shadowCoord)
 {
@@ -76,11 +80,11 @@ PixelShaderOutput main(VertexShaderOutput _input)
     float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
     float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor) * shadowFactor;
 
-
+    float3 envColor = CalculateEnViromentColor(_input, worldPosition);
 
     if (enableLighting != 0)
     {
-        output.color.rgb = directionalLight + pointLight + spotLightcColor;
+        output.color.rgb = directionalLight + pointLight + spotLightcColor + envColor;
         output.color.a = materialColor.a * textureColor.a;
     }
     else
@@ -189,4 +193,14 @@ float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3
         lighting += CalculateSpotLighting(_input, SL[i], _toEye, _textureColor);
     }
     return lighting;
+}
+
+float3 CalculateEnViromentColor(VertexShaderOutput _input, float3 _cameraPos)
+{
+
+    float3 cameraToPosition = normalize(_input.worldPosition - _cameraPos);
+    float3 reflectVector = reflect(cameraToPosition, normalize(_input.normal));
+    float4 envColor = gEnviromentTexture.Sample(gSampler, reflectVector);
+    
+    return envColor.rgb;
 }

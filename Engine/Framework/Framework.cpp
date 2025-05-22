@@ -6,6 +6,7 @@
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
 #include <Features/Event/EventManager.h>
+#include <System/Audio/AudioSystem.h>
 
 #include <Features/Json/JsonHub.h>
 
@@ -71,12 +72,14 @@ void Framework::Initialize()
     audio_ = Audio::GetInstance();
     audio_->Initialize();
 
+    AudioSystem::GetInstance()->Initialize();
+
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
 
 
     collisionManager_ = CollisionManager::GetInstance();
-    collisionManager_->Initialize();
+    collisionManager_->Initialize(Vector2{ 150,100 }, 5, { 0,0 });
 
     sceneManager_ = SceneManager::GetInstance();
 

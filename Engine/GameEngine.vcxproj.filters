@@ -220,6 +220,15 @@
     <Filter Include="Features\Effect\Modifier\Preset">
       <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\postEffects">
+      <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\PosttEffects">
+      <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Collision\Tree">
+      <UniqueIdentifier>{a01a5b5e-fd33-4c0b-9cf1-f26c55606ed6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -483,6 +492,9 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
@@ -491,6 +503,23 @@
     </ClCompile>
     <ClCompile Include="System\Time\Time_MT.cpp">
       <Filter>System\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\Dissolve.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\AudioSystem.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\SoundInstance.cpp" />
+    <ClCompile Include="System\Audio\VoiceInstance.cpp" />
+    <ClCompile Include="Features\Model\SkyBox.cpp">
+      <Filter>Features\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\Tree\QuadTree.cpp">
+      <Filter>Features\Collision\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\Tree\Cell.cpp">
+      <Filter>Features\Collision\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -533,7 +562,36 @@
     <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="PointLightShadowMap.hlsl" />
+    <FxCompile Include="PointLightShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\RadialBlur.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\Dissolve.hlsl">
+      <Filter>HLSL\postEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -863,6 +921,9 @@
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
+    <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Triangle.h">
       <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
@@ -871,6 +932,27 @@
     </ClInclude>
     <ClInclude Include="System\Time\Time_MT.h">
       <Filter>System\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\Dissolve.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SoundInstance.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VoiceInstance.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioSystem.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\SkyBox.h">
+      <Filter>Features\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\Tree\Cell.h">
+      <Filter>Features\Collision\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\Tree\QuadTree.h">
+      <Filter>Features\Collision\Tree</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
