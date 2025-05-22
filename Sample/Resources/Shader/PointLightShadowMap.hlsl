@@ -32,14 +32,21 @@ cbuffer TransformationMatrix : register(b0)
 struct PointLight
 {
     float4 color;
+
     float3 position;
     float intensity;
+
     float radius;
     float decay;
     int isHalf;
+    int castShadow;
+    
+    float shadowFactor;
+    float3 pad;
 
     float4x4 lightVP[6];
 };
+
 
 cbuffer gLightGroup : register(b1)
 {

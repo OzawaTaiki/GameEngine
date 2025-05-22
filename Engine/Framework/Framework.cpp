@@ -43,6 +43,9 @@ void Framework::Initialize()
     rtvManager_ = RTVManager::GetInstance();
     rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->Initialize();
+#endif
 
     PSOManager::GetInstance()->Initialize();
 
@@ -85,9 +88,6 @@ void Framework::Initialize()
 
 
 
-#ifdef _DEBUG
-    ImGuiDebugManager::GetInstance()->Initialize();
-#endif
 
 }
 

@@ -573,21 +573,22 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     shadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     shadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+
+    D3D12_DESCRIPTOR_RANGE PLShadowMapRange[1] = {};
+    PLShadowMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
+    PLShadowMapRange[0].NumDescriptors = 1;
+    PLShadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    PLShadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
     D3D12_DESCRIPTOR_RANGE enviromentMapRange[1] = {};
-    enviromentMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
-    enviromentMapRange[0].NumDescriptors = 1; 
+    enviromentMapRange[0].BaseShaderRegister = 3;  // t3 にバインド
+    enviromentMapRange[0].NumDescriptors = 1;
     enviromentMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     enviromentMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    //D3D12_DESCRIPTOR_RANGE PLShadowMapRange[1] = {};
-    //PLShadowMapRange[0].BaseShaderRegister = 2;  // t2 にバインド
-    //PLShadowMapRange[0].NumDescriptors = 32 * 6;
-    //PLShadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    //PLShadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[8] = {};
+    D3D12_ROOT_PARAMETER rootParameters[9] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -627,16 +628,16 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     rootParameters[6].DescriptorTable.NumDescriptorRanges = _countof(shadowMapRange);
 
     // PLシャドウマップ
-   /* rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[7].DescriptorTable.pDescriptorRanges = PLShadowMapRange;
-    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(PLShadowMapRange);*/
-
-    // 環境マップ用のテクスチャ
     rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[7].DescriptorTable.pDescriptorRanges = enviromentMapRange;
-    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(enviromentMapRange);
+    rootParameters[7].DescriptorTable.pDescriptorRanges = PLShadowMapRange;
+    rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(PLShadowMapRange);
+
+    // 環境マップ用のテクスチャ
+    rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[8].DescriptorTable.pDescriptorRanges = enviromentMapRange;
+    rootParameters[8].DescriptorTable.NumDescriptorRanges = _countof(enviromentMapRange);
 
     
 
