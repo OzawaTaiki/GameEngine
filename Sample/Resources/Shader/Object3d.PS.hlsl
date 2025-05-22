@@ -94,7 +94,7 @@ float ComputePointLightShadow(int lightIndex, float3 worldPos, PointLight _PL)
     ).r;
 
     // シャドウバイアスを考慮
-    float bias = 0.005;
+    float bias = 0.001;
     float shadow = currentDepth > closestDepth + bias ? _PL.shadowFactor : 1.0;
 
 
@@ -119,7 +119,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     // シャドウファクターを適用したライティング
     float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor) * shadowFactor;
     float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
-    float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor) * shadowFactor;
+    float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor);
 
     float3 envColor = CalculateEnViromentColor(_input, worldPosition);
 

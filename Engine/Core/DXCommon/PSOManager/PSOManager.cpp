@@ -541,13 +541,13 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
     // pointLight用のサンプラ
     staticSamplers[2].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT; // 比較用フィルタ
-    staticSamplers[2].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP; // 境界外を無効化
-    staticSamplers[2].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    staticSamplers[2].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[2].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER; // 境界外を無効化
+    staticSamplers[2].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    staticSamplers[2].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
     staticSamplers[2].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // 影の外は光が当たる
     staticSamplers[2].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 深度比較
     staticSamplers[2].MaxLOD = D3D12_FLOAT32_MAX;
-    staticSamplers[2].ShaderRegister = 2; // s1
+    staticSamplers[2].ShaderRegister = 2; // s2
     staticSamplers[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 
@@ -569,7 +569,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
     D3D12_DESCRIPTOR_RANGE shadowMapRange[1] = {};
     shadowMapRange[0].BaseShaderRegister = 1;  // t1 にバインド
-    shadowMapRange[0].NumDescriptors = 1; 
+    shadowMapRange[0].NumDescriptors = 1;
     shadowMapRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     shadowMapRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -639,7 +639,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     rootParameters[8].DescriptorTable.pDescriptorRanges = enviromentMapRange;
     rootParameters[8].DescriptorTable.NumDescriptorRanges = _countof(enviromentMapRange);
 
-    
+
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ

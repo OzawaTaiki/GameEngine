@@ -39,6 +39,8 @@ void PointLightComponent::CreateShadowMaps(uint32_t shadowMapSize)
     // 6面分のシャドウマップを作成
     std::string mapName = name_ + "_ShadowMap";
 
+    shadowMapSize = 4096;
+
     uint32_t handle =
         RTVManager::GetInstance()->CreateCubemapRenderTarget(
             mapName,
