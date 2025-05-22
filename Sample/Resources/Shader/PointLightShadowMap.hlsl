@@ -40,7 +40,7 @@ struct PointLight
     float decay;
     int isHalf;
     int castShadow;
-    
+
     float shadowFactor;
     float3 pad;
 

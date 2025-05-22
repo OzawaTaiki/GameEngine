@@ -224,6 +224,7 @@ void LightGroup::ImGui()
 void LightGroup::DrawDirectionalLightImGui()
 {
 #ifdef _DEBUG
+    bool isDirty = false;
     if (ImGui::CollapsingHeader("Directional Light")) {
         if (!directionalLight_) {
             if (ImGui::Button("Create Directional Light")) {
@@ -241,11 +242,12 @@ void LightGroup::DrawDirectionalLightImGui()
         Vector3 dir = data.direction;
         if (ImGui::DragFloat3("Direction", &dir.x, 0.01f)) {
             directionalLight_->SetDirection(dir); // Normalized internally
+            isDirty = true;
         }
 
-        ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
+        isDirty|=ImGui::DragFloat("Intensity", &data.intensity, 0.01f, 0.0f, 10.0f);
 
-        ImGui::DragFloat("Shadow Factor", &data.shadowFactor, 0.01f, 0.0f, 1.0f);
+        isDirty |= ImGui::DragFloat("Shadow Factor", &data.shadowFactor, 0.01f, 0.0f, 1.0f);
 
         bool isHalf = data.isHalf != 0;
         if (ImGui::Checkbox("Half Lambert", &isHalf)) {
@@ -256,6 +258,12 @@ void LightGroup::DrawDirectionalLightImGui()
         if (ImGui::Checkbox("Cast Shadow", &castShadow)) {
             directionalLight_->SetCastShadow(castShadow);
         }
+
+        if(isDirty)
+        {
+            directionalLight_->UpdateViewProjection(shadowMapSize_);
+        }
+
     }
 #endif // _DEBUG
 
