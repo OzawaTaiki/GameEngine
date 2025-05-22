@@ -76,6 +76,26 @@ WorldTransform* Collider::GetWorldTransform()
     return worldTransform_;
 }
 
+Vector3 Collider::GetSize() const
+{
+    Vector3 scale;
+    if (worldTransform_ != nullptr)
+    {
+        scale = worldTransform_->scale_;
+    }
+    else
+    {
+        scale = defaultTransform_.scale_;
+    }
+
+    return Vector3
+    {
+        size_.x * scale.x,
+        size_.y * scale.y,
+        size_.z * scale.z
+    };
+}
+
 
 void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
 {
@@ -236,6 +256,12 @@ void SphereCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
+void SphereCollider::SetRadius(float _radius)
+{
+    radius_ = _radius;
+    size_ = Vector3(_radius, _radius, _radius);
+}
+
 bool SphereCollider::Contains(const Vector3& _point)
 {
     // オフセットとワールド変換を考慮した中心からの距離でチェックする
@@ -267,9 +293,10 @@ Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
 void SphereCollider::ImGui()
 {
 #ifdef _DEBUG
-
+    ImGui::PushID(this);
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f);
+    ImGui::PopID();
 
 #endif // _DEBUG
 }
@@ -333,6 +360,14 @@ void AABBCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
+void AABBCollider::SetMinMax(const Vector3& _min, const Vector3& _max)
+{
+    min_ = _min;
+    max_ = _max;
+    // サイズを更新
+    size_ = max_ - min_;
+}
+
 bool AABBCollider::Contains(const Vector3& _point)
 {
     return min_.x <= _point.x && _point.x <= max_.x &&
@@ -352,6 +387,7 @@ Vector3 AABBCollider::GetClosestPoint(const Vector3& _point)
 void AABBCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
 
     Collider::ImGui();
 
@@ -373,6 +409,7 @@ void AABBCollider::ImGui()
         if (max_.z < min_.z)
             min_.z = max_.z;
     }
+    ImGui::PopID();
 
 
 #endif // _DEBUG
@@ -427,6 +464,12 @@ void OBBCollider::Save(const std::string& _name)
         jsonBinder_->RegisterVariable("localPivot", &localPivot_);
     }
     jsonBinder_->Save();
+}
+
+void OBBCollider::SetHalfExtents(const Vector3& _halfExtents)
+{
+    halfExtents_ = _halfExtents;
+    size_ = halfExtents_ * 2.0f; // サイズは半分の大きさの2倍
 }
 
 bool OBBCollider::Contains(const Vector3& _point)
@@ -511,10 +554,12 @@ Vector3 OBBCollider::GetCenter()
 void OBBCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
 
     Collider::ImGui();
     ImGui::DragFloat3("HalfExtents", &halfExtents_.x, 0.01f);
     ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+    ImGui::PopID();
 
 #endif // _DEBUG
 }
@@ -663,6 +708,19 @@ void CapsuleCollider::Save(const std::string& _name)
     jsonBinder_->Save();
 }
 
+void CapsuleCollider::SetRadius(float _radius)
+{
+    radius_ = _radius;
+    size_ = GetCapsuleAABBSize();
+}
+
+
+void CapsuleCollider::SetHeight(float _height)
+{
+    height_ = _height;
+    // サイズは半径の2倍と高さ
+    size_ = GetCapsuleAABBSize();
+}
 
 bool CapsuleCollider::Contains(const Vector3& _point)
 {
@@ -767,6 +825,7 @@ Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& _point, const Vect
 void CapsuleCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f, 0.01f, 1000.0f);
     ImGui::DragFloat("Height", &height_, 0.01f, 0.01f, 1000.0f);
@@ -775,7 +834,22 @@ void CapsuleCollider::ImGui()
         direction_ = direction_.Normalize();
     }
     ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+    ImGui::PopID();
 #endif // _DEBUG
+}
+
+Vector3 CapsuleCollider::GetCapsuleAABBSize()
+{
+    Vector3 halfVec = direction_ * (height_ * 0.5f);
+    Vector3 p1 = GetCenter() - halfVec; // 一方の端点
+    Vector3 p2 = GetCenter() + halfVec; // もう一方の端点
+
+    // AABBの最小点と最大点を計算
+    Vector3 min = Vector3::Min(p1, p2) - Vector3(radius_, radius_, radius_);
+    Vector3 max = Vector3::Max(p1, p2) + Vector3(radius_, radius_, radius_);
+
+    // AABBのサイズを計算
+    return max - min;
 }
 
 std::string ToString(BoundingBox _box)

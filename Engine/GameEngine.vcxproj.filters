@@ -226,6 +226,9 @@
     <Filter Include="Features\PosttEffects">
       <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Collision\Tree">
+      <UniqueIdentifier>{a01a5b5e-fd33-4c0b-9cf1-f26c55606ed6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -508,6 +511,12 @@
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
     <ClCompile Include="Features\Model\SkyBox.cpp">
       <Filter>Features\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\Tree\QuadTree.cpp">
+      <Filter>Features\Collision\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\Tree\Cell.cpp">
+      <Filter>Features\Collision\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -932,6 +941,12 @@
     </ClInclude>
     <ClInclude Include="Features\Model\SkyBox.h">
       <Filter>Features\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\Tree\Cell.h">
+      <Filter>Features\Collision\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\Tree\QuadTree.h">
+      <Filter>Features\Collision\Tree</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

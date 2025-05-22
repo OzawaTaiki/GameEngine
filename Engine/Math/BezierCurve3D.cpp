@@ -54,7 +54,10 @@ void BezierCurve3D::DrawWithControlPoints(const Vector4& _curveColor, const Vect
     // 制御点間に線を描画（制御多角形）
     for (size_t i = 1; i < controlPoints_.size(); ++i)
     {
-        LineDrawer::GetInstance()->RegisterPoint(controlPoints_[i - 1], controlPoints_[i], { 0.0f, 1.0f, 0.0f, 0.5f }); // 半透明の緑色
+        Vector3 worldPos1 = controlPoints_[i - 1] + worldPosition_;
+        Vector3 worldPos2 = controlPoints_[i] + worldPosition_;
+
+        LineDrawer::GetInstance()->RegisterPoint(worldPos1, worldPos2, { 0.0f, 1.0f, 0.0f, 0.5f }); // 半透明の緑色
     }
 
     // 制御点を視覚化
@@ -63,15 +66,117 @@ void BezierCurve3D::DrawWithControlPoints(const Vector4& _curveColor, const Vect
     for (const auto& point : controlPoints_)
     {
         // 各制御点に小さな十字を描画
-        Vector3 horizontal1 = point + Vector3(-pointSize, 0.0f, 0.0f);
-        Vector3 horizontal2 = point + Vector3(pointSize, 0.0f, 0.0f);
-        Vector3 vertical1 = point + Vector3(0.0f, -pointSize, 0.0f);
-        Vector3 vertical2 = point + Vector3(0.0f, pointSize, 0.0f);
+        Vector3 horizontal1 = point + worldPosition_ + Vector3(-pointSize, 0.0f, 0.0f);
+        Vector3 horizontal2 = point + worldPosition_ + Vector3(pointSize, 0.0f, 0.0f);
+        Vector3 vertical1 = point+ worldPosition_ + Vector3(0.0f, -pointSize, 0.0f);
+        Vector3 vertical2 = point+ worldPosition_ + Vector3(0.0f, pointSize, 0.0f);
 
         LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _controlPointColor);
         LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _controlPointColor);
     }
 }
+
+
+void BezierCurve3D::DrawMovingCross(float _progress, float _crossSize, const Vector4& _color) const
+{
+    // 等速移動のためのt値が必要
+    static std::vector<float> equallySpacedTValues;
+
+    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
+    if (equallySpacedTValues.empty())
+    {
+        equallySpacedTValues = GenerateEquallySpacedTValues(100);
+    }
+
+    // 進行度を0〜1の範囲に制限
+    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
+
+    // 等速移動の位置を計算
+    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues);
+
+    // 十字を描画
+    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
+    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
+    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
+    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
+
+    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
+    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
+}
+
+void BezierCurve3D::Draw(const Vector3& _worldPos, const Vector4& _color) const
+{
+    if (!isDraw_)  return;
+
+    // 曲線上の点を生成
+    std::vector<Vector3> points = GenerateCurvePoints();
+
+    // 連続する点間に線を描画
+    for (size_t i = 1; i < points.size(); ++i)
+    {
+        LineDrawer::GetInstance()->RegisterPoint(points[i - 1], points[i], _color);
+    }
+}
+
+void BezierCurve3D::DrawWithControlPoints(const Vector3& _worldPos, const Vector4& _curveColor, const Vector4& _controlPointColor) const
+{
+    if (!isDraw_)  return;
+
+    // 曲線を描画
+    Draw(_curveColor);
+
+    // 制御点間に線を描画（制御多角形）
+    for (size_t i = 1; i < controlPoints_.size(); ++i)
+    {
+        Vector3 worldPos1 = controlPoints_[i - 1] + _worldPos;
+        Vector3 worldPos2 = controlPoints_[i] + _worldPos;
+
+        LineDrawer::GetInstance()->RegisterPoint(worldPos1, worldPos2, { 0.0f, 1.0f, 0.0f, 0.5f }); // 半透明の緑色
+    }
+
+    // 制御点を視覚化
+    const float pointSize = 0.1f; // 十字のサイズ
+
+    for (const auto& point : controlPoints_)
+    {
+        // 各制御点に小さな十字を描画
+        Vector3 horizontal1 = point + _worldPos + Vector3(-pointSize, 0.0f, 0.0f);
+        Vector3 horizontal2 = point + _worldPos + Vector3(pointSize, 0.0f, 0.0f);
+        Vector3 vertical1 = point + _worldPos + Vector3(0.0f, -pointSize, 0.0f);
+        Vector3 vertical2 = point + _worldPos + Vector3(0.0f, pointSize, 0.0f);
+
+        LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _controlPointColor);
+        LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _controlPointColor);
+    }
+}
+
+void BezierCurve3D::DrawMovingCross(const Vector3& _worldPos, float _progress, float _crossSize, const Vector4& _color) const
+{
+    // 等速移動のためのt値が必要
+    static std::vector<float> equallySpacedTValues;
+
+    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
+    if (equallySpacedTValues.empty())
+    {
+        equallySpacedTValues = GenerateEquallySpacedTValues(100);
+    }
+
+    // 進行度を0〜1の範囲に制限
+    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
+
+    // 等速移動の位置を計算
+    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues) + _worldPos;
+
+    // 十字を描画
+    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
+    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
+    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
+    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
+
+    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
+    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
+}
+
 
 void BezierCurve3D::Load(const std::string& _filePath)
 {
@@ -81,6 +186,7 @@ void BezierCurve3D::Load(const std::string& _filePath)
     // JSONから制御点を読み込む
     jsonBinder_->RegisterVariable("ControlPoints", &controlPoints_);
     jsonBinder_->RegisterVariable("Resolution", &resolution_);
+    jsonBinder_->RegisterVariable("WorldPosition", &worldPosition_);
 
 }
 
@@ -139,34 +245,42 @@ const std::vector<Vector3>& BezierCurve3D::GetControlPoints() const
 // 曲線上の点を計算する関数
 Vector3 BezierCurve3D::CalculatePoint(float _t) const
 {
+    Vector3 localpos = Vector3(0.0f, 0.0f, 0.0f);
+
     // tの値を0〜1の範囲に制限
     if (_t <= 0.0f)
     {
-        return controlPoints_.front(); // 始点を返す
+        localpos= controlPoints_.front(); // 始点を返す
+        return localpos + worldPosition_;
     }
     if (_t >= 1.0f)
     {
-        return controlPoints_.back(); // 終点を返す
+        localpos= controlPoints_.back(); // 終点を返す
+        return localpos + worldPosition_;
     }
 
     // 制御点が不足している場合
     if (controlPoints_.size() < 2)
     {
-        return controlPoints_.empty() ? Vector3() : controlPoints_[0];
+        localpos= controlPoints_.empty() ? Vector3() : controlPoints_[0];
+        return localpos + worldPosition_;
     }
 
     // 特別な最適化：制御点が4つ（3次ベジエ曲線）の場合
     if (controlPoints_.size() == 4)
     {
-        return CalculateCubicPoint(_t,
+        localpos= CalculateCubicPoint(_t,
             controlPoints_[0],
             controlPoints_[1],
             controlPoints_[2],
             controlPoints_[3]);
+        return localpos + worldPosition_;
     }
 
-    // 一般的なケースでは再帰的なde Casteljauアルゴリズムを使用
-    return CalculateBezierPointRecursive(_t, controlPoints_);
+    localpos = CalculateBezierPointRecursive(_t, controlPoints_);
+
+    return localpos + worldPosition_;
+
 }
 
 // 3次ベジエ曲線の計算（最適化のため）
@@ -605,32 +719,6 @@ void BezierCurve3D::InvalidateCache()
     cachedEquallySpacedTValues_.clear();
 }
 
-void BezierCurve3D::DrawMovingCross(float _progress, float _crossSize, const Vector4& _color) const
-{
-    // 等速移動のためのt値が必要
-    static std::vector<float> equallySpacedTValues;
-
-    // 必要に応じてt値を生成（一度だけ計算してキャッシュ）
-    if (equallySpacedTValues.empty())
-    {
-        equallySpacedTValues = GenerateEquallySpacedTValues(100);
-    }
-
-    // 進行度を0〜1の範囲に制限
-    _progress = (std::max)(0.0f, (std::min)(1.0f, _progress));
-
-    // 等速移動の位置を計算
-    Vector3 position = GetPositionAtEqualDistanceProgress(_progress, &equallySpacedTValues);
-
-    // 十字を描画
-    Vector3 horizontal1 = position + Vector3(-_crossSize, 0.0f, 0.0f);
-    Vector3 horizontal2 = position + Vector3(_crossSize, 0.0f, 0.0f);
-    Vector3 vertical1 = position + Vector3(0.0f, -_crossSize, 0.0f);
-    Vector3 vertical2 = position + Vector3(0.0f, _crossSize, 0.0f);
-
-    LineDrawer::GetInstance()->RegisterPoint(horizontal1, horizontal2, _color);
-    LineDrawer::GetInstance()->RegisterPoint(vertical1, vertical2, _color);
-}
 
 void BezierCurve3D::ImGui()
 {
@@ -644,6 +732,9 @@ void BezierCurve3D::ImGui()
     {
         SetResolution(resolution);
     }
+
+    if (ImGui::DragFloat3("Position", &worldPosition_.x, 0.01f))
+        InvalidateCache();
 
     ImGui::Checkbox("DrawLine", &isDraw_);
 

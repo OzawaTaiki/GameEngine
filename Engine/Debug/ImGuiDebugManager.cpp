@@ -11,12 +11,15 @@ ImGuiDebugManager* ImGuiDebugManager::GetInstance()
 void ImGuiDebugManager::Initialize()
 {
     debugWindows_.clear();
+    colliderDebugWindows_.clear();
     isSelect_.clear();
 }
 
 void ImGuiDebugManager::ShowDebugWindow()
 {
 #ifdef _DEBUG
+    //ImGui::ShowIDStackToolWindow();
+
     ImGui::Begin("Debug");
     {
         static bool isSelect[9] = { true };
@@ -84,7 +87,7 @@ void ImGuiDebugManager::ShowDebugWindow()
         for (auto& [name, func] : debugWindows_)
         {
             bool flag = isSelect_[i];
-            if (ImGui::Selectable(name.c_str(), &flag))
+            if (ImGui::Selectable((name + "##Debug").c_str(), &flag))
                 isSelect_[i] = flag;
 
             ++i;
@@ -96,7 +99,7 @@ void ImGuiDebugManager::ShowDebugWindow()
         {
             if (name == "CollisionManager") continue;
             bool flag = colliderIsSelect_[i];
-            if (ImGui::Selectable(name.c_str(), &flag))
+            if (ImGui::Selectable((name + "##ColliderDebug").c_str(), &flag))
                 colliderIsSelect_[i] = flag;
             ++i;
         }
@@ -111,10 +114,12 @@ void ImGuiDebugManager::ShowDebugWindow()
             size_t i = 0;
             for (auto& [name, func] : debugWindows_)
             {
+                std::string label = name + "##Debug";
+
                 if (isSelect_[i])
                 {
                     bool flag = isSelect_[i];
-                    if (ImGui::BeginTabItem(name.c_str(), reinterpret_cast<bool*>(&flag)))
+                    if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
                     {
                         func();
                         ImGui::EndTabItem();
@@ -130,16 +135,19 @@ void ImGuiDebugManager::ShowDebugWindow()
         colliderDebugWindows_["CollisionManager"]();
         ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
         {
-
             size_t i = 0;
+            std::string label = "CollisionManager##Debug";
+
             for (auto& [name, func] : colliderDebugWindows_)
             {
                 if (name == "CollisionManager") continue;
 
                 if (colliderIsSelect_[i])
                 {
+                    label = name + "##ColliderDebug";
+
                     bool flag = colliderIsSelect_[i];
-                    if (ImGui::BeginTabItem(name.c_str(), reinterpret_cast<bool*>(&flag)))
+                    if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
                     {
                         func();
                         ImGui::EndTabItem();
@@ -160,7 +168,7 @@ void ImGuiDebugManager::ShowDebugWindow()
 std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::function<void()> _func)
 {
     std::string name = _name;
-    int32_t count = 0;
+    int32_t count = 1;
 
     // すでに同じ名前のデバッグウィンドウが存在する場合、名前を変更する
     if (debugWindows_.contains(name))
@@ -169,8 +177,12 @@ std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::fun
 
         while (debugWindows_.find(name) != debugWindows_.end())
         {
-            name = name + std::to_string(count);
-            it++;
+            std::string num;
+            if(count < 10)
+                num = "0";
+            num += std::to_string(count);
+            name = _name + num;
+            it++; ++count;
         }
     }
 
@@ -203,7 +215,7 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
 {
 
     std::string name = _name;
-    int32_t count = 0;
+    int32_t count = 1;
 
     // すでに同じ名前のデバッグウィンドウが存在する場合、名前を変更する
     if (colliderDebugWindows_.contains(name))
@@ -212,8 +224,12 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
 
         while (colliderDebugWindows_.find(name) != colliderDebugWindows_.end())
         {
-            name = name + std::to_string(count);
-            it++;
+            std::string num;
+            if (count < 10)
+                num = "0";
+            num += std::to_string(count);
+            name = _name + num;
+            it++; ++count;
         }
     }
 

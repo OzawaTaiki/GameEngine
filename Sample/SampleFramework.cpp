@@ -38,6 +38,8 @@ void SampleFramework::Initialize()
     currentTex_ = "default";
     redertextureName_["default"] = "postEffect";
     redertextureName_["postEffect"] = "default";
+
+    Time::SetDeltaTimeFixed(false);
 }
 
 void SampleFramework::Update()
