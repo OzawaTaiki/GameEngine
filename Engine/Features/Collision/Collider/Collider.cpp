@@ -293,9 +293,10 @@ Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
 void SphereCollider::ImGui()
 {
 #ifdef _DEBUG
-
+    ImGui::PushID(this);
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f);
+    ImGui::PopID();
 
 #endif // _DEBUG
 }
@@ -386,6 +387,7 @@ Vector3 AABBCollider::GetClosestPoint(const Vector3& _point)
 void AABBCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
 
     Collider::ImGui();
 
@@ -407,6 +409,7 @@ void AABBCollider::ImGui()
         if (max_.z < min_.z)
             min_.z = max_.z;
     }
+    ImGui::PopID();
 
 
 #endif // _DEBUG
@@ -551,10 +554,12 @@ Vector3 OBBCollider::GetCenter()
 void OBBCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
 
     Collider::ImGui();
     ImGui::DragFloat3("HalfExtents", &halfExtents_.x, 0.01f);
     ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+    ImGui::PopID();
 
 #endif // _DEBUG
 }
@@ -820,6 +825,7 @@ Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& _point, const Vect
 void CapsuleCollider::ImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f, 0.01f, 1000.0f);
     ImGui::DragFloat("Height", &height_, 0.01f, 0.01f, 1000.0f);
@@ -828,6 +834,7 @@ void CapsuleCollider::ImGui()
         direction_ = direction_.Normalize();
     }
     ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
+    ImGui::PopID();
 #endif // _DEBUG
 }
 
