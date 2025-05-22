@@ -93,6 +93,7 @@ void Framework::Initialize()
 
 void Framework::Update()
 {
+    gameTime_->BeginFrame();
     if (winApp_->ProcessMessage())
     {
         endRequest_ = true;
@@ -103,7 +104,6 @@ void Framework::Update()
     ImGuiDebugManager::GetInstance()->ShowDebugWindow();
 
     Time::Update();
-    gameTime_->Update();
 
     input_->Update();
 

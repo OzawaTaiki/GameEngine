@@ -1,6 +1,8 @@
 #include <Features/Scene/Manager/SceneManager.h>
 #include <System/Input/Input.h>
 #include <System/Time/Time.h>
+#include <System/Time/GameTime.h>
+#include <System/Time/Time_MT.h>
 #include <cassert>
 
 SceneManager* SceneManager::GetInstance()
@@ -140,12 +142,18 @@ void SceneManager::ImGui()
     //char comboLabel[128];
 
     ImGui::Begin("SceneManager");
-    ImGui::Text("Frametate: %.3f fps", Time::GetFramerate());
-    ImGui::Text("DeltaTime: %4.2f ms", Time::GetDeltaTime<double>() * 1000.0);
+    ImGui::SeparatorText("TIME_MT");
+    ImGui::Text("Frametate: %.3f fps", Time_MT::GetFramerate());
+    ImGui::Text("DeltaTime: %4.2f ms", Time_MT::GetDeltaTime<double>() * 1000.0);
 
-    bool isFixed = Time::IsDeltaTimeFixed();
+    bool isFixed = Time_MT::IsDeltaTimeFixed();
     if(ImGui::Checkbox("Fixed DeltaTime", &isFixed))
-        Time::SetDeltaTimeFixed(isFixed);
+        Time_MT::SetDeltaTimeFixed(isFixed);
+
+    ImGui::SeparatorText("GameTime");
+
+    ImGui::Text("Frametate: %.3f fps", GameTime::GetInstance()->GetFramerate());
+    ImGui::Text("DeltaTime: %4.2f ms", GameTime::GetInstance()->GetDeltaTime() * 1000.0);
 
     std::string name = sceneFactory_->ShowDebugWindow();
     if (!name.empty())
