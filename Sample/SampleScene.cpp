@@ -73,6 +73,12 @@ void SampleScene::Initialize()
     lights_ = std::make_shared<LightGroup>();
     lights_->Initialize();
 
+    //auto pl = std::make_shared<PointLightComponent>();
+    //lights_->AddPointLight("PointLight", pl);
+
+
+    LightingSystem::GetInstance()->SetActiveGroup(lights_);
+
     sequence_ = std::make_unique<AnimationSequence>("test");
     sequence_->Initialize("Resources/Data/");
 
@@ -152,7 +158,6 @@ void SampleScene::Update()
 
 
 #endif // _DEBUG
-    LightingSystem::GetInstance()->SetActiveGroup(lights_);
 
     for (auto& col : colliders_)
     {
@@ -203,7 +208,7 @@ void SampleScene::Draw()
 
     //oModel_->Draw(&SceneCamera_, testColor_);
     //oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
-    //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ////aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
@@ -222,6 +227,10 @@ void SampleScene::Draw()
 void SampleScene::DrawShadow()
 {
 
+    for (auto& model : models_)
+    {
+        model->DrawShadow(&SceneCamera_, 0);
+    }
     //oModel_->DrawShadow(&SceneCamera_, 0);
     //oModel2_->DrawShadow(&SceneCamera_, 1);
     //aModel_->DrawShadow(&SceneCamera_, 2);

@@ -25,7 +25,7 @@ public:
     void SetTexture(const std::string& _name);
     void SetTexture(uint32_t _handle);
 
-    void QueueCmdCubeTexture(uint32_t _index = 7) const;
+    void QueueCmdCubeTexture(uint32_t _index = 8) const;
 
 private:
     void UpdateWorldTransform();
