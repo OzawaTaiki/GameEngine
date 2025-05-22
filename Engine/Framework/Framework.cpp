@@ -86,6 +86,7 @@ void Framework::Initialize()
 
     sceneManager_ = SceneManager::GetInstance();
 
+    Time_MT::GetInstance()->Initialize();
 
 
 
@@ -124,6 +125,7 @@ void Framework::PostDraw()
 
 void Framework::Finalize()
 {
+    Time_MT::GetInstance()->Finalize();
     collisionManager_->Finalize();
     sceneManager_->Finalize();
 

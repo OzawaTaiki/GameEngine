@@ -11,6 +11,7 @@
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <System/Audio/Audio.h>
+#include <System/Time/Time_MT.h>
 
 class Framework
 {
@@ -48,6 +49,7 @@ protected:
     CollisionManager*       collisionManager_       = nullptr;//
     GameTime*               gameTime_               = nullptr;//
     Audio* audio_ = nullptr;//
+
 
 
 
