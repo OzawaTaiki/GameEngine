@@ -24,22 +24,25 @@ void Model::Initialize()
 
 void Model::Update(float _deltaTime)
 {
-    if (currentAnimation_)
+    if (!currentAnimation_ || !currentAnimation_->IsPlaying())
     {
-        currentAnimation_->Update(skeleton_.GetJoints(), _deltaTime);
-        // アニメーションが終わったらアニメーションを解除
-        if (!currentAnimation_->IsPlaying())
-        {
-            preAnimation_ = currentAnimation_.get();
-        }
+        return;
     }
+
+    currentAnimation_->Update(skeleton_.GetJoints(), _deltaTime);
+
+    // アニメーションが終わったらアニメーションを解除
+    if (!currentAnimation_->IsPlaying())
+    {
+        preAnimation_ = currentAnimation_.get();
+        return; 
+    }
+
     skeleton_.Update();
     skinCluster_.Update(skeleton_.GetJoints());
 
     if (skinningCS_)
         skinningCS_->Execute();
-
-
 }
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
@@ -117,9 +120,6 @@ Model* Model::CreateFromFile(const std::string& _filePath)
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
 
-    model->currentAnimation_ = std::make_unique<ModelAnimation>();
-    model->currentAnimation_->Initialize();
-
     return model;
 }
 
@@ -134,9 +134,6 @@ Model* Model::CreateFromMesh(std::unique_ptr<Mesh> _mesh)
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
-
-    model->currentAnimation_ = std::make_unique<ModelAnimation>();
-    model->currentAnimation_->Initialize();
 
     return model;
 }
@@ -154,9 +151,6 @@ Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
-
-    model->currentAnimation_ = std::make_unique<ModelAnimation>();
-    model->currentAnimation_->Initialize();
 
     return model;
 }
@@ -214,6 +208,11 @@ void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _
 
 void Model::SetAnimation(const std::string& _name,bool _loop)
 {
+    if (!currentAnimation_)
+    {
+        return;
+    }
+
     if (animation_.find(_name) == animation_.end())
     {
         assert(false && "アニメーションが見つかりません");
@@ -228,6 +227,11 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
 
 void Model::ChangeAnimation(const std::string& _name,float _blendTime, bool _loop)
 {
+    if (!currentAnimation_)
+    {
+        return;
+    }
+
     if (animation_.find(_name) == animation_.end())
     {
         assert(false && "アニメーションが見つかりません");
@@ -299,6 +303,16 @@ Vector3 Model::GetMax(size_t _index) const
 
 }
 
+bool Model::HasAnimation() const
+{
+    return currentAnimation_ != nullptr && !animation_.empty();
+}
+
+bool Model::IsAnimationPlaying() const
+{
+    return currentAnimation_ && currentAnimation_->IsPlaying();
+}
+
 void Model::LoadFile(const std::string& _filepath)
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -313,14 +327,15 @@ void Model::LoadFile(const std::string& _filepath)
     LoadMesh(scene);
     LoadMaterial(scene);
 
-    LoadAnimation(scene, filepath);
-    LoadNode(scene);
-    CreateSkeleton();
-
-    skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
-
     if (scene->HasAnimations())
     {
+        LoadAnimation(scene, filepath);
+        LoadNode(scene);
+        CreateSkeleton();
+
+        skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
+
+
         mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
 
         skinningCS_ = std::make_unique<SkinningCS>();
@@ -329,6 +344,8 @@ void Model::LoadFile(const std::string& _filepath)
         skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
         skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
 
+        currentAnimation_ = std::make_unique<ModelAnimation>();
+        currentAnimation_->Initialize();
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -387,8 +404,6 @@ void Model::LoadMesh(const aiScene* _scene)
         pMesh->TransferData();
 
         mesh_.push_back(std::move(pMesh));
-
-
     }
 }
 
