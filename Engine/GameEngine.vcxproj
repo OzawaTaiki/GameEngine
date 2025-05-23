@@ -159,6 +159,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Collision\RayCast\Ray.cpp" />
     <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp" />
     <ClCompile Include="Features\Collision\Shapes.cpp" />
+    <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGird.cpp" />
     <ClCompile Include="Features\Collision\Tree\Cell.cpp" />
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp" />
     <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp" />
@@ -260,6 +261,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Collision\RayCast\Ray.h" />
     <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h" />
     <ClInclude Include="Features\Collision\Shapes.h" />
+    <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGird.h" />
     <ClInclude Include="Features\Collision\Tree\Cell.h" />
     <ClInclude Include="Features\Collision\Tree\QuadTree.h" />
     <ClInclude Include="Features\Effect\Editor\ParticleEditor.h" />
