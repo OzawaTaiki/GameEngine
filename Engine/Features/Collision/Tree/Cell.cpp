@@ -17,8 +17,8 @@ void ObjectForTree::Remove()
     {
         if (belongingCell_)
         {
-            belongingCell_->RemoveDataByIter(dataIter_); // ‹óŠÔ‚©‚çíœ
-            belongingCell_ = nullptr; // Š‘®‚·‚é‹óŠÔ‚ğnull‚Éİ’è
+            belongingCell_->RemoveDataByIter(dataIter_); // ç©ºé–“ã‹ã‚‰å‰Šé™¤
+            belongingCell_ = nullptr; // æ‰€å±ã™ã‚‹ç©ºé–“ã‚’nullã«è¨­å®š
             //dataIter_ = nullptr;
         }
     }
@@ -29,9 +29,22 @@ Cell::~Cell()
     {
         if (data)
         {
-            data->SetCell(nullptr); // Š‘®‚·‚é‹óŠÔ‚ğnull‚Éİ’è
+            data->SetCell(nullptr); // æ‰€å±ã™ã‚‹ç©ºé–“ã‚’nullã«è¨­å®š
         }
     }
+    data_.clear();
+}
+
+void Cell::Reset()
+{
+    for (auto& data : data_)
+    {
+        if (data)
+        {
+            data->SetCell(nullptr); // æ‰€å±ã™ã‚‹ç©ºé–“ã‚’nullã«è¨­å®š
+        }
+    }
+
     data_.clear();
 }
 
@@ -42,7 +55,7 @@ bool Cell::RegisterData(std::shared_ptr<ObjectForTree> _data)
 
     data_.push_front(_data);
     _data->SetCell(this);
-    _data->SetDataIter(data_.begin()); // ƒCƒeƒŒ[ƒ^İ’è
+    _data->SetDataIter(data_.begin()); // ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿è¨­å®š
     return true;
 }
 
@@ -55,7 +68,7 @@ bool Cell::RemoveDataByIter(typename std::list<std::shared_ptr<ObjectForTree>>::
         data->SetCell(nullptr);
     }
 
-    data_.erase(_iter); // O(1)‚Ìíœ‘€ì
+    data_.erase(_iter); // O(1)ã®å‰Šé™¤æ“ä½œ
     return true;
 }
 
@@ -63,10 +76,10 @@ bool Cell::RemoveData(std::shared_ptr<ObjectForTree> _data)
 {
     if (!_data || _data->GetCell() != this) return false;
 
-    // ƒf[ƒ^‚ª‚ÂƒCƒeƒŒ[ƒ^‚ğg—p‚µ‚ÄŒø—¦“I‚Éíœ
+    // ãƒ‡ãƒ¼ã‚¿ãŒæŒã¤ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã‚’ä½¿ç”¨ã—ã¦åŠ¹ç‡çš„ã«å‰Šé™¤
     auto iter = _data->GetDataIter();
     _data->SetCell(nullptr);
-    data_.erase(iter); // O(1)‚Ìíœ‘€ì
+    data_.erase(iter); // O(1)ã®å‰Šé™¤æ“ä½œ
 
     return true;
 }
@@ -79,6 +92,6 @@ std::shared_ptr<ObjectForTree> Cell::GetFirstData()
 
 bool Cell::OnRemove(std::shared_ptr<ObjectForTree> _removeObj)
 {
-    // íœƒƒ\ƒbƒh‚Ì“ˆê
+    // å‰Šé™¤ãƒ¡ã‚½ãƒƒãƒ‰ã®çµ±ä¸€
     return RemoveData(_removeObj);
 }

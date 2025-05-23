@@ -25,7 +25,6 @@ Collider::~Collider()
 #ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 #endif // _DEBUG
-
 }
 
 void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
@@ -38,6 +37,7 @@ void Collider::OnCollision(Collider* _other, const ColliderInfo& _info)
 
 bool Collider::IsCollidingWith(Collider* _other) const
 {
+    std::lock_guard<std::mutex> lock(collisionMutex_);
     auto it = collisionMap_.find(_other);
     if (it != collisionMap_.end()) {
         return it->second.isColliding;
@@ -47,6 +47,7 @@ bool Collider::IsCollidingWith(Collider* _other) const
 
 CollisionState Collider::GetCollisionState(Collider* _other) const
 {
+    std::lock_guard<std::mutex> lock(collisionMutex_);
     auto it = collisionMap_.find(_other);
     if (it != collisionMap_.end()) {
         const CollisionData& data = it->second;
@@ -106,9 +107,10 @@ Vector3 Collider::GetSize() const
     };
 }
 
-
 void Collider::AddCurrentCollision(Collider* _other, const ColliderInfo& _info)
 {
+    std::lock_guard<std::mutex> lock(collisionMutex_);
+
     // 現在のフレームでの衝突を記録
     currentCollisions_.push_back(_other);
 
@@ -166,11 +168,12 @@ void Collider::ImGui()
     ImGui::Checkbox("Draw", &isDraw_);
 
 #endif // _DEBUG
-
 }
 
 void Collider::UpdateCollisionState()
 {
+    std::lock_guard<std::mutex> lock(collisionMutex_);
+
     // すべてのマップエントリについて、現在衝突していないとマーク
     for (auto& pair : collisionMap_) {
         pair.second.isColliding = false;
@@ -221,16 +224,13 @@ void Collider::UpdateCollisionState()
     currentCollisions_.clear();
 }
 
-SphereCollider::SphereCollider(const std::string& _name) : Collider()
+SphereCollider::SphereCollider(const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Sphere_3D);
 #ifdef _DEBUG
-
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 #endif // _DEBUG
 }
-
-
 
 void SphereCollider::Draw()
 {
@@ -254,13 +254,13 @@ void SphereCollider::Draw()
 
 void SphereCollider::Load(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
         jsonBinder_->RegisterVariable("radius", &radius_);
 }
 
 void SphereCollider::Save(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
         jsonBinder_->RegisterVariable("radius", &radius_);
 
     jsonBinder_->Save();
@@ -323,17 +323,20 @@ void SphereCollider::ImGui()
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f);
     ImGui::PopID();
-
 #endif // _DEBUG
 }
 
-AABBCollider::AABBCollider(const std::string& _name) : Collider()
+ SphereCollider::SphereCollider(bool _isTemporary) : Collider()
+{
+    SetBoundingBox(BoundingBox::Sphere_3D);
+}
+
+AABBCollider::AABBCollider(const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::AABB_3D);
 #ifdef _DEBUG
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 #endif // _DEBUG
-
 }
 void AABBCollider::Draw()
 {
@@ -362,12 +365,11 @@ void AABBCollider::Draw()
     vertices[7] = pos + Vector3(scaledMin.x, scaledMin.y, scaledMin.z); // 左下後
 
     LineDrawer::GetInstance()->DrawOBB(vertices);
-
 }
 
 void AABBCollider::Load(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
     {
         jsonBinder_->RegisterVariable("min", &min_);
         jsonBinder_->RegisterVariable("max", &max_);
@@ -376,7 +378,7 @@ void AABBCollider::Load(const std::string& _name)
 
 void AABBCollider::Save(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
     {
         jsonBinder_->RegisterVariable("min", &min_);
         jsonBinder_->RegisterVariable("max", &max_);
@@ -452,17 +454,18 @@ void AABBCollider::ImGui()
             min_.z = max_.z;
     }
     ImGui::PopID();
-
-
 #endif // _DEBUG
 }
 
-OBBCollider::OBBCollider(const std::string& _name) : Collider()
+AABBCollider::AABBCollider(bool _isTemporary) : Collider()
+{
+    SetBoundingBox(BoundingBox::AABB_3D);
+}
+
+OBBCollider::OBBCollider(const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::OBB_3D);
 #ifdef _DEBUG
-
-
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 #endif // _DEBUG
 }
@@ -491,7 +494,7 @@ void OBBCollider::Draw()
 
 void OBBCollider::Load(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
     {
         jsonBinder_->RegisterVariable("halfExtents", &halfExtents_);
         jsonBinder_->RegisterVariable("localPivot", &localPivot_);
@@ -577,7 +580,6 @@ std::vector<Vector3> OBBCollider::GetVertices()
         corners[i] = center + Transform(localCorners[i], rotMat);
     }
 
-
     return corners;
 }
 
@@ -632,18 +634,20 @@ void OBBCollider::ImGui()
     ImGui::DragFloat3("HalfExtents", &halfExtents_.x, 0.01f);
     ImGui::DragFloat3("LocalPivot", &localPivot_.x, 0.01f);
     ImGui::PopID();
-
 #endif // _DEBUG
 }
 
-CapsuleCollider::CapsuleCollider(const std::string& _name) : Collider()
+OBBCollider::OBBCollider(bool _isTemporary) : Collider()
+{
+    SetBoundingBox(BoundingBox::OBB_3D);
+}
+
+ CapsuleCollider::CapsuleCollider(const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Capsule_3D);
 #ifdef _DEBUG
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
-
 #endif // _DEBUG
-
 }
 
 void CapsuleCollider::Draw()
@@ -758,7 +762,7 @@ void CapsuleCollider::Draw()
 
 void CapsuleCollider::Load(const std::string& _name)
 {
-    if(InitJsonBinder(_name))
+    if (InitJsonBinder(_name))
     {
         jsonBinder_->RegisterVariable("radius", &radius_);
         jsonBinder_->RegisterVariable("direction", &direction_);
@@ -785,7 +789,6 @@ void CapsuleCollider::SetRadius(float _radius)
     radius_ = _radius;
     size_ = GetCapsuleAABBSize();
 }
-
 
 void CapsuleCollider::SetHeight(float _height)
 {
@@ -901,7 +904,7 @@ void CapsuleCollider::ImGui()
     Collider::ImGui();
     ImGui::DragFloat("Radius", &radius_, 0.01f, 0.01f, 1000.0f);
     ImGui::DragFloat("Height", &height_, 0.01f, 0.01f, 1000.0f);
-    if(ImGui::DragFloat3("Direction", &direction_.x, 0.01f))
+    if (ImGui::DragFloat3("Direction", &direction_.x, 0.01f))
     {
         direction_ = direction_.Normalize();
     }
@@ -922,6 +925,11 @@ Vector3 CapsuleCollider::GetCapsuleAABBSize()
 
     // AABBのサイズを計算
     return max - min;
+}
+
+CapsuleCollider::CapsuleCollider(bool _isTemporary) : Collider()
+{
+    SetBoundingBox(BoundingBox::Capsule_3D);
 }
 
 AABB CapsuleCollider::GetBounds() const

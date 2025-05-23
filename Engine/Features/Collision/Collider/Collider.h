@@ -13,6 +13,7 @@
 #include <functional>
 #include <variant>
 #include <cassert>
+#include <mutex>
 
 class Collider;
 
@@ -103,7 +104,10 @@ public:
     CollisionState GetCollisionState(Collider* _other) const;
 
     // 任意のコライダーと衝突しているかどうか
-    bool IsColliding() const { return !currentCollisions_.empty(); }
+    bool IsColliding() const {
+        std::lock_guard<std::mutex> lock(collisionMutex_);
+        return !currentCollisions_.empty();
+    }
 
     // 特定のコライダーと衝突しているかどうか
     bool IsCollidingWith(Collider* _other) const;
@@ -178,7 +182,7 @@ public:
     // _pointから最も近い点を求める
     virtual Vector3 GetClosestPoint(const Vector3& _point) = 0;
 
-    // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）
+    // 現在衝突中のコライダーを追加（CollisionManagerから呼ばれる）- スレッドセーフ版
     void AddCurrentCollision(Collider* _other, const ColliderInfo& _info);
 
     std::string GetName() const { return name_; }
@@ -191,7 +195,7 @@ public:
 
 protected:
 
-    bool InitJsonBinder(const std::string& _name, const std::string& _folderPath="Resources/Data/Colliders/");
+    bool InitJsonBinder(const std::string& _name, const std::string& _folderPath = "Resources/Data/Colliders/");
 
     void ImGui();
 
@@ -219,7 +223,8 @@ private:
     BoundingBox boundingBox_ = BoundingBox::NONE; // 衝突判定の形状
     WorldTransform* worldTransform_ = nullptr; // ワールド行列
 
-    // 衝突状態の記録
+    // 衝突状態の記録（スレッドセーフにするためのミューテックス）
+    mutable std::mutex collisionMutex_;
     std::unordered_map<Collider*, CollisionData> collisionMap_;
 
     // 現在のフレームで衝突しているコライダーのリスト（UpdateCollisionStateで使用）
@@ -234,18 +239,15 @@ private:
 
     WorldTransform defaultTransform_;
 
-
     bool isInitialized_ = false; // 初期化フラグ
-
 };
-
-
 
 class SphereCollider : public Collider
 {
 public:
     // コンストラクタ
-    SphereCollider(const std::string& _name = "Collider");
+    SphereCollider(const char* _name);
+    explicit SphereCollider(bool _isTemporary);
     // デストラクタ
     ~SphereCollider() = default;
 
@@ -280,6 +282,8 @@ public:
     // コンストラクタ
     AABBCollider(const std::string& _name = "Collider");
 
+    AABBCollider(const char* _name);
+    explicit AABBCollider(bool _isTemporary);
     // デストラクタ
     ~AABBCollider() = default;
 
@@ -288,7 +292,6 @@ public:
     void Load(const std::string& _name) override;
 
     void Save(const std::string& _name) override;
-
 
     // AABBの最小値と最大値を設定する
     void SetMinMax(const Vector3& _min, const Vector3& _max);
@@ -306,18 +309,17 @@ public:
     AABB GetBounds() const override;
 
 
-    void ImGui();
 private:
     Vector3 min_; // AABBの最小値
     Vector3 max_; // AABBの最大値
 };
 
-
 class OBBCollider : public Collider
 {
 public:
     // コンストラクタ
-    OBBCollider(const std::string& _name = "Collider");
+    OBBCollider(const char* _name);
+    explicit OBBCollider(bool _isTemporary);
     // デストラクタ
     ~OBBCollider() = default;
 
@@ -350,6 +352,8 @@ public:
     AABB GetBounds() const override;
 
     void ImGui();
+
+
 private:
     Vector3 halfExtents_; // OBBの半分の大きさ
     Vector3 localPivot_; // OBBの基準点
@@ -359,7 +363,8 @@ class CapsuleCollider : public Collider
 {
 public:
     // コンストラクタ
-    CapsuleCollider(const std::string& _name = "Collider");
+    CapsuleCollider(const char* _name);
+    explicit CapsuleCollider(bool _isTemporary);
     // デストラクタ
     ~CapsuleCollider() = default;
 

@@ -23,6 +23,8 @@ public:
     void RegisterObj(Collider* _obj);
     void GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*, Collider*>>& _pair, std::list<Collider*>& _stac);
 
+    void Reset();
+
     std::vector<Cell*> GetCells() { return cells_; }
 
 private:
