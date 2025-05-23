@@ -82,7 +82,6 @@ void Framework::Initialize()
 
 
     collisionManager_ = CollisionManager::GetInstance();
-    collisionManager_->Initialize(Vector2{ 50,50 }, 5, { 0,0 });
 
     sceneManager_ = SceneManager::GetInstance();
 
