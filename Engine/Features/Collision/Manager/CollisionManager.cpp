@@ -3,6 +3,8 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <Features/Collision/CollisionLayer/CollisionLayerManager.h>
 #include <algorithm>
+#include <future>
+#include <chrono>
 
 CollisionManager* CollisionManager::GetInstance()
 {
@@ -14,7 +16,22 @@ void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, co
 {
     colliders_.clear();
     collisionPairs_.clear();
-    isDrawEnabled_ = true;
+    isDrawEnabled_.store(true);
+    isCollisionPhase_.store(false);
+
+    // OnCollision呼び出しキューをクリア
+    {
+        std::lock_guard<std::mutex> lock(collisionCallQueueMutex_);
+        while (!collisionCallQueue_.empty()) {
+            collisionCallQueue_.pop();
+        }
+    }
+
+    // 遅延削除キューをクリア
+    {
+        std::lock_guard<std::mutex> lock(pendingUnregisterMutex_);
+        pendingUnregister_.clear();
+    }
 
     // QuadTreeの初期化
     quadTree_ = std::make_unique<QuadTree>();
@@ -23,14 +40,43 @@ void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, co
 
 void CollisionManager::Finalize()
 {
+    // 衝突判定フェーズを終了
+    isCollisionPhase_.store(false);
+
     colliders_.clear();
     collisionPairs_.clear();
+
+    // OnCollision呼び出しキューをクリア
+    {
+        std::lock_guard<std::mutex> lock(collisionCallQueueMutex_);
+        while (!collisionCallQueue_.empty()) {
+            collisionCallQueue_.pop();
+        }
+    }
+
+    // 遅延削除キューをクリア
+    {
+        std::lock_guard<std::mutex> lock(pendingUnregisterMutex_);
+        pendingUnregister_.clear();
+    }
 }
 
 void CollisionManager::Update()
 {
-    // 衝突判定を実行
+    // 遅延削除の処理（衝突判定前）
+    ProcessPendingUnregistrations();
+
+    // 衝突判定フェーズ開始
+    isCollisionPhase_.store(true);
+
+    // 衝突判定を実行（マルチスレッド）
     CheckCollisions();
+
+    // 衝突判定フェーズ終了
+    isCollisionPhase_.store(false);
+
+    // キューに溜まったOnCollision呼び出しを処理
+    ProcessCollisionCallbacks();
 
     // 衝突応答を実行
     //ResolveCollisions();
@@ -39,7 +85,7 @@ void CollisionManager::Update()
     UpdateCollisionStates();
 
     // デバッグ描画が有効なら描画
-    if (isDrawEnabled_)
+    if (isDrawEnabled_.load())
     {
         DrawColliders();
     }
@@ -48,9 +94,7 @@ void CollisionManager::Update()
     colliders_.clear();
     collisionPairs_.clear();
 
-    quadTree_.reset();
-    quadTree_ = std::make_unique<QuadTree>();
-    quadTree_->Initialize(Vector2(60.0f, 100.0f), 2,{-15.0f,-80.0f}); // フィールドサイズとレベルを指定
+    quadTree_->Reset();
 }
 
 void CollisionManager::RegisterCollider(Collider* _collider)
@@ -59,14 +103,21 @@ void CollisionManager::RegisterCollider(Collider* _collider)
     if (_collider == nullptr)
         return;
 
+    // 衝突判定中の登録はスキップ（警告出力）
+    if (isCollisionPhase_.load()) {
+#ifdef _DEBUG
+        // Debug::Log("Warning: RegisterCollider called during collision phase\n");
+#endif
+        return;
+    }
+
     // 既に登録されているかチェック
     auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
     if (it != colliders_.end())
         return;
 
-    // コライダーを登録
+    // コライダーを登録（高速 - ミューテックス不使用）
     colliders_.push_back(_collider);
-
 }
 
 void CollisionManager::CheckCollisions()
@@ -76,69 +127,175 @@ void CollisionManager::CheckCollisions()
     // ブロードフェーズの更新（空間分割等の最適化）
     UpdateBroadPhase();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
-    Debug::Log(std::format("Broad Phase Duration: {} microseconds\n", duration));
-    now = std::chrono::high_resolution_clock::now();
+    // 判定対象がない場合は早期リターン
+    if (potentialCollisions_.empty())
+        return;
 
-    uint32_t potential = potentialCollisions_.size();
-    uint32_t count = 0;
-    uint32_t hitCount = 0;
+    // スレッド数を決定
+    const size_t totalPairs = potentialCollisions_.size();
+    const size_t numThreads = (std::min)(static_cast<size_t>(threadCount_), totalPairs);
 
-    for (const auto& pair : potentialCollisions_)
+    if (numThreads <= 1)
     {
+        // シングルスレッドで処理
+        CheckCollisionsRange(0, totalPairs);
+    }
+    else
+    {
+        // マルチスレッドで処理
+        std::vector<std::future<void>> futures;
+        const size_t pairsPerThread = totalPairs / numThreads;
+        const size_t remainingPairs = totalPairs % numThreads;
+
+        for (size_t i = 0; i < numThreads; ++i)
+        {
+            size_t startIndex = i * pairsPerThread;
+            size_t endIndex = startIndex + pairsPerThread;
+
+            // 最後のスレッドに余りを割り当て
+            if (i == numThreads - 1)
+            {
+                endIndex += remainingPairs;
+            }
+
+            futures.push_back(std::async(std::launch::async,
+                [this, startIndex, endIndex]() {
+                    CheckCollisionsRange(startIndex, endIndex);
+                }));
+        }
+
+        // 全てのスレッドの完了を待機
+        for (auto& future : futures)
+        {
+            future.wait();
+        }
+    }
+}
+
+void CollisionManager::CheckCollisionsRange(size_t _startIndex, size_t _endIndex)
+{
+    std::vector<CollisionPair> localCollisionPairs;
+    std::vector<CollisionCallInfo> localCallQueue;
+
+    for (size_t i = _startIndex; i < _endIndex; ++i)
+    {
+        const auto& pair = potentialCollisions_[i];
         Collider* colliderA = pair.first;
         Collider* colliderB = pair.second;
 
-         //レイヤーマスクでフィルタリング
+        // レイヤーマスクでフィルタリング
         if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
             (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
         {
             continue; // 衝突しないように設定されている
         }
 
-        ++count;
         ColliderInfo info;
 
 #ifdef _DEBUG
-        //std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
-        //std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
-        //Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+        std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+        std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
+        Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
+        std::string nameA = colliderA->GetName();
+        std::string nameB = colliderB->GetName();
+        //Debug::Log("Checking collision between " + nameA + " and " + nameB + "\n");
 #endif // _DEBUG
 
         // CollisionDetectorを使用して衝突判定を実行
         if (CollisionDetector::DetectCollision(colliderA, colliderB, info))
         {
-            // 衝突情報を保存
-            CollisionPair pair;
-            pair.colliderA = colliderA;
-            pair.colliderB = colliderB;
-            pair.info = info;
-            collisionPairs_.push_back(pair);
+            // 衝突情報を保存（ローカル）
+            CollisionPair collisionPair;
+            collisionPair.colliderA = colliderA;
+            collisionPair.colliderB = colliderB;
+            collisionPair.info = info;
+            localCollisionPairs.push_back(collisionPair);
 
-            colliderA->OnCollision(colliderB, info);
+            // OnCollision呼び出し情報をローカルキューに追加
+            CollisionCallInfo callInfoA;
+            callInfoA.caller = colliderA;
+            callInfoA.other = colliderB;
+            callInfoA.info = info;
+            localCallQueue.push_back(callInfoA);
 
-
-            // 衝突情報を反転して相手側にも記録
-            ColliderInfo reversedInfo = info;
-            reversedInfo.contactNormal = -info.contactNormal;
-            colliderB->OnCollision(colliderA, reversedInfo);
+            // 衝突情報を反転して相手側の呼び出し情報も追加
+            CollisionCallInfo callInfoB;
+            callInfoB.caller = colliderB;
+            callInfoB.other = colliderA;
+            callInfoB.info = info;
+            callInfoB.info.contactNormal = -info.contactNormal;
+            localCallQueue.push_back(callInfoB);
 
             // 各コライダーに現在の衝突を記録
             colliderA->AddCurrentCollision(colliderB, info);
+
+            ColliderInfo reversedInfo = info;
+            reversedInfo.contactNormal = -info.contactNormal;
             colliderB->AddCurrentCollision(colliderA, reversedInfo);
 
-            ++hitCount;
-
+            //Debug::Log("Checking collision between\t" + nameA + "\tand " + nameB + "\tHit\n");
         }
+        else
+            Debug::Log( nameA + "\tand " + nameB + "\t----------\n");
     }
 
-    Debug::Log(std::format("Potential Collisions: {}\n Actual Collisions: {}\n hitCount:{}\n----------\n", potential, count, hitCount));
+    // ローカルな結果をグローバルなコンテナに追加（ミューテックスで保護）
+    if (!localCollisionPairs.empty())
+    {
+        std::lock_guard<std::mutex> lock(collisionPairsMutex_);
+        collisionPairs_.insert(collisionPairs_.end(), localCollisionPairs.begin(), localCollisionPairs.end());
+    }
 
-    end= std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
-    Debug::Log(std::format("Narrow Phase Duration: {} microseconds\n", duration));
+    if (!localCallQueue.empty())
+    {
+        std::lock_guard<std::mutex> lock(collisionCallQueueMutex_);
+        for (const auto& callInfo : localCallQueue)
+        {
+            collisionCallQueue_.push(callInfo);
+        }
+    }
+}
 
+void CollisionManager::ProcessCollisionCallbacks()
+{
+    std::lock_guard<std::mutex> lock(collisionCallQueueMutex_);
+
+    while (!collisionCallQueue_.empty())
+    {
+        const auto& callInfo = collisionCallQueue_.front();
+        callInfo.caller->OnCollision(callInfo.other, callInfo.info);
+        collisionCallQueue_.pop();
+    }
+}
+
+void CollisionManager::ProcessPendingUnregistrations()
+{
+    std::lock_guard<std::mutex> lock(pendingUnregisterMutex_);
+
+    for (Collider* collider : pendingUnregister_) {
+        RemoveColliderImmediate(collider);
+    }
+
+    pendingUnregister_.clear();
+}
+
+void CollisionManager::RemoveColliderImmediate(Collider* _collider)
+{
+    // コライダーリストから削除
+    auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
+    if (it != colliders_.end()) {
+        colliders_.erase(it);
+    }
+
+    // 衝突ペアからも削除
+    if (!collisionPairs_.empty()) {
+        collisionPairs_.erase(
+            std::remove_if(collisionPairs_.begin(), collisionPairs_.end(),
+                [_collider](const CollisionPair& pair) {
+                    return pair.colliderA == _collider || pair.colliderB == _collider;
+                }),
+            collisionPairs_.end());
+    }
 }
 
 void CollisionManager::ResolveCollisions()
@@ -162,7 +319,7 @@ void CollisionManager::UpdateCollisionStates()
 void CollisionManager::DrawColliders()
 {
     // デバッグ描画が無効ならスキップ
-    if (!isDrawEnabled_)
+    if (!isDrawEnabled_.load())
         return;
 
     // 衝突中のコライダーを赤色で描画
@@ -199,7 +356,6 @@ void CollisionManager::DrawColliders()
 
     // 衝突点と法線を描画
     LineDrawer::GetInstance()->SetColor({ 1.0f , 1.0f , 1.0f , 1.0f });
-    //LineDrawer::GetInstance()->SetColor({ 0.7f, 0.7f, 0.7f, 1.0f }); // ぐれー
     for (const auto& pair : collisionPairs_)
     {
         // 衝突点を描画
@@ -216,30 +372,60 @@ void CollisionManager::UnregisterCollider(Collider* _collider)
     if (_collider == nullptr)
         return;
 
-    // コライダーリストから削除
-    auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
-    if (it != colliders_.end()) {
-        colliders_.erase(it);
+    if (isCollisionPhase_.load()) {
+        // 衝突判定中の場合は削除を遅延
+        std::lock_guard<std::mutex> lock(pendingUnregisterMutex_);
+
+        // 重複チェック
+        auto it = std::find(pendingUnregister_.begin(), pendingUnregister_.end(), _collider);
+        if (it == pendingUnregister_.end()) {
+            pendingUnregister_.push_back(_collider);
+        }
+        return;
     }
 
-    if (collisionPairs_.empty())
-        return;
-
-    // 衝突ペアからも削除
-    collisionPairs_.erase(
-        std::remove_if(collisionPairs_.begin(), collisionPairs_.end(),
-            [_collider](const CollisionPair& pair) {
-                return pair.colliderA == _collider || pair.colliderB == _collider;
-            }),
-        collisionPairs_.end());
+    // 通常の削除処理
+    RemoveColliderImmediate(_collider);
 }
 
 void CollisionManager::ImGui()
 {
 #ifdef _DEBUG
     ImGui::PushID(this);
+
     // デバッグ描画の有効/無効を設定
-    ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
+    bool drawEnabled = isDrawEnabled_.load();
+    if (ImGui::Checkbox("Draw Colliders", &drawEnabled))
+    {
+        isDrawEnabled_.store(drawEnabled);
+    }
+
+    // スレッド数の設定
+    int threadCount = static_cast<int>(threadCount_);
+    if (ImGui::SliderInt("Thread Count", &threadCount, 1, 16))
+    {
+        threadCount_ = static_cast<uint32_t>(threadCount);
+    }
+
+    // フェーズ状態表示
+    ImGui::Text("Collision Phase: %s", isCollisionPhase_.load() ? "Active" : "Inactive");
+
+    // 統計情報表示
+    ImGui::Text("Registered Colliders: %zu", colliders_.size());
+    ImGui::Text("Potential Collisions: %zu", potentialCollisions_.size());
+    ImGui::Text("Active Collisions: %zu", collisionPairs_.size());
+
+    // 遅延削除キューの状態
+    {
+        std::lock_guard<std::mutex> lock(pendingUnregisterMutex_);
+        ImGui::Text("Pending Unregistrations: %zu", pendingUnregister_.size());
+    }
+
+    // OnCollisionキューの状態
+    {
+        std::lock_guard<std::mutex> lock(collisionCallQueueMutex_);
+        ImGui::Text("Collision Callback Queue: %zu", collisionCallQueue_.size());
+    }
 
     ImGui::PopID();
 #endif // _DEBUG
@@ -263,9 +449,7 @@ void CollisionManager::ResolveCollision(const CollisionPair& _pair)
 
 void CollisionManager::UpdateBroadPhase()
 {
-
     // 空間分割などの最適化を行う場合はここに実装
-
     for (auto& collider : colliders_)
     {
         quadTree_->RegisterObj(collider);
@@ -277,14 +461,20 @@ void CollisionManager::UpdateBroadPhase()
 
     // QuadTreeを使用して衝突ペアを取得
     quadTree_->GetCollisionPair(0, potentialCollisions_, stac);
-
 }
 
 CollisionManager::CollisionManager()
+    : threadCount_(std::thread::hardware_concurrency())
+    , isDrawEnabled_(true)
+    , isCollisionPhase_(false)
 {
+    // スレッド数が0の場合は1に設定
+    if (threadCount_ == 0)
+    {
+        threadCount_ = 1;
+    }
+
 #ifdef _DEBUG
-
-
     ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
 #endif // DEBUG
 }

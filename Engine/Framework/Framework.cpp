@@ -82,10 +82,11 @@ void Framework::Initialize()
 
 
     collisionManager_ = CollisionManager::GetInstance();
-    collisionManager_->Initialize(Vector2{ 150,100 }, 5, { 0,0 });
+    collisionManager_->Initialize(Vector2{ 55,90 }, 7, { -15,-70 });
 
     sceneManager_ = SceneManager::GetInstance();
 
+    Time_MT::GetInstance()->Initialize();
 
 
 
@@ -124,6 +125,7 @@ void Framework::PostDraw()
 
 void Framework::Finalize()
 {
+    Time_MT::GetInstance()->Finalize();
     collisionManager_->Finalize();
     sceneManager_->Finalize();
 

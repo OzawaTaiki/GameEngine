@@ -27,8 +27,8 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
             _info
         );
     }
-    else if (CheckBoundingSpheres(_colliderA, _colliderB, 1.00f))
-    {
+    //else if (CheckBoundingSpheres(_colliderA, _colliderB, 1.00f))
+    //{
 
         // AABB vs AABB
         if (typeA == BoundingBox::AABB_3D && typeB == BoundingBox::AABB_3D)
@@ -227,7 +227,7 @@ bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _collide
 
             return result;
         }
-    }
+    //}
 
     // サポートされていない組み合わせ
     return false;
@@ -714,24 +714,33 @@ bool CollisionDetector::IntersectSphereCapsule(SphereCollider* _sphere, CapsuleC
 
 bool CollisionDetector::IntersectAABBOBB(AABBCollider* _aabb, OBBCollider* _obb, ColliderInfo& _info)
 {
-    // AABBをOBBとして扱って、OBB vs OBB の判定を利用
-    OBBCollider tempOBB;
+    // プレイヤーなど、Y軸のみ回転のOBBかチェック
+    const WorldTransform* obbTransform = _obb->GetWorldTransform();
+
+    const Quaternion& quat = obbTransform->quaternion_;
+    const float tolerance = 0.001f; // 許容誤差
+
+    if ((std::abs(quat.x) < tolerance && std::abs(quat.z) < tolerance)) {
+        return IntersectAABBOBB_YRotationOnly(_aabb, _obb, _info);
+    }
+
+
+    // 一般的なケースは従来の方法
+    OBBCollider tempOBB(true);
     tempOBB.SetBoundingBox(BoundingBox::OBB_3D);
 
-    // AABBの中心と半分のサイズを計算
     Vector3 aabbMin = _aabb->GetMin();
     Vector3 aabbMax = _aabb->GetMax();
     Vector3 center = (aabbMin + aabbMax) * 0.5f;
     Vector3 halfExtents = (aabbMax - aabbMin) * 0.5f;
 
-    // 一時的なOBBを設定
     tempOBB.SetHalfExtents(halfExtents);
     tempOBB.SetLocalPivot(center);
     tempOBB.SetWorldTransform(_aabb->GetWorldTransform());
 
-    // OBB vs OBB の判定を利用
     return IntersectOBBOBB(&tempOBB, _obb, _info);
 }
+
 
 bool CollisionDetector::IntersectAABBCapsule(AABBCollider* _aabb, CapsuleCollider* _capsule, ColliderInfo& _info)
 {
@@ -855,6 +864,160 @@ bool CollisionDetector::IntersectOBBCapsule(OBBCollider* _obb, CapsuleCollider* 
 
     return true;
 }
+
+bool CollisionDetector::IntersectAABBOBB_YRotationOnly(AABBCollider* _aabb, OBBCollider* _obb, ColliderInfo& _info)
+{
+    // 1. Y軸方向の単純AABB判定
+    const WorldTransform* aabbTransform = _aabb->GetWorldTransform();
+    const WorldTransform* obbTransform = _obb->GetWorldTransform();
+
+    // AABBのワールド座標でのY範囲
+    Vector3 aabbOffset = Transform(_aabb->GetOffset(), aabbTransform->quaternion_.ToMatrix());
+    float aabbMinY = (_aabb->GetMin().y * aabbTransform->scale_.y) + aabbTransform->transform_.y + aabbOffset.y;
+    float aabbMaxY = (_aabb->GetMax().y * aabbTransform->scale_.y) + aabbTransform->transform_.y + aabbOffset.y;
+
+    // OBBのワールド座標でのY範囲
+    Vector3 obbCenter = _obb->GetCenter();
+    Vector3 obbHalfExtents = _obb->GetHalfExtents() * obbTransform->scale_;
+    float obbMinY = obbCenter.y - obbHalfExtents.y;
+    float obbMaxY = obbCenter.y + obbHalfExtents.y;
+
+    // Y軸で分離している場合は早期リターン
+    if (aabbMaxY < obbMinY || aabbMinY > obbMaxY) {
+        return false;
+    }
+
+    // Y軸の重なり量を計算
+    float overlapY = std::min(aabbMaxY, obbMaxY) - std::max(aabbMinY, obbMinY);
+
+    // 2. XZ平面での2D判定
+    Vector2 aabbMin2D = Vector2(_aabb->GetMin().x * aabbTransform->scale_.x + aabbTransform->transform_.x + aabbOffset.x,
+        _aabb->GetMin().z * aabbTransform->scale_.z + aabbTransform->transform_.z + aabbOffset.z);
+    Vector2 aabbMax2D = Vector2(_aabb->GetMax().x * aabbTransform->scale_.x + aabbTransform->transform_.x + aabbOffset.x,
+        _aabb->GetMax().z * aabbTransform->scale_.z + aabbTransform->transform_.z + aabbOffset.z);
+
+    Vector2 obbCenter2D = Vector2(obbCenter.x, obbCenter.z);
+    Vector2 obbHalfSize2D = Vector2(obbHalfExtents.x, obbHalfExtents.z);
+
+    // クォータニオンからY軸回転角を取得
+    const Quaternion& quat = obbTransform->quaternion_;
+    float rotationY = std::atan2(2.0f * (quat.w * quat.y + quat.x * quat.z),
+        1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z));
+
+
+    Vector2 contactPoint2D, contactNormal2D;
+    float penetration2D;
+
+    if (!IntersectRotatedRect_vs_AxisAlignedRect(obbCenter2D, obbHalfSize2D, rotationY,
+        aabbMin2D, aabbMax2D, contactPoint2D, contactNormal2D, penetration2D)) {
+        return false;
+    }
+
+    // 3. 衝突情報の構築
+    _info.hasCollision = true;
+
+    // Y軸とXZ平面のうち、より小さい侵入量を選択
+    if (overlapY < penetration2D) {
+        // Y軸での分離が最小
+        _info.penetration = overlapY;
+        _info.contactNormal = Vector3(0.0f, (obbCenter.y > (aabbMinY + aabbMaxY) * 0.5f) ? 1.0f : -1.0f, 0.0f);
+        _info.contactPoint = Vector3(contactPoint2D.x, (aabbMinY + aabbMaxY) * 0.5f, contactPoint2D.y);
+    }
+    else {
+        // XZ平面での分離が最小
+        _info.penetration = penetration2D;
+        _info.contactNormal = Vector3(contactNormal2D.x, 0.0f, contactNormal2D.y);
+        _info.contactPoint = Vector3(contactPoint2D.x, obbCenter.y, contactPoint2D.y);
+    }
+
+    return true;
+}
+
+
+bool CollisionDetector::IntersectRotatedRect_vs_AxisAlignedRect(const Vector2& _rectCenter, const Vector2& _rectHalfSize, float _rotationY,
+    const Vector2& _aabbMin, const Vector2& _aabbMax,
+    Vector2& _contactPoint, Vector2& _contactNormal, float& _penetration)
+{
+    float cosY = std::cos(_rotationY);
+    float sinY = std::sin(_rotationY);
+
+    // 回転した矩形の軸ベクトル
+    Vector2 axisX = Vector2(cosY, sinY);
+    Vector2 axisZ = Vector2(-sinY, cosY);
+
+    // AABBの中心とハーフサイズ
+    Vector2 aabbCenter = (_aabbMin + _aabbMax) * 0.5f;
+    Vector2 aabbHalfSize = (_aabbMax - _aabbMin) * 0.5f;
+
+    Vector2 centerDiff = _rectCenter - aabbCenter;
+
+    float minOverlap = FLT_MAX;
+    Vector2 bestAxis;
+
+    // 4つの軸でテスト: AABB の X軸、Z軸、回転矩形の X軸、Z軸
+
+    // 1. AABB の X軸 (1, 0)
+    {
+        float projection = std::abs(centerDiff.x) - aabbHalfSize.x -
+            (_rectHalfSize.x * std::abs(cosY) + _rectHalfSize.y * std::abs(sinY));
+        if (projection > 0) return false;
+
+        float overlap = -projection;
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = Vector2(centerDiff.x > 0 ? 1.0f : -1.0f, 0.0f);
+        }
+    }
+
+    // 2. AABB の Z軸 (0, 1)
+    {
+        float projection = std::abs(centerDiff.y) - aabbHalfSize.y -
+            (_rectHalfSize.x * std::abs(sinY) + _rectHalfSize.y * std::abs(cosY));
+        if (projection > 0) return false;
+
+        float overlap = -projection;
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = Vector2(0.0f, centerDiff.y > 0 ? 1.0f : -1.0f);
+        }
+    }
+
+    // 3. 回転矩形の X軸
+    {
+        float centerProj = centerDiff.x * cosY + centerDiff.y * sinY;
+        float aabbProj = aabbHalfSize.x * std::abs(cosY) + aabbHalfSize.y * std::abs(sinY);
+        float projection = std::abs(centerProj) - _rectHalfSize.x - aabbProj;
+        if (projection > 0) return false;
+
+        float overlap = -projection;
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = centerProj > 0 ? axisX : Vector2(-axisX.x, -axisX.y);
+        }
+    }
+
+    // 4. 回転矩形の Z軸
+    {
+        float centerProj = centerDiff.x * (-sinY) + centerDiff.y * cosY;
+        float aabbProj = aabbHalfSize.x * std::abs(sinY) + aabbHalfSize.y * std::abs(cosY);
+        float projection = std::abs(centerProj) - _rectHalfSize.y - aabbProj;
+        if (projection > 0) return false;
+
+        float overlap = -projection;
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = centerProj > 0 ? axisZ : Vector2(-axisZ.x, -axisZ.y);
+        }
+    }
+
+    // 衝突情報を設定
+    _penetration = minOverlap;
+    _contactNormal = bestAxis;
+    _contactPoint = aabbCenter - bestAxis * (minOverlap * 0.5f);
+
+    return true;
+}
+
 
 float CollisionDetector::SegmentSegmentDistance(const Vector3& _start1, const Vector3& _end1, const Vector3& _start2, const Vector3& _end2, Vector3& _closestPoint1, Vector3& _closestPoint2)
 {

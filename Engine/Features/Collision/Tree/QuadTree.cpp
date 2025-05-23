@@ -128,6 +128,17 @@ void QuadTree::GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*
     }
 }
 
+void QuadTree::Reset()
+{
+    for (auto& cell : cells_)
+    {
+        if (cell)
+        {
+            cell->Reset();
+        }
+    }
+}
+
 int32_t QuadTree::ConvertPointToMortonCode(const Vector2& _pos) const
 {
     int32_t index = 0;

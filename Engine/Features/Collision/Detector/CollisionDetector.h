@@ -40,6 +40,14 @@ private:
     // OBBとカプセルの衝突判定
     static bool IntersectOBBCapsule(OBBCollider* _obb, CapsuleCollider* _capsule, ColliderInfo& _info);
 
+    // Y軸回転特化のAABB vs OBB判定
+    static bool IntersectAABBOBB_YRotationOnly(AABBCollider* _aabb, OBBCollider* _obb, ColliderInfo& _info);
+
+    // 2D回転矩形 vs 軸平行矩形の判定（XZ平面）
+    static bool IntersectRotatedRect_vs_AxisAlignedRect(const Vector2& _rectCenter, const Vector2& _rectHalfSize, float _rotationY,
+        const Vector2& _aabbMin, const Vector2& _aabbMax, Vector2& _contactPoint, Vector2& _contactNormal, float& _penetration);
+
+
     // 2つの線分間の最短距離を計算（カプセル衝突判定用）
     static float SegmentSegmentDistance(
         const Vector3& _start1, const Vector3& _end1,
