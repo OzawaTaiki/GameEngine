@@ -58,7 +58,7 @@ public:
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }
 
-    uint32_t GetVertexSrvIndex() { return skinningCS_->GetInputVertexSrvIndex(); }
+    uint32_t GetVertexSrvIndex() { return skinningCS_ ? skinningCS_->GetInputVertexSrvIndex() : 0; }
 
     ID3D12Resource* GetIndexResource(size_t _index = -1);
 
@@ -70,6 +70,9 @@ public:
     Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return skeleton_.GetSkeletonSpaceMatrix(_index); }
     bool IsAllAnimationEnd() { return currentAnimation_ == nullptr || !currentAnimation_->IsPlaying(); }
     bool IsIdle() { return currentAnimation_ == nullptr || currentAnimation_->IsIdle(); }
+
+    bool HasAnimation() const;
+    bool IsAnimationPlaying() const;
 
     static const std::string defaultDirpath_;
 private:

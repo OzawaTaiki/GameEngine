@@ -42,7 +42,6 @@ void ObjectModel::Initialize(Model* _model)
 
 void ObjectModel::Update()
 {
-    model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
 
 
     worldTransform_.transform_ = translate_;
@@ -52,6 +51,12 @@ void ObjectModel::Update()
     else
         worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData(useQuaternion_);
+
+    if (model_->HasAnimation() && model_->IsAnimationPlaying())
+    {
+        model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+    }
+
 }
 
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
@@ -102,12 +107,18 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 
 void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
 {
-    model_->SetAnimation(_name, _isLoop);
+    if (model_->HasAnimation())
+    {
+        model_->SetAnimation(_name, _isLoop);
+    }
 }
 
 void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop)
 {
-    model_->ChangeAnimation(_name, _blendTime, _isLoop);
+    if (model_->HasAnimation())
+    {
+        model_->ChangeAnimation(_name, _blendTime, _isLoop);
+    }
 }
 
 void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
