@@ -74,6 +74,10 @@ private:
     std::vector<ObjectModel*> models_;
     std::vector<AABBCollider*> colliders_;
 
+    std::vector<ObjectModel*> s_models_;
+    std::vector<AABBCollider*> s_colliders_;
+
+
     void Create();
 
 #ifdef _DEBUG

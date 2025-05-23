@@ -52,6 +52,14 @@ enum class BoundingBox
     Capsule_3D
 };
 
+struct AABB
+{
+    Vector3 min;
+    Vector3 max;
+
+    bool Intersect(AABB _other) const;
+};
+
 std::string ToString(BoundingBox _box);
 
 /// Scene::Initialize(){
@@ -156,13 +164,17 @@ public:
     // ワールドトランスフォームを取得する
     WorldTransform* GetWorldTransform();
 
+    const  WorldTransform* GetWorldTransform() const;
     // コライダーのオフセットを設定する
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
 
     // コライダーのオフセットを取得する
     Vector3 GetOffset() const { return offset_; }
 
+    // コライダーのサイズを設定する
     Vector3 GetSize() const;
+
+    virtual AABB GetBounds() const = 0;
 
     // _pointが内部に含まれているか
     virtual bool Contains(const Vector3& _point) = 0;
@@ -255,9 +267,10 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point)  override;
 
+    AABB GetBounds() const override;
+
+
     void ImGui();
-
-
 private:
 
     float radius_ = 0.0f; // 球の半径
@@ -266,7 +279,7 @@ private:
 class AABBCollider : public Collider
 {
 public:
-    // コンストラクタ
+
     AABBCollider(const char* _name);
     explicit AABBCollider(bool _isTemporary);
     // デストラクタ
@@ -291,8 +304,9 @@ public:
     // _pointから最も近い点を求める
     Vector3 GetClosestPoint(const Vector3& _point)  override;
 
-    void ImGui();
+    AABB GetBounds() const override;
 
+    void ImGui();
 
 private:
     Vector3 min_; // AABBの最小値
@@ -332,7 +346,9 @@ public:
     // OBBの頂点を取得する
     std::vector<Vector3> GetVertices();
     // OBBの中心を取得する
-    Vector3 GetCenter();
+    Vector3 GetCenter() const;
+
+    AABB GetBounds() const override;
 
     void ImGui();
 
@@ -383,10 +399,10 @@ public:
     Vector3 GetClosestPoint(const Vector3& _point)  override;
 
     // カプセルの中心を取得する
-    Vector3 GetCenter();
+    Vector3 GetCenter() const;
 
     // カプセルの中心線の両端を取得する
-    void GetCapsuleSegment(Vector3& _start, Vector3& _end);
+    void GetCapsuleSegment(Vector3& _start, Vector3& _end) const;
 
     // 点と線分間の最近接点を計算
     Vector3 ClosestPointOnSegment(const Vector3& _point, const Vector3& _start, const Vector3& _end) const;
@@ -395,6 +411,7 @@ public:
 
     Vector3 GetCapsuleAABBSize();
 
+    AABB GetBounds() const override;
 
 private:
     float radius_ = 0.0f; // カプセルの半径

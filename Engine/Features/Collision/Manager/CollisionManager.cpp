@@ -12,7 +12,7 @@ CollisionManager* CollisionManager::GetInstance()
     return &instance;
 }
 
-void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, const Vector2& _leftTop)
+void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, const Vector2& _leftBotom, float _gridSize)
 {
     colliders_.clear();
     collisionPairs_.clear();
@@ -35,7 +35,11 @@ void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, co
 
     // QuadTreeの初期化
     quadTree_ = std::make_unique<QuadTree>();
-    quadTree_->Initialize(_fieldSize, _level, _leftTop);
+    quadTree_->Initialize(_fieldSize, _level, _leftBotom);
+
+    // スパイラルハッシュグリッドの初期化
+    spiralHashGrid_ = std::make_unique<SpiralHashGrid>(_gridSize);
+    spiralHashGrid_->Clear();
 }
 
 void CollisionManager::Finalize()
@@ -120,6 +124,31 @@ void CollisionManager::RegisterCollider(Collider* _collider)
     colliders_.push_back(_collider);
 }
 
+void CollisionManager::RegisterStaticCollider(Collider* _collider)
+{
+    // nullチェック
+    if (_collider == nullptr)
+        return;
+    // 衝突判定中の登録はスキップ（警告出力）
+    if (isCollisionPhase_.load()) {
+#ifdef _DEBUG
+        // Debug::Log("Warning: RegisterStaticCollider called during collision phase\n");
+#endif
+        return;
+    }
+
+    // 既に登録されているかチェック
+    auto it = std::find(staticColliders_.begin(), staticColliders_.end(), _collider);
+    if (it != staticColliders_.end())
+        return;
+
+    // コライダーを登録（高速 - ミューテックス不使用）
+    staticColliders_.push_back(_collider);
+
+    spiralHashGrid_->AddCollider(_collider);
+
+}
+
 void CollisionManager::CheckCollisions()
 {
     auto now = std::chrono::high_resolution_clock::now();
@@ -193,11 +222,11 @@ void CollisionManager::CheckCollisionsRange(size_t _startIndex, size_t _endIndex
         ColliderInfo info;
 
 #ifdef _DEBUG
-        std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
+        /*std::string layerA = CollisionLayerManager::GetInstance()->GetLayerStr(colliderA->GetLayer());
         std::string layerB = CollisionLayerManager::GetInstance()->GetLayerStr(colliderB->GetLayer());
         Debug::Log("Checking collision between " + layerA + " and " + layerB + "\n");
         std::string nameA = colliderA->GetName();
-        std::string nameB = colliderB->GetName();
+        std::string nameB = colliderB->GetName();*/
         //Debug::Log("Checking collision between " + nameA + " and " + nameB + "\n");
 #endif // _DEBUG
 
@@ -235,8 +264,8 @@ void CollisionManager::CheckCollisionsRange(size_t _startIndex, size_t _endIndex
 
             //Debug::Log("Checking collision between\t" + nameA + "\tand " + nameB + "\tHit\n");
         }
-        else
-            Debug::Log( nameA + "\tand " + nameB + "\t----------\n");
+        //else
+            //Debug::Log( nameA + "\tand " + nameB + "\t----------\n");
     }
 
     // ローカルな結果をグローバルなコンテナに追加（ミューテックスで保護）
@@ -314,6 +343,12 @@ void CollisionManager::UpdateCollisionStates()
     {
         collider->UpdateCollisionState();
     }
+
+    // 全ての静的コライダーの衝突状態を更新
+    for (auto collider : staticColliders_)
+    {
+        collider->UpdateCollisionState();
+    }
 }
 
 void CollisionManager::DrawColliders()
@@ -353,6 +388,29 @@ void CollisionManager::DrawColliders()
         // コライダーを描画
         collider->Draw();
     }
+
+    // 静的コライダーを描画
+    for (auto collider : staticColliders_)
+    {
+        // コライダーが衝突中か判定
+        bool isColliding = std::find(collidingColliders.begin(), collidingColliders.end(), collider) != collidingColliders.end();
+
+        // 衝突状態に応じて色を設定
+        if (isColliding)
+        {
+            // 衝突中は赤色
+            LineDrawer::GetInstance()->SetColor({ 1.0f, 0.0f, 1.0f, 1.0f });
+        }
+        else
+        {
+            // 通常時は緑色
+            LineDrawer::GetInstance()->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
+        }
+
+        // コライダーを描画
+        collider->Draw();
+    }
+
 
     // 衝突点と法線を描画
     LineDrawer::GetInstance()->SetColor({ 1.0f , 1.0f , 1.0f , 1.0f });
@@ -461,6 +519,32 @@ void CollisionManager::UpdateBroadPhase()
 
     // QuadTreeを使用して衝突ペアを取得
     quadTree_->GetCollisionPair(0, potentialCollisions_, stac);
+
+    for (auto dynamicCollider : colliders_)
+    {
+        // SpiralHashGridを使用して動的コライダーと衝突する可能性がある静的コライダーを取得
+        std::vector<Collider*> nearbyStaticColliders = spiralHashGrid_->CheckCollision(dynamicCollider);
+
+        for (auto staticCollider : nearbyStaticColliders)
+        {
+            // 重複チェック（同じペアが既に存在しないか）
+            bool alreadyExists = false;
+            for (const auto& existingPair : potentialCollisions_)
+            {
+                if ((existingPair.first == dynamicCollider && existingPair.second == staticCollider) ||
+                    (existingPair.first == staticCollider && existingPair.second == dynamicCollider))
+                {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            if (!alreadyExists)
+            {
+                potentialCollisions_.emplace_back(dynamicCollider, staticCollider);
+            }
+        }
+    }
 }
 
 CollisionManager::CollisionManager()

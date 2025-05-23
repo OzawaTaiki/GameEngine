@@ -77,6 +77,16 @@ WorldTransform* Collider::GetWorldTransform()
     return worldTransform_;
 }
 
+const WorldTransform* Collider::GetWorldTransform() const
+{
+    if (worldTransform_ == nullptr)
+    {
+        return &defaultTransform_;
+    }
+
+    return worldTransform_;
+}
+
 Vector3 Collider::GetSize() const
 {
     Vector3 scale;
@@ -290,6 +300,22 @@ Vector3 SphereCollider::GetClosestPoint(const Vector3& _point)
     return center + direction / length * radius;
 }
 
+AABB SphereCollider::GetBounds() const
+{
+    // ワールド変換を取得
+    const WorldTransform* transform = GetWorldTransform();
+
+    // オフセットをワールド座標に変換
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+
+    // スケールを考慮した半径
+    float worldRadius = radius_ * transform->scale_.x; // 均等スケールを想定
+
+    Vector3 radiusVec(worldRadius, worldRadius, worldRadius);
+    return AABB(center - radiusVec, center + radiusVec);
+}
+
 void SphereCollider::ImGui()
 {
 #ifdef _DEBUG
@@ -312,7 +338,6 @@ AABBCollider::AABBCollider(const char* _name) : Collider()
     name_ = ImGuiDebugManager::GetInstance()->AddColliderDebugWindow(_name, [&]() {ImGui(); });
 #endif // _DEBUG
 }
-
 void AABBCollider::Draw()
 {
     if (!isDraw_)
@@ -384,6 +409,23 @@ Vector3 AABBCollider::GetClosestPoint(const Vector3& _point)
         std::clamp(_point.y, min_.y, max_.y),
         std::clamp(_point.z, min_.z, max_.z)
     );
+}
+
+AABB AABBCollider::GetBounds() const
+{
+    // ワールド変換を取得
+    const WorldTransform* transform = GetWorldTransform();
+
+    // オフセットをワールド座標に変換
+    Vector3 worldOffset = Transform(offset_, transform->quaternion_.ToMatrix());
+    Vector3 center = transform->transform_ + worldOffset;
+
+    // スケールを考慮したAABBの最小値と最大値
+    Vector3 scaledMin = min_ * transform->scale_;
+    Vector3 scaledMax = max_ * transform->scale_;
+
+    return AABB(center + scaledMin, center + scaledMax);
+
 }
 
 void AABBCollider::ImGui()
@@ -541,7 +583,7 @@ std::vector<Vector3> OBBCollider::GetVertices()
     return corners;
 }
 
-Vector3 OBBCollider::GetCenter()
+Vector3 OBBCollider::GetCenter() const 
 {
     WorldTransform transform = *GetWorldTransform();
 
@@ -550,6 +592,37 @@ Vector3 OBBCollider::GetCenter()
     Vector3 pivot = Transform(localPivot_, affine);
 
     return transform.transform_ + pivot;
+
+}
+
+AABB OBBCollider::GetBounds() const
+{
+    const WorldTransform* transform = GetWorldTransform(); // const版を呼び出し
+
+    Vector3 center = GetCenter();
+    Vector3 scaledHalfExtents = halfExtents_ * transform->scale_;
+
+    Matrix4x4 rotMat = transform->quaternion_.ToMatrix();
+
+    Vector3 axisX = Vector3(rotMat.m[0][0], rotMat.m[1][0], rotMat.m[2][0]);
+    Vector3 axisY = Vector3(rotMat.m[0][1], rotMat.m[1][1], rotMat.m[2][1]);
+    Vector3 axisZ = Vector3(rotMat.m[0][2], rotMat.m[1][2], rotMat.m[2][2]);
+
+    Vector3 projection = Vector3(
+        scaledHalfExtents.x * std::abs(axisX.x) +
+        scaledHalfExtents.y * std::abs(axisY.x) +
+        scaledHalfExtents.z * std::abs(axisZ.x),
+
+        scaledHalfExtents.x * std::abs(axisX.y) +
+        scaledHalfExtents.y * std::abs(axisY.y) +
+        scaledHalfExtents.z * std::abs(axisZ.y),
+
+        scaledHalfExtents.x * std::abs(axisX.z) +
+        scaledHalfExtents.y * std::abs(axisY.z) +
+        scaledHalfExtents.z * std::abs(axisZ.z)
+    );
+
+    return AABB(center - projection, center + projection);
 }
 
 void OBBCollider::ImGui()
@@ -778,7 +851,7 @@ Vector3 CapsuleCollider::GetClosestPoint(const Vector3& _point)
     return closest + toPoint.Normalize() * radius_;
 }
 
-Vector3 CapsuleCollider::GetCenter()
+Vector3 CapsuleCollider::GetCenter() const
 {
     WorldTransform transform = *GetWorldTransform();
 
@@ -789,7 +862,7 @@ Vector3 CapsuleCollider::GetCenter()
     return transform.transform_ + pivot;
 }
 
-void CapsuleCollider::GetCapsuleSegment(Vector3& _start, Vector3& _end)
+void CapsuleCollider::GetCapsuleSegment(Vector3& _start, Vector3& _end) const
 {
     Vector3 center = GetCenter();
 
@@ -859,6 +932,24 @@ CapsuleCollider::CapsuleCollider(bool _isTemporary) : Collider()
     SetBoundingBox(BoundingBox::Capsule_3D);
 }
 
+AABB CapsuleCollider::GetBounds() const
+{
+    const WorldTransform* transform = GetWorldTransform(); // const版を呼び出し
+
+    // GetCapsuleSegmentがconst関数でない場合の回避策
+    Vector3 start, end;
+    const_cast<CapsuleCollider*>(this)->GetCapsuleSegment(start, end);
+
+    float worldRadius = radius_ * (std::max)({ transform->scale_.x, transform->scale_.y, transform->scale_.z });
+
+    Vector3 minPoint = Vector3::Min(start, end);
+    Vector3 maxPoint = Vector3::Max(start, end);
+
+    Vector3 radiusVec(worldRadius, worldRadius, worldRadius);
+
+    return AABB(minPoint - radiusVec, maxPoint + radiusVec);
+}
+
 std::string ToString(BoundingBox _box)
 {
     switch (_box)
@@ -874,4 +965,12 @@ std::string ToString(BoundingBox _box)
     default:
         return "NONE";
     }
+}
+
+bool AABB::Intersect(AABB _other) const 
+{
+    return  min.x <= _other.max.x && max.x >= _other.min.x &&
+            min.y <= _other.max.y && max.y >= _other.min.y &&
+            min.z <= _other.max.z && max.z >= _other.min.z;
+
 }

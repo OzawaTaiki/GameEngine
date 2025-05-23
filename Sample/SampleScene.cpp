@@ -35,6 +35,24 @@ SampleScene::~SampleScene()
         model = nullptr;
     }
     models_.clear();
+
+    for (auto& collider : s_colliders_)
+    {
+        CollisionManager::GetInstance()->UnregisterCollider(collider);
+        delete collider;
+        collider = nullptr;
+    }
+
+    s_colliders_.clear();
+
+    for (auto& model : s_models_)
+    {
+        delete model;
+        model = nullptr;
+    }
+    s_models_.clear();
+
+
 }
 
 void SampleScene::Initialize()
@@ -159,17 +177,26 @@ void SampleScene::Update()
 
 #endif // _DEBUG
 
-    for (auto& col : colliders_)
+    static bool isSta = false;
+    ImGui::Checkbox("Static", &isSta);
+
+    size_t loop = colliders_.size() - s_colliders_.size();
+    if(isSta)
+        loop+= s_colliders_.size();
+    ImGui::Text("Collider Count: %d", loop);
+
+    for (int i = 0; i < loop; ++i)
     {
-        CollisionManager::GetInstance()->RegisterCollider(col);
+        CollisionManager::GetInstance()->RegisterCollider(colliders_[i]);
     }
 
-    test_->Update();
+
+    /*test_->Update();
     oModel_->Update();
     oModel2_->Update();
     aModel_->Update();
     plane_->Update();
-    sprite_->Update();
+    sprite_->Update();*/
 
     if (input_->IsKeyTriggered(DIK_TAB))
     {
@@ -201,14 +228,20 @@ void SampleScene::Draw()
 
     skyBox_->QueueCmdCubeTexture();
 
-    for (auto& model : models_)
+    int i = 0;
+    for (; i < models_.size(); ++i)
     {
-        model->Draw(&SceneCamera_, 0, { 1,1,1,1 });
+        models_[i]->Draw(&SceneCamera_, 0, testColor_);
     }
+    for (int j = 0; j < s_models_.size(); ++j)
+    {
+        s_models_[j]->Draw(&SceneCamera_, 0, { .7f,.7f,.7f,1 });
+    }
+
 
     //oModel_->Draw(&SceneCamera_, testColor_);
     //oModel2_->Draw(&SceneCamera_, 0 ,{ 1, 1, 1, 1 });
-    plane_->Draw(&SceneCamera_, { 1,1,1,1 });
+    //plane_->Draw(&SceneCamera_, { 1,1,1,1 });
 
     ////aModel_->Draw(&SceneCamera_, { 1,1,1,1 });
 
@@ -226,11 +259,11 @@ void SampleScene::Draw()
 
 void SampleScene::DrawShadow()
 {
-
-    for (auto& model : models_)
+    for (int i = 0; i < models_.size(); ++i)
     {
-        model->DrawShadow(&SceneCamera_, 0);
+        models_[i]->DrawShadow(&SceneCamera_, 0);
     }
+
     //oModel_->DrawShadow(&SceneCamera_, 0);
     //oModel2_->DrawShadow(&SceneCamera_, 1);
     //aModel_->DrawShadow(&SceneCamera_, 2);
@@ -241,13 +274,13 @@ void SampleScene::Create()
 {
     auto rand = RandomGenerator::GetInstance();
 
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         ObjectModel* model = new ObjectModel("test");
         model->Initialize("Cube/Cube.obj");
-        model->translate_.x = rand->GetRandValue(-0.0f, 25.0f);
+        model->translate_.x = rand->GetRandValue(-0.0f, 80.0f);
         model->translate_.y = 0.0f;
-        model->translate_.z = rand->GetRandValue(-0.0f, 25.0f);
+        model->translate_.z = rand->GetRandValue(-0.0f, 80.0f);
 
         model->Update();
 
@@ -259,6 +292,61 @@ void SampleScene::Create()
         models_.push_back(model);
         colliders_.push_back(collider);
     }
+
+    for (int i = 0; i < 5; i++)
+    {
+        ObjectModel* model = new ObjectModel("test");
+        model->Initialize("Cube/Cube.obj");
+        model->translate_.x = rand->GetRandValue(-0.0f, 80.0f);
+        model->translate_.y = -3.0f;
+        model->translate_.z = rand->GetRandValue(-0.0f, 80.0f);
+        model->scale_ = { 10,1,10 };
+        model->scale_.x *= rand->GetRandValue(0.5f, 2.0f);
+        model->scale_.z *= rand->GetRandValue(0.5f, 2.0f);
+
+        model->Update();
+
+        AABBCollider* collider = new AABBCollider("static_");
+        collider->SetLayer("static_");
+        collider->SetWorldTransform(model->GetWorldTransform());
+        collider->SetMinMax(model->GetMin(), model->GetMax());
+
+        AABBCollider* collider2 = new AABBCollider("s_temp");
+        collider2->SetLayer("s_temp");
+        collider2->SetWorldTransform(model->GetWorldTransform());
+        collider2->SetMinMax(model->GetMin(), model->GetMax());
+
+        s_models_.push_back(model);
+        colliders_.push_back(collider2);
+        s_colliders_.push_back(collider);
+        CollisionManager::GetInstance()->RegisterStaticCollider(s_colliders_.back());
+    }
+
+    {
+        ObjectModel* model = new ObjectModel("test");
+        model->Initialize("Cube/Cube.obj");
+        model->translate_.x = 40.0f;
+        model->translate_.y = -3.0f;
+        model->translate_.z = 40.0f;
+        model->scale_ = { 80,1,80 };
+        model->Update();
+
+        AABBCollider* collider = new AABBCollider("static_");
+        collider->SetLayer("static_");
+        collider->SetWorldTransform(model->GetWorldTransform());
+        collider->SetMinMax(model->GetMin(), model->GetMax());
+
+        AABBCollider* collider2 = new AABBCollider("s_temp");
+        collider2->SetLayer("s_temp");
+        collider2->SetWorldTransform(model->GetWorldTransform());
+        collider2->SetMinMax(model->GetMin(), model->GetMax());
+
+        s_models_.push_back(model);
+        colliders_.push_back(collider2);
+        s_colliders_.push_back(collider);
+        CollisionManager::GetInstance()->RegisterStaticCollider(s_colliders_.back());
+    }
+
 }
 
 #ifdef _DEBUG
