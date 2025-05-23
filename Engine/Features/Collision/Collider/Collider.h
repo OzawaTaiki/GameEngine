@@ -279,8 +279,6 @@ private:
 class AABBCollider : public Collider
 {
 public:
-    // コンストラクタ
-    AABBCollider(const std::string& _name = "Collider");
 
     AABBCollider(const char* _name);
     explicit AABBCollider(bool _isTemporary);
@@ -308,6 +306,7 @@ public:
 
     AABB GetBounds() const override;
 
+    void ImGui();
 
 private:
     Vector3 min_; // AABBの最小値

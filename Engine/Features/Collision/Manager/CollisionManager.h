@@ -3,6 +3,8 @@
 #include <Features/Collision/Collider/Collider.h>
 #include <Features/Collision/Detector/CollisionDetector.h>
 #include <Features/Collision/Tree/QuadTree.h>
+#include <Features/Collision/SpiralHashGird/SpiralHashGrid.h>
+
 #include <vector>
 #include <unordered_map>
 #include <functional>
@@ -27,7 +29,7 @@ public:
     static CollisionManager* GetInstance();
 
     // 初期化
-    void Initialize(const Vector2& _fieldSize, uint32_t _level, const Vector2& _leftBottom);
+    void Initialize(const Vector2& _fieldSize, uint32_t _level, const Vector2& _leftBottom, float _gridSize = 1.0f);
 
     // 終了処理
     void Finalize();
@@ -37,6 +39,9 @@ public:
 
     // コライダーを登録する（高速版 - 衝突判定中は無視）
     void RegisterCollider(Collider* _collider);
+
+    // コライダーを登録する（静的コライダー用 地形など)
+    void RegisterStaticCollider(Collider* _collider);
 
     // 衝突判定を実行する（マルチスレッド対応）
     void CheckCollisions();
@@ -88,6 +93,8 @@ private:
     // コライダーのリスト
     std::vector<Collider*> colliders_;
 
+    std::vector<Collider*> staticColliders_; // 静的コライダーのリスト
+
     // 衝突ペアのリスト
     std::vector<CollisionPair> collisionPairs_;
 
@@ -98,6 +105,8 @@ private:
     std::vector<std::pair<Collider*, Collider*>> potentialCollisions_;
 
     std::unique_ptr<QuadTree> quadTree_; // 空間分割のための四分木
+
+    std::unique_ptr<SpiralHashGrid> spiralHashGrid_; // スパイラルハッシュグリッド
 
     // マルチスレッド関連
     uint32_t threadCount_;

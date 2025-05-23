@@ -524,7 +524,7 @@
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp">
       <Filter>Features\Collision\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGird.cpp">
+    <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGrid.cpp">
       <Filter>Features\Collision\SpiralHashGrid</Filter>
     </ClCompile>
   </ItemGroup>
@@ -960,7 +960,7 @@
     <ClInclude Include="Features\Collision\Tree\QuadTree.h">
       <Filter>Features\Collision\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGird.h">
+    <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGrid.h">
       <Filter>Features\Collision\SpiralHashGrid</Filter>
     </ClInclude>
   </ItemGroup>

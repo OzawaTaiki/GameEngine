@@ -1,4 +1,4 @@
-#include "SpiralHashGird.h"
+#include "SpiralHashGrid.h"
 
 #include <set>
 
