@@ -77,6 +77,8 @@ public:
 
     ~Cell();
 
+    void Reset();
+
     std::list<std::shared_ptr<ObjectForTree >>& GetData() { return data_; } // データ取得
 
     bool RegisterData(std::shared_ptr<ObjectForTree > _data);
