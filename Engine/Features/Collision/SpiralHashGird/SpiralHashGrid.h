@@ -17,6 +17,7 @@ public:
     void Reset() { Clear(); }
 
     void AddCollider(Collider* _collider);
+    void RemoveCollider(Collider* _collider);
 
     std::vector<Collider*> CheckCollision(Collider* _col) const;
 

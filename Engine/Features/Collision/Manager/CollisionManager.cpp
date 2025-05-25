@@ -316,6 +316,12 @@ void CollisionManager::RemoveColliderImmediate(Collider* _collider)
         colliders_.erase(it);
     }
 
+    auto staticIt = std::find(staticColliders_.begin(), staticColliders_.end(), _collider);
+    if (staticIt != staticColliders_.end()) {
+        staticColliders_.erase(staticIt);
+        spiralHashGrid_->RemoveCollider(_collider); // スパイラルハッシュグリッドからも削除
+    }
+
     // 衝突ペアからも削除
     if (!collisionPairs_.empty()) {
         collisionPairs_.erase(
@@ -438,8 +444,8 @@ void CollisionManager::UnregisterCollider(Collider* _collider)
         auto it = std::find(pendingUnregister_.begin(), pendingUnregister_.end(), _collider);
         if (it == pendingUnregister_.end()) {
             pendingUnregister_.push_back(_collider);
+            return;
         }
-        return;
     }
 
     // 通常の削除処理

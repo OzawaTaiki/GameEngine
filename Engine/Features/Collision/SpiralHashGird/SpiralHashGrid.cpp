@@ -16,6 +16,31 @@ void SpiralHashGrid::AddCollider(Collider* _collider)
     }
 }
 
+void SpiralHashGrid::RemoveCollider(Collider* _collider)
+{
+    std::array<int32_t, 4> cellIndices = GetCellIndices(_collider);
+
+    for (int32_t x = cellIndices[0]; x <= cellIndices[1]; ++x)
+    {
+        for (int32_t y = cellIndices[2]; y <= cellIndices[3]; ++y)
+        {
+            uint64_t hashKey = GetHashKey(x, y);
+            auto it = grid_.find(hashKey);
+            if (it != grid_.end())
+            {
+                // コライダーを削除
+                auto& colliders = it->second;
+                colliders.erase(std::remove(colliders.begin(), colliders.end(), _collider), colliders.end());
+                // コライダーがいなくなったらエントリを削除
+                if (colliders.empty())
+                {
+                    grid_.erase(it);
+                }
+            }
+        }
+    }
+}
+
 std::vector<Collider*> SpiralHashGrid::CheckCollision(Collider* _col) const
 {
     std::set<Collider*> result;
