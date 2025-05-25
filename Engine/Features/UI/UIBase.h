@@ -51,7 +51,9 @@ public:
 
     void SetTextureNameAndLoad(const std::string& _textureName);
 
+    void Save();
 
+    void ImGui();
 protected:
     std::unique_ptr <Sprite> sprite_ = nullptr;
 
@@ -75,6 +77,5 @@ protected:
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
 
-    void ImGui();
 
 };
