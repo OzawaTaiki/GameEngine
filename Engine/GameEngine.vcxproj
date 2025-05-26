@@ -314,6 +314,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Scene\ISceneFactory.h" />
     <ClInclude Include="Features\Scene\Manager\SceneManager.h" />
     <ClInclude Include="Features\Scene\ParticleTestScene.h" />
+    <ClInclude Include="Features\Scene\SceneData.h" />
     <ClInclude Include="Features\SilhouetteDetection.h" />
     <ClInclude Include="Features\Sprite\Sprite.h" />
     <ClInclude Include="Features\Sprite\SpriteManager.h" />

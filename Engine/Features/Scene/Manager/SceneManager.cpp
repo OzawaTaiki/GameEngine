@@ -15,6 +15,8 @@ SceneManager::~SceneManager()
 {
     //scenes_.clear();
     //currentScene_.reset();
+
+    delete sceneFactory_;
 }
 //
 //void SceneManager::RegisterScene(const std::string& _name, SceneFactory _scene)
@@ -37,7 +39,7 @@ void SceneManager::Initialize(const std::string& _name)
     currentSceneName_ = _name;
 
     nextSceneName_ = "empty";
-    currentScene_->Initialize();
+    currentScene_->Initialize(nullptr);
 }
 
 void SceneManager::Update()
@@ -81,11 +83,14 @@ void SceneManager::SetTransition(std::unique_ptr<ISceneTransition> _transition)
     }
 }
 
-void SceneManager::ReserveScene(const std::string& _name)
+void SceneManager::ReserveScene(const std::string& _name, std::unique_ptr<SceneData> _sceneData)
 {
     auto instance = GetInstance();
 
     instance->nextSceneName_ = _name;
+    if (instance->sceneData_)
+        instance->sceneData_.reset();
+    instance->sceneData_ = std::move(_sceneData);
 
     if (instance->transition_ != nullptr && !instance->isTransition_)
     {
@@ -117,7 +122,7 @@ void SceneManager::ChangeScene()
     instance->currentScene_.reset();
 
     instance->currentScene_ = instance->sceneFactory_->CreateScene(instance->nextSceneName_);
-    instance->currentScene_->Initialize();
+    instance->currentScene_->Initialize(instance->sceneData_.get());
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
 
@@ -158,7 +163,7 @@ void SceneManager::ImGui()
     std::string name = sceneFactory_->ShowDebugWindow();
     if (!name.empty())
     {
-        ReserveScene(name);
+        ReserveScene(name, nullptr);
     }
 
 
