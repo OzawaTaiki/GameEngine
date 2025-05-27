@@ -1,6 +1,8 @@
 #include "SpiralHashGrid.h"
 
 #include <set>
+#include <array>
+#include <Features/LineDrawer/LineDrawer.h>
 
 void SpiralHashGrid::AddCollider(Collider* _collider)
 {
@@ -47,7 +49,25 @@ std::vector<Collider*> SpiralHashGrid::CheckCollision(Collider* _col) const
 
     AABB bounds = _col->GetBounds();
 
-    std::array<int32_t, 4> cellIndices = GetCellIndices(_col);
+#ifdef _DEBUG
+    std::array<Vector3,8> vertices;
+    vertices[0] = bounds.min;
+    vertices[1]=Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
+    vertices[2]=Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+    vertices[3]=Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+    vertices[4]=Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
+    vertices[5]=Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
+    vertices[6]=Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+    vertices[7]=Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
+
+    // デバッグ用にAABBの頂点を描画
+    LineDrawer::GetInstance()->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+    LineDrawer::GetInstance()->DrawOBB(vertices);
+    //(vertices, Matrix4x4::Identity());
+#endif
+
+
+    std::array<int32_t, 4> cellIndices = GetCellIndices(bounds);
 
     for (int32_t x = cellIndices[0]; x <= cellIndices[1]; ++x)
     {
@@ -110,4 +130,17 @@ std::array<int32_t, 4> SpiralHashGrid::GetCellIndices(Collider* _col) const
 
     return { minX, maxX,minY, maxY };
 
+}
+
+std::array<int32_t, 4> SpiralHashGrid::GetCellIndices(const AABB& _aabb) const
+{
+    Vector2 min = Vector2(_aabb.min.x, _aabb.min.z);
+    Vector2 max = Vector2(_aabb.max.x, _aabb.max.z);
+
+    int32_t minX = static_cast<int32_t>(min.x / cellSize_);
+    int32_t minY = static_cast<int32_t>(min.y / cellSize_);
+    int32_t maxX = static_cast<int32_t>(max.x / cellSize_);
+    int32_t maxY = static_cast<int32_t>(max.y / cellSize_);
+
+    return { minX, maxX, minY, maxY };
 }

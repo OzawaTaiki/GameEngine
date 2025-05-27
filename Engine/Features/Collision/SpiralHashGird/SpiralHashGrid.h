@@ -27,6 +27,7 @@ private:
     uint64_t GetHashKey(int32_t _x, int32_t _y) const;
 
     std::array<int32_t, 4> GetCellIndices(Collider* _col) const;
+    std::array<int32_t, 4> GetCellIndices(const AABB& _aabb) const;
 
 private:
 

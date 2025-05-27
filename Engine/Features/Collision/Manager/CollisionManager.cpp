@@ -164,10 +164,14 @@ void CollisionManager::CheckCollisions()
     const size_t totalPairs = potentialCollisions_.size();
     const size_t numThreads = (std::min)(static_cast<size_t>(threadCount_), totalPairs);
 
+    CheckCollisionsRange(0, totalPairs);
+    // シングルスレッドで処理
     if (numThreads <= 1)
     {
-        // シングルスレッドで処理
-        CheckCollisionsRange(0, totalPairs);
+    }
+    else if (true)
+    {
+
     }
     else
     {
@@ -310,6 +314,8 @@ void CollisionManager::ProcessPendingUnregistrations()
 
 void CollisionManager::RemoveColliderImmediate(Collider* _collider)
 {
+    // たぶんスレッドセーフになってない
+
     // コライダーリストから削除
     auto it = std::find(colliders_.begin(), colliders_.end(), _collider);
     if (it != colliders_.end()) {

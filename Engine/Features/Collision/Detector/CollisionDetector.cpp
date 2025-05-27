@@ -717,14 +717,6 @@ bool CollisionDetector::IntersectAABBOBB(AABBCollider* _aabb, OBBCollider* _obb,
     // プレイヤーなど、Y軸のみ回転のOBBかチェック
     const WorldTransform* obbTransform = _obb->GetWorldTransform();
 
-    const Quaternion& quat = obbTransform->quaternion_;
-    const float tolerance = 0.001f; // 許容誤差
-
-    if ((std::abs(quat.x) < tolerance && std::abs(quat.z) < tolerance)) {
-        return IntersectAABBOBB_YRotationOnly(_aabb, _obb, _info);
-    }
-
-
     // 一般的なケースは従来の方法
     OBBCollider tempOBB(true);
     tempOBB.SetBoundingBox(BoundingBox::OBB_3D);
@@ -736,6 +728,7 @@ bool CollisionDetector::IntersectAABBOBB(AABBCollider* _aabb, OBBCollider* _obb,
 
     tempOBB.SetHalfExtents(halfExtents);
     tempOBB.SetLocalPivot(center);
+    tempOBB.SetOffset(_aabb->GetOffset());
     tempOBB.SetWorldTransform(_aabb->GetWorldTransform());
 
     return IntersectOBBOBB(&tempOBB, _obb, _info);
