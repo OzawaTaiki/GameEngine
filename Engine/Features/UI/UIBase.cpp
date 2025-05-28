@@ -93,6 +93,14 @@ void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
     sprite_->SetTextureHandle(textureHandle_);
 }
 
+void UIBase::Save()
+{
+    if (jsonBinder_)
+    {
+        jsonBinder_->Save();
+    }
+}
+
 void UIBase::ImGui()
 {
 #ifdef _DEBUG

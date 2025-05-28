@@ -963,5 +963,8 @@
     <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGrid.h">
       <Filter>Features\Collision\SpiralHashGrid</Filter>
     </ClInclude>
+    <ClInclude Include="Features\Scene\SceneData.h">
+      <Filter>Features\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

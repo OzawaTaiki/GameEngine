@@ -2,6 +2,7 @@
 #include <Features/Scene/Interface/BaseScene.h>
 #include <Features/Scene/ISceneFactory.h>
 #include <Features/Scene/Interface/ISceneTransition.h>
+#include <Features/Scene/SceneData.h>
 
 #include <iostream>
 #include <cstdint>
@@ -40,7 +41,7 @@ public:
 
     // シーンの予約
     // _name : 予約するシーンの名前
-    static void ReserveScene(const std::string& _name);
+    static void ReserveScene(const std::string& _name, std::unique_ptr<SceneData> _sceneData);
 
     // シーンの変更
     static void ChangeScene();
@@ -58,6 +59,9 @@ private:
     std::unique_ptr<BaseScene> currentScene_ = nullptr;
 
     std::unique_ptr<ISceneTransition> transition_ = nullptr;
+
+    std::unique_ptr<SceneData> sceneData_ = nullptr;
+
     bool isTransition_ = false;
 
     // 現在のシーン名

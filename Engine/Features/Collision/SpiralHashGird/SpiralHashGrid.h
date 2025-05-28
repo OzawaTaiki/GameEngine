@@ -17,6 +17,7 @@ public:
     void Reset() { Clear(); }
 
     void AddCollider(Collider* _collider);
+    void RemoveCollider(Collider* _collider);
 
     std::vector<Collider*> CheckCollision(Collider* _col) const;
 
@@ -26,6 +27,7 @@ private:
     uint64_t GetHashKey(int32_t _x, int32_t _y) const;
 
     std::array<int32_t, 4> GetCellIndices(Collider* _col) const;
+    std::array<int32_t, 4> GetCellIndices(const AABB& _aabb) const;
 
 private:
 

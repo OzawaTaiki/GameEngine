@@ -44,31 +44,35 @@ Model* Plane::Generate(const std::string& _name)
 }
 
 
-std::array<Vector3, 4>  Plane::CalculateVertices()
+std::array<Vector3, 4> Plane::CalculateVertices()
 {
     std::array<Vector3, 4> vertices = defaultVertices_;
-
     normal_ = normal_.Normalize();
-
-    const Vector3 defaultNormal = { 0.0f, 0.0, 1.0f };
+    const Vector3 defaultNormal = { 0.0f, 0.0f, 1.0f };
     Quaternion q = Quaternion::FromToRotation(defaultNormal, normal_);
     Matrix4x4 rotationMatrix = q.Normalize().ToMatrix();
 
-    // サイズから重心を求める
-    // 対角線の公転を求める
+    Vector4 halfSize = size_ * 0.5f;
 
-    Vector4 halfSize = size_ * 0.5f; // 上 左 右 下
-
+    // 正規化pivot（-1~1）を実際の座標に変換
+    Vector3 actualPivot = {
+        pivot_.x * halfSize.x,  // X軸のpivot位置
+        pivot_.y * halfSize.y,  // Y軸のpivot位置
+        0.0f
+    };
 
     vertices[0] = { -halfSize.x,   halfSize.y, 0.0f }; // 左上
-    vertices[1] = {  halfSize.x,   halfSize.z, 0.0f }; // 右上
+    vertices[1] = { halfSize.x,   halfSize.z, 0.0f }; // 右上
     vertices[2] = { -halfSize.w,  -halfSize.y, 0.0f }; // 左下
-    vertices[3] = {  halfSize.w,  -halfSize.z, 0.0f }; // 右下
+    vertices[3] = { halfSize.w,  -halfSize.z, 0.0f }; // 右下
 
-    // 回転
-    for (auto& vertex : vertices)
+    for (uint32_t i = 0; i < vertices.size(); ++i)
     {
-        vertex = Transform(vertex, rotationMatrix);
+        // 回転を適用
+        vertices[i] = Transform(vertices[i], rotationMatrix);
+
+        vertices[i] = vertices[i] + actualPivot;
+
     }
 
     return vertices;

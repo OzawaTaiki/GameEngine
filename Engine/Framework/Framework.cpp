@@ -124,10 +124,10 @@ void Framework::PostDraw()
 
 void Framework::Finalize()
 {
-    Time_MT::GetInstance()->Finalize();
-    collisionManager_->Finalize();
     sceneManager_->Finalize();
 
+    Time_MT::GetInstance()->Finalize();
+    collisionManager_->Finalize();
     imguiManager_->Finalize();
     delete imguiManager_;
 

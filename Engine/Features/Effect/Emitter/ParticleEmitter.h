@@ -83,15 +83,21 @@ struct ParticleInitParamsForGenerator
     // パーティクルの減速率
     Range<float> deceleration = { 0.0f, 0.0f, 1.0f };
 
+
+    // 回転パラメータを追加
+    Range<Vector3> rotation = { Vector3(0, 0, 0), Vector3(0,0,0), Vector3(6.28318f ,6.28318f ,6.28318f)}; // 0〜2π（360度)
+    Range<Vector3> rotationSpeed = { Vector3(0, 0, 0), Vector3(-3.14159f,-3.14159f,-3.14159f), Vector3(3.14159f,3.14159f,3.14159f) }; // -π〜π（-180度〜180度/秒）
+
+
     // パーティクルの初期色
     Range<Vector3> colorRGB = { Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(1, 1, 1) };
     Range<float> colorA = { 1.0f, 0.0f, 1.0f }; // アルファ値の範囲
     // パーティクルの初期サイズ
-    Range<float> size = { 1.0f, 0.5f, 2.0f };
+    Range<Vector3> size = { Vector3(1.0f,1.0f,1.0f), Vector3(0.5f,0.5f,0.5f), Vector3(2.0f,2.0f,2.0f) };
 
     std::array<bool, 3> billboard = { false, false, false }; // ビルボードのタイプ
 
-    uint32_t textureHandle = 0; // テクスチャのハンドル
+    std::string textureName = "uvChecker.png"; // テクスチャの名前（デフォルト
 
     std::vector<std::string> modifiers; // モディファイアのリスト
 
@@ -182,6 +188,7 @@ private:
     void DebugWindowForPosition();
     void DebugWindowForDirection();
     void DebugWindowForSpeed();
+    void DebugWindowForRotation();
     void DebugWindowForDeceleration();
     void DebugWindowForLifeTime();
     void DebugWindowForColor();

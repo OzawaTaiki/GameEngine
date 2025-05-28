@@ -19,8 +19,13 @@ public:
 
     void SetNormal(const Vector3& _normal) { normal_ = _normal; }
 
-    void SetSize(const Vector2& _size) { size_ = _size; }
+    void SetSize(const Vector2& _size) { size_ = Vector4(_size.x, _size.y, _size.x, _size.y); }
     void SetSize(const Vector4& _size) { size_ = _size; }
+
+    // 基準点を設定 (-1~1)
+    void SetPivot(const Vector3& _pivot) { pivot_ = _pivot; }
+
+
 
     void SetFlipU(bool _flip) { flipU_ = _flip; }
     void SetFlipV(bool _flip) { flipV_ = _flip; }
@@ -42,6 +47,9 @@ private:
     };
 
     Vector3 normal_ = { 0.0f,0.0f,1.0f };
+
+    // 基準点 (-1~1)
+    Vector3 pivot_ = { 0.0f, 0.0f, 0.0f };
 
     // 上 左 右 下
     Vector4 size_ = { 1.0f, 1.0f ,1.0f, 1.0f };

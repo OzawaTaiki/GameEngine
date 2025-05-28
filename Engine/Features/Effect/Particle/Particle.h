@@ -73,6 +73,7 @@ private:
 
     Vector3 translate_ = { 0.0f,0.0f ,0.0f };
     Vector3 rotation_ = { 0.0f,0.0f ,0.0f };
+    Vector3 rotationSpeed_ = { 0.0f,0.0f ,0.0f };
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector4 color_ = { 1.0f,1.0f ,1.0f,1.0f };
     float speed_ = 0.0f;
