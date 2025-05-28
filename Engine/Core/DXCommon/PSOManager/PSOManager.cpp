@@ -27,11 +27,12 @@ void PSOManager::Initialize()
     assert(SUCCEEDED(hr));
 
 
-    CreatePSOForModel           (PSOFlags::Type_Model           | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
-    CreatePSOForSprite          (PSOFlags::Type_Sprite          | PSOFlags::Blend_Normal    | PSOFlags::Cull_Back);
-    CreatePSOForLineDrawer      (PSOFlags::Type_LineDrawer      | PSOFlags::Blend_Normal    | PSOFlags::Cull_None);
-    CreatePSOForParticle        (PSOFlags::Type_Particle        | PSOFlags::Blend_Add       | PSOFlags::Cull_Back);
-    CreatePSOForOffScreen       ();
+    CreatePSOForModel(PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mAll_fLEqual);
+    CreatePSOForModel(PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual);
+    CreatePSOForSprite(PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_Disable);
+    CreatePSOForLineDrawer(PSOFlags::Type_LineDrawer | PSOFlags::Blend_Normal | PSOFlags::Cull_None | PSOFlags::Depth_mZero_fLEqual);
+    CreatePSOForParticle(PSOFlags::Type_Particle | PSOFlags::Blend_Add | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual);
+    CreatePSOForOffScreen();
     CreatePSOForDLShadowMap();
     CreatePSOForPLShadowMap();
     //CreatePSOForSkyBox();
@@ -663,13 +664,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
 
 #pragma region DepthStencilState
     //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    //Depthの機能を有効にする
-    depthStencilDesc.DepthEnable = true;
-    //書き込みします
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    //比較関数はLessEqeul つまり近ければ描画される
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = GetDepthStencilDesc(_flags);
 #pragma endregion
 
 #pragma region InputLayout
@@ -956,11 +951,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
 
 #pragma region DepthStencilState
     //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    depthStencilDesc.DepthEnable = true;
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    depthStencilDesc.StencilEnable = false;
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = GetDepthStencilDesc(_flags);
 #pragma endregion
 
 #pragma region InputLayout
@@ -1117,13 +1108,7 @@ void PSOManager::CreatePSOForParticle(PSOFlags _flags)
 
 #pragma region DepthStencilState
     //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    //Depthの機能を有効にする
-    depthStencilDesc.DepthEnable = true;
-    //書き込みしない
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    //比較関数はLessEqeul つまり近ければ描画される
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = GetDepthStencilDesc(_flags);
 #pragma endregion
 
 #pragma region InputLayout
@@ -1730,6 +1715,63 @@ D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
     return rasterizerDesc;
 }
 
+D3D12_DEPTH_STENCIL_DESC PSOManager::GetDepthStencilDesc(PSOFlags _flag)
+{
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
+    depthStencilDesc.DepthEnable = true; // デフォルトは有効
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL; // デフォルトは全て書き込む
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // デフォルトはLessEqual
+    depthStencilDesc.StencilEnable = false; // デフォルトは無効
+
+
+    if (HasFlag(_flag, PSOFlags::Depth_Disable))
+    {
+        depthStencilDesc.DepthEnable = false;
+    }
+    else if (HasFlag(_flag, PSOFlags::Depth_Enable))
+    {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+        if (HasFlag(_flag, PSOFlags::Depth_Func_Always))
+        {
+            depthStencilDesc.StencilEnable = false;
+        }
+    }
+
+    if (depthStencilDesc.DepthEnable)
+    {
+        if (HasFlag(_flag, PSOFlags::Depth_Mask_All))
+        {
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        }
+        else if (HasFlag(_flag, PSOFlags::Depth_Mask_Zero))
+        {
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        }
+        else
+        {
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL; // デフォルトは全て書き込む
+        }
+
+        if (HasFlag(_flag, PSOFlags::Depth_Func_LessEqual))
+        {
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        }
+        else if (HasFlag(_flag, PSOFlags::Depth_Func_Always))
+        {
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+        }
+        else
+        {
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        }
+    }
+
+    return depthStencilDesc;
+}
+
 
 size_t PSOManager::GetType(PSOFlags _flag)
 {
@@ -1880,8 +1922,9 @@ bool IsValidPSOFlags(PSOFlags _flags)
     bool isTypeValid = IsSingleBitSetInMask(_flags, TypeMask);
     bool isBlendValid = IsSingleBitSetInMask(_flags, BlendMask);
     bool isCullValid = IsSingleBitSetInMask(_flags, CullMask);
+    bool isDepthValid = IsSingleBitSetInMask(_flags, DepthMask);
 
-    return isTypeValid && isBlendValid && isCullValid;
+    return isTypeValid && isBlendValid && isCullValid && isDepthValid;
 }
 
 bool IsSingleBitSetInMask(PSOFlags _flags, PSOFlags _mask)

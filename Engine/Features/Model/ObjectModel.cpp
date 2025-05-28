@@ -64,13 +64,15 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     objectColor_->SetColor(_color);
 
     auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
-
-    auto pointLights = lightGroup->GetAllPointLights();
-    if (!pointLights.empty())
+    if(lightGroup)
     {
-        auto handles = pointLights[0]->GetShadowMapHandles();
-        uint32_t handle = handles[0];
-        RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+        auto pointLights = lightGroup->GetAllPointLights();
+        if (!pointLights.empty())
+        {
+            auto handles = pointLights[0]->GetShadowMapHandles();
+            uint32_t handle = handles[0];
+            RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+        }
     }
 
     RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);

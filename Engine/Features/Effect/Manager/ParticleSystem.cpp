@@ -164,7 +164,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
         group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -221,7 +221,7 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
             throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -246,7 +246,7 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
             throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))

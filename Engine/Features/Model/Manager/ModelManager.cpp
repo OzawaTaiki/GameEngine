@@ -12,7 +12,8 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Initialize()
 {
-    psoFlags_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
+    psoFlags_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mAll_fLEqual;
+    psoFlagsForAlpha_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual;
 
 
     /// PSOを取得
@@ -26,6 +27,13 @@ void ModelManager::Initialize()
     // 生成されているか確認
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_ = rootSignature.value();
+
+    auto psoAlpha = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlagsForAlpha_);
+    // PSOが生成されているか確認
+    assert(psoAlpha.has_value() && psoAlpha != nullptr);
+    graphicsPipelineStateForAlpha_ = psoAlpha.value();
+
+
  }
 
 void ModelManager::PreDrawForObjectModel() const
@@ -34,6 +42,16 @@ void ModelManager::PreDrawForObjectModel() const
 
     commandList->SetGraphicsRootSignature(rootSignature_);
     commandList->SetPipelineState(graphicsPipelineState_);
+
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void ModelManager::PreDrawForAlphaObjectModel() const
+{
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->SetGraphicsRootSignature(rootSignature_);
+    commandList->SetPipelineState(graphicsPipelineStateForAlpha_);
 
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

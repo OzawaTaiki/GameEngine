@@ -18,7 +18,7 @@ public:
 
     void Initialize();
     void PreDrawForObjectModel() const;
-
+    void PreDrawForAlphaObjectModel() const;
 
     Model* FindSameModel(const std::string& _name);
     Model* Create(const std::string& _name);
@@ -29,7 +29,11 @@ private:
     ID3D12RootSignature* rootSignature_ = {};
     ID3D12PipelineState* graphicsPipelineState_ = {};
 
+    ID3D12PipelineState* graphicsPipelineStateForAlpha_ = {};
+
+
     PSOFlags psoFlags_ = {};
+    PSOFlags psoFlagsForAlpha_{};
 
 
     ModelManager() = default;
