@@ -33,6 +33,17 @@ enum class PSOFlags
     Cull_None				= 1 << 20,
     Cull_Front				= 1 << 21,
     Cull_Back				= 1 << 22,
+
+    Depth_Enable            = 1 << 23,
+    Depth_Disable           = 1 << 24,
+    Depth_Mask_All          = 1 << 25,
+    Depth_Mask_Zero         = 1 << 26,
+    Depth_Func_LessEqual    = 1 << 27,
+    Depth_Func_Always       = 1 << 28,
+    // TODO 項目ごとに分けるべき
+
+    Depth_mAll_fLEqual = Depth_Enable | Depth_Mask_All | Depth_Func_LessEqual,
+    Depth_mZero_fLEqual = Depth_Enable | Depth_Mask_Zero | Depth_Func_LessEqual
 };
 
 PSOFlags SetBlendMode(PSOFlags _flag, PSOFlags _mode);
@@ -101,6 +112,12 @@ PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen;
 constexpr PSOFlags CullMask =
 PSOFlags::Cull_Back | PSOFlags::Cull_Front | PSOFlags::Cull_None;
 
+constexpr PSOFlags DepthMask =
+PSOFlags::Depth_Enable | PSOFlags::Depth_Disable | PSOFlags::Depth_Mask_All
+| PSOFlags::Depth_Mask_Zero | PSOFlags::Depth_Func_LessEqual
+| PSOFlags::Depth_Func_Always;
+
+
 
 #pragma endregion
 #pragma endregion
@@ -162,6 +179,7 @@ private:
 
 	D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
     D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);
+    D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(PSOFlags _flag);
 
     size_t GetType(PSOFlags _flag);
 	PSOFlags GetBlendMode(PSOFlags _flag);
