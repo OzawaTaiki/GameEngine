@@ -12,6 +12,7 @@ void Particle::Initialize(const ParticleInitParam& _param)
 
     translate_ = parameter_.position;
     rotation_ = parameter_.rotate;
+    rotationSpeed_ = parameter_.rotationSpeed;
     scale_ = parameter_.size;
     speed_ = parameter_.speed;
 
@@ -53,6 +54,8 @@ void Particle::Update(float _deltaTime)
 
     translate_ += velocity_ * _deltaTime;
 
+    // 回転の更新
+    rotation_ += rotationSpeed_ * _deltaTime;
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 

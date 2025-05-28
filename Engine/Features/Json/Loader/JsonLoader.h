@@ -124,8 +124,8 @@ void JsonLoader::GetValue(std::string _gName, std::string _vName, std::vector<T>
                        std::is_same_v<T, Vector2> ||
                        std::is_same_v<T, Vector3> ||
                        std::is_same_v<T, Vector4> ||
-        std::is_same_v<T, Vector4> ||
-        std::is_same_v<T, std::string>)
+                        std::is_same_v<T, Quaternion> ||
+                        std::is_same_v<T, std::string>)
     {
         std::vector<T> vec;
         for (auto& v : values_[_gName][_vName])
@@ -160,8 +160,8 @@ void JsonLoader::GetValue(std::string _gName, std::string _vName, std::list<T>& 
                        std::is_same_v<T, Vector2> ||
                        std::is_same_v<T, Vector3> ||
                        std::is_same_v<T, Vector4> ||
-        std::is_same_v<T, Vector4> ||
-        std::is_same_v<T, std::string>)
+                        std::is_same_v<T, Quaternion> ||
+                        std::is_same_v<T, std::string>)
     {
         std::list<T> list;
         for (auto& v : values_[_gName][_vName])

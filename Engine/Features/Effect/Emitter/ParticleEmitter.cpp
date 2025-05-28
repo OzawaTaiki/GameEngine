@@ -63,8 +63,6 @@ void ParticleEmitter::ShowDebugWindow()
 #ifdef _DEBUG
 
 
-    ImGui::Separator();
-    ImGui::BeginTabBar("Emitter");
     {
         if(ImGui::BeginTabItem(name_.c_str()))
         {
@@ -174,7 +172,8 @@ void ParticleEmitter::ShowDebugWindow()
                     ImGui::InputText("##TexturePath", texturePath_, 256);
                     if (ImGui::Button("Apply##TexturePath"))
                     {
-                        initParams_.textureHandle = TextureManager::GetInstance()->Load(texturePath_, textureRoot_);
+                        initParams_.textureName = texturePath_;
+                        TextureManager::GetInstance()->Load(texturePath_, textureRoot_);
                     }
                     ImGui::TreePop();
                 }
@@ -230,6 +229,11 @@ void ParticleEmitter::ShowDebugWindow()
                     DebugWindowForSpeed();
                     ImGui::TreePop();
                 }
+                if (ImGui::TreeNode("Rotation"))
+                {
+                    DebugWindowForRotation();
+                    ImGui::TreePop();
+                }
                 if (ImGui::TreeNode("Deceleration"))
                 {
                     DebugWindowForDeceleration();
@@ -258,8 +262,6 @@ void ParticleEmitter::ShowDebugWindow()
         }
         ImGui::EndTabItem();
     }
-    ImGui::EndTabBar();
-    ImGui::Separator();
 
 #endif // _DEBUG
 
@@ -286,22 +288,6 @@ void ParticleEmitter::GenerateParticles()
         initParam.color = Vector4(rgb.x, rgb.y, rgb.z, alpha);
 
 
-        initParam.direction;
-        if (initParams_.directionType == ParticleDirectionType::Random ||
-            initParams_.directionType == ParticleDirectionType::Fixed)
-        {
-            initParam.direction = initParams_.direction.GetValue();
-        }
-        else if (initParams_.directionType == ParticleDirectionType::Outward)
-        {
-            //TODO
-            initParam.direction = Vector3(0, 1, 0);
-        }
-        else if (initParams_.directionType == ParticleDirectionType::Inward)
-        {
-            initParam.direction = Vector3(0, -1, 0);
-        }
-
 
         initParam.isInfiniteLife;
         initParam.isInfiniteLife = initParams_.lifeTimeType == ParticleLifeTimeType::Infinite;
@@ -315,7 +301,7 @@ void ParticleEmitter::GenerateParticles()
         initParam.position;
         Vector3 emitterWorldPos = offset_;
         if (parentTransform_)
-            parentTransform_->GetWorldPosition();
+            emitterWorldPos += parentTransform_->GetWorldPosition();
         switch (shape_)
         {
         case EmitterShape::Box:
@@ -338,7 +324,32 @@ void ParticleEmitter::GenerateParticles()
             break;
         }
 
-        initParam.rotate;
+
+        initParam.direction;
+        if (initParams_.directionType == ParticleDirectionType::Random ||
+            initParams_.directionType == ParticleDirectionType::Fixed)
+        {
+            initParam.direction = initParams_.direction.GetValue();
+        }
+        else if (initParams_.directionType == ParticleDirectionType::Outward)
+        {
+            Vector3 dir = initParam.position - emitterWorldPos;
+            dir = dir.Normalize();
+
+            initParam.direction = dir;
+        }
+        else if (initParams_.directionType == ParticleDirectionType::Inward)
+        {
+
+            Vector3 dir = initParam.position - emitterWorldPos;
+            dir = -dir.Normalize();
+
+            initParam.direction = dir;
+        }
+
+        // 回転設定を追加
+        initParam.rotate = initParams_.rotation.GetValue();
+        initParam.rotationSpeed = initParams_.rotationSpeed.GetValue();
 
 
         initParam.size;
@@ -359,8 +370,10 @@ void ParticleEmitter::GenerateParticles()
     if (useModelName_ == "")
         useModelName_ = "plane/plane.gltf";
 
+    uint32_t textureHandle = TextureManager::GetInstance()->Load(initParams_.textureName);
+
     // groupnameには仮でエミッターの名前を入れている
-    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, particles, settings, initParams_.textureHandle, initParams_.modifiers);
+    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, particles, settings, textureHandle, initParams_.modifiers);
 }
 
 void ParticleEmitter::InitJsonBinder()
@@ -427,6 +440,16 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("size_Max", &initParams_.size.max);
     jsonBinder_->RegisterVariable("size_Value", &initParams_.size.value);
 
+    jsonBinder_->RegisterVariable("rotation_Random", &initParams_.rotation.isRandom);
+    jsonBinder_->RegisterVariable("rotation_Min", &initParams_.rotation.min);
+    jsonBinder_->RegisterVariable("rotation_Max", &initParams_.rotation.max);
+    jsonBinder_->RegisterVariable("rotation_Value", &initParams_.rotation.value);
+
+    jsonBinder_->RegisterVariable("rotationSpeed_Random", &initParams_.rotationSpeed.isRandom);
+    jsonBinder_->RegisterVariable("rotationSpeed_Min", &initParams_.rotationSpeed.min);
+    jsonBinder_->RegisterVariable("rotationSpeed_Max", &initParams_.rotationSpeed.max);
+    jsonBinder_->RegisterVariable("rotationSpeed_Value", &initParams_.rotationSpeed.value);
+
     jsonBinder_->RegisterVariable("RGB_Random", &initParams_.colorRGB.isRandom);
     jsonBinder_->RegisterVariable("RGB_Min", &initParams_.colorRGB.min);
     jsonBinder_->RegisterVariable("RGB_Max", &initParams_.colorRGB.max);
@@ -437,7 +460,7 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("alpha_Max", &initParams_.colorA.max);
     jsonBinder_->RegisterVariable("alpha_Value", &initParams_.colorA.value);
 
-    jsonBinder_->RegisterVariable("textureHandle", &initParams_.textureHandle);
+    jsonBinder_->RegisterVariable("texturePath", &initParams_.textureName);
 
     jsonBinder_->RegisterVariable("modifiers", &initParams_.modifiers);
 
@@ -464,12 +487,12 @@ void ParticleEmitter::DebugWindowForSize()
 
     if (sizeParams.isRandom)
     {
-        ImGui::DragFloat("Min", &sizeParams.min, 0.01f);
-        ImGui::DragFloat("Max", &sizeParams.max, 0.01f);
+        ImGui::DragFloat3("Min", &sizeParams.min.x, 0.01f);
+        ImGui::DragFloat3("Max", &sizeParams.max.x, 0.01f);
     }
     else
     {
-        ImGui::DragFloat("Size", &sizeParams.value);
+        ImGui::DragFloat3("Size", &sizeParams.value.x,0.01f);
     }
     ImGui::Separator();
 }
@@ -581,6 +604,53 @@ void ParticleEmitter::DebugWindowForSpeed()
     {
         ImGui::DragFloat("Speed", &speed.value, 0.01f);
     }
+    ImGui::Separator();
+
+}
+
+void ParticleEmitter::DebugWindowForRotation()
+{
+    auto& rotation = initParams_.rotation;
+    int imRotation = static_cast<int>(!rotation.isRandom);
+
+    ImGui::Separator();
+
+    ImGui::RadioButton("Random##rot", &imRotation, 0);
+    ImGui::RadioButton("Fixed##rot", &imRotation, 1);
+
+    rotation.isRandom = imRotation == 0;
+
+    if (rotation.isRandom)
+    {
+        ImGui::DragFloat3("Min##rot", &rotation.min.x, 0.01f);
+        ImGui::DragFloat3("Max##rot", &rotation.max.x, 0.01f);
+    }
+    else
+    {
+        ImGui::DragFloat3("Rotation##rot", &rotation.value.x, 0.01f);
+    }
+
+
+    ImGui::SeparatorText("Rotation Speed");
+
+    auto& rotationSpeed = initParams_.rotationSpeed;
+    int imRotationSpeed = static_cast<int>(!rotationSpeed.isRandom);
+
+    ImGui::RadioButton("Random##rotSpeed", &imRotationSpeed, 0);
+    ImGui::RadioButton("Fixed##rotSpeed", &imRotationSpeed, 1);
+
+    rotationSpeed.isRandom = imRotationSpeed == 0;
+
+    if (rotationSpeed.isRandom)
+    {
+        ImGui::DragFloat3("Min##rotSpeed", &rotationSpeed.min.x, 0.01f);
+        ImGui::DragFloat3("Max##rotSpeed", &rotationSpeed.max.x, 0.01f);
+    }
+    else
+    {
+        ImGui::DragFloat3("Rotation Speed##rotSpeed", &rotationSpeed.value.x, 0.01f);
+    }
+
     ImGui::Separator();
 
 }

@@ -135,6 +135,10 @@ std::vector<ValueVariant> JsonLoader::FromJson(const json& _j)
     {
         vec.push_back(Vector4(_j["x"].get<float>(), _j["y"].get<float>(), _j["z"].get<float>(), _j["w"].get<float>()));
     }
+    else if (_j.is_object() && _j.size() == 4 && _j.contains("qx") && _j.contains("qy") && _j.contains("qz") && _j.contains("qw"))
+    {
+        vec.push_back(Quaternion(_j["qx"].get<float>(), _j["qy"].get<float>(), _j["qz"].get<float>(), _j["qw"].get<float>()));
+    }
     else if (_j.is_array())
     {
         for (auto j : _j)
@@ -163,6 +167,10 @@ std::vector<ValueVariant> JsonLoader::FromJson(const json& _j)
             {
                 vec.push_back(Vector4(j["x"].get<float>(), j["y"].get<float>(), j["z"].get<float>(), j["w"].get<float>()));
             }
+            else if (_j.is_object() && _j.size() == 4 && _j.contains("qx") && _j.contains("qy") && _j.contains("qz") && _j.contains("qw"))
+            {
+                vec.push_back(Quaternion(_j["qx"].get<float>(), _j["qy"].get<float>(), _j["qz"].get<float>(), _j["qw"].get<float>()));
+            }
         }
     }
 
@@ -187,24 +195,30 @@ json JsonLoader::ToJson(const std::vector<ValueVariant>& _data)
             j.push_back(std::get<float>(v));
             break;
         case 3: // Vector2
-            {
-                Vector2 vec = std::get<Vector2>(v);
-                j.push_back({ vec.x,vec.y });
-            }
-            break;
+        {
+            Vector2 vec = std::get<Vector2>(v);
+            j.push_back({ vec.x,vec.y });
+        }
+        break;
         case 4: // Vector3
-            {
-                Vector3 vec3 = std::get<Vector3>(v);
-                j.push_back({ vec3.x,vec3.y,vec3.z });
-            }
-            break;
+        {
+            Vector3 vec3 = std::get<Vector3>(v);
+            j.push_back({ vec3.x,vec3.y,vec3.z });
+        }
+        break;
         case 5: // Vector4
-            {
-                Vector4 vec4 = std::get<Vector4>(v);
-                j.push_back({ vec4.x,vec4.y,vec4.z,vec4.w });
-            }
-            break;
-        case 6: // std::string
+        {
+            Vector4 vec4 = std::get<Vector4>(v);
+            j.push_back({ vec4.x,vec4.y,vec4.z,vec4.w });
+        }
+        break;
+        case 6: // Quaternion
+        {
+            Quaternion quat = std::get<Quaternion>(v);
+            j.push_back({ quat.x,quat.y,quat.z,quat.w });
+        }
+        break;
+        case 7: // std::string
             j.push_back(std::get<std::string>(v));
             break;
         default:

@@ -22,6 +22,7 @@ struct ParticleInitParam
     // 回転
     Vector3 rotate = { 0,0,0 };
     //ValueTransition<Vector3> rotateTransition;
+    Vector3 rotationSpeed = { 0,0,0 }; // 回転速度
 
     // 位置
     Vector3 position = { 0,0,0 };
