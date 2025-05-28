@@ -89,10 +89,11 @@ void ParticleSystem::Update(float _deltaTime)
                 continue;
             }
 
-            Matrix4x4 affineMatrix = MakeScaleMatrix(particle->GetScale());
-            affineMatrix *= billboardMatrix;
-            affineMatrix *= MakeRotateMatrix(particle->GetRotation());
-            affineMatrix *= MakeTranslateMatrix(particle->GetPosition());
+            Matrix4x4 affineMatrix =
+                MakeScaleMatrix(particle->GetScale()) *
+                MakeRotateMatrix(particle->GetRotation()) *
+                billboardMatrix*
+                MakeTranslateMatrix(particle->GetPosition());
 
             particleList.mappedInstanceBuffer[particleList.instanceCount].worldMatrix = affineMatrix;
             particleList.mappedInstanceBuffer[particleList.instanceCount].color = particle->GetColor();

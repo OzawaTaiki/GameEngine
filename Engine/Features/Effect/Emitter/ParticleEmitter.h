@@ -117,6 +117,9 @@ public:
 
     void GenerateParticles();
 
+    void SetParentTransform(WorldTransform* _parentTransform) { parentTransform_ = _parentTransform; }
+    void SetOffset(const Vector3& _offset) { offset_ = _offset; }
+
 private:
 
     void InitJsonBinder();

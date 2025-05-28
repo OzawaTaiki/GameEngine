@@ -299,9 +299,12 @@ void ParticleEmitter::GenerateParticles()
         }
 
         initParam.position;
-        Vector3 emitterWorldPos = offset_;
+        Vector3 emitterWorldPos = { 0,0,0 };
         if (parentTransform_)
-            emitterWorldPos += parentTransform_->GetWorldPosition();
+        {
+            //emitterWorldPos = parentTransform_->GetWorldPosition();
+            emitterWorldPos = Transform(offset_, parentTransform_->matWorld_);
+        }
         switch (shape_)
         {
         case EmitterShape::Box:
@@ -318,6 +321,7 @@ void ParticleEmitter::GenerateParticles()
             initParam.position.x = std::cosf(rad) * sphereOffset;
             initParam.position.y = RandomGenerator::GetInstance()->GetRandValue(-sphereOffset, sphereOffset);
             initParam.position.z = std::sinf(rad) * sphereOffset;
+            initParam.position += emitterWorldPos;
             break;
         }
         default:
