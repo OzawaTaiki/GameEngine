@@ -55,7 +55,7 @@ SampleScene::~SampleScene()
 
 }
 
-void SampleScene::Initialize()
+void SampleScene::Initialize(SceneData* _sceneData)
 {
     SceneCamera_.Initialize();
     SceneCamera_.translate_ = { 0,5,-20 };
