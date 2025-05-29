@@ -10,8 +10,7 @@
 #include <cassert>
 
 // 静的メンバ変数の初期化
-uint32_t ParticleSystem::maxInstancesPerGroup = 1024;
-
+uint32_t ParticleSystem::maxInstancesPerGroup = 8096;
 
 ParticleSystem* ParticleSystem::GetInstance()
 {
