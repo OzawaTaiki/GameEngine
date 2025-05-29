@@ -63,27 +63,25 @@ void ParticleEmitter::ShowDebugWindow()
 #ifdef _DEBUG
 
 
+    ImGui::PushID(this);
     {
-        if(ImGui::BeginTabItem(name_.c_str()))
+        if (ImGui::Button("Emit"))      GenerateParticles();
+        ImGui::SameLine();
+        if (ImGui::Button("Save"))
         {
+            jsonBinder_->Save();
+        }
 
-            if (ImGui::Button("Emit"))      GenerateParticles();
-            ImGui::SameLine();
-            if (ImGui::Button("Save"))
-            {
-                jsonBinder_->Save();
-            }
+        if (ImGui::CollapsingHeader("Emitter Settings"))
+        {
+            ImGui::Text("Emitter Name");
 
-            if (ImGui::CollapsingHeader("Emitter Settings"))
-            {
-                ImGui::Text("Emitter Name");
+            ImGui::BeginDisabled(1);
+            ImGui::InputText("##EmitterName", name_.data(), name_.size());
+            ImGui::EndDisabled();
 
-                ImGui::BeginDisabled(1);
-                ImGui::InputText("##EmitterName", name_.data(), name_.size());
-                ImGui::EndDisabled();
-
-                ImGui::Separator();
-                if (ImGui::TreeNode("Emitter Shape"))
+            ImGui::Separator();
+            if (ImGui::TreeNode("Emitter Shape"))
                 {
                     int* shapePtr = reinterpret_cast<int*>(&shape_);
 
@@ -106,162 +104,161 @@ void ParticleEmitter::ShowDebugWindow()
                         break;
                     }
                 }
-                if (ImGui::TreeNode("Emit Settings"))
-                {
-                    ImGui::InputInt("Emit count", reinterpret_cast<int*>(&emitCount_));
-                    ImGui::InputInt("Emit per second", reinterpret_cast<int*>(&emitPerSecond_));
-
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Time"))
-                {
-                    ImGui::DragFloat("Delay Time", &delayTime_, 0.01f);
-                    ImGui::DragFloat("Life Time", &lifeTime, 0.01f);
-                    ImGui::Checkbox("Loop", &isLoop_);
-
-                    ImGui::TreePop();
-                }
-
-                if (parentTransform_ != nullptr)
-                {
-                    if (ImGui::TreeNode("Emitter Offset"))
-                    {
-                        ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
-                        ImGui::TreePop();
-                    }
-                }
-            }
-
-            if (ImGui::CollapsingHeader("Particle Init Params"))
+            if (ImGui::TreeNode("Emit Settings"))
             {
-                if (ImGui::TreeNode("Use Model"))
-                {
-                    ImGui::Text("ModelPath");
-                    ImGui::InputText("##ModelPath", modelPath_, 256);
-                    if (ImGui::Button("Apply##ModelPath"))
-                    {
-                        Model* model = Model::CreateFromFile(modelPath_);
-                        useModelName_ = modelPath_;
-                        strcpy_s(modelName_, 256, "");
-                    }
-                    ImGui::Separator();
-                    ImGui::Text("ModelName");
-                    ImGui::InputText("##ModelName", modelName_, 256);
-                    if (ImGui::Button("Apply##ModelName"))
-                    {
-                        Model* model = ModelManager::GetInstance()->FindSameModel(modelName_);
-                        if (model == nullptr)
-                        {
-                            throw std::runtime_error("Model not found");
-                        }
-                        else
-                        {
-                            useModelName_ = modelName_;
-                            strcpy_s(modelPath_, 256, "");
-                        }
-                    }
-                    ImGui::TreePop();
-                }
+                ImGui::InputInt("Emit count", reinterpret_cast<int*>(&emitCount_));
+                ImGui::InputInt("Emit per second", reinterpret_cast<int*>(&emitPerSecond_));
 
-                if (ImGui::TreeNode("Use Texture"))
-                {
-                    ImGui::Text("TextureRoot");
-                    ImGui::InputText("##TextureRoot", textureRoot_, 256);
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Time"))
+            {
+                ImGui::DragFloat("Delay Time", &delayTime_, 0.01f);
+                ImGui::DragFloat("Life Time", &lifeTime, 0.01f);
+                ImGui::Checkbox("Loop", &isLoop_);
 
-                    ImGui::Text("TexturePath");
-                    ImGui::InputText("##TexturePath", texturePath_, 256);
-                    if (ImGui::Button("Apply##TexturePath"))
-                    {
-                        initParams_.textureName = texturePath_;
-                        TextureManager::GetInstance()->Load(texturePath_, textureRoot_);
-                    }
-                    ImGui::TreePop();
-                }
-
-                if (ImGui::TreeNode("Billboard"))
-                {
-                    ImGui::Text("Billboard");
-                    ImGui::Checkbox("X", &initParams_.billboard[0]);            ImGui::SameLine();
-                    ImGui::Checkbox("Y", &initParams_.billboard[1]);            ImGui::SameLine();
-                    ImGui::Checkbox("Z", &initParams_.billboard[2]);
-                    ImGui::TreePop();
-                }
-
-                // RenderSetting
-                if (ImGui::TreeNode("Render Setting"))
-                {
-                    ImGui::Text("Blend Mode");
-                    ImGui::RadioButton("Normal", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Normal));
-                    ImGui::RadioButton("Add", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Add));
-                    ImGui::RadioButton("Sub", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Sub));
-                    ImGui::RadioButton("Mul", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Multiply));
-                    ImGui::RadioButton("Screen", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Screen));
-
-                    ImGui::Separator();
-
-                    ImGui::Checkbox("Cull Back", &cullBack_);
-
-                    ImGui::TreePop();
-                }
-
-                if (ImGui::TreeNode("Life Time"))
-                {
-                    DebugWindowForLifeTime();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Position"))
-                {
-                    DebugWindowForPosition();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Size"))
-                {
-                    DebugWindowForSize();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Direction"))
-                {
-                    DebugWindowForDirection();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Speed"))
-                {
-                    DebugWindowForSpeed();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Rotation"))
-                {
-                    DebugWindowForRotation();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Deceleration"))
-                {
-                    DebugWindowForDeceleration();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Color"))
-                {
-                    DebugWindowForColor();
-                    ImGui::TreePop();
-                }
-                if (ImGui::TreeNode("Modifiers"))
-                {
-                    DebugWindowForModifier();
-                    ImGui::TreePop();
-                }
-               /* if (ImGui::TreeNode("Sequence"))
-                {
-                    ImGui::Text("Sequence For Particle");
-                    ImGui::Checkbox("Enable Sequence", &initParams_.enableSequence);
-                    if(initParams_.enableSequence)
-                        ImGui::Checkbox("Show Sequence", &isOpenTimeline);
-                    ImGui::TreePop();
-                }*/
+                ImGui::TreePop();
             }
 
+            if (parentTransform_ != nullptr)
+            {
+                if (ImGui::TreeNode("Emitter Offset"))
+                {
+                    ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
+                    ImGui::TreePop();
+                }
+            }
         }
-        ImGui::EndTabItem();
+
+        if (ImGui::CollapsingHeader("Particle Init Params"))
+        {
+            if (ImGui::TreeNode("Use Model"))
+            {
+                ImGui::Text("ModelPath");
+                ImGui::InputText("##ModelPath", modelPath_, 256);
+                if (ImGui::Button("Apply##ModelPath"))
+                {
+                    Model* model = Model::CreateFromFile(modelPath_);
+                    useModelName_ = modelPath_;
+                    strcpy_s(modelName_, 256, "");
+                }
+                ImGui::Separator();
+                ImGui::Text("ModelName");
+                ImGui::InputText("##ModelName", modelName_, 256);
+                if (ImGui::Button("Apply##ModelName"))
+                {
+                    Model* model = ModelManager::GetInstance()->FindSameModel(modelName_);
+                    if (model == nullptr)
+                    {
+                        throw std::runtime_error("Model not found");
+                    }
+                    else
+                    {
+                        useModelName_ = modelName_;
+                        strcpy_s(modelPath_, 256, "");
+                    }
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Use Texture"))
+            {
+                ImGui::Text("TextureRoot");
+                ImGui::InputText("##TextureRoot", textureRoot_, 256);
+
+                ImGui::Text("TexturePath");
+                ImGui::InputText("##TexturePath", texturePath_, 256);
+                if (ImGui::Button("Apply##TexturePath"))
+                {
+                    initParams_.textureName = texturePath_;
+                    TextureManager::GetInstance()->Load(texturePath_, textureRoot_);
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Billboard"))
+            {
+                ImGui::Text("Billboard");
+                ImGui::Checkbox("X", &initParams_.billboard[0]);            ImGui::SameLine();
+                ImGui::Checkbox("Y", &initParams_.billboard[1]);            ImGui::SameLine();
+                ImGui::Checkbox("Z", &initParams_.billboard[2]);
+                ImGui::TreePop();
+            }
+
+            // RenderSetting
+            if (ImGui::TreeNode("Render Setting"))
+            {
+                ImGui::Text("Blend Mode");
+                ImGui::RadioButton("Normal", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Normal));
+                ImGui::RadioButton("Add", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Add));
+                ImGui::RadioButton("Sub", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Sub));
+                ImGui::RadioButton("Mul", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Multiply));
+                ImGui::RadioButton("Screen", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Screen));
+
+                ImGui::Separator();
+
+                ImGui::Checkbox("Cull Back", &cullBack_);
+
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Life Time"))
+            {
+                DebugWindowForLifeTime();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Position"))
+            {
+                DebugWindowForPosition();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Size"))
+            {
+                DebugWindowForSize();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Direction"))
+            {
+                DebugWindowForDirection();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Speed"))
+            {
+                DebugWindowForSpeed();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Rotation"))
+            {
+                DebugWindowForRotation();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Deceleration"))
+            {
+                DebugWindowForDeceleration();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Color"))
+            {
+                DebugWindowForColor();
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("Modifiers"))
+            {
+                DebugWindowForModifier();
+                ImGui::TreePop();
+            }
+           /* if (ImGui::TreeNode("Sequence"))
+            {
+                ImGui::Text("Sequence For Particle");
+                ImGui::Checkbox("Enable Sequence", &initParams_.enableSequence);
+                if(initParams_.enableSequence)
+                    ImGui::Checkbox("Show Sequence", &isOpenTimeline);
+                ImGui::TreePop();
+            }*/
+        }
+
     }
+    ImGui::PopID(); // Pop ID for this emitter
 
 #endif // _DEBUG
 
