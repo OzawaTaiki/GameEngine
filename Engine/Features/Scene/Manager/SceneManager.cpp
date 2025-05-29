@@ -90,6 +90,12 @@ void SceneManager::ReserveScene(const std::string& _name, std::unique_ptr<SceneD
     instance->nextSceneName_ = _name;
     if (instance->sceneData_)
         instance->sceneData_.reset();
+    if (_sceneData == nullptr)
+    {
+        _sceneData = std::make_unique<SceneData>();
+    }
+    _sceneData->beforeScene = instance->currentSceneName_;
+
     instance->sceneData_ = std::move(_sceneData);
 
     if (instance->transition_ != nullptr && !instance->isTransition_)
