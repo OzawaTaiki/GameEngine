@@ -1,6 +1,6 @@
 #include "DecelerationModifier.h"
 
-float DecelerationModifier::deceleration_ = 0.8f; // 初期値
+float DecelerationModifier::deceleration_ = 2.0f; // 初期値
 
 void DecelerationModifier::Apply(Particle* _particle, float _deltaTime)
 {
