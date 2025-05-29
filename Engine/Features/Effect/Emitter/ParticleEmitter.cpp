@@ -104,6 +104,11 @@ void ParticleEmitter::ShowDebugWindow()
                         break;
                     }
                 }
+            if (ImGui::TreeNode("position"))
+            {
+                ImGui::DragFloat3("Position", &position_.x, 0.01f);
+                ImGui::TreePop();
+            }
             if (ImGui::TreeNode("Emit Settings"))
             {
                 ImGui::InputInt("Emit count", reinterpret_cast<int*>(&emitCount_));
@@ -296,7 +301,7 @@ void ParticleEmitter::GenerateParticles()
         }
 
         initParam.position;
-        Vector3 emitterWorldPos = { 0,0,0 };
+        Vector3 emitterWorldPos = position_;
         if (parentTransform_)
         {
             //emitterWorldPos = parentTransform_->GetWorldPosition();

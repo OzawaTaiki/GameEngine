@@ -167,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp" />
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp" />
     <ClCompile Include="Features\Effect\Modifier\Preset\DecelerationModifier.cpp" />
+    <ClCompile Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.cpp" />
     <ClCompile Include="Features\Effect\Particle\Particle.cpp" />
     <ClCompile Include="Features\Event\EventManager.cpp" />
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp" />
@@ -271,6 +272,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Effect\Modifier\ParticleModifier.h" />
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h" />
     <ClInclude Include="Features\Effect\Modifier\Preset\DecelerationModifier.h" />
+    <ClInclude Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.h" />
     <ClInclude Include="Features\Effect\Particle\Particle.h" />
     <ClInclude Include="Features\Effect\ParticleInitParam.h" />
     <ClInclude Include="Features\Event\EventData.h" />
