@@ -119,6 +119,8 @@ public:
 
     void SetParentTransform(WorldTransform* _parentTransform) { parentTransform_ = _parentTransform; }
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
+    void SetPosition(const Vector3& _position) { position_ = _position; }
+
 
 private:
 

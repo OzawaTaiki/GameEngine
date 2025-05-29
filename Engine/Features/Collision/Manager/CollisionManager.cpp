@@ -529,8 +529,9 @@ void CollisionManager::UpdateBroadPhase()
 
     std::list<Collider*> stac;
 
+    if(!colliders_.empty())
     // QuadTreeを使用して衝突ペアを取得
-    quadTree_->GetCollisionPair(0, potentialCollisions_, stac);
+        quadTree_->GetCollisionPair(0, potentialCollisions_, stac);
 
     for (auto dynamicCollider : colliders_)
     {

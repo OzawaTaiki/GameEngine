@@ -24,6 +24,8 @@ ParticleSystem::~ParticleSystem()
     ClearParticles();
 
     delete factory_;
+    factory_ = nullptr;
+
 }
 
 void ParticleSystem::Initialize()
@@ -71,23 +73,25 @@ void ParticleSystem::Update(float _deltaTime)
                     CreateModifier(name);
                     it = modifierNames_.find(name);
                 }
-
-                it->second->Apply(particles, _deltaTime);
+                std::list<Particle*> raw_particles;
+                for (auto& smart_ptr : particles)
+                {
+                    raw_particles.push_back(smart_ptr.get());
+                }
+                it->second->Apply(raw_particles, _deltaTime);
             }
         }
 
         for (auto it = particles.begin(); it != particles.end();)
         {
-            Particle* particle = *it;
-
-            particle->Update(_deltaTime);
+            auto& particle = *it;
 
             if (!particle->IsAlive())
             {
-                delete particle;
                 it = particles.erase(it);
                 continue;
             }
+            particle->Update(_deltaTime);
 
             Matrix4x4 affineMatrix =
                 MakeScaleMatrix(particle->GetScale()) *
@@ -137,13 +141,19 @@ void ParticleSystem::SetModifierFactory(IParticleMoifierFactory* _factory)
         return;
 
     if (factory_ != nullptr)
+    {
         delete factory_;
+        factory_ = nullptr;
+    }
 
     factory_ = _factory;
 }
 
 void ParticleSystem::AddParticle(const std::string& _groupName, const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
+    std::unique_ptr<Particle> particle_ptr(_particle);
+
+
     ParticleKey key;
     key.modelName = _useModelName;
     key.settings = _settings;
@@ -151,11 +161,11 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
     auto it = particles_.find(_groupName);
     if (it == particles_.end())
     {
-        ParticleGroup group;
+        ParticleGroup& group = particles_[_groupName];
         group.key = key;
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
-        group.particles.push_back(_particle);
+        group.particles.push_back(std::move(particle_ptr));
 
         group.instanceBuffer = DXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * maxInstancesPerGroup);
         group.instanceBuffer->Map(0, nullptr, reinterpret_cast<void**>(&group.mappedInstanceBuffer));
@@ -165,7 +175,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
         group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -180,12 +190,10 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
         {
             group.useModifierName[name] = 1;
         }
-
-        particles_[_groupName] = group;
     }
     else
     {
-        it->second.particles.push_back(_particle);
+        it->second.particles.push_back(std::move(particle_ptr));
     }
 
     // モディファイアの登録
@@ -198,6 +206,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
 
 void ParticleSystem::AddParticles(const std::string& _groupName, const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
+
     ParticleKey key;
     key.modelName = _useModelName;
     key.settings = _settings;
@@ -205,12 +214,16 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
     auto it = particles_.find(_groupName);
     if (it == particles_.end())
     {
-        ParticleGroup group;
+        ParticleGroup& group = particles_[_groupName];
         group.key = key;
 
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
-        group.particles = std::list<Particle*>(_particles.begin(), _particles.end());
+
+        for (Particle* particle : _particles)
+        {
+            group.particles.push_back(std::unique_ptr<Particle>(particle));
+        }
 
         group.instanceBuffer = DXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * maxInstancesPerGroup);
         group.instanceBuffer->Map(0, nullptr, reinterpret_cast<void**>(&group.mappedInstanceBuffer));
@@ -222,7 +235,7 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
             throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -230,34 +243,25 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
 
         group.psoIndex = psoFlags;
         group.textureHandle = _textureHandle;
-
-        particles_[_groupName] = group;
     }
     else
     {
         auto& group = it->second;
 
-        group.particles.insert(it->second.particles.end(), _particles.begin(), _particles.end());
-        group.key = key;
-        particles_[_groupName].textureHandle = _textureHandle;
-
-
-        group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
-        if (group.model == nullptr)
-            throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
-
-        PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle;
-
-        // PSOFlagsが未登録の場合は登録する
-        if (!psoMap_.contains(psoFlags))
-            psoMap_[psoFlags] = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags).value();
-
-        group.psoIndex = psoFlags;
+        // パーティクルだけを追加
+        for (Particle* particle : _particles)
+        {
+            group.particles.push_back(std::unique_ptr<Particle>(particle));
+        }
         group.textureHandle = _textureHandle;
 
-        particles_[_groupName] = group;
-
+        // モデルが異なる場合のみ更新
+        if (group.model == nullptr || group.key.modelName != _useModelName)
+        {
+            group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
+            if (group.model == nullptr)
+                throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
+        }
     }
 
     // モディファイアの登録
@@ -270,29 +274,14 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
 
 void ParticleSystem::ClearParticles()
 {
-    for (auto& [key, particleList] : particles_)
-    {
-        for (auto& particle : particleList.particles)
-        {
-            delete particle;
-        }
-        particleList.particles.clear();
-    }
     particles_.clear();
 }
 
 void ParticleSystem::ClearParticles(const std::string& _groupName)
 {
     auto it = particles_.find(_groupName);
-    if (it == particles_.end())
-        return;
-
-    ParticleGroup& particleList = it->second;
-    for (auto& particle : particleList.particles)
-    {
-        delete particle;
-    }
-    particleList.particles.clear();
+    if (it != particles_.end())
+        it->second.particles.clear();
 }
 
 void ParticleSystem::CreateModifier(const std::string& _name)

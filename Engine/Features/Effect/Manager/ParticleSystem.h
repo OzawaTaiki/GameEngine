@@ -120,7 +120,7 @@ private:
     {
         ParticleKey key;
         Model* model = nullptr;
-        std::list<Particle*> particles;
+        std::list <std::unique_ptr<Particle>> particles;
         uint32_t srvIndex = 0;
         uint32_t instanceCount = 0;
         PSOFlags psoIndex = {};

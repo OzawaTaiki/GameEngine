@@ -527,6 +527,9 @@
     <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGrid.cpp">
       <Filter>Features\Collision\SpiralHashGrid</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.cpp">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -965,6 +968,9 @@
     </ClInclude>
     <ClInclude Include="Features\Scene\SceneData.h">
       <Filter>Features\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.h">
+      <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

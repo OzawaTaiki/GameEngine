@@ -4,12 +4,12 @@
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
 
-// 上向き板 いらんかも //TODO
+// z+向き板 いらんかも //TODO
 std::array<Vector3, 4> Plane::defaultVertices_ = {
-   Vector3(-1.0f, 0.0f, -1.0f ),
-   Vector3( 1.0f, 0.0f, -1.0f ),
-   Vector3( 1.0f, 0.0f,  1.0f ),
-   Vector3(-1.0f, 0.0f,  1.0f )
+   Vector3( 1.0f,  1.0f ,0.0f),
+   Vector3(-1.0f,  1.0f ,0.0f),
+   Vector3( 1.0f, -1.0f ,0.0f),
+   Vector3(-1.0f, -1.0f ,0.0f)
 };
 
 Model* Plane::Generate(const std::string& _name)
@@ -58,31 +58,28 @@ std::array<Vector3, 4> Plane::CalculateVertices()
 {
     std::array<Vector3, 4> vertices = defaultVertices_;
     normal_ = normal_.Normalize();
-    const Vector3 defaultNormal = { 0.0f, 0.0f, 1.0f };
+    const Vector3 defaultNormal = { 0.0f, 0.0f, -1.0f };
     Quaternion q = Quaternion::FromToRotation(defaultNormal, normal_);
     Matrix4x4 rotationMatrix = q.Normalize().ToMatrix();
 
     Vector4 halfSize = size_ * 0.5f;
 
-    // 正規化pivot（-1~1）を実際の座標に変換
-    Vector3 actualPivot = {
-        pivot_.x * halfSize.x,  // X軸のpivot位置
-        pivot_.y * halfSize.y,  // Y軸のpivot位置
-        0.0f
-    };
+    for (uint32_t i = 0; i < vertices.size(); ++i)
+    {
+        // 基準点を適用
+        vertices[i] -= pivot_;
 
-    vertices[0] = { -halfSize.x,   halfSize.y, 0.0f }; // 左上
-    vertices[1] = { halfSize.x,   halfSize.z, 0.0f }; // 右上
-    vertices[2] = { -halfSize.w,  -halfSize.y, 0.0f }; // 左下
-    vertices[3] = { halfSize.w,  -halfSize.z, 0.0f }; // 右下
+        // サイズを適用
+        vertices[i].x *= halfSize.x;
+        vertices[i].y *= halfSize.y;
+        vertices[i].z *= halfSize.z;
+
+    }
 
     for (uint32_t i = 0; i < vertices.size(); ++i)
     {
         // 回転を適用
         vertices[i] = Transform(vertices[i], rotationMatrix);
-
-        vertices[i] = vertices[i] + actualPivot;
-
     }
 
     return vertices;
