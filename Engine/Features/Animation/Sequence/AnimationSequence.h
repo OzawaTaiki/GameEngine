@@ -22,6 +22,8 @@ public:
 
     void AddSequenceEvent(SequenceEvent* _sequenceEvent);
 
+    bool IsEnd() const;
+
     void DeleteMarkedSequenceEvent();
 
     std::string GetLabel() const { return label_; }

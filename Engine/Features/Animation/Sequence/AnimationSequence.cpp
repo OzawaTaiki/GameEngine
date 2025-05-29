@@ -82,6 +82,34 @@ void AnimationSequence::AddSequenceEvent(SequenceEvent* _sequenceEvent)
     }
 }
 
+bool AnimationSequence::IsEnd() const
+{
+    if (isLooping_)
+    {
+        return false; // ループ中は常にfalse
+    }
+
+    if (sequenceEvents_.empty())
+    {
+        return true; // イベントがない場合は終了
+    }
+
+    if (currentTime_ < maxPlayTime_)
+    {
+        return false; // 現在の時間が最大再生時間未満ならfalse
+    }
+
+    for (auto& sequenceEvent : sequenceEvents_)
+    {
+        if (!sequenceEvent.second->IsEnd())
+        {
+            return false; // 1つでも終了していないイベントがあればfalse
+        }
+    }
+
+    return true; // 全てのイベントが終了していればtrue
+}
+
 void AnimationSequence::DeleteMarkedSequenceEvent()
 {
     for (auto it = sequenceEvents_.begin(); it != sequenceEvents_.end();)

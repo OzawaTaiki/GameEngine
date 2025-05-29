@@ -51,6 +51,7 @@ void SequenceEvent::Update(float _currentTime)
     if (_currentTime >= lastKeyFrame->time)
     {
         value_ = lastKeyFrame->value;
+        isEnd_ = true; // イベントの終了フラグを立てる
         return;
     }
 
