@@ -10,8 +10,7 @@
 #include <cassert>
 
 // 静的メンバ変数の初期化
-uint32_t ParticleSystem::maxInstancesPerGroup = 1024;
-
+uint32_t ParticleSystem::maxInstancesPerGroup = 8192;
 
 ParticleSystem* ParticleSystem::GetInstance()
 {
@@ -193,6 +192,15 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
     }
     else
     {
+        PSOFlags psoFlags = _settings.GetPSOFlags();
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+
+        // PSOFlagsが未登録の場合は登録する
+        if (!psoMap_.contains(psoFlags))
+            psoMap_[psoFlags] = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags).value();
+
+        it->second.psoIndex = psoFlags;
+
         it->second.particles.push_back(std::move(particle_ptr));
     }
 
@@ -254,6 +262,15 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
             group.particles.push_back(std::unique_ptr<Particle>(particle));
         }
         group.textureHandle = _textureHandle;
+
+        PSOFlags psoFlags = _settings.GetPSOFlags();
+        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+
+        // PSOFlagsが未登録の場合は登録する
+        if (!psoMap_.contains(psoFlags))
+            psoMap_[psoFlags] = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlags).value();
+
+        group.psoIndex = psoFlags;
 
         // モデルが異なる場合のみ更新
         if (group.model == nullptr || group.key.modelName != _useModelName)

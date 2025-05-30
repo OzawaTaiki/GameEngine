@@ -27,6 +27,16 @@ Model* Plane::Generate(const std::string& _name)
         vertices[i].position.w = 1.0f;
         vertices[i].normal = normal_;
         vertices[i].texcoord = uvs_[i];
+
+        if (flipU_)
+        {
+            vertices[i].texcoord.x = 1.0f - vertices[i].texcoord.x;
+        }
+        if (flipV_)
+        {
+            vertices[i].texcoord.y = 1.0f - vertices[i].texcoord.y;
+        }
+
     }
 
 

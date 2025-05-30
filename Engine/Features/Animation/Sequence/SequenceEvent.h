@@ -104,6 +104,8 @@ public:
 
     void DeleteMarkedKeyFrame();
 
+    bool IsEnd() const { return isEnd_; }
+
     void MarkForDelete();
     bool IsDelete() const { return isDelete_; }
 
@@ -131,7 +133,7 @@ private:
     std::string label_;
     bool isSelect_;
     bool isDelete_;
-
+    bool isEnd_ = false; // イベントの終了フラグ
     ParameterValue value_; // 補間した値
 
     std::list<KeyFrame> keyFrames_;
