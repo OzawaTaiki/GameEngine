@@ -47,7 +47,6 @@ bool Collider::IsCollidingWith(Collider* _other) const
 
 CollisionState Collider::GetCollisionState(Collider* _other) const
 {
-    std::lock_guard<std::mutex> lock(collisionMutex_);
     auto it = collisionMap_.find(_other);
     if (it != collisionMap_.end()) {
         const CollisionData& data = it->second;
