@@ -83,6 +83,10 @@ void ParticleSystem::Update(float _deltaTime)
 
         for (auto it = particles.begin(); it != particles.end();)
         {
+            // group上限より大きいとき強制退場
+            if (particleList.instanceCount >= maxInstancesPerGroup)
+                break;
+
             auto& particle = *it;
 
             if (!particle->IsAlive())
