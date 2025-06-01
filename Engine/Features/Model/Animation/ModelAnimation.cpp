@@ -230,9 +230,9 @@ void ModelAnimation::ReadSampler(const std::string&  _filepath)
                     if (sampler.contains("output"))
                         s.output = sampler["output"];
 
-                    if (sampler.contains("interpolation"))
-                        s.interpolation = sampler["interpolation"];
-                    else
+                    //if (sampler.contains("interpolation"))
+                        //s.interpolation = sampler["interpolation"];
+                    //else
                         s.interpolation = "LINEAR";
 
                     samplers_.push_back(s);
@@ -288,11 +288,19 @@ void ModelAnimation::ChangeAnimation(const Animation& _animation, float _blendTi
     // 新しいアニメーションに切り替え
     animation_ = _animation;
     animetionTimer_ = 0.0f;
+    isPlaying_ = true;
 
     // ブレンド情報の設定
     state_.blendTime = 0.0f;
     state_.totalBlendTime = _blendTime;
     state_.isBlending = true;
+}
+
+void ModelAnimation::SetAnimation(const Animation& _animation)
+{
+    animation_ = _animation;
+    animetionTimer_ = 0.0f;
+    isPlaying_ = true;
 }
 
 
