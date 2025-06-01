@@ -35,7 +35,7 @@ void Model::Update(float _deltaTime)
     if (!currentAnimation_->IsPlaying())
     {
         preAnimation_ = currentAnimation_.get();
-        return; 
+        return;
     }
 
     skeleton_.Update();
@@ -155,19 +155,22 @@ Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<
     return model;
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation) const
+
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
 {
     QueueLightCommand(_commandList, 5);
 
+    bool hasAnimation = HasAnimation() && currentAnimation_ && currentAnimation_->IsPlaying();
+
     for (auto& mesh : mesh_)
     {
-        if (!_animation)
+        //if (!hasAnimation)
             mesh->QueueCommand(_commandList);
-        else
+        /*else
         {
             mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
             skinCluster_.QueueCommand(_commandList);
-        }
+        }*/
         material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
@@ -175,14 +178,21 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _a
     }
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, bool _animation) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle) const
 {
     QueueLightCommand(_commandList, 5);
 
+    bool hasAnimation = HasAnimation() && currentAnimation_ && currentAnimation_->IsPlaying();
 
     for (auto& mesh : mesh_)
     {
-        mesh->QueueCommand(_commandList);
+        //if (!hasAnimation)
+            mesh->QueueCommand(_commandList);
+        /*else
+        {
+            mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
+            skinCluster_.QueueCommand(_commandList);
+        }*/
         material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
@@ -218,10 +228,9 @@ void Model::SetAnimation(const std::string& _name,bool _loop)
         assert(false && "アニメーションが見つかりません");
         return;
     }
-    currentAnimation_->SetAnimation(animation_[_name]->GetAnimation());
-    //currentAnimation_ = animation_[_name].get();
-    currentAnimation_->SetLoop(_loop);
     currentAnimation_->Reset();
+    currentAnimation_->SetAnimation(animation_[_name]->GetAnimation());
+    currentAnimation_->SetLoop(_loop);
 
 }
 
@@ -237,10 +246,10 @@ void Model::ChangeAnimation(const std::string& _name,float _blendTime, bool _loo
         assert(false && "アニメーションが見つかりません");
         return;
     }
+    currentAnimation_->Reset();
     currentAnimation_->ChangeAnimation(animation_[_name]->GetAnimation(), _blendTime);
     //currentAnimation_ = animation_[_name].get();
     currentAnimation_->SetLoop(_loop);
-    currentAnimation_->Reset();
 }
 
 void Model::ToIdle(float _timeToIdle)
@@ -256,12 +265,36 @@ void Model::ToIdle(float _timeToIdle)
     }
 }
 
-void Model::LoadAnimation(const std::string& _filePath)
+void Model::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
     assert(scene->HasAnimations());
-    LoadAnimation(scene, defaultDirpath_ + _filePath);
+    LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
+
+
+    if (!currentAnimation_)
+    {
+        LoadNode(scene);
+        CreateSkeleton();
+
+        currentAnimation_ = std::make_unique<ModelAnimation>();
+        currentAnimation_->Initialize();
+
+        if (!skeleton_.GetJoints().empty() && !mesh_.empty())
+        {
+            skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
+
+
+            mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
+
+            skinningCS_ = std::make_unique<SkinningCS>();
+            skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
+            skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
+            skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
+            skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
+        }
+    }
 }
 
 ID3D12Resource* Model::GetIndexResource(size_t _index)
@@ -329,9 +362,13 @@ void Model::LoadFile(const std::string& _filepath)
 
     if (scene->HasAnimations())
     {
-        LoadAnimation(scene, filepath);
+        LoadAnimation(scene, filepath,"");
         LoadNode(scene);
         CreateSkeleton();
+
+
+        currentAnimation_ = std::make_unique<ModelAnimation>();
+        currentAnimation_->Initialize();
 
         skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
 
@@ -344,8 +381,6 @@ void Model::LoadFile(const std::string& _filepath)
         skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
         skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
 
-        currentAnimation_ = std::make_unique<ModelAnimation>();
-        currentAnimation_->Initialize();
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -439,7 +474,7 @@ void Model::LoadMaterial(const aiScene* _scene)
     }
 }
 
-void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath)
+void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath, const std::string& _name)
 {
     if (_scene->mNumAnimations == 0)
         return;
@@ -449,8 +484,12 @@ void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath)
 
     for (uint32_t animationIndex = 0; animationIndex < _scene->mNumAnimations; ++animationIndex)
     {
-        std::string name = _scene->mAnimations[animationIndex]->mName.C_Str();
+        std::string name = _name;
+        // 引数が空ならシーンのアニメーション名を使う
+        if (name.empty())
+            name = _scene->mAnimations[animationIndex]->mName.C_Str();
 
+        // シーンのアニメーション名が空なら、デフォルトの名前を生成
         if (name.empty())
         {
             name = "animation" + std::to_string(animationIndex + animation_.size());

@@ -60,7 +60,7 @@ public:
     void SetLoop(bool _loop) { isLoop_ = _loop; }
 
     void ChangeAnimation(const Animation& _animation,float _blendTime);
-    void SetAnimation(const Animation& _animation) { animation_ = _animation; }
+    void SetAnimation(const Animation& _animation);
 
     Animation GetAnimation() const { return animation_; }
     
