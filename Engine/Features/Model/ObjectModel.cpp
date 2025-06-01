@@ -103,6 +103,8 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+
+    //model_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)

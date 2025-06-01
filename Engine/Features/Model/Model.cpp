@@ -268,7 +268,7 @@ void Model::ToIdle(float _timeToIdle)
 void Model::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate|aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
     assert(scene->HasAnimations());
     LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
 
@@ -283,6 +283,15 @@ void Model::LoadAnimation(const std::string& _filePath, const std::string& _name
 
         if (!skeleton_.GetJoints().empty() && !mesh_.empty())
         {
+            for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+            {
+                aiMesh* mesh = scene->mMeshes[meshIndex];
+                for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+                {
+                    skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
+                }
+            }
+
             skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
 
 
@@ -354,7 +363,7 @@ void Model::LoadFile(const std::string& _filepath)
 
     Assimp::Importer importer;
     std::string filepath = defaultDirpath_ + _filepath;
-    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate| aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
+    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate|aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
     assert(scene->HasMeshes());// メッシュがないのは対応しない
 
     LoadMesh(scene);
@@ -407,8 +416,8 @@ void Model::LoadMesh(const aiScene* _scene)
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
         {
             VertexData vertex = {};
-            vertex.position = { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, -mesh->mVertices[vertexIndex].z, 1.0f };
-            vertex.normal = { mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, -mesh->mNormals[vertexIndex].z };
+            vertex.position = { -mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, mesh->mVertices[vertexIndex].z, 1.0f };
+            vertex.normal = { -mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, mesh->mNormals[vertexIndex].z };
             vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
 
             vertices.push_back(vertex);
