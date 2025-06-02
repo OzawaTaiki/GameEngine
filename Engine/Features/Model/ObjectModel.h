@@ -25,6 +25,8 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
+    bool IsEndAnimation() const { return !model_->IsAnimationPlaying(); }
+
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
