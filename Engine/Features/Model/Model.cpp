@@ -268,7 +268,7 @@ void Model::ToIdle(float _timeToIdle)
 void Model::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate|aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
     assert(scene->HasAnimations());
     LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
 
@@ -363,7 +363,7 @@ void Model::LoadFile(const std::string& _filepath)
 
     Assimp::Importer importer;
     std::string filepath = defaultDirpath_ + _filepath;
-    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate|aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
+    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
     assert(scene->HasMeshes());// メッシュがないのは対応しない
 
     LoadMesh(scene);
