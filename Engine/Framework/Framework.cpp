@@ -30,7 +30,7 @@ void Framework::Run()
 void Framework::Initialize()
 {
     winApp_ = WinApp::GetInstance();
-    winApp_->Initilize();
+    winApp_->Initilize(L"3104_kagemairi");
 
     dxCommon_ = DXCommon::GetInstance();
     dxCommon_->Initialize(winApp_, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
