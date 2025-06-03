@@ -42,8 +42,6 @@ void ObjectModel::Initialize(Model* _model)
 
 void ObjectModel::Update()
 {
-
-
     worldTransform_.transform_ = translate_;
     worldTransform_.scale_ = scale_;
     if (useQuaternion_)
@@ -105,6 +103,13 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+
+    //model_->DrawSkeleton(worldTransform_.matWorld_);
+}
+
+void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)
+{
+    model_->LoadAnimation(_filePath, _name);
 }
 
 void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)

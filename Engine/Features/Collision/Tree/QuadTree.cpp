@@ -1,4 +1,7 @@
 #include "QuadTree.h"
+
+#include <Math/Vector/VectorFunction.h>
+
 #include <iostream>
 #include <cmath>
 #include <list>
@@ -54,6 +57,9 @@ void QuadTree::RegisterObj(Collider* _obj)
     oft->SetData(_obj);
 
     Vector2 pos(_obj->GetWorldTransform()->GetWorldPosition().x, _obj->GetWorldTransform()->GetWorldPosition().z);
+    Vector3 offset = _obj->GetOffset();
+    Vector3 worldOffset = Transform(offset, _obj->GetWorldTransform()->quaternion_.ToMatrix());
+    pos += Vector2(worldOffset.x, worldOffset.z);
     Vector2 size(_obj->GetSize().x, _obj->GetSize().z);
 
     MortonResult result = CalculateObjectMortonNumberAndLevel(pos, size);

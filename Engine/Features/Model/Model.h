@@ -38,8 +38,8 @@ public:
     static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
     static Model* CreateFromVertices(std::vector<VertexData> _vertices, std::vector<uint32_t> _indices, const std::string& _name);
 
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, bool _animation = false) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, bool _animation = false) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle) const;
 
     void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const;
 
@@ -51,7 +51,7 @@ public:
     void StopAnimation() { currentAnimation_ = nullptr; }
     void ToIdle(float _timeToIdle);
 
-    void LoadAnimation(const std::string& _filePath);
+    void LoadAnimation(const std::string& _filePath, const std::string& _name);
 
     UVTransform& GetUVTransform(uint32_t _index = 0) { return material_[_index]->GetUVTransform(); }
 
@@ -97,7 +97,7 @@ private:
     void LoadFile(const std::string& _filepath);
     void LoadMesh(const aiScene* _scene);
     void LoadMaterial(const aiScene* _scene);
-    void LoadAnimation(const aiScene* _scene, const std::string& _filepath);
+    void LoadAnimation(const aiScene* _scene, const std::string& _filepath, const std::string& _name);
     void LoadNode(const aiScene* _scene);
     void CreateSkeleton();
     void CreateSkinCluster(const aiMesh* _mesh);
