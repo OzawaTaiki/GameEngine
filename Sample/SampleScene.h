@@ -3,7 +3,6 @@
 #include <Features/Camera/Camera/Camera.h>
 #include <Features/Camera/DebugCamera/DebugCamera.h>
 #include <Features/Model/ObjectModel.h>
-#include <Features/Model/AnimationModel.h>
 
 #include <Features/Effect/Manager/ParticleSystem.h>
 #include <Features/LineDrawer/LineDrawer.h>
@@ -39,28 +38,39 @@ public:
     void DrawShadow() override;
 
 private:
-    // シーン関連
+    // -----------------------------
+    // シーン関連 基本セット
+
+    // カメラ
     Camera SceneCamera_ = {};
+
+    // デバッグカメラ
     DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 
+    // ライン描画
     LineDrawer* lineDrawer_ = nullptr;
+    // 入力
     Input* input_ = nullptr;
+    // パーティクル
     ParticleSystem* particleManager_ = nullptr;
+    // ライト
+    std::shared_ptr<LightGroup> lights_;
 
-    std::unique_ptr<ObjectModel> aModel_ = nullptr;
 
-    std::unique_ptr<ObjectModel> oModel_= nullptr;
-    std::unique_ptr<ObjectModel> oModel2_= nullptr;
-    std::unique_ptr<ObjectModel> plane_ = nullptr;
-    std::unique_ptr<ObjectModel> test_= nullptr;
+    //------------------------------
+    // シーン固有
+
+
+    std::unique_ptr<ObjectModel> human_= nullptr;
+    std::unique_ptr<ObjectModel> ground_ = nullptr;
+
+    uint32_t groundTextureHandle_ = 0;
+
+    Vector4 drawColor_ = { 1,1,1,1 }; // 描画色
 
     std::unique_ptr <Sprite> sprite_ = nullptr;
 
-    std::shared_ptr<LightGroup> lights_;
-    std::list<std::pair<float, Vector4>> colors;
-
-    std::unique_ptr<AnimationSequence> sequence_ = nullptr;
 
     std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
 
@@ -69,16 +79,6 @@ private:
 
     std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
-    Vector4 testColor_ = { 1,1,1,1 };
-
-    std::vector<ObjectModel*> models_;
-    std::vector<AABBCollider*> colliders_;
-
-    std::vector<ObjectModel*> s_models_;
-    std::vector<AABBCollider*> s_colliders_;
-
-
-    void Create();
 
 #ifdef _DEBUG
     void ImGui();

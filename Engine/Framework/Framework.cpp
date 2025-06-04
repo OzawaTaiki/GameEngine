@@ -16,7 +16,7 @@
 
 void Framework::Run()
 {
-    Initialize();
+    Initialize(L"");
 
     while (!IsEndRequested())
     {
@@ -27,10 +27,10 @@ void Framework::Run()
     Finalize();
 }
 
-void Framework::Initialize()
+void Framework::Initialize(const std::wstring& _winTitle)
 {
     winApp_ = WinApp::GetInstance();
-    winApp_->Initilize(L"3104_kagemairi");
+    winApp_->Initilize(_winTitle.c_str());
 
     dxCommon_ = DXCommon::GetInstance();
     dxCommon_->Initialize(winApp_, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
