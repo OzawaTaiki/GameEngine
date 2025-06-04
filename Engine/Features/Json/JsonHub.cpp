@@ -29,6 +29,12 @@ void JsonHub::LoadRootDirectory()
 
 void JsonHub::LoadFilesRecursively(const std::string& _directoryPath)
 {
+    if (!std::filesystem::exists(_directoryPath))
+    {
+        // ディレクトリが存在しない場合は早期リターン
+        return;
+    }
+
     // ディレクトリ内のファイルを読み込む
     for (auto& entry : std::filesystem::directory_iterator(_directoryPath, std::filesystem::directory_options::skip_permission_denied))
     {
