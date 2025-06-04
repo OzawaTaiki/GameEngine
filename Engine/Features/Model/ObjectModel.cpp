@@ -128,15 +128,10 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
     }
 }
 
-void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
+void ObjectModel::DrawShadow(const Camera* _camera)
 {
     auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
     if (lightGroup.get() == nullptr) return;
-
-    if (idForGPU == nullptr)
-        CreateIDResource();
-
-    *idForGPU = _id;
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
@@ -149,7 +144,6 @@ void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
 
         _camera->QueueCommand(commandList, 0);
         worldTransform_.QueueCommand(commandList, 1);
-        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
         model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
     }
 
@@ -171,7 +165,6 @@ void ObjectModel::DrawShadow(const Camera* _camera,  uint32_t _id)
 
         worldTransform_.QueueCommand(commandList, 0);
         LightingSystem::GetInstance()->QueuePointLightShadowCommand(commandList, 1, pointLight.get());
-        commandList->SetGraphicsRootConstantBufferView(2, idResource_->GetGPUVirtualAddress());
         model_->GetMeshPtr()->QueueCommand(commandList);//
 
         commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
@@ -214,11 +207,4 @@ void ObjectModel::InitializeCommon()
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
     gameTime_ = GameTime::GetInstance();
-}
-
-void ObjectModel::CreateIDResource()
-{
-    idResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t));
-
-    idResource_->Map(0, nullptr, (void**)&idForGPU);
 }

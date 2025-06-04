@@ -1349,7 +1349,7 @@ void PSOManager::CreatePSOForDLShadowMap()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[4] = {};
+    D3D12_ROOT_PARAMETER rootParameters[3] = {};
 
     //カメラ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -1361,14 +1361,10 @@ void PSOManager::CreatePSOForDLShadowMap()
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
     rootParameters[1].Descriptor.ShaderRegister = 1;
 
-    // id
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[2].Descriptor.ShaderRegister = 2;
     // LightGroup
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[3].Descriptor.ShaderRegister = 3;
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+    rootParameters[2].Descriptor.ShaderRegister = 3;
 
 
 
@@ -1499,7 +1495,7 @@ void PSOManager::CreatePSOForPLShadowMap()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[3] = {};
+    D3D12_ROOT_PARAMETER rootParameters[2] = {};
 
 
     // transform
@@ -1512,10 +1508,6 @@ void PSOManager::CreatePSOForPLShadowMap()
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_GEOMETRY;
     rootParameters[1].Descriptor.ShaderRegister = 1;
 
-    // id
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[2].Descriptor.ShaderRegister = 2;
 
     descriptionRootSignature.pStaticSamplers = nullptr;
     descriptionRootSignature.NumStaticSamplers = 0;

@@ -213,7 +213,7 @@ void SampleScene::Draw()
 
 void SampleScene::DrawShadow()
 {
-    human_->DrawShadow(&SceneCamera_,0);
+    human_->DrawShadow(&SceneCamera_);
 }
 
 #ifdef _DEBUG

@@ -19,11 +19,6 @@ struct PixelShaderOutput
     float4 data : SV_TARGET0;
 };
 
-cbuffer gID : register(b2)
-{
-    uint id;
-}
-
 VertexShaderOutput ShadowMapVS(VertexShaderInput _input)
 {
 
@@ -44,12 +39,8 @@ PixelShaderOutput ShadowMapPS(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
 
-    float r = (id & 0xFF) / 255.0; // 下位8bit
-    float g = ((id >> 8) & 0xFF) / 255.0; // 中位8bit
-    float b = ((id >> 16) & 0xFF) / 255.0; // 上位8bit
+    float z = _input.shadowPos.z / _input.shadowPos.w; // NDC座標のZ値を取得
 
-    float a = 1.0f;
-    output.data = float4(r, g, b, a);
-
+    output.data = float4(z, z, z, 1.0f);
     return output;
 }

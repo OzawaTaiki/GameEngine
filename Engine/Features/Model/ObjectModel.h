@@ -13,12 +13,16 @@ public:
     ~ObjectModel();
 
     void Initialize(const std::string& _filePath);
-    void Initialize(std::unique_ptr< Mesh> _mesh);
+    void Initialize(std::unique_ptr<Mesh> _mesh);
     void Initialize(Model* _model);
+
     void Update();
+
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
-    void DrawShadow(const Camera* _camera,  uint32_t _id);
+    void DrawShadow(const Camera* _camera);
+
+
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
 
     void LoadAnimation(const std::string& _filePath, const std::string& _name);
@@ -66,11 +70,6 @@ private:
     std::string timeChannel = "default";
     GameTime* gameTime_ = nullptr;
 
-    uint32_t* idForGPU = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource> idResource_ = nullptr;
-
     char filePathBuffer_[128];
-
-    void CreateIDResource();
 
 };
