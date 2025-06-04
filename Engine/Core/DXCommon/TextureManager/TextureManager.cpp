@@ -105,8 +105,7 @@ std::optional<uint32_t>  TextureManager::IsTextureLoaded(const std::string& _fil
 
 DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 {
-	DirectX::ScratchImage image{}
-	;
+	DirectX::ScratchImage image{};
 	std::wstring filePathw = ConvertString(_filepath);
     HRESULT hr = S_FALSE;
 	if (filePathw.ends_with(L".dds"))
@@ -118,25 +117,41 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
 		hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	}
 
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+		std::string str = "Failed to load texture: " + _filepath + "\n";
+        Debug::Log(str);
+		assert("Failed to load texture" && false);
+		throw std::runtime_error("Failed to load texture");
+		return {};
+    }
+
 
     auto metadata = image.GetMetadata();
 	if (metadata.mipLevels <= 1)
     {
 		return image;
     }
-	
+
 	//ミップマップの生成
 	DirectX::ScratchImage mipImage{};
 	if (DirectX::IsCompressed(image.GetMetadata().format))
 	{
 		mipImage = std::move(image);
 	}
-	else 
+	else
 	{
 		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 4, mipImage);
 	}
-	assert(SUCCEEDED(hr));
+
+    if (FAILED(hr))
+    {
+        std::string str = "Failed to generate mipmaps for texture: " + _filepath;
+        Debug::Log(str);
+		throw std::runtime_error("Failed to generate mipmaps for texture");
+		return {};
+    }
+
 
 	//ミップマップ付きのデータを返す
 	return mipImage;
