@@ -160,17 +160,9 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
 {
     QueueLightCommand(_commandList, 5);
 
-    bool hasAnimation = HasAnimation() && currentAnimation_ && currentAnimation_->IsPlaying();
-
     for (auto& mesh : mesh_)
     {
-        //if (!hasAnimation)
-            mesh->QueueCommand(_commandList);
-        /*else
-        {
-            mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
-            skinCluster_.QueueCommand(_commandList);
-        }*/
+        mesh->QueueCommand(_commandList);
         material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
@@ -182,17 +174,10 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
 {
     QueueLightCommand(_commandList, 5);
 
-    bool hasAnimation = HasAnimation() && currentAnimation_ && currentAnimation_->IsPlaying();
 
     for (auto& mesh : mesh_)
     {
-        //if (!hasAnimation)
-            mesh->QueueCommand(_commandList);
-        /*else
-        {
-            mesh->QueueCommand(_commandList, skinCluster_.GetInfluenceBufferView());
-            skinCluster_.QueueCommand(_commandList);
-        }*/
+        mesh->QueueCommand(_commandList);
         material_[mesh->GetUseMaterialIndex()]->TransferData();
         material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
         material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
@@ -202,7 +187,7 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
 
 void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
 {
-    QueueLightCommand(_commandList, 3);
+    QueueLightCommand(_commandList, 2);
     for (auto& mesh : mesh_)
     {
         mesh->QueueCommand(_commandList);
