@@ -23,7 +23,7 @@ public:
 
 protected:
 
-    virtual void Initialize();
+    virtual void Initialize(const std::wstring& _winTitle);
 
     virtual void Update();
 

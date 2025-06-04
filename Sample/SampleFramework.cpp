@@ -7,9 +7,9 @@
 #include "SceneFactory.h"
 #include "ParticleModifierFactory.h"
 
-void SampleFramework::Initialize()
+void SampleFramework::Initialize(const std::wstring& _winTitle)
 {
-    Framework::Initialize();
+    Framework::Initialize(L"GameEngine");
 
 
     JsonHub::GetInstance()->Initialize("Resources/Data/");
@@ -31,6 +31,12 @@ void SampleFramework::Initialize()
 
     sceneManager_->SetSceneFactory(new SceneFactory());
     particleManager_->SetModifierFactory(new ParticleModifierFactory());
+
+    Vector2 fieldSize = { 100.0f, 100.0f };
+    Vector2 leftBottom = { -50.0f, -50.0f };
+    float gridSize = 1.0f;
+
+    collisionManager_->Initialize(fieldSize, 5, leftBottom, gridSize);
 
     // 最初のシーンで初期化
     sceneManager_->Initialize("Sample");

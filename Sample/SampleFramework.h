@@ -8,7 +8,7 @@ public:
     SampleFramework() = default;
     ~SampleFramework() = default;
 
-    void Initialize() override;
+    void Initialize(const std::wstring& _winTitle) override;
     void Update() override;
     void Draw() override;
 
