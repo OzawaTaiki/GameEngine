@@ -1,27 +1,12 @@
 #pragma once
-
 #include <Features/Collision/Collider/Collider.h>
 #include <Features/Collision/Detector/CollisionDetector.h>
 #include <Features/Collision/Tree/QuadTree.h>
 #include <Features/Collision/SpiralHashGird/SpiralHashGrid.h>
-
 #include <vector>
 #include <unordered_map>
 #include <functional>
-#include <mutex>
-#include <thread>
-#include <queue>
-#include <atomic>
 
-// OnCollision呼び出し情報を保存する構造体
-struct CollisionCallInfo
-{
-    Collider* caller;
-    Collider* other;
-    ColliderInfo info;
-};
-
-// 衝突判定の管理を行うクラス（完全スレッドセーフ版）
 class CollisionManager
 {
 public:
@@ -37,13 +22,13 @@ public:
     // 毎フレームの更新
     void Update();
 
-    // コライダーを登録する（高速版 - 衝突判定中は無視）
+    // コライダーを登録する
     void RegisterCollider(Collider* _collider);
 
     // コライダーを登録する（静的コライダー用 地形など)
     void RegisterStaticCollider(Collider* _collider);
 
-    // 衝突判定を実行する（マルチスレッド対応）
+    // 衝突判定を実行する
     void CheckCollisions();
 
     // 衝突応答を実行する
@@ -56,16 +41,13 @@ public:
     void DrawColliders();
 
     // デバッグ描画の有効/無効を設定
-    void SetDrawEnabled(bool _enabled) { isDrawEnabled_.store(_enabled); }
+    void SetDrawEnabled(bool _enabled) { isDrawEnabled_ = _enabled; }
 
     // デバッグ描画の有効/無効を取得
-    bool IsDrawEnabled() const { return isDrawEnabled_.load(); }
+    bool IsDrawEnabled() const { return isDrawEnabled_; }
 
-    // コライダーの登録解除（安全版 - 遅延削除対応）
+    // コライダーの登録解除
     void UnregisterCollider(Collider* _collider);
-
-    // スレッド数を設定（デフォルトはハードウェア並行性）
-    void SetThreadCount(uint32_t _threadCount) { threadCount_ = _threadCount; }
 
     // デバッグUI
     void ImGui();
@@ -77,14 +59,8 @@ private:
     // 空間分割などの最適化のためのユーティリティ
     void UpdateBroadPhase();
 
-    // スレッドで実行される衝突判定処理
-    void CheckCollisionsRange(size_t _startIndex, size_t _endIndex);
-
-    // OnCollisionキューを処理する
-    void ProcessCollisionCallbacks();
-
-    // 遅延削除処理
-    void ProcessPendingUnregistrations();
+    // 衝突判定の範囲処理
+    void CheckCollisionsRange();
 
     // 即座削除の内部メソッド
     void RemoveColliderImmediate(Collider* _collider);
@@ -92,35 +68,22 @@ private:
 private:
     // コライダーのリスト
     std::vector<Collider*> colliders_;
-
     std::vector<Collider*> staticColliders_; // 静的コライダーのリスト
 
     // 衝突ペアのリスト
     std::vector<CollisionPair> collisionPairs_;
 
     // デバッグ描画の有効/無効
-    std::atomic<bool> isDrawEnabled_;
+    bool isDrawEnabled_;
 
     // 衝突ペアのリスト（衝突する可能性があるpair）
     std::vector<std::pair<Collider*, Collider*>> potentialCollisions_;
 
-    std::unique_ptr<QuadTree> quadTree_; // 空間分割のための四分木
+    // 空間分割のための四分木
+    std::unique_ptr<QuadTree> quadTree_;
 
-    std::unique_ptr<SpiralHashGrid> spiralHashGrid_; // スパイラルハッシュグリッド
-
-    // マルチスレッド関連
-    uint32_t threadCount_;
-    std::mutex collisionPairsMutex_;      // collisionPairs_への書き込み保護
-    std::mutex collisionCallQueueMutex_;  // OnCollision呼び出しキューの保護
-    std::queue<CollisionCallInfo> collisionCallQueue_; // OnCollision呼び出し情報のキュー
-
-    // フェーズ管理
-    std::atomic<bool> isCollisionPhase_{ false };  // 衝突判定フェーズ中かどうか
-
-    // 遅延削除システム
-    std::mutex pendingUnregisterMutex_;          // 削除待ちキューの保護
-    std::vector<Collider*> pendingUnregister_;   // 削除待ちのコライダー
-
+    // スパイラルハッシュグリッド
+    std::unique_ptr<SpiralHashGrid> spiralHashGrid_;
 
 private:
     // コンストラクタ
