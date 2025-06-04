@@ -1,22 +1,21 @@
 #pragma once
+
+// 必須
 #include <Features/Scene/Interface/BaseScene.h>
 #include <Features/Camera/Camera/Camera.h>
 #include <Features/Camera/DebugCamera/DebugCamera.h>
-#include <Features/Model/ObjectModel.h>
 
-#include <Features/Effect/Manager/ParticleSystem.h>
-#include <Features/LineDrawer/LineDrawer.h>
 #include <System/Input/Input.h>
-#include <System/Time/GameTime.h>
-#include <Features/UI/UIButton.h>
-#include <Features/Model/Primitive/Ring.h>
-#include <Features/Model/Primitive/Cylinder.h>
-#include <Features/UVTransform/SpriteSheetAnimetion.h>
-#include <Features/UVTransform/UVTransformAnimation.h>
-#include <Features/Animation/Sequence/AnimationSequence.h>
-#include <Features/Effect/Emitter/ParticleEmitter.h>
-
+#include <Features/LineDrawer/LineDrawer.h>
+#include <Features/Effect/Manager/ParticleSystem.h>
 #include <Features/Collision/Manager/CollisionManager.h>
+#include <Features/Light/Group/LightGroup.h>
+
+#include <memory>
+
+#include <Features/Sprite/Sprite.h>
+#include <Features/Model/ObjectModel.h>
+#include <Features/Effect/Emitter/ParticleEmitter.h>
 
 #include <System/Audio/AudioSystem.h>
 #include <System/Audio/SoundInstance.h>
@@ -24,7 +23,6 @@
 
 #include <Features/Model/SkyBox.h>
 
-#include <memory>
 
 class SampleScene : public BaseScene
 {

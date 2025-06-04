@@ -1,22 +1,16 @@
 #include "SampleScene.h"
 
+#include <Core/DXCommon/TextureManager/TextureManager.h>
+
 #include <Features/Scene/Manager/SceneManager.h>
-#include <Debug/ImGuiManager.h>
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
-#include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Features/Model/Primitive/Triangle.h>
+#include <Features/Model/Primitive/Plane.h>
 #include <Features/Collision/Manager/CollisionManager.h>
-#include <Debug/ImguITools.h>
-#include <Features/Model/Primitive/Ring.h>
-#include <Features/Model/Primitive/Cylinder.h>
 #include <Features/PostEffects/DepthBasedOutLine.h>
 
-#include <Features/Effect/Emitter/ParticleEmitter.h>
-#include <Features/Model/Primitive/Triangle.h>
-#include <Features/Model/Primitive/Plane.h>
-
-#include <Features/Model/Primitive/Plane.h>
-#include <Features/Model/Primitive/Triangle.h>
+#include <Debug/ImGuiManager.h>
 
 
 SampleScene::~SampleScene()
@@ -145,7 +139,24 @@ void SampleScene::Update()
                 {
                     // 返り値で VoiceInstanceを受け取る
                     // これを使用して音量やピッチの変更ができる
-                    auto voice = soundInstance_->Play();
+                    voiceInstance_ = soundInstance_->Play();
+                }
+            }
+
+            static float volume = 1.0f;
+            if (ImGui::DragFloat("Volume", &volume, 0.0f, 1.0f))
+            {
+                if (voiceInstance_)
+                {
+                    voiceInstance_->SetVolume(volume);
+                }
+            }
+            if (ImGui::Button("Stop Sound"))
+            {
+                if (voiceInstance_)
+                {
+                    voiceInstance_->Stop();
+                    voiceInstance_ = nullptr; // VoiceInstanceを解放
                 }
             }
         }
