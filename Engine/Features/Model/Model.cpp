@@ -253,7 +253,7 @@ void Model::ToIdle(float _timeToIdle)
 void Model::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
     assert(scene->HasAnimations());
     LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
 
@@ -342,14 +342,23 @@ bool Model::IsAnimationPlaying() const
 
 void Model::LoadFile(const std::string& _filepath)
 {
+#ifdef _DEBUG
     auto start = std::chrono::high_resolution_clock::now();
-    Debug::Log("load start\nfilepath:" + defaultDirpath_ + _filepath + "\n");
+#endif // _DEBUG
+
+    Debug::Log("loading : filepath:" + defaultDirpath_ + _filepath + "\n");
     name_ = _filepath;
 
     Assimp::Importer importer;
     std::string filepath = defaultDirpath_ + _filepath;
-    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
-    assert(scene->HasMeshes());// メッシュがないのは対応しない
+    const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->HasMeshes()) {
+        Debug::Log("Failed to load model file: " + filepath + "\n");
+        Debug::Log("\tERROR::ASSIMP::" + std::string(importer.GetErrorString()) + "\n");
+        throw std::runtime_error("Failed to load model file");
+        return;
+    }
 
     LoadMesh(scene);
     LoadMaterial(scene);
@@ -377,10 +386,14 @@ void Model::LoadFile(const std::string& _filepath)
 
     }
 
+#ifdef _DEBUG
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::string str = std::to_string(duration);
-    Debug::Log("Load finish \ntime :" + str + "ms\n");
+    std::string str = std::to_string(duration) + " ms\n";
+    Debug::Log("Load complete " + str);
+#else
+    Debug::Log("Load complete\n");
+#endif // _DEBUG
     //Debug::Log("data\nvertex :" + std::to_string(vertices_.size()) + "\nindex :" + std::to_string(indices_.size()) + "\n");
 
 }
@@ -448,6 +461,8 @@ void Model::LoadMaterial(const aiScene* _scene)
         if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
             aiString textureFilePath;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+
+            // TODO Materialからテクスチャを読み込む際のパスの設定を改善する
 
             // /の位置を探す
             size_t slashPos = name_.find('/');
