@@ -30,7 +30,7 @@ void SampleScene::Initialize(SceneData* _sceneData)
 
 
     lineDrawer_ = LineDrawer::GetInstance();
-    lineDrawer_->Initialize();
+    //lineDrawer_->Initialize();
     lineDrawer_->SetCameraPtr(&SceneCamera_);
 
     input_ = Input::GetInstance();

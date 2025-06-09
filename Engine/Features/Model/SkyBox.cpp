@@ -12,9 +12,24 @@ void SkyBox::Initialize(const Vector3& _scale, bool _useQuaternion)
     PSOManager* psoManager = PSOManager::GetInstance();
     psoManager->CreatePSOForSkyBox();
 
-    pipelineState_ = psoManager->GetPipeLineStateObject(PSOFlags::Type_SkyBox | PSOFlags::Blend_Normal | PSOFlags::Cull_Back).value();
 
-    rootSignature_ = psoManager->GetRootSignature(PSOFlags::Type_SkyBox).value();
+    auto pso = psoManager->GetPipeLineStateObject(PSOFlags::Combine(PSOFlags::Type::SkyBox , PSOFlags::BlendMode::Normal , PSOFlags::CullMode::Back,PSOFlags::DepthMode::Comb_mAll_fLessEqual));
+    if (!pso.has_value() || pso.value() == nullptr)
+    {
+        assert(0 && "PSO for SkyBox is not created");
+        return;
+    }
+    pipelineState_ = pso.value();
+
+    // RootSignature
+    auto rs = psoManager->GetRootSignature(PSOFlags::Type::SkyBox);
+    if (!rs.has_value() || rs.value() == nullptr)
+    {
+        assert(0 && "RootSignature for SkyBox is not created");
+        return;
+    }
+    rootSignature_ = rs.value();
+
 
     // 初期化
     worldTransform_.Initialize();

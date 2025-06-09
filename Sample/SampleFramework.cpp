@@ -129,8 +129,8 @@ void SampleFramework::Draw()
     // スワップチェインに戻す
     rtvManager_->SetSwapChainRenderTexture(dxCommon_->GetSwapChain());
 
-    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_OffScreen);
-    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_OffScreen);
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::OffScreen);
+    PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::OffScreen);
 
     // レンダーテクスチャを描画
     rtvManager_->DrawRenderTexture(currentTex_);

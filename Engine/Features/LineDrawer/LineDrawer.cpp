@@ -13,8 +13,7 @@ LineDrawer* LineDrawer::GetInstance()
 
 void LineDrawer::Initialize()
 {
-    psoFlags_ = PSOFlags::Type_LineDrawer | PSOFlags::Blend_Normal | PSOFlags::Cull_None |
-        PSOFlags::Depth_mZero_fLEqual;
+    psoFlags_ = PSOFlags::ForLineDrawer();
 
     index = 0u;
     color_ = { 0.0f,0.0f,0.0f,1.0f };

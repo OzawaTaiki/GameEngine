@@ -22,6 +22,12 @@ public:
     JsonLoader(const std::string& _directory, bool _autoSave = true);
     ~JsonLoader();
 
+    /// <summary>
+    /// Jsonファイルを読み込む
+    /// </summary>
+    static json LoadFile(const std::string& _filepath);
+
+
     void LoadJson(const std::string& _filepath, bool _isMakeFile = false);
     void MakeJsonFile()const;
 

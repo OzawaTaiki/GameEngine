@@ -12,8 +12,8 @@ ModelManager* ModelManager::GetInstance()
 
 void ModelManager::Initialize()
 {
-    psoFlags_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mAll_fLEqual;
-    psoFlagsForAlpha_ = PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual;
+    psoFlags_ = PSOFlags::ForNormalModel();
+    psoFlagsForAlpha_ = PSOFlags::ForAlphaModel();
 
 
     /// PSOを取得
