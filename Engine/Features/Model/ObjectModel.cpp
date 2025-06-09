@@ -139,8 +139,8 @@ void ObjectModel::DrawShadow(const Camera* _camera)
     {
         RTVManager::GetInstance()->SetRenderTexture("ShadowMap");
 
-        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_DLShadowMap);
-        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_DLShadowMap);
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::DLShadowMap);
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::DLShadowMap);
 
         _camera->QueueCommand(commandList, 0);
         worldTransform_.QueueCommand(commandList, 1);
@@ -155,8 +155,8 @@ void ObjectModel::DrawShadow(const Camera* _camera)
         if (!pointLight->IsCastShadow())
             continue;
 
-        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type_PLShadowMap);
-        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type_PLShadowMap);
+        PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::PLShadowMap);
+        PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::PLShadowMap);
 
         auto handles = pointLight->GetShadowMapHandles();
         uint32_t handle = handles[0];

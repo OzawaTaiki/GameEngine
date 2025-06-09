@@ -9,130 +9,156 @@
 #include <wrl.h>
 #include <array>
 #include <optional>
+#include <stdexcept>
 
-#pragma region PSOFlags
-enum class PSOFlags
+struct PSOFlags
 {
-    None					= 0,
+    /// enumたちの定義
 
-    Type_Model				= 1,
-    Type_Sprite				= 1 << 1,
-    Type_LineDrawer			= 1 << 2,
-    Type_Particle			= 1 << 3,
-    Type_OffScreen          = 1 << 4,
-    Type_DLShadowMap        = 1 << 5,
-    Type_PLShadowMap        = 1 << 6,
-    Type_SkyBox             = 1 << 7,
+    enum class Type
+    {
+        None = 0,
+        Model = 1 << 0,
+        Sprite = 1 << 1,
+        LineDrawer = 1 << 2,
+        Particle = 1 << 3,
+        OffScreen = 1 << 4,
+        DLShadowMap = 1 << 5,
+        PLShadowMap = 1 << 6,
+        SkyBox = 1 << 7
+    };
+    enum class BlendMode
+    {
+        Normal = 0,
+        Add = 1 << 0,
+        Sub = 1 << 1,
+        Multiply = 1 << 2,
+        Screen = 1 << 3
+    };
+    enum class CullMode
+    {
+        None = 0,
+        Front = 1,
+        Back = 1 << 1
+    };
+    enum class DepthMode
+    {
+        Disable = 0,
+        Enable = 1 << 0,
+        MaskAll = 1 << 1, // すべての深度を書き込む
+        MaskZero = 1 << 2, // 深度を書き込まない
+        FuncLessEqual = 1 << 3, // 深度比較関数: 手前と等しい場合に描画
+        FuncAlways = 1 << 4, // 常に描画する
+        FuncGreater = 1 << 5,  // 深度比較関数: 手前より奥のものを描画
+        // 通常描画用
+        Comb_mAll_fLessEqual = Enable | MaskAll | FuncLessEqual,
+        // 深度書き込まない パーティクルなど
+        Comb_mZero_fLessEqual = Enable | MaskZero | FuncLessEqual,
+        // 書き込まない 奥を描画する 壁の向こうのシルエットとか
+        Comb_mAll_fGreater = Enable | MaskAll | FuncGreater,
+    };
 
-    Blend_Normal			= 1 << 11,
-    Blend_Add				= 1 << 12,
-    Blend_Sub				= 1 << 13,
-    Blend_Multiply			= 1 << 14,
-    Blend_Screen			= 1 << 15,
+    // コンストラクタ
+    constexpr PSOFlags() = default;
+    constexpr PSOFlags(uint64_t val) : value(val) {}
+    constexpr PSOFlags(Type type) : value(static_cast<uint64_t>(type)) {}
+    constexpr PSOFlags(BlendMode blendMode) : value(static_cast<uint64_t>(blendMode) << 8) {}
+    constexpr PSOFlags(CullMode cullMode) : value(static_cast<uint64_t>(cullMode) << 16) {}
+    constexpr PSOFlags(DepthMode depthMode) : value(static_cast<uint64_t>(depthMode) << 24) {}
 
-    Cull_None				= 1 << 20,
-    Cull_Front				= 1 << 21,
-    Cull_Back				= 1 << 22,
+    // フラグの値
+    uint64_t value = 0;
 
-    Depth_Enable            = 1 << 23,
-    Depth_Disable           = 1 << 24,
-    Depth_Mask_All          = 1 << 25,
-    Depth_Mask_Zero         = 1 << 26,
-    Depth_Func_LessEqual    = 1 << 27,
-    Depth_Func_Always       = 1 << 28,
-    // TODO 項目ごとに分けるべき
+    // 各フラグのビットマスク
+    static constexpr uint64_t TypeMask = 0x00000000000000FF;
+    static constexpr uint64_t BlendModeMask = 0x000000000000FF00;
+    static constexpr uint64_t CullModeMask = 0x00000000000F0000;
+    static constexpr uint64_t DepthModeMask = 0x00000000FF000000;
 
-    Depth_mAll_fLEqual = Depth_Enable | Depth_Mask_All | Depth_Func_LessEqual,
-    Depth_mZero_fLEqual = Depth_Enable | Depth_Mask_Zero | Depth_Func_LessEqual
+    constexpr operator uint64_t() const { return static_cast<uint64_t>(value); }
+
+    // 比較演算子
+    constexpr bool operator==(const PSOFlags& other) const { return value == other.value; }
+    constexpr bool operator!=(const PSOFlags& other) const { return value != other.value; }
+
+    constexpr PSOFlags operator|(const PSOFlags& other) const { return PSOFlags(value | other.value); }
+    constexpr PSOFlags operator&(const PSOFlags& other) const { return PSOFlags(value & other.value); }
+
+    // 指定されたマスク範囲で単一の値（0を含む）がセットされているか確認
+    bool IsSingleValueSet(uint64_t _mask) const
+    {
+        uint64_t maskedValue = value & _mask;
+        // 0は有効な単一値として扱う
+        // 0でない場合は、単一ビットかどうかを確認
+        return (maskedValue == 0) || ((maskedValue & (maskedValue - 1)) == 0);
+    }
+
+    // 0を除外したい場合用）
+    bool IsSingleBitSet(uint64_t _mask) const
+    {
+        uint64_t maskedValue = value & _mask;
+        return (maskedValue != 0) && ((maskedValue & (maskedValue - 1)) == 0);
+    }
+
+    // Typeがセットされているか確認
+    bool HasType() const { return (value & TypeMask) != 0; }
+    // 特定のフラグがセットされているか確認
+    bool HasFlag(PSOFlags flag) const { return (value & static_cast<uint64_t>(flag)) != 0; }
+
+    Type GetType() const
+    {
+        if (!HasType())
+        {
+            throw std::runtime_error("Typeが設定されていません");
+            return Type::None;
+        }
+        return static_cast<Type>(value & TypeMask);
+    }
+
+    uint64_t GetTypeValue() const { return value & TypeMask; }
+
+    // BlendModeを取得
+    BlendMode GetBlendMode() const { return static_cast<BlendMode>((value & BlendModeMask) >> 8); }
+    // CullModeを取得
+    CullMode GetCullMode() const { return static_cast<CullMode>((value & CullModeMask) >> 16); }
+    // DepthModeを取得
+    DepthMode GetDepthMode() const { return static_cast<DepthMode>((value & DepthModeMask) >> 24); }
+
+    // 複数項目の組み合わせを確実に行うヘルパー関数
+    static constexpr PSOFlags Combine(Type type, BlendMode blendMode, CullMode cullMode, DepthMode depthMode) {
+        return PSOFlags(static_cast<uint64_t>(type) |
+            (static_cast<uint64_t>(blendMode) << 8) |
+            (static_cast<uint64_t>(cullMode) << 16) |
+            (static_cast<uint64_t>(depthMode) << 24));
+    }
+
+    static constexpr PSOFlags ForNormalModel() {
+        return Combine(Type::Model, BlendMode::Normal, CullMode::Back, DepthMode::Comb_mAll_fLessEqual);
+    }
+    static constexpr PSOFlags ForAlphaModel() {
+        return Combine(Type::Model, BlendMode::Normal, CullMode::Back, DepthMode::Comb_mZero_fLessEqual);
+    }
+    static constexpr PSOFlags ForSprite() {
+        return Combine(Type::Sprite, BlendMode::Normal, CullMode::None, DepthMode::Disable);
+    }
+    static constexpr PSOFlags ForLineDrawer() {
+        return Combine(Type::LineDrawer, BlendMode::Normal, CullMode::None, DepthMode::Comb_mZero_fLessEqual);
+    }
+    static constexpr PSOFlags ForAddBlendParticle() {
+        return Combine(Type::Particle, BlendMode::Add, CullMode::None, DepthMode::Comb_mZero_fLessEqual);
+    }
 };
-
-PSOFlags SetBlendMode(PSOFlags _flag, PSOFlags _mode);
-
-PSOFlags GetBlendMode(BlendMode _mode);
-
-BlendMode GetBlendMode(PSOFlags _flag);
-
-/// <summary>
-/// PSOFlagsが有効かどうかを判定する
-/// </summary>
-/// <param name="_flags"></param>
-/// <returns>有効なら true</returns>
-bool IsValidPSOFlags(PSOFlags _flags);
-
-/// <summary>
-/// PSOFlagsの中に一つだけビットが立っているかどうかを判定する
-/// </summary>
-/// <param name="_flags"></param>
-/// <param name="_mask"></param>
-/// <returns>複数設定されていたら false</returns>
-bool IsSingleBitSetInMask(PSOFlags _flags, PSOFlags _mask);
-
-/// <summary>
-/// PSOFlagsの中に指定したフラグが含まれているかどうかを判定する
-/// </summary>
-/// <param name="_flag"></param>
-/// <param name="_checkFlag"></param>
-/// <returns></returns>
-bool HasFlag(PSOFlags _flag, PSOFlags _checkFlag);
-
-#pragma region PSOFlagsの演算子オーバーロード
-constexpr PSOFlags operator|(PSOFlags a, PSOFlags b)
-{
-    return static_cast<PSOFlags>(static_cast<int>(a) | static_cast<int>(b));
-}
-constexpr PSOFlags operator&(PSOFlags a, PSOFlags b)
-{
-    return static_cast<PSOFlags>(static_cast<int>(a) & static_cast<int>(b));
-}
-constexpr PSOFlags operator~(PSOFlags a)
-{
-    return static_cast<PSOFlags>(~static_cast<int>(a));
-}
-constexpr PSOFlags& operator|=(PSOFlags& a, PSOFlags b)
-{
-    return a = a | b;
-}
-constexpr PSOFlags& operator&=(PSOFlags& a, PSOFlags b)
-{
-    return a = a & b;
-}
-#pragma endregion
-
-#pragma region PSOFlagsのマスク
-constexpr PSOFlags TypeMask =
-PSOFlags::Type_Model |
-PSOFlags::Type_Sprite | PSOFlags::Type_LineDrawer | PSOFlags::Type_Particle
-| PSOFlags::Type_OffScreen | PSOFlags::Type_DLShadowMap | PSOFlags::Type_PLShadowMap
-| PSOFlags::Type_SkyBox
-;
-constexpr PSOFlags BlendMask =
-PSOFlags::Blend_Normal | PSOFlags::Blend_Add |
-PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen;
-
-constexpr PSOFlags CullMask =
-PSOFlags::Cull_Back | PSOFlags::Cull_Front | PSOFlags::Cull_None;
-
-constexpr PSOFlags DepthMask =
-PSOFlags::Depth_Enable | PSOFlags::Depth_Disable | PSOFlags::Depth_Mask_All
-| PSOFlags::Depth_Mask_Zero | PSOFlags::Depth_Func_LessEqual
-| PSOFlags::Depth_Func_Always;
-
-
-
-#pragma endregion
-#pragma endregion
 
 class DXCommon;
 class PSOManager
 {
 public:
-
-	static PSOManager* GetInstance();
+    static PSOManager* GetInstance();
 
     void Initialize();
 
-	std::optional<ID3D12PipelineState*> GetPipeLineStateObject(PSOFlags _flag);
-	std::optional<ID3D12RootSignature*> GetRootSignature(PSOFlags _flag);
+    std::optional<ID3D12PipelineState*> GetPipeLineStateObject(PSOFlags _flag);
+    std::optional<ID3D12RootSignature*> GetRootSignature(PSOFlags _flag);
 
     void SetPipeLineStateObject(PSOFlags _flag);
     void SetRootSignature(PSOFlags _flag);
@@ -142,17 +168,14 @@ public:
     void SetRegisterPSO(const std::string& _name);
     void SetRegisterRootSignature(const std::string& _name);
 
-
-
-	Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
-		//Complierするshaderファイルへのパス
-		const std::wstring& _filePath,
-		//Compilerに使用するprofile
-		const wchar_t* _profile,
+    Microsoft::WRL::ComPtr<IDxcBlob>  ComplieShader(
+        //Complierするshaderファイルへのパス
+        const std::wstring& _filePath,
+        //Compilerに使用するprofile
+        const wchar_t* _profile,
         const std::wstring& _entryFuncName = L"main",
-		const std::wstring& _dirPath = L"Resources/Shader/"
-        );
-
+        const std::wstring& _dirPath = L"Resources/Shader/"
+    );
 
     void CreatePSOForPostEffect(const std::string& _name,
         const std::wstring& _psFileName,
@@ -165,6 +188,7 @@ public:
     void CreatePSOForSkyBox();
 
 private:
+    void CreateDefaultPSOs();
 
     void CreatePSOForModel(PSOFlags _flags);
     void CreatePSOForSprite(PSOFlags _flags);
@@ -175,35 +199,89 @@ private:
     void CreatePSOForDLShadowMap();
     void CreatePSOForPLShadowMap();
 
-
-
-	D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
+    D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
     D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);
     D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(PSOFlags _flag);
 
-    size_t GetType(PSOFlags _flag);
-	PSOFlags GetBlendMode(PSOFlags _flag);
+    DXCommon* dxCommon_ = nullptr;
 
-	DXCommon* dxCommon_ = nullptr;
-
-	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> graphicsPipelineStates_;
-	std::unordered_map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
+    std::unordered_map<uint64_t, Microsoft::WRL::ComPtr<ID3D12PipelineState>> graphicsPipelineStates_;
+    std::unordered_map<uint64_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> postEffectPipelineStates_;
 
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> registerPSO_;
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> regiterRootSignature_;
 
-
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
     Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 
-
-
-
-
-	PSOManager() = default;
-	~PSOManager() = default;
-	PSOManager(const PSOManager&) = delete;
-	PSOManager& operator=(const PSOManager&) = delete;
+    PSOManager() = default;
+    ~PSOManager() = default;
+    PSOManager(const PSOManager&) = delete;
+    PSOManager& operator=(const PSOManager&) = delete;
 };
+
+#pragma region psoflagの演算子
+// 2項目の組み合わせ
+constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::BlendMode rhs)
+{
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 8));
+}
+constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::CullMode rhs)
+{
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 16));
+}
+constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::DepthMode rhs)
+{
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 24));
+}
+constexpr PSOFlags operator|(PSOFlags::BlendMode lhs, PSOFlags::CullMode rhs)
+{
+    return PSOFlags((static_cast<uint64_t>(lhs) << 8) | (static_cast<uint64_t>(rhs) << 16));
+}
+constexpr PSOFlags operator|(PSOFlags::BlendMode lhs, PSOFlags::DepthMode rhs)
+{
+    return PSOFlags((static_cast<uint64_t>(lhs) << 8) | (static_cast<uint64_t>(rhs) << 24));
+}
+constexpr PSOFlags operator|(PSOFlags::CullMode lhs, PSOFlags::DepthMode rhs)
+{
+    return PSOFlags((static_cast<uint64_t>(lhs) << 16) | (static_cast<uint64_t>(rhs) << 24));
+}
+
+// PSOFlagsとenum classの組み合わせ
+constexpr PSOFlags operator|(PSOFlags lhs, PSOFlags::Type rhs)
+{
+    return lhs | PSOFlags(rhs);
+}
+constexpr PSOFlags operator|(PSOFlags lhs, PSOFlags::BlendMode rhs)
+{
+    return lhs | PSOFlags(rhs);
+}
+constexpr PSOFlags operator|(PSOFlags lhs, PSOFlags::CullMode rhs)
+{
+    return lhs | PSOFlags(rhs);
+}
+constexpr PSOFlags operator|(PSOFlags lhs, PSOFlags::DepthMode rhs)
+{
+    return lhs | PSOFlags(rhs);
+}
+
+// 逆順も対応
+constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags rhs)
+{
+    return PSOFlags(lhs) | rhs;
+}
+constexpr PSOFlags operator|(PSOFlags::BlendMode lhs, PSOFlags rhs)
+{
+    return PSOFlags(lhs) | rhs;
+}
+constexpr PSOFlags operator|(PSOFlags::CullMode lhs, PSOFlags rhs)
+{
+    return PSOFlags(lhs) | rhs;
+}
+constexpr PSOFlags operator|(PSOFlags::DepthMode lhs, PSOFlags rhs)
+{
+    return PSOFlags(lhs) | rhs;
+}
+#pragma endregion

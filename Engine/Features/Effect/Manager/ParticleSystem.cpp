@@ -31,7 +31,7 @@ void ParticleSystem::Initialize()
 {
     srvManager_ = SRVManager::GetInstance();
 
-    auto rootsig = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type_Particle);
+    auto rootsig = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type::Particle);
     assert(rootsig.has_value());
     rootSignature_ = rootsig.value();
 }
@@ -178,7 +178,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
         group.model = ModelManager::GetInstance()->FindSameModel(_useModelName);
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+        psoFlags = psoFlags | PSOFlags::Type::Particle | PSOFlags::DepthMode::Comb_mZero_fLessEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -197,7 +197,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
     else
     {
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+        psoFlags = psoFlags | PSOFlags::Type::Particle | PSOFlags::DepthMode::Comb_mZero_fLessEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -247,7 +247,7 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
             throw std::runtime_error("Modelname '" + _useModelName + "'  が無効です。");
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+        psoFlags = psoFlags | PSOFlags::Type::Particle | PSOFlags::DepthMode::Comb_mZero_fLessEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))
@@ -268,7 +268,7 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
         group.textureHandle = _textureHandle;
 
         PSOFlags psoFlags = _settings.GetPSOFlags();
-        psoFlags |= PSOFlags::Type_Particle | PSOFlags::Depth_mZero_fLEqual;
+        psoFlags = psoFlags | PSOFlags::Type::Particle | PSOFlags::DepthMode::Comb_mZero_fLessEqual;
 
         // PSOFlagsが未登録の場合は登録する
         if (!psoMap_.contains(psoFlags))

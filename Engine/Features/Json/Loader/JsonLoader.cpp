@@ -21,6 +21,26 @@ JsonLoader::JsonLoader(const std::string& _directory, bool _autoSave) {
 JsonLoader::~JsonLoader() {
 }
 
+json JsonLoader::LoadFile(const std::string& _filepath)
+{
+    std::ifstream inputFile(_filepath);
+    if (!inputFile.is_open())
+    {
+        assert(inputFile.is_open() && "Cant Open inputFile");
+        return json();
+    }
+
+    json j;
+    if (inputFile.peek() != std::ifstream::traits_type::eof())
+    {
+        inputFile >> j;
+    }
+
+    inputFile.close();
+    return j;
+
+}
+
 void JsonLoader::LoadJson(const std::string& _filepath, bool _isMakeFile) {
 
     // 拡張子の有無

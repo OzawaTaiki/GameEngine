@@ -23,33 +23,33 @@ struct ParticleRenderSettings
 
     PSOFlags GetPSOFlags() const
     {
-        PSOFlags flags = PSOFlags::None;
+        PSOFlags flags = PSOFlags::BlendMode::Normal;
 
         switch (blendMode)
         {
         case BlendMode::Normal:
-            flags |= PSOFlags::Blend_Normal;
+            flags = flags | PSOFlags::BlendMode::Normal;
             break;
         case BlendMode::Add:
-            flags |= PSOFlags::Blend_Add;
+            flags = flags | PSOFlags::BlendMode::Add;
             break;
         case BlendMode::Sub:
-            flags |= PSOFlags::Blend_Sub;
+            flags = flags | PSOFlags::BlendMode::Sub;
             break;
         case BlendMode::Multiply:
-            flags |= PSOFlags::Blend_Multiply;
+            flags = flags | PSOFlags::BlendMode::Multiply;
             break;
         case BlendMode::Screen:
-            flags |= PSOFlags::Blend_Screen;
+            flags = flags | PSOFlags::BlendMode::Screen;
             break;
         default:
             break;
         }
 
         if (cullBack)
-            flags |= PSOFlags::Cull_Back;
+            flags = flags | PSOFlags::CullMode::Back;
         else
-            flags |= PSOFlags::Cull_None;
+            flags = flags | PSOFlags::CullMode::None;
 
 
         return flags;

@@ -26,22 +26,13 @@ void PSOManager::Initialize()
     hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
     assert(SUCCEEDED(hr));
 
-
-    CreatePSOForModel(PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mAll_fLEqual);
-    CreatePSOForModel(PSOFlags::Type_Model | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual);
-    CreatePSOForSprite(PSOFlags::Type_Sprite | PSOFlags::Blend_Normal | PSOFlags::Cull_Back | PSOFlags::Depth_Disable);
-    CreatePSOForLineDrawer(PSOFlags::Type_LineDrawer | PSOFlags::Blend_Normal | PSOFlags::Cull_None | PSOFlags::Depth_mZero_fLEqual);
-    CreatePSOForParticle(PSOFlags::Type_Particle | PSOFlags::Blend_Add | PSOFlags::Cull_Back | PSOFlags::Depth_mZero_fLEqual);
-    CreatePSOForOffScreen();
-    CreatePSOForDLShadowMap();
-    CreatePSOForPLShadowMap();
-    //CreatePSOForSkyBox();
+    CreateDefaultPSOs();
 
 }
 
 std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags _flag)
 {
-    size_t index = static_cast<size_t>(_flag);
+    uint64_t index = static_cast<uint64_t>(_flag);
     // 要素があるか確認
     auto it = graphicsPipelineStates_.find(index);
     // あったらそれを返す
@@ -50,33 +41,29 @@ std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags 
     // なかったらnullを返す
     else
     {
-        size_t type = GetType(_flag);
-        size_t index = static_cast<size_t>(_flag);
+        PSOFlags::Type type = _flag.GetType();
+        uint64_t index = static_cast<uint64_t>(_flag);
 
         switch (type)
         {
-        case 1 << 0 : // Model
+        case PSOFlags::Type::None:
+            assert(false && "PSOのTypeが設定されていません");
+            return std::nullopt;
+            break;
+        case PSOFlags::Type::Model:
             CreatePSOForModel(_flag);
             return graphicsPipelineStates_[index].Get();
             break;
-        case 1 << 1 : // Sprite
+        case PSOFlags::Type::Sprite:
             CreatePSOForSprite(_flag);
             return graphicsPipelineStates_[index].Get();
             break;
-        case 1 << 2: // LineDrawer
+        case PSOFlags::Type::LineDrawer:
             CreatePSOForLineDrawer(_flag);
             return graphicsPipelineStates_[index].Get();
             break;
-        case 1 << 3: // Particle
+        case PSOFlags::Type::Particle:
             CreatePSOForParticle(_flag);
-            return graphicsPipelineStates_[index].Get();
-            break;
-        case 1 << 4: // OffScreen
-            CreatePSOForOffScreen();
-            return graphicsPipelineStates_[index].Get();
-            break;
-        case 1 << 5: // DLShadowMap
-            CreatePSOForDLShadowMap();
             return graphicsPipelineStates_[index].Get();
             break;
         default:
@@ -89,7 +76,7 @@ std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags 
 
 std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(PSOFlags _flag)
 {
-    size_t type = GetType(_flag);
+    uint64_t type = _flag.GetTypeValue();
     // 要素があるか確認
     auto it = rootSignatures_.find(type);
     // あったらそれを返す
@@ -102,7 +89,7 @@ std::optional<ID3D12RootSignature*> PSOManager::GetRootSignature(PSOFlags _flag)
 
 void PSOManager::SetPipeLineStateObject(PSOFlags _flag)
 {
-    size_t index = static_cast<size_t>(_flag);
+    uint64_t index = _flag;
     // 要素があるか確認
     auto it = graphicsPipelineStates_.find(index);
     if (it == graphicsPipelineStates_.end())
@@ -115,7 +102,7 @@ void PSOManager::SetPipeLineStateObject(PSOFlags _flag)
 
 void PSOManager::SetRootSignature(PSOFlags _flag)
 {
-    size_t type = GetType(_flag);
+    uint64_t type = _flag.GetTypeValue();
     // 要素があるか確認
     auto it = rootSignatures_.find(type);
     if (it == rootSignatures_.end())
@@ -137,7 +124,7 @@ void PSOManager::SetPSOForPostEffect(const std::string& _name)
     }
 
     dxCommon_->GetCommandList()->SetPipelineState(postEffectPipelineStates_[_name].Get());
-    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<uint64_t>(PSOFlags::Type::OffScreen)].Get());
 }
 
 void PSOManager::SetRegisterPSO(const std::string& _name)
@@ -147,7 +134,6 @@ void PSOManager::SetRegisterPSO(const std::string& _name)
         assert(false && "PSOがみつかりません");
 
     dxCommon_->GetCommandList()->SetPipelineState(registerPSO_[_name].Get());
-    //dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignatures_[static_cast<size_t>(PSOFlags::Type_OffScreen)].Get());
 }
 
 void PSOManager::SetRegisterRootSignature(const std::string& _name)
@@ -227,10 +213,13 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
     const std::wstring& _entryFuncName,
     const std::wstring& _dirPath)
 {
+    PSOFlags flag = PSOFlags::Type::OffScreen | PSOFlags::BlendMode::Normal |
+        PSOFlags::CullMode::None |
+        PSOFlags::DepthMode::Disable;
+
     HRESULT hr = S_FALSE;
 
-    size_t rootSignatureType = static_cast<size_t>(PSOFlags::Type_OffScreen);
-
+    uint64_t rootSignatureType = flag.GetTypeValue();
 #pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -313,13 +302,13 @@ void PSOManager::CreatePSOForPostEffect(const std::string& _name,
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
     //すべての色要素を書き込む
-    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+    blendDesc = GetBlendDesc(flag);
 #pragma endregion
 
 #pragma region RasterizerState
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_None);
+    rasterizerDesc = GetRasterizerDesc(flag);
 #pragma endregion
 
     // PSOを生成する
@@ -364,6 +353,8 @@ void PSOManager::RegisterRootSignature(const std::string& _name, ID3D12RootSigna
 
 void PSOManager::CreatePSOForSkyBox()
 {
+
+    PSOFlags flag = PSOFlags::Type::SkyBox | PSOFlags::BlendMode::Normal | PSOFlags::CullMode::Back | PSOFlags::DepthMode::Comb_mAll_fLessEqual;
 
     HRESULT hr = S_FALSE;
 
@@ -428,7 +419,7 @@ void PSOManager::CreatePSOForSkyBox()
     descriptionRootSignature.pStaticSamplers = staticSamplers;
     descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-    size_t type = static_cast<size_t>(PSOFlags::Type_SkyBox);
+    uint64_t type = flag.GetTypeValue();
 
     //シリアライズしてバイナリする
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
@@ -467,14 +458,14 @@ void PSOManager::CreatePSOForSkyBox()
 #pragma region BlendState
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
-    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+    blendDesc = GetBlendDesc(flag);
 #pragma endregion
 
 #pragma region RasterizerState
 
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_Back);
+    rasterizerDesc = GetRasterizerDesc(flag);
 
     //三角形を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
@@ -505,16 +496,30 @@ void PSOManager::CreatePSOForSkyBox()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    PSOFlags flag = PSOFlags::Type_SkyBox | PSOFlags::Blend_Normal | PSOFlags::Cull_Back;
 
-    graphicsPipelineStates_[static_cast<size_t>(flag)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(flag)] = pipelineState;
+}
+
+void PSOManager::CreateDefaultPSOs()
+{
+
+    CreatePSOForModel(PSOFlags::ForNormalModel());
+    CreatePSOForModel(PSOFlags::ForAlphaModel());
+    CreatePSOForSprite(PSOFlags::ForSprite());
+    CreatePSOForLineDrawer(PSOFlags::ForLineDrawer());
+    CreatePSOForParticle(PSOFlags::ForAddBlendParticle());
+
+    CreatePSOForOffScreen();
+    CreatePSOForDLShadowMap();
+    CreatePSOForPLShadowMap();
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(_flags);
+
+    uint64_t type = _flags.GetTypeValue();
 
 #pragma region Sampler
     //Samplerの設定
@@ -740,7 +745,7 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+    graphicsPipelineStates_[_flags] = pipelineState;
 
 }
 
@@ -749,7 +754,7 @@ void PSOManager::CreatePSOForSprite(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(_flags);
+    uint64_t type = _flags.GetTypeValue();
 
 #pragma region Sampler
     //Samplerの設定
@@ -890,7 +895,7 @@ void PSOManager::CreatePSOForSprite(PSOFlags _flags)
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(_flags)] = pipelineState;
 
 }
 
@@ -898,8 +903,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(_flags);
-
+    uint64_t type = _flags.GetTypeValue();
 #pragma region Sampler
     //Samplerの設定
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -1021,7 +1025,7 @@ void PSOManager::CreatePSOForLineDrawer(PSOFlags _flags)
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(_flags)] = pipelineState;
 
 }
 
@@ -1029,7 +1033,7 @@ void PSOManager::CreatePSOForParticle(PSOFlags _flags)
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(_flags);
+    uint64_t type = _flags.GetTypeValue();
 
 #pragma region Sampler
     //Samplerの設定
@@ -1179,7 +1183,7 @@ void PSOManager::CreatePSOForParticle(PSOFlags _flags)
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(_flags)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(_flags)] = pipelineState;
 
 }
 
@@ -1187,7 +1191,9 @@ void PSOManager::CreatePSOForOffScreen()
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(PSOFlags::Type_OffScreen | PSOFlags::Cull_None | PSOFlags::Blend_Normal);
+    PSOFlags flag = PSOFlags::Type::OffScreen | PSOFlags::CullMode::None | PSOFlags::BlendMode::Normal;
+
+    uint64_t type = flag.GetTypeValue();
 
 #pragma region Sampler
     //Samplerの設定
@@ -1271,13 +1277,13 @@ void PSOManager::CreatePSOForOffScreen()
     /// BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
     //すべての色要素を書き込む
-    blendDesc = GetBlendDesc(PSOFlags::Blend_Normal);
+    blendDesc = GetBlendDesc(flag);
 #pragma endregion
 
 #pragma region RasterizerState
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_None);
+    rasterizerDesc = GetRasterizerDesc(flag);
 #pragma endregion
 
     // PSOを生成する
@@ -1314,7 +1320,9 @@ void PSOManager::CreatePSOForDLShadowMap()
 {
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(PSOFlags::Type_DLShadowMap);
+    PSOFlags flag = PSOFlags::Type::DLShadowMap | PSOFlags::CullMode::Back | PSOFlags::BlendMode::Normal | PSOFlags::DepthMode::Comb_mAll_fLessEqual;
+
+    uint64_t type = flag.GetTypeValue();
 
 #pragma region Sampler
     //Samplerの設定
@@ -1390,15 +1398,7 @@ void PSOManager::CreatePSOForDLShadowMap()
 
 #pragma region DepthStencilState
     //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    //Depthの機能を有効にする
-    depthStencilDesc.DepthEnable = true;
-    //書き込みします
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    //比較関数はLessEqeul つまり近ければ描画される
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
-    depthStencilDesc.StencilEnable = false;
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = GetDepthStencilDesc(flag);
 #pragma endregion
 
 #pragma region InputLayout
@@ -1444,7 +1444,7 @@ void PSOManager::CreatePSOForDLShadowMap()
 
     /// RasterizerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(PSOFlags::Cull_None);
+    rasterizerDesc = GetRasterizerDesc(flag);
 
     //三角形を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
@@ -1476,16 +1476,16 @@ void PSOManager::CreatePSOForDLShadowMap()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(type)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(type)] = pipelineState;
 
 }
 
 void PSOManager::CreatePSOForPLShadowMap()
 {
-
+    PSOFlags flags = PSOFlags::Type::PLShadowMap | PSOFlags::CullMode::Back | PSOFlags::BlendMode::Normal | PSOFlags::DepthMode::Comb_mAll_fLessEqual;
     HRESULT hr = S_FALSE;
 
-    size_t type = GetType(PSOFlags::Type_PLShadowMap);
+    uint64_t type = flags.GetTypeValue();
 
 
 #pragma region RootSignature
@@ -1531,15 +1531,7 @@ void PSOManager::CreatePSOForPLShadowMap()
 
 #pragma region DepthStencilState
     //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    //Depthの機能を有効にする
-    depthStencilDesc.DepthEnable = true;
-    //書き込みします
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    //比較関数はLessEqeul つまり近ければ描画される
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
-    depthStencilDesc.StencilEnable = false;
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = GetDepthStencilDesc(flags);
 #pragma endregion
 
 #pragma region InputLayout
@@ -1630,38 +1622,46 @@ void PSOManager::CreatePSOForPLShadowMap()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[static_cast<size_t>(type)] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(type)] = pipelineState;
 }
 
 D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
 {
+    if(!_flag.IsSingleValueSet(PSOFlags::BlendModeMask))
+    {
+        assert("BlendModeが複数設定されています" && false);
+        return {};
+    }
+
+
     D3D12_BLEND_DESC blendDesc{};
 
-    PSOFlags mode = GetBlendMode(_flag);
+
+    PSOFlags::BlendMode mode = _flag.GetBlendMode();
 
     switch (mode)
     {
-    case PSOFlags::Blend_Normal:
+    case PSOFlags::BlendMode::Normal:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
         break;
-    case PSOFlags::Blend_Add:
+    case PSOFlags::BlendMode::Add:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case PSOFlags::Blend_Sub:
+    case PSOFlags::BlendMode::Sub:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         break;
-    case PSOFlags::Blend_Multiply:
+    case PSOFlags::BlendMode::Multiply:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
         break;
-    case PSOFlags::Blend_Screen:
+    case PSOFlags::BlendMode::Screen:
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
@@ -1669,6 +1669,7 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
     default:
         break;
     }
+
 
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -1681,27 +1682,32 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
 
 D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
 {
-    if (!IsSingleBitSetInMask(_flag, CullMask))
+    if (_flag.IsSingleValueSet(PSOFlags::CullModeMask) == false)
     {
-        assert("Cullが複数設定されています" && false);
+        assert("CullModeが複数設定されています" && false);
+        return {};
     }
 
     D3D12_RASTERIZER_DESC rasterizerDesc{};
 
-    if (HasFlag(_flag, PSOFlags::Cull_None))
+    PSOFlags::CullMode cullMode = _flag.GetCullMode();
+
+    switch (cullMode)
     {
+    case PSOFlags::CullMode::None:
         rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
         rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    }
-    else if (HasFlag(_flag, PSOFlags::Cull_Back))
-    {
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    }
-    else if (HasFlag(_flag, PSOFlags::Cull_Front))
-    {
+        break;
+    case PSOFlags::CullMode::Front:
         rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
         rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+        break;
+    case PSOFlags::CullMode::Back:
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+        break;
+    default:
+        break;
     }
 
     return rasterizerDesc;
@@ -1709,224 +1715,86 @@ D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
 
 D3D12_DEPTH_STENCIL_DESC PSOManager::GetDepthStencilDesc(PSOFlags _flag)
 {
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
-    depthStencilDesc.DepthEnable = true; // デフォルトは有効
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL; // デフォルトは全て書き込む
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // デフォルトはLessEqual
-    depthStencilDesc.StencilEnable = false; // デフォルトは無効
 
+    /*if (!_flag.IsSingleValueSet(PSOFlags::DepthModeMask))
+    {
+        assert("DepthModeが複数設定されています" && false);
+        return {};
+    }*/
 
-    if (HasFlag(_flag, PSOFlags::Depth_Disable))
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
+
+    // デフォルト値を設定
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    depthStencilDesc.StencilEnable = false;
+
+    // DepthModeを取得
+    auto depthMode = _flag.GetDepthMode();
+
+    // Disableの場合
+    if (depthMode == PSOFlags::DepthMode::Disable)
     {
         depthStencilDesc.DepthEnable = false;
+        return depthStencilDesc;
     }
-    else if (HasFlag(_flag, PSOFlags::Depth_Enable))
+
+    // 組み合わせフラグの処理
+    if (depthMode == PSOFlags::DepthMode::Comb_mAll_fLessEqual)
     {
         depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        return depthStencilDesc;
+    }
+    else if (depthMode == PSOFlags::DepthMode::Comb_mZero_fLessEqual)
+    {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        return depthStencilDesc;
+    }
+    else if (depthMode == PSOFlags::DepthMode::Comb_mAll_fGreater)
+    {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+        return depthStencilDesc;
+    }
 
-        if (HasFlag(_flag, PSOFlags::Depth_Func_Always))
-        {
-            depthStencilDesc.StencilEnable = false;
-        }
+    // 個別フラグの処理
+    if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::Enable)))
+    {
+        depthStencilDesc.DepthEnable = true;
     }
 
     if (depthStencilDesc.DepthEnable)
     {
-        if (HasFlag(_flag, PSOFlags::Depth_Mask_All))
+        // マスクの設定
+        if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::MaskAll)))
         {
             depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         }
-        else if (HasFlag(_flag, PSOFlags::Depth_Mask_Zero))
+        else if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::MaskZero)))
         {
             depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
         }
-        else
-        {
-            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL; // デフォルトは全て書き込む
-        }
 
-        if (HasFlag(_flag, PSOFlags::Depth_Func_LessEqual))
+        // 比較関数の設定
+        if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::FuncLessEqual)))
         {
             depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
         }
-        else if (HasFlag(_flag, PSOFlags::Depth_Func_Always))
+        else if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::FuncAlways)))
         {
             depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
         }
-        else
+        else if (_flag.HasFlag(PSOFlags(PSOFlags::DepthMode::FuncGreater)))
         {
-            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
         }
     }
 
     return depthStencilDesc;
 }
-
-
-size_t PSOManager::GetType(PSOFlags _flag)
-{
-    if(!IsSingleBitSetInMask(_flag,TypeMask))
-    {
-        assert("Typeが複数設定されているか，Typeが設定されていません" && false);
-    }
-
-    if (HasFlag(_flag, PSOFlags::Type_Model))
-    {
-        return static_cast<size_t>(PSOFlags::Type_Model);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_Sprite))
-    {
-        return static_cast<size_t>(PSOFlags::Type_Sprite);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_LineDrawer))
-    {
-        return static_cast<size_t>(PSOFlags::Type_LineDrawer);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_Particle))
-    {
-        return static_cast<size_t>(PSOFlags::Type_Particle);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_OffScreen))
-    {
-        return static_cast<size_t>(PSOFlags::Type_OffScreen);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_DLShadowMap))
-    {
-        return static_cast<size_t>(PSOFlags::Type_DLShadowMap);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_PLShadowMap))
-    {
-        return static_cast<size_t>(PSOFlags::Type_PLShadowMap);
-    }
-    else if (HasFlag(_flag, PSOFlags::Type_SkyBox))
-    {
-        return static_cast<size_t>(PSOFlags::Type_SkyBox);
-    }
-
-
-    assert("Typeが設定されていません" && false);
-    return 0;
-
-}
-
-PSOFlags PSOManager::GetBlendMode(PSOFlags _flag)
-{
-    if (!IsSingleBitSetInMask(_flag, BlendMask))
-    {
-        assert("BlendModeが複数設定されています" && false);
-        return PSOFlags::Blend_Normal;
-    }
-
-    if (HasFlag(_flag, PSOFlags::Blend_Normal))
-    {
-        return  PSOFlags::Blend_Normal;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Add))
-    {
-        return  PSOFlags::Blend_Add;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Sub))
-    {
-        return  PSOFlags::Blend_Sub;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Multiply))
-    {
-        return  PSOFlags::Blend_Multiply;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Screen))
-    {
-        return  PSOFlags::Blend_Screen;
-    }
-
-    // デフォルトはNormal
-    return  PSOFlags::Blend_Normal;
-}
-
-PSOFlags SetBlendMode(PSOFlags _flag, PSOFlags _mode)
-{
-    if (!IsSingleBitSetInMask(_flag, BlendMask))
-    {
-        assert(false);
-    }
-
-    PSOFlags flag = _flag;
-
-    flag &= ~(PSOFlags::Blend_Normal | PSOFlags::Blend_Add | PSOFlags::Blend_Sub | PSOFlags::Blend_Multiply | PSOFlags::Blend_Screen);
-    flag |= _mode;
-
-    return flag;
-}
-
-PSOFlags GetBlendMode(BlendMode _mode)
-{
-    switch (_mode)
-    {
-    case BlendMode::Normal:
-        return PSOFlags::Blend_Normal;
-    case BlendMode::Add:
-        return PSOFlags::Blend_Add;
-    case BlendMode::Sub:
-        return PSOFlags::Blend_Sub;
-    case BlendMode::Multiply:
-        return PSOFlags::Blend_Multiply;
-    case BlendMode::Screen:
-        return PSOFlags::Blend_Screen;
-    default:
-        return PSOFlags::Blend_Normal;
-    }
-}
-
-BlendMode GetBlendMode(PSOFlags _flag)
-{
-    if (!IsSingleBitSetInMask(_flag, BlendMask))
-    {
-        assert(false);
-    }
-    if (HasFlag(_flag, PSOFlags::Blend_Normal))
-    {
-        return BlendMode::Normal;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Add))
-    {
-        return BlendMode::Add;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Sub))
-    {
-        return BlendMode::Sub;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Multiply))
-    {
-        return BlendMode::Multiply;
-    }
-    else if (HasFlag(_flag, PSOFlags::Blend_Screen))
-    {
-        return BlendMode::Screen;
-    }
-    return BlendMode::Normal;
-}
-
-
-bool IsValidPSOFlags(PSOFlags _flags)
-{
-    // Type, Blend, Cullのビットがそれぞれ一つだけセットされているか確認
-    bool isTypeValid = IsSingleBitSetInMask(_flags, TypeMask);
-    bool isBlendValid = IsSingleBitSetInMask(_flags, BlendMask);
-    bool isCullValid = IsSingleBitSetInMask(_flags, CullMask);
-    bool isDepthValid = IsSingleBitSetInMask(_flags, DepthMask);
-
-    return isTypeValid && isBlendValid && isCullValid && isDepthValid;
-}
-
-bool IsSingleBitSetInMask(PSOFlags _flags, PSOFlags _mask)
-{
-    size_t maskedFlag = static_cast<size_t>(_flags & _mask);
-    return (maskedFlag != 0) && ((maskedFlag & (maskedFlag - 1)) == 0);
-}
-
-bool HasFlag(PSOFlags _flag, PSOFlags _checkFlag)
-{
-    return (_flag & _checkFlag) == _checkFlag;
-}
-
