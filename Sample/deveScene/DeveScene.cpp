@@ -12,6 +12,7 @@
 
 #include <Debug/ImGuiManager.h>
 
+#include "LevelEditorLoader.h"
 
 DeveScene::~DeveScene()
 {
@@ -104,6 +105,44 @@ void DeveScene::Initialize(SceneData* _sceneData)
     skyBox_->Initialize(30.0f);
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
+    LevelEditorLoader loader;
+
+    //loader.Load("C:/class/2025A/TL1/test.json");
+
+    auto objectParams = loader.GetAllObjectParameters();
+
+    for (const auto& [name, params] : objectParams)
+    {
+        auto model = std::make_unique<ObjectModel>(params.name);
+        // モデルのを読み込む
+        model->Initialize("suzune.obj");
+
+        model->translate_ = params.position;
+        model->euler_ = params.rotation;
+        model->scale_ = params.scale;
+
+
+        if (params.hasChild)
+        {
+            for (const auto& child : params.childParameters)
+            {
+                auto childModel = std::make_unique<ObjectModel>(child.name);
+                childModel->Initialize("cube/cube.obj");
+                childModel->translate_ = child.position;
+                childModel->euler_ = child.rotation;
+                childModel->scale_ = child.scale;
+
+                childModel->SetParent(model->GetWorldTransform());
+
+                models_.push_back(std::move(childModel));
+
+            }
+        }
+
+        models_.push_back(std::move(model));
+
+    }
+
 
 }
 
@@ -160,7 +199,10 @@ void DeveScene::Update()
     // モデルの更新
     ground_->Update();
 
-
+    for (const auto& model : models_)
+    {
+        model->Update();
+    }
 
 
     // --------------------------------
@@ -196,6 +238,10 @@ void DeveScene::Draw()
     // groundの描画
     ground_->Draw(&SceneCamera_, groundTextureHandle_, drawColor_);
 
+    for (const auto& model : models_)
+    {
+        model->Draw(&SceneCamera_, 0, drawColor_);
+    }
 
     // Sprite用のPSO等をセット
     Sprite::PreDraw();

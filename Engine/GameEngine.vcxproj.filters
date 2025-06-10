@@ -232,6 +232,12 @@
     <Filter Include="Features\Collision\SpiralHashGrid">
       <UniqueIdentifier>{8ccabc1c-898d-4356-9e85-abbf31094bee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\LevelEditor">
+      <UniqueIdentifier>{e3c280d0-a343-413f-93ac-a4ce660ca9cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\LevelEditor\Loader">
+      <UniqueIdentifier>{63f432ce-bc89-48fa-8545-82e8f5b69960}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -530,6 +536,7 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
+    <ClCompile Include="LevelEditorLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -971,6 +978,9 @@
     </ClInclude>
     <ClInclude Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelEditorLoader.h">
+      <Filter>Features\LevelEditor\Loader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
