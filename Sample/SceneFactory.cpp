@@ -1,6 +1,7 @@
 #include "SceneFactory.h"
 
 #include "SampleScene.h"
+#include "deveScene/DeveScene.h"
 //#include <Features/Scene/ParticleTestScene.h>
 
 std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
@@ -13,6 +14,10 @@ std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
     {
         return std::make_unique<ParticleTestScene>();
     }*/
+    else if (_name == "Develop")
+    {
+        return std::make_unique<DeveScene>();
+    }
 
     assert("Scene Not Found");
 
@@ -33,6 +38,10 @@ std::string SceneFactory::ShowDebugWindow()
     {
         return "ParticleTest";
     }*/
+    if (ImGui::Button("Develop"))
+    {
+        return "Develop";
+    }
 
 
 #endif // _DEBUG

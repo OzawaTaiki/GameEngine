@@ -96,6 +96,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deveScene\DeveScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ParticleModifierFactory.cpp" />
     <ClCompile Include="SampleFramework.cpp" />
@@ -111,6 +112,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="deveScene\DeveScene.h" />
     <ClInclude Include="ParticleModifierFactory.h" />
     <ClInclude Include="SampleFramework.h" />
     <ClInclude Include="SampleScene.h" />
