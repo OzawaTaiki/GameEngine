@@ -113,6 +113,9 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
     for (const auto& [name, params] : objectParams)
     {
+        if (params.name == "Camera")
+            continue;
+
         auto model = std::make_unique<ObjectModel>(params.name);
         // モデルのを読み込む
         model->Initialize(params.modelPath);
@@ -141,6 +144,9 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
         models_.push_back(std::move(model));
     }
+
+    SceneCamera_.translate_ = objectParams["Camera"].position;
+    SceneCamera_.rotate_ = objectParams["Camera"].rotation;
 
 }
 
