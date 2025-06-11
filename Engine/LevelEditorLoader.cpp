@@ -1,5 +1,7 @@
 #include "LevelEditorLoader.h"
 
+#include <numbers>
+
 void LevelEditorLoader::Load(const std::string& _filePath)
 {
     // jsonファイルを読み込み jsonオブジェクトを取得
@@ -64,6 +66,14 @@ ObjectParameters LevelEditorLoader::GetObjectParameterFromJson(const json& obj) 
         if (transform.contains("rotation"))
         {
             param.rotation = Vector3(transform["rotation"][0], transform["rotation"][1], transform["rotation"][2]);
+            // かめらのとき デフォルトの向きが違うので合わせる
+            if (obj.contains("type") && obj["type"] == "CAMERA")
+            {
+                // blenderでは (0,0,0)のとき 下向き
+                // こちらでは (0,0,0)のとき 正面なので調整する
+
+                param.rotation.x += std::numbers::pi_v<float> / 2.0f; // カメラの向きを調整
+            }
         }
         if (transform.contains("scale"))
         {
