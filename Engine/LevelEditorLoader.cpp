@@ -65,7 +65,15 @@ void LevelEditorLoader::Load(const std::string& _filePath)
                 }
                 param.colliders.push_back(colliderParam);
             }
+        }
 
+        if (obj.contains("file_name"))
+        {
+            param.modelPath = obj["file_name"].get<std::string>(); // ファイル名を設定
+        }
+        else
+        {
+            param.modelPath = "cube/cube.obj"; // デフォルトのファイル名を設定
         }
 
         if (obj.contains("children"))
