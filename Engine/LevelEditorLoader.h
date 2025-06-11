@@ -47,6 +47,9 @@ public:
 
 private:
 
+    ObjectParameters GetObjectParameterFromJson(const json& obj) const;
+
+
     std::map<std::string, ObjectParameters> objectParameters_; // オブジェクトのパラメータを格納するベクター
 
 
