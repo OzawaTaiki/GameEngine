@@ -115,7 +115,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
     {
         auto model = std::make_unique<ObjectModel>(params.name);
         // モデルのを読み込む
-        model->Initialize("suzune.obj");
+        model->Initialize(params.modelPath);
 
         model->translate_ = params.position;
         model->euler_ = params.rotation;
@@ -127,7 +127,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
             for (const auto& child : params.childParameters)
             {
                 auto childModel = std::make_unique<ObjectModel>(child.name);
-                childModel->Initialize("cube/cube.obj");
+                childModel->Initialize(child.modelPath);
                 childModel->translate_ = child.position;
                 childModel->euler_ = child.rotation;
                 childModel->scale_ = child.scale;
@@ -140,9 +140,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
         }
 
         models_.push_back(std::move(model));
-
     }
-
 
 }
 
