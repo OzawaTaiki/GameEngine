@@ -107,7 +107,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
     LevelEditorLoader loader;
 
-    loader.Load("C:/class/2025A/TL1/test.json");
+    loader.Load("Resources/testData/test.json");
 
     auto objectParams = loader.GetAllObjectParameters();
 
