@@ -25,7 +25,9 @@ struct PSOFlags
         OffScreen = 1 << 4,
         DLShadowMap = 1 << 5,
         PLShadowMap = 1 << 6,
-        SkyBox = 1 << 7
+        SkyBox = 1 << 7,
+        Text = 1 << 8, // テキスト描画用
+
     };
     enum class BlendMode
     {
@@ -58,22 +60,28 @@ struct PSOFlags
         Comb_mAll_fGreater = Enable | MaskAll | FuncGreater,
     };
 
+    static constexpr uint64_t TypeShift = 0;          // Typeのビットシフト
+    static constexpr uint64_t BlendModeShift = 12;    // BlendModeのビットシフト
+    static constexpr uint64_t CullModeShift = 28;     // CullModeのビットシフト
+    static constexpr uint64_t DepthModeShift = 24;    // DepthModeのビットシフト
+
     // コンストラクタ
     constexpr PSOFlags() = default;
     constexpr PSOFlags(uint64_t val) : value(val) {}
     constexpr PSOFlags(Type type) : value(static_cast<uint64_t>(type)) {}
-    constexpr PSOFlags(BlendMode blendMode) : value(static_cast<uint64_t>(blendMode) << 8) {}
-    constexpr PSOFlags(CullMode cullMode) : value(static_cast<uint64_t>(cullMode) << 16) {}
-    constexpr PSOFlags(DepthMode depthMode) : value(static_cast<uint64_t>(depthMode) << 24) {}
+    constexpr PSOFlags(BlendMode blendMode) : value(static_cast<uint64_t>(blendMode) << BlendModeShift) {}
+    constexpr PSOFlags(CullMode cullMode) : value(static_cast<uint64_t>(cullMode) << CullModeShift) {}
+    constexpr PSOFlags(DepthMode depthMode) : value(static_cast<uint64_t>(depthMode) << DepthModeShift) {}
 
     // フラグの値
     uint64_t value = 0;
 
+
     // 各フラグのビットマスク
-    static constexpr uint64_t TypeMask = 0x00000000000000FF;
-    static constexpr uint64_t BlendModeMask = 0x000000000000FF00;
-    static constexpr uint64_t CullModeMask = 0x00000000000F0000;
-    static constexpr uint64_t DepthModeMask = 0x00000000FF000000;
+    static constexpr uint64_t TypeMask =        0x0000000000000FFF;
+    static constexpr uint64_t BlendModeMask =   0x00000000000FF000;
+    static constexpr uint64_t CullModeMask =    0x0000000000F00000;
+    static constexpr uint64_t DepthModeMask =   0x0000000FFF000000;
 
     constexpr operator uint64_t() const { return static_cast<uint64_t>(value); }
 
@@ -118,18 +126,18 @@ struct PSOFlags
     uint64_t GetTypeValue() const { return value & TypeMask; }
 
     // BlendModeを取得
-    BlendMode GetBlendMode() const { return static_cast<BlendMode>((value & BlendModeMask) >> 8); }
+    BlendMode GetBlendMode() const { return static_cast<BlendMode>((value & BlendModeMask) >> BlendModeShift); }
     // CullModeを取得
-    CullMode GetCullMode() const { return static_cast<CullMode>((value & CullModeMask) >> 16); }
+    CullMode GetCullMode() const { return static_cast<CullMode>((value & CullModeMask) >> CullModeShift); }
     // DepthModeを取得
-    DepthMode GetDepthMode() const { return static_cast<DepthMode>((value & DepthModeMask) >> 24); }
+    DepthMode GetDepthMode() const { return static_cast<DepthMode>((value & DepthModeMask) >> DepthModeShift); }
 
     // 複数項目の組み合わせを確実に行うヘルパー関数
     static constexpr PSOFlags Combine(Type type, BlendMode blendMode, CullMode cullMode, DepthMode depthMode) {
         return PSOFlags(static_cast<uint64_t>(type) |
-            (static_cast<uint64_t>(blendMode) << 8) |
-            (static_cast<uint64_t>(cullMode) << 16) |
-            (static_cast<uint64_t>(depthMode) << 24));
+            (static_cast<uint64_t>(blendMode) << BlendModeShift) |
+            (static_cast<uint64_t>(cullMode)  << CullModeShift) |
+            (static_cast<uint64_t>(depthMode) << DepthModeShift));
     }
 
     static constexpr PSOFlags ForNormalModel() {
@@ -146,6 +154,9 @@ struct PSOFlags
     }
     static constexpr PSOFlags ForAddBlendParticle() {
         return Combine(Type::Particle, BlendMode::Add, CullMode::None, DepthMode::Comb_mZero_fLessEqual);
+    }
+    static constexpr PSOFlags ForText() {
+        return Combine(Type::Text, BlendMode::Normal, CullMode::None, DepthMode::Disable);
     }
 };
 
@@ -195,6 +206,7 @@ private:
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);
     void CreatePSOForOffScreen();
+    void CreatePSOForText();
 
     void CreatePSOForDLShadowMap();
     void CreatePSOForPLShadowMap();
@@ -226,27 +238,27 @@ private:
 // 2項目の組み合わせ
 constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::BlendMode rhs)
 {
-    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 8));
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << PSOFlags::BlendModeShift));
 }
 constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::CullMode rhs)
 {
-    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 16));
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << PSOFlags::CullModeShift));
 }
 constexpr PSOFlags operator|(PSOFlags::Type lhs, PSOFlags::DepthMode rhs)
 {
-    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << 24));
+    return PSOFlags(static_cast<uint64_t>(lhs) | (static_cast<uint64_t>(rhs) << PSOFlags::DepthModeShift));
 }
 constexpr PSOFlags operator|(PSOFlags::BlendMode lhs, PSOFlags::CullMode rhs)
 {
-    return PSOFlags((static_cast<uint64_t>(lhs) << 8) | (static_cast<uint64_t>(rhs) << 16));
+    return PSOFlags((static_cast<uint64_t>(lhs) << PSOFlags::BlendModeShift) | (static_cast<uint64_t>(rhs) << PSOFlags::CullModeShift));
 }
 constexpr PSOFlags operator|(PSOFlags::BlendMode lhs, PSOFlags::DepthMode rhs)
 {
-    return PSOFlags((static_cast<uint64_t>(lhs) << 8) | (static_cast<uint64_t>(rhs) << 24));
+    return PSOFlags((static_cast<uint64_t>(lhs) << PSOFlags::BlendModeShift) | (static_cast<uint64_t>(rhs) << PSOFlags::DepthModeShift));
 }
 constexpr PSOFlags operator|(PSOFlags::CullMode lhs, PSOFlags::DepthMode rhs)
 {
-    return PSOFlags((static_cast<uint64_t>(lhs) << 16) | (static_cast<uint64_t>(rhs) << 24));
+    return PSOFlags((static_cast<uint64_t>(lhs) << PSOFlags::CullModeShift) | (static_cast<uint64_t>(rhs) << PSOFlags::DepthModeShift));
 }
 
 // PSOFlagsとenum classの組み合わせ

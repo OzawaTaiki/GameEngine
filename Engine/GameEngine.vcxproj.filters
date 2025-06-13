@@ -238,6 +238,9 @@
     <Filter Include="Features\LevelEditor\Loader">
       <UniqueIdentifier>{63f432ce-bc89-48fa-8545-82e8f5b69960}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\TextRenderring">
+      <UniqueIdentifier>{836eac1b-0b99-447c-bace-230d0eed60ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -537,6 +540,12 @@
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
     <ClCompile Include="LevelEditorLoader.cpp" />
+    <ClCompile Include="Features\TextRenderer\TextRenderer.cpp">
+      <Filter>Features\TextRenderring</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\TextRenderer\STBImplementation.cpp">
+      <Filter>Features\TextRenderring</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -606,6 +615,9 @@
       <Filter>HLSL\postEffects</Filter>
     </FxCompile>
     <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="TextRenderer.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
@@ -981,6 +993,9 @@
     </ClInclude>
     <ClInclude Include="LevelEditorLoader.h">
       <Filter>Features\LevelEditor\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\TextRenderer.h">
+      <Filter>Features\TextRenderring</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -11,6 +11,9 @@
 #include <Features/PostEffects/DepthBasedOutLine.h>
 
 #include <Debug/ImGuiManager.h>
+#include <Debug/ImGuiHelper.h>
+#include  <Core/DXCommon/DXCommon.h>
+
 
 #include "LevelEditorLoader.h"
 
@@ -148,10 +151,13 @@ void DeveScene::Initialize(SceneData* _sceneData)
     SceneCamera_.translate_ = objectParams["Camera"].position;
     SceneCamera_.rotate_ = objectParams["Camera"].rotation;
 
+
+    textRenderer_ = TextRenderer::GetInstance();
 }
 
 void DeveScene::Update()
 {
+    textRenderer_->BeginFrame();
     // シーン関連更新
 #ifdef _DEBUG
 
@@ -159,6 +165,7 @@ void DeveScene::Update()
     if (Input::GetInstance()->IsKeyTriggered(DIK_F1))
         enableDebugCamera_ = !enableDebugCamera_;
 
+    static std::string str = "Hello, World!";
 
     {
         ImGui::Begin("Engine");
@@ -191,6 +198,9 @@ void DeveScene::Update()
                 }
             }
         }
+
+        ImGuiHelper::InputText("Text Input", &str);
+
         ImGui::End();
 
         // light調整用
@@ -198,7 +208,10 @@ void DeveScene::Update()
 
     }
 
+
+
 #endif // _DEBUG
+
 
     // モデルの更新
     ground_->Update();
@@ -208,6 +221,9 @@ void DeveScene::Update()
         model->Update();
     }
 
+    std::wstring wstr = std::wstring(str.begin(), str.end());
+    wstr += L"\nこんにちは 世界";
+    textRenderer_->DrawText(wstr, Vector2{ 100, 100 }, Vector4{ 1, 1, 1, 1 });
 
     // --------------------------------
     // シーン共通更新処理
@@ -254,6 +270,7 @@ void DeveScene::Draw()
 
 
     ParticleSystem::GetInstance()->DrawParticles();
+    textRenderer_->EndFrame();
 }
 
 void DeveScene::DrawShadow()

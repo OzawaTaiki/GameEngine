@@ -80,6 +80,7 @@ void Framework::Initialize(const std::wstring& _winTitle)
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
 
+    textRenderer_ = TextRenderer::GetInstance();
 
     collisionManager_ = CollisionManager::GetInstance();
 
