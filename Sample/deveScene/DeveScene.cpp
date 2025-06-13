@@ -159,13 +159,13 @@ void DeveScene::Update()
 {
     textRenderer_->BeginFrame();
     // シーン関連更新
+    static std::string str = "Hello, World!";
 #ifdef _DEBUG
 
     // デバッグカメラ
     if (Input::GetInstance()->IsKeyTriggered(DIK_F1))
         enableDebugCamera_ = !enableDebugCamera_;
 
-    static std::string str = "Hello, World!";
 
     {
         ImGui::Begin("Engine");
