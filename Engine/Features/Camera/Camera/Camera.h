@@ -7,6 +7,12 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+enum class CameraType
+{
+    Perspective,
+    Orthographic
+};
+
 class Camera
 {
 public:
@@ -14,7 +20,7 @@ public:
     Camera() = default;
     ~Camera() = default;
 
-    void Initialize();
+    void Initialize(CameraType _cameraType = CameraType::Perspective, const Vector2& _winSize = { 1280.0f, 720.0f });
     void Update(bool _showImGui = true);
     void Draw();
 
@@ -61,7 +67,15 @@ public:
 
     Matrix4x4 matView_ = {};
     Matrix4x4 matProjection_ = {};
+
+    // 透視投影か正射影投影か
+    CameraType cameraType_ = CameraType::Perspective;
+
 private:
+    // ortho用
+    Vector2 LeftTop_ = { 0.0f, 0.0f }; // 左上座標
+    Vector2 RightBottom_ = { 1280.0f, 720.0f }; // 右下座標
+    Vector2 winSize_ = { 1280.0f, 720.0f }; // 正射影投影のサイズ
 
     // シェイク用変数たち
     bool shaking_ = false;

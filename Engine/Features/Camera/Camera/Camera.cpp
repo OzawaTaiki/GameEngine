@@ -9,10 +9,22 @@
 #endif // _DEBUG
 
 
-void Camera::Initialize()
+void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
 {
+
+    cameraType_ = _cameraType;
+    winSize_ = _winSize;
+    aspectRatio_ = winSize_.x / winSize_.y;
+
+    if (cameraType_ == CameraType::Orthographic)
+    {
+        LeftTop_ = { winSize_.x * -0.5f, winSize_.y * 0.5f};
+        RightBottom_ = { winSize_.x * 0.5f, winSize_.y * -0.5f };
+    }
+
     Map();
     UpdateMatrix();
+
 
     gameTime_ = GameTime::GetInstance();
 }
@@ -77,7 +89,17 @@ void Camera::UpdateMatrix()
     matView_ = Inverse(matWorld_);
     //translate_ = { 0,500,0 };
     //matView_ = LoolAt(translate_, { 0,0,0 }, { 1,0,0 });
-    matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
+    switch (cameraType_)
+    {
+    case CameraType::Perspective:
+        matProjection_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
+        break;
+    case CameraType::Orthographic:
+        matProjection_ = MakeOrthographicMatrix(LeftTop_.x, LeftTop_.y, RightBottom_.x, RightBottom_.y, nearClip_, farClip_);
+        break;
+    default:
+        break;
+    }
     //matProjection_ = MakeOrthographicMatrix(0, 0, 1280, 720, 0.1f, 1000.0f);
     matViewProjection_ = matView_ * matProjection_;
 
