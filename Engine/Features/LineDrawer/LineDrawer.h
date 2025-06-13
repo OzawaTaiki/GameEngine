@@ -19,6 +19,7 @@ public:
 
     void Initialize();
     void SetCameraPtr(const Camera* _cameraPtr) { cameraFor3dptr_ = _cameraPtr; }
+    void SetCameraPtr2D(const Camera* _cameraPtr) { cameraFor2dptr_ = _cameraPtr; }
     void SetColor(const Vector4& _color) { color_ = _color; }
     void RegisterPoint(const Vector3& _start, const Vector3& _end);
     void RegisterPoint(const Vector3& _start, const Vector3& _end,const Vector4& _color);
