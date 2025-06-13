@@ -18,10 +18,12 @@ public:
     static LineDrawer* GetInstance();
 
     void Initialize();
-    void SetCameraPtr(const Camera* _cameraPtr) { cameraptr_ = _cameraPtr; }
+    void SetCameraPtr(const Camera* _cameraPtr) { cameraFor3dptr_ = _cameraPtr; }
     void SetColor(const Vector4& _color) { color_ = _color; }
     void RegisterPoint(const Vector3& _start, const Vector3& _end);
     void RegisterPoint(const Vector3& _start, const Vector3& _end,const Vector4& _color);
+    void RegisterPoint(const Vector2& _start, const Vector2& _end);
+    void RegisterPoint(const Vector2& _start, const Vector2& _end, const Vector4& _color);
     void Draw();
 
     void DrawOBB(const Matrix4x4& _affineMat);
@@ -35,14 +37,19 @@ public:
     void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color);
 
 private:
+    void Draw3Dlines();
+    void Draw2Dlines();
+
     void TransferData();
 
     PSOFlags psoFlags_;
 
     const uint32_t kMaxNum = 4096u * 24u;
-    uint32_t index = 0u;
+    uint32_t indexFor3d_ = 0u;
+    uint32_t indexFor2d_ = 0u;
     Vector4 color_ = { 0,0,0,1 };
-    const Camera* cameraptr_=nullptr;
+    const Camera* cameraFor3dptr_=nullptr;
+    const Camera* cameraFor2dptr_ = nullptr;
     ID3D12RootSignature* rootSignature_ = nullptr;
     ID3D12PipelineState* graphicsPipelineState_ = nullptr;
 
@@ -50,8 +57,11 @@ private:
     {
         Matrix4x4 vp;
     };
-    Microsoft::WRL::ComPtr <ID3D12Resource> resources_ = nullptr;
-    ConstantBufferData* constMap_;
+    Microsoft::WRL::ComPtr <ID3D12Resource> resourcesForMat3D_ = nullptr;
+    ConstantBufferData* matFor3dConstMap_;
+
+    Microsoft::WRL::ComPtr <ID3D12Resource> resourceForMat2D_ = nullptr;
+    ConstantBufferData* matFor2dConstMap_;
 
     struct PointData
     {
@@ -59,9 +69,14 @@ private:
         Vector4 color;
     };
 
-    PointData* vConstMap_ = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_ = nullptr;
-    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_ = {};
+    PointData* vConstMapFor3D_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceFor3D_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewFor3D_ = {};
+
+    PointData* vConstMapFor2D_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceFor2D_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewFor2D_ = {};
+
 
     void SetVerties();
 
