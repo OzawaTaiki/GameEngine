@@ -2,12 +2,16 @@
 #include <Windows.h>
 #include <cstdint>
 
+#include <Math/Vector/Vector2.h>
+
 class WinApp
 {
 public: //静的メンバ変数
 	// ウィンドウサイズ
 	static uint32_t kWindowWidth_;		// 横
 	static uint32_t kWindowHeight_;		// 縦
+
+    static Vector2 kWindowSize_;	// サイズ
 
 	static const wchar_t kWindowClassName[];
 

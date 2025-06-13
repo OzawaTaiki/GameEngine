@@ -9,6 +9,9 @@
 class AnimationSequence;
 namespace ImGuiHelper
 {
+
+    bool InputText(const char* _label, std::string* _str, ImGuiInputTextFlags _flags = 0);
+
     /// <summary>
     /// 直角五角形を描画する
     /// </summary>

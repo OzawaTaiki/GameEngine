@@ -12,6 +12,7 @@ const wchar_t WinApp::kWindowClassName[] = L"WindowClass";
 
 uint32_t WinApp::kWindowWidth_ = 1280;
 uint32_t WinApp::kWindowHeight_ = 720;
+Vector2 WinApp::kWindowSize_ = Vector2{ static_cast<float>(kWindowWidth_), static_cast<float>(kWindowHeight_) };
 
 WinApp* WinApp::GetInstance()
 {
@@ -61,6 +62,8 @@ void WinApp::Initilize(const wchar_t* _title, uint32_t _width, uint32_t _height,
 
     kWindowWidth_ = _width;
     kWindowHeight_ = _height;
+
+    kWindowSize_ = Vector2{ static_cast<float>(_width), static_cast<float>(_height) };
 
 	RECT wrc = { 0,0,(LONG)_width,(LONG)_height };
 

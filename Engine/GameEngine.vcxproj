@@ -205,6 +205,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\SilhouetteDetection.cpp" />
     <ClCompile Include="Features\Sprite\Sprite.cpp" />
     <ClCompile Include="Features\Sprite\SpriteManager.cpp" />
+    <ClCompile Include="Features\TextRenderer\STBImplementation.cpp" />
+    <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="Features\UI\UIBase.cpp" />
     <ClCompile Include="Features\UI\UIButton.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
@@ -321,6 +323,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\SilhouetteDetection.h" />
     <ClInclude Include="Features\Sprite\Sprite.h" />
     <ClInclude Include="Features\Sprite\SpriteManager.h" />
+    <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Features\UI\UIBase.h" />
     <ClInclude Include="Features\UI\UIButton.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
@@ -480,6 +483,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       </DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="TextRenderer.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
