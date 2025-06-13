@@ -15,7 +15,8 @@ void LineDrawer::Initialize()
 {
     psoFlags_ = PSOFlags::ForLineDrawer();
 
-    index = 0u;
+    indexFor3d_ = 0u;
+    indexFor2d_ = 0u;
     color_ = { 0.0f,0.0f,0.0f,1.0f };
 
     /// PSOを取得
@@ -31,15 +32,29 @@ void LineDrawer::Initialize()
     rootSignature_ = rootSignature.value();
 
     // まｐ
-    resources_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
-    resources_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
+    resourcesForMat3D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
+    resourcesForMat3D_->Map(0, nullptr, reinterpret_cast<void**>(&matFor3dConstMap_));
 
-    vertexResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
-    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
+    vertexResourceFor3D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
+    vertexResourceFor3D_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMapFor3D_));
 
-    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = sizeof(PointData) * kMaxNum;
-    vertexBufferView_.StrideInBytes = sizeof(PointData);
+    vertexBufferViewFor3D_.BufferLocation = vertexResourceFor3D_->GetGPUVirtualAddress();
+    vertexBufferViewFor3D_.SizeInBytes = sizeof(PointData) * kMaxNum;
+    vertexBufferViewFor3D_.StrideInBytes = sizeof(PointData);
+
+
+
+    resourceForMat2D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
+    resourceForMat2D_->Map(0, nullptr, reinterpret_cast<void**>(&matFor2dConstMap_));
+
+    vertexResourceFor2D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
+    vertexResourceFor2D_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMapFor2D_));
+
+    vertexBufferViewFor2D_.BufferLocation = vertexResourceFor2D_->GetGPUVirtualAddress();
+    vertexBufferViewFor2D_.SizeInBytes = sizeof(PointData) * kMaxNum;
+    vertexBufferViewFor2D_.StrideInBytes = sizeof(PointData);
+
+
 
     SetVerties();
 }
@@ -51,18 +66,35 @@ void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end)
 
 void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, const Vector4& _color)
 {
-    assert(index + 2 < kMaxNum && "The line instance is too large");
+    assert(indexFor3d_ + 2 < kMaxNum && "The line instance is too large");
 
-    vConstMap_[index].position = { _start, 1.0f };
-    vConstMap_[index++].color = _color;
+    vConstMapFor3D_[indexFor3d_].position = { _start, 1.0f };
+    vConstMapFor3D_[indexFor3d_++].color = _color;
 
-    vConstMap_[index].position = { _end, 1.0f };
-    vConstMap_[index++].color = _color;
+    vConstMapFor3D_[indexFor3d_].position = { _end, 1.0f };
+    vConstMapFor3D_[indexFor3d_++].color = _color;
+}
+
+void LineDrawer::RegisterPoint(const Vector2& _start, const Vector2& _end)
+{
+    RegisterPoint(_start, _end, color_);
+}
+
+void LineDrawer::RegisterPoint(const Vector2& _start, const Vector2& _end, const Vector4& _color)
+{
+    assert(indexFor2d_ + 2 < kMaxNum && "The line instance is too large");
+
+    vConstMapFor2D_[indexFor2d_].position = { _start.x,_start.y,0.0f, 1.0f };
+    vConstMapFor2D_[indexFor2d_++].color = _color;
+
+    vConstMapFor2D_[indexFor2d_].position = { _end.x, _end.y,0.0f,1.0f };
+    vConstMapFor2D_[indexFor2d_++].color = _color;
 }
 
 void LineDrawer::Draw()
 {
-    assert(cameraptr_ != nullptr);
+
+    if (indexFor3d_ == 0u && indexFor2d_ == 0u) return;
 
     TransferData();
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -71,12 +103,36 @@ void LineDrawer::Draw()
     commandList->SetPipelineState(graphicsPipelineState_);
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    Draw3Dlines();
+    Draw2Dlines();
+}
 
-    commandList->SetGraphicsRootConstantBufferView(0, resources_->GetGPUVirtualAddress());
-    commandList->DrawInstanced(index, index / 2, 0, 0);
+void LineDrawer::Draw3Dlines()
+{
+    if (indexFor3d_ == 0u) return;
+    assert(cameraFor3dptr_ != nullptr);
 
-    index = 0u;
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewFor3D_);
+    commandList->SetGraphicsRootConstantBufferView(0, resourcesForMat3D_->GetGPUVirtualAddress());
+    commandList->DrawInstanced(indexFor3d_, indexFor3d_ / 2, 0, 0);
+
+    indexFor3d_ = 0u;
+}
+
+void LineDrawer::Draw2Dlines()
+{
+    if (indexFor2d_ == 0u) return;
+    assert(cameraFor2dptr_ != nullptr);
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewFor2D_);
+    commandList->SetGraphicsRootConstantBufferView(0, resourceForMat2D_->GetGPUVirtualAddress());
+    commandList->DrawInstanced(indexFor2d_, indexFor2d_ / 2, 0, 0);
+
+    indexFor2d_ = 0u;
 }
 
 void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
@@ -185,9 +241,11 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
     }
 }
 
+
 void LineDrawer::TransferData()
 {
-    constMap_->vp = cameraptr_->GetViewProjection();
+    matFor3dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
+    matFor2dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
 }
 
 void LineDrawer::SetVerties()
