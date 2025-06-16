@@ -8,7 +8,7 @@
 
 UIBase::~UIBase()
 {
-    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(label_);
+    //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(label_);
 }
 
 void UIBase::Initialize(const std::string& _label)
@@ -44,7 +44,7 @@ void UIBase::Initialize(const std::string& _label)
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
 
-    ImGuiDebugManager::GetInstance()->AddDebugWindow(_label, [&]() {ImGui(); });
+    //ImGuiDebugManager::GetInstance()->AddDebugWindow(_label, [&]() {ImGui(); });
 }
 
 void UIBase::Draw()

@@ -36,6 +36,7 @@ public:
     const Vector2& GetSize() const { return size_; }
     void SetSize(const Vector2& _size) { size_ = _size; };
 
+    void SetRotate(float _rotate) { rotate_ = _rotate; }
     float GetRotate() const { return rotate_; }
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
 

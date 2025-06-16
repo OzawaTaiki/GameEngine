@@ -18,8 +18,10 @@ void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
 
     if (cameraType_ == CameraType::Orthographic)
     {
-        LeftTop_ = { winSize_.x * -0.5f, winSize_.y * 0.5f};
-        RightBottom_ = { winSize_.x * 0.5f, winSize_.y * -0.5f };
+        LeftTop_={ 0,0 };
+        RightBottom_ = winSize_;
+        //LeftTop_ = { winSize_.x * -0.5f, winSize_.y * 0.5f};
+        //RightBottom_ = { winSize_.x * 0.5f, winSize_.y * -0.5f };
     }
 
     Map();
