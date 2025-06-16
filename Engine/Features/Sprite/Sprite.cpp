@@ -13,12 +13,12 @@ uint32_t Sprite::winHeight_ = 720;
 
 Sprite::Sprite(const std::string& _name)
 {
-    name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+    //name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
 }
 
 Sprite::~Sprite()
 {
-    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+    //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 }
 
 void Sprite::Initialize()

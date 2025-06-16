@@ -123,6 +123,17 @@ bool Input::IsMouseReleased(uint8_t _buttonNum) const
     return false;
 }
 
+float Input::GetMouseWheel() const
+{
+    if (mouse_.lZ != 0)
+    {
+        // マウスホイールの回転量を取得
+        return static_cast<float>(mouse_.lZ) / WHEEL_DELTA;
+    }
+
+    return 0.0f;
+}
+
 Vector2 Input::GetMousePosition() const
 {
     POINT mousePos;

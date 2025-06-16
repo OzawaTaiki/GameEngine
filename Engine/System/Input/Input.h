@@ -57,6 +57,8 @@ public:
 	bool IsMousePressed(uint8_t _buttonNum) const;
 	bool IsMouseReleased(uint8_t _buttonNum) const;
 
+    float GetMouseWheel() const;
+
 	Vector2 GetMousePosition() const;
     void GetMove(Vector3& _move, float _spped = 1.0f) const;
     void GetRotate(Vector3& _rot, float _sensi = 0.001f) const;

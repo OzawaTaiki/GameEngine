@@ -244,8 +244,10 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
 
 void LineDrawer::TransferData()
 {
-    matFor3dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
-    matFor2dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
+    if (cameraFor3dptr_)
+        matFor3dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
+    if (cameraFor2dptr_)
+        matFor2dConstMap_->vp = cameraFor2dptr_->GetViewProjection();
 }
 
 void LineDrawer::SetVerties()
