@@ -7,28 +7,6 @@
 #include <algorithm>
 #include <numbers>
 
-
-bool ImGuiHelper::InputText(const char* _label, std::string* _str, ImGuiInputTextFlags _flags)
-{
-    // バッファサイズを確保（最低256文字、現在の文字列長+128文字のうち大きい方）
-    size_t buffer_size = (std::max)(_str->capacity() + 1, (std::max)(size_t(256), _str->size() + 128));
-    _str->resize(buffer_size - 1);
-
-    bool result = ImGui::InputText(_label, _str->data(), buffer_size, _flags);
-
-    if (result) {
-        // null terminatorまでの長さに調整
-        _str->resize(strlen(_str->data()));
-    }
-    else {
-        // 変更されていない場合も元のサイズに戻す
-        _str->resize(strlen(_str->data()));
-    }
-
-    return result;
-
-}
-
 void ImGuiHelper::DrawRightPentagon(const ImVec2& _center, const ImVec2& _inscribedRect, float _angle, ImU32 _color)
 {
 
