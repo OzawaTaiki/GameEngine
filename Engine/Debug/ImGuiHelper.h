@@ -9,8 +9,24 @@
 class AnimationSequence;
 namespace ImGuiHelper
 {
+    template<size_t kBufferSize = 256>
+    bool InputText(const char* _label, std::string& _str, ImGuiInputTextFlags _flags = 0)
+    {
+        bool changed = false;
 
-    bool InputText(const char* _label, std::string* _str, ImGuiInputTextFlags _flags = 0);
+        static char buffer[kBufferSize];
+
+        size_t copySize = (std::min)(_str.length(), kBufferSize - 1); // 末尾のヌル文字を考慮して-1
+        std::memcpy(buffer,_str.c_str(),copySize);
+        buffer[copySize] = '\0'; // ヌル終端
+
+        changed = ImGui::InputText(_label, buffer, kBufferSize, _flags);
+
+        if (changed)
+            _str = std::string(buffer);
+
+        return changed;
+    }
 
     /// <summary>
     /// 直角五角形を描画する
