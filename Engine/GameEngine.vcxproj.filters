@@ -241,6 +241,9 @@
     <Filter Include="Features\TextRenderring">
       <UniqueIdentifier>{836eac1b-0b99-447c-bace-230d0eed60ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility\FileDialog">
+      <UniqueIdentifier>{2837f622-517e-4658-8264-59f3d93a05fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -545,6 +548,9 @@
     </ClCompile>
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp">
       <Filter>Features\TextRenderring</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\FileDialog\FileDialog.cpp">
+      <Filter>Utility\FileDialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -996,6 +1002,9 @@
     </ClInclude>
     <ClInclude Include="Features\TextRenderer\TextRenderer.h">
       <Filter>Features\TextRenderring</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\FileDialog\FileDialog.h">
+      <Filter>Utility\FileDialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
