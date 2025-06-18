@@ -30,14 +30,23 @@ FileFilterBuilder& FileFilterBuilder::Add(FilterType _filterType)
     auto it = filterMap.find(_filterType);
     if (it != filterMap.end())
     {
-        combinatedFilter_ += it->second.first + '\0' + it->second.second + '\0';
+        std::string filterString = it->second.first + '\0' + it->second.second + '\0';
+        combinatedFilter_.insert(combinatedFilter_.end(), filterString.begin(), filterString.end());
+    }
+    else
+    {
+        // フィルターが見つからない場合はデフォルトのフィルターを追加
+        std::string defaultFilter = GetFilterString(FilterType::AllFiles);
+        AppendString(defaultFilter);
+        AppendNull(); // 文字列の終端を追加
     }
     return *this;
 }
 
 FileFilterBuilder& FileFilterBuilder::AddCustom(const std::string& _description, const std::string& _extension)
 {
-    combinatedFilter_ += _description + '\0' + _extension + '\0';
+    std::string filterString = _description + '\0' + _extension + '\0';
+    combinatedFilter_.insert(combinatedFilter_.end(), filterString.begin(), filterString.end());
     return *this;
 }
 
@@ -45,10 +54,71 @@ std::string FileFilterBuilder::Build()
 {
     if (combinatedFilter_.empty())
     {
-        combinatedFilter_ = GetFilterString(FilterType::AllFiles);
+        std::string defaultFilter = GetFilterString(FilterType::AllFiles);
+        AppendString(defaultFilter);
+        AppendNull(); // 文字列の終端を追加
     }
-    return combinatedFilter_;
+    return std::string(combinatedFilter_.data(), combinatedFilter_.size());
 }
+
+FileFilterBuilder& FileFilterBuilder::AddSeparateExtensions(FilterType _filterType)
+{
+    switch (_filterType)
+    {
+    case FileFilterBuilder::FilterType::AllFiles:
+        Add(FileFilterBuilder::FilterType::AllFiles);
+        break;
+    case FileFilterBuilder::FilterType::TextFiles:
+        Add(FileFilterBuilder::FilterType::TextFiles);
+        break;
+    case FileFilterBuilder::FilterType::ImageFiles:
+        AddImageExtensions();
+        break;
+    case FileFilterBuilder::FilterType::AudioFiles:
+        AddAudioExtensions();
+        break;
+    case FileFilterBuilder::FilterType::DataFiles:
+        AddDataExtensions();
+        break;
+    default:
+        break;
+    }
+
+    return *this;
+
+}
+
+void  FileFilterBuilder::AddImageExtensions()
+{
+    AddCustom("png files", "*.png");
+    AddCustom("jpg files", "*.jpg");
+    AddCustom("jpeg files", "*.jpeg");
+}
+
+void FileFilterBuilder::AddAudioExtensions()
+{
+    AddCustom("mp3 files", "*.mp3");
+    AddCustom("wav files", "*.wav");
+}
+
+void FileFilterBuilder::AddDataExtensions()
+{
+    AddCustom("json files", "*.json");
+    AddCustom("csv files", "*.csv");
+    AddCustom("xml files", "*.xml");
+    AddCustom("dat files", "*.dat");
+}
+
+void FileFilterBuilder::AppendString(const std::string& _str)
+{
+    combinatedFilter_.insert(combinatedFilter_.end(), _str.begin(), _str.end());
+}
+
+void FileFilterBuilder::AppendNull()
+{
+    combinatedFilter_.push_back('\0'); // 文字列の終端を追加
+}
+
 
 
 std::string FileDialog::OpenFile(const std::string& _filter)
@@ -137,6 +207,60 @@ std::string FileDialog::SaveFile(const std::string& _filter)
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXPLORER;
 
+    if (GetSaveFileNameA(&ofn))
+    {
+        return std::string(szFile);
+    }
+    static const std::string emptyResult;
+    return emptyResult; // ファイル保存がキャンセルされた場合は空の文字列を返す
+}
+
+std::string FileDialog::CreateFile(const std::string& _filter, const std::string& _defaultName)
+{
+    OPENFILENAMEA ofn = { 0 };
+    char szFile[260] = { 0 };
+
+    strcpy_s(szFile, _defaultName.c_str()); // デフォルト名を設定
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = WinApp::GetInstance()->GetHwnd();
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = _filter.c_str();
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = nullptr;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXPLORER | OFN_HIDEREADONLY;
+
+    if (GetSaveFileNameA(&ofn))
+    {
+        return std::string(szFile);
+    }
+
+    static const std::string emptyResult;
+    return emptyResult; // ファイル作成がキャンセルされた場合は空の文字列を返す
+}
+
+std::string FileDialog::SaveFileAs(const std::string& _filter, const std::string& _defaultName)
+{
+    OPENFILENAMEA ofn = { 0 };
+    char szFile[260] = { 0 };
+
+    strcpy_s(szFile, _defaultName.c_str()); // デフォルト名を設定
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = WinApp::GetInstance()->GetHwnd();
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = _filter.c_str();
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = nullptr;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_EXPLORER | OFN_HIDEREADONLY;
     if (GetSaveFileNameA(&ofn))
     {
         return std::string(szFile);
