@@ -244,6 +244,9 @@
     <Filter Include="Utility\FileDialog">
       <UniqueIdentifier>{2837f622-517e-4658-8264-59f3d93a05fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility\StringUtils">
+      <UniqueIdentifier>{f986a21b-7b23-4181-bb5b-144f7a0454bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -551,6 +554,9 @@
     </ClCompile>
     <ClCompile Include="Utility\FileDialog\FileDialog.cpp">
       <Filter>Utility\FileDialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\StringUtils\StringUitls.cpp">
+      <Filter>Utility\StringUtils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1005,6 +1011,9 @@
     </ClInclude>
     <ClInclude Include="Utility\FileDialog\FileDialog.h">
       <Filter>Utility\FileDialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\StringUtils\StringUitls.h">
+      <Filter>Utility\StringUtils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

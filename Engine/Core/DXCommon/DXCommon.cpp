@@ -574,8 +574,8 @@ void DXCommon::InitializeFixFPS()
 
 void DXCommon::UpdateFixFPS()
 {
-	const std::chrono::microseconds kMinTime(static_cast<uint64_t>(1000000.0f / 60.0f));
-	const std::chrono::microseconds kMinCheckTime(static_cast<uint64_t>(1000000.0f / 65.0f));
+	const std::chrono::microseconds kMinTime(static_cast<uint64_t>(1000000.0f / 65.0f));
+	const std::chrono::microseconds kMinCheckTime(static_cast<uint64_t>(1000000.0f / 66.0f));
 
 	// 現在時間を取得
 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
