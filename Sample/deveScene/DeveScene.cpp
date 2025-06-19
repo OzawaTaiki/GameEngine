@@ -199,7 +199,6 @@ void DeveScene::Update()
             }
         }
 
-        ImGuiHelper::InputText("Text Input", &str);
 
         ImGui::End();
 
