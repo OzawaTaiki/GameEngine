@@ -2,9 +2,10 @@
 
 #include <Debug/Debug.h>
 
-VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume) :
+VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume, float _sampleRate) :
     sourceVoice_(_sourceVoice),
-    volume_(_volume)
+    volume_(_volume),
+    sampleRate_(_sampleRate)
 {
     if (!sourceVoice_)
     {
@@ -83,3 +84,11 @@ void VoiceInstance::SetVolume(float _volume)
         volume_ = _volume;
     }
 }
+
+float VoiceInstance::GetElapsedTime() const
+{
+    XAUDIO2_VOICE_STATE state;
+    sourceVoice_->GetState(&state);
+    return static_cast<float>(state.SamplesPlayed) / sampleRate_; // Assuming 44100 Hz sample rate
+}
+

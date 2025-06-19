@@ -528,8 +528,6 @@
     <ClCompile Include="System\Audio\AudioSystem.cpp">
       <Filter>System\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="System\Audio\SoundInstance.cpp" />
-    <ClCompile Include="System\Audio\VoiceInstance.cpp" />
     <ClCompile Include="Features\Model\SkyBox.cpp">
       <Filter>Features\Model</Filter>
     </ClCompile>
@@ -557,6 +555,12 @@
     </ClCompile>
     <ClCompile Include="Utility\StringUtils\StringUitls.cpp">
       <Filter>Utility\StringUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\VoiceInstance.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\SoundInstance.cpp">
+      <Filter>System\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

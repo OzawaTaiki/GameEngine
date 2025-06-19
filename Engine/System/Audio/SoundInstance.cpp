@@ -6,9 +6,10 @@
 
 #include <cassert>
 
-SoundInstance::SoundInstance(uint32_t _soundID, AudioSystem* _audioSystem) :
+SoundInstance::SoundInstance(uint32_t _soundID, AudioSystem* _audioSystem,float _sampleRate) :
     soundID_(_soundID),
-    audioSystem_(_audioSystem)
+    audioSystem_(_audioSystem),
+    sampleRate_(_sampleRate)
 {
 }
 
@@ -50,8 +51,8 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bo
 
     pSourceVoice->SetVolume(_volume);
 
-    auto voiceInstance = std::make_shared<VoiceInstance>(pSourceVoice, _volume);
-    voiceInstance->Play();
+    auto voiceInstance = std::make_shared<VoiceInstance>(pSourceVoice, _volume, sampleRate_);
+        voiceInstance->Play();
 
     voiceInstance_.push_back(voiceInstance);
 
