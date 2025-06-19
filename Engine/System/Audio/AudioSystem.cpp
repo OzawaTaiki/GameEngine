@@ -138,9 +138,10 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     pathToid_[_filename] = soundId;
 
     Debug::Log("\tID : " + std::to_string(soundId) + "\n");
+    float sampleRate = static_cast<float>(soundData.wfex.nSamplesPerSec);
 
-    auto soundindtance = std::make_shared<SoundInstance>(soundId, this, soundData.wfex.nSamplesPerSec);
-        soundInstances_[soundId] = soundindtance;
+    auto soundindtance = std::make_shared<SoundInstance>(soundId, this, sampleRate);
+    soundInstances_[soundId] = soundindtance;
 
     return soundindtance;
 }
