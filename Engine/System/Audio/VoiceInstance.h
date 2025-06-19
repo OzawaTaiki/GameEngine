@@ -5,7 +5,7 @@
 class VoiceInstance
 {
 public:
-    VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume = 1.0f);
+    VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume = 1.0f, float _sampleRate = 44100.0f);
     ~VoiceInstance() = default;
 
     void Play();
@@ -22,6 +22,8 @@ public:
     bool IsPlaying() const { return isPlaying_; }
     bool IsPaused() const { return isPaused_; }
 
+    float GetElapsedTime() const;
+
 
 private:
 
@@ -31,6 +33,7 @@ private:
     bool isFadingIn_ = false;
 
     float volume_ = 1.0f;
+    float sampleRate_ = 44100.0f; // サンプルレート
 
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
 
