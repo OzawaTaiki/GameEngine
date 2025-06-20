@@ -17,7 +17,7 @@ SoundInstance::~SoundInstance()
 {
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap)
+std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, bool _loop, bool _enableOverlap)
 {
     //保留
     if (!_enableOverlap) {}
@@ -46,15 +46,26 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bo
     hresult = pSourceVoice->SubmitSourceBuffer(&buf);
     assert(SUCCEEDED(hresult));
 
-    hresult = pSourceVoice->Start();
-    assert(SUCCEEDED(hresult));
-
     pSourceVoice->SetVolume(_volume);
 
     auto voiceInstance = std::make_shared<VoiceInstance>(pSourceVoice, _volume, sampleRate_);
-        voiceInstance->Play();
 
     voiceInstance_.push_back(voiceInstance);
 
     return voiceInstance;
+}
+
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap)
+{
+    auto voiceInstance = GenerateVoiceInstance(_volume, _loop, _enableOverlap);
+    if (voiceInstance)
+    {
+        voiceInstance->Play();
+        return voiceInstance;
+    }
+    else
+    {
+        Debug::Log("Error: Failed to play sound instance\n");
+        return nullptr;
+    }
 }
