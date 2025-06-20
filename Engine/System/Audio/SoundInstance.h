@@ -16,6 +16,7 @@ public:
     SoundInstance(uint32_t _soundID, AudioSystem* _audioSystem, float _sampleRate);
     ~SoundInstance();
 
+    std::shared_ptr<VoiceInstance> GenerateVoiceInstance(float _volume = 1.0f, bool _loop = false, bool _enableOverlap = true);
     std::shared_ptr<VoiceInstance> Play(float _volume = 1.0f, bool _loop = false, bool _enableOverlap = true);
 
 private:
