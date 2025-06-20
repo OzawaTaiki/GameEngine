@@ -17,7 +17,7 @@ SoundInstance::~SoundInstance()
 {
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, bool _loop, bool _enableOverlap)
+std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap)
 {
     //保留
     if (!_enableOverlap) {}
@@ -35,9 +35,13 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
         return nullptr;
     }
 
+    UINT32 startSample = static_cast<UINT32>(_startTime * sampleRate_);
+
     XAUDIO2_BUFFER buf{};
     buf.pAudioData = audioSystem_->GetBuffer(soundID_);
     buf.AudioBytes = audioSystem_->GetBufferSize(soundID_);
+    buf.PlayBegin = startSample;
+    buf.PlayLength = 0; // 最後まで再生
     buf.Flags = XAUDIO2_END_OF_STREAM;
 
     if (_loop)
@@ -57,7 +61,12 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
 std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap)
 {
-    auto voiceInstance = GenerateVoiceInstance(_volume, _loop, _enableOverlap);
+    return Play(_volume, 0.0f, _loop, _enableOverlap);
+}
+
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap)
+{
+    auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap);
     if (voiceInstance)
     {
         voiceInstance->Play();
@@ -65,7 +74,22 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bo
     }
     else
     {
-        Debug::Log("Error: Failed to play sound instance\n");
+        Debug::Log("Error: Failed to play sound instance with start time\n");
         return nullptr;
     }
+}
+
+float SoundInstance::GetDuration() const
+{
+    if (audioSystem_)
+    {
+        unsigned int bufSize = audioSystem_->GetBufferSize(soundID_);
+        auto& wfex = audioSystem_->GetSoundFormat(soundID_);
+
+        if (wfex.nAvgBytesPerSec > 0)
+        {
+            return static_cast<float>(bufSize) / wfex.nAvgBytesPerSec;
+        }
+    }
+    return 0.0f; // Duration cannot be determined
 }
