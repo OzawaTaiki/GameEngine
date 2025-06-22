@@ -5,7 +5,7 @@
 class VoiceInstance
 {
 public:
-    VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume = 1.0f, float _sampleRate = 44100.0f);
+    VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume = 1.0f, float _sampleRate = 44100.0f, float _startTime = 0.0f);
     ~VoiceInstance() = default;
 
     /// <summary>
@@ -71,6 +71,11 @@ public:
     /// <returns>経過時間(秒)</returns>
     float GetElapsedTime() const;
 
+    /// <summary>
+    /// 再生開始時間を取得
+    /// </summary>
+    /// <returns>再生開始時間(秒)</returns>
+    float GetStartTime() const { return startTime_; }
 
 private:
     /// <summary>
@@ -86,6 +91,9 @@ private:
 
     // 音量
     float volume_ = 1.0f;
+
+    // 再生開始時間
+    float startTime_ = 0.0f;
 
     // サンプルレート
     float sampleRate_ = 44100.0f;
