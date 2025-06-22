@@ -52,7 +52,7 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
     pSourceVoice->SetVolume(_volume);
 
-    auto voiceInstance = std::make_shared<VoiceInstance>(pSourceVoice, _volume, sampleRate_);
+    auto voiceInstance = std::make_shared<VoiceInstance>(pSourceVoice, _volume, sampleRate_, _startTime);
 
     voiceInstance_.push_back(voiceInstance);
 

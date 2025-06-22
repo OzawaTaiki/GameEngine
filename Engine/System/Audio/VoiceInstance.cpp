@@ -2,10 +2,13 @@
 
 #include <Debug/Debug.h>
 
-VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume, float _sampleRate) :
+VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume, float _sampleRate, float _startTime) :
     sourceVoice_(_sourceVoice),
     volume_(_volume),
-    sampleRate_(_sampleRate)
+    sampleRate_(_sampleRate),
+    startTime_(_startTime),
+    isPaused_(false),
+    hr_(S_OK)
 {
     if (!sourceVoice_)
     {
@@ -113,7 +116,7 @@ float VoiceInstance::GetElapsedTime() const
 {
     XAUDIO2_VOICE_STATE state;
     sourceVoice_->GetState(&state);
-    return static_cast<float>(state.SamplesPlayed) / sampleRate_;
+    return static_cast<float>(state.SamplesPlayed) / sampleRate_ + startTime_;
 }
 
 void VoiceInstance::CheckHRESULT() const
