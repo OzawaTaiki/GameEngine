@@ -50,6 +50,13 @@ void SceneManager::Update()
     ImGui();
 #endif // _DEBUG
     currentScene_->Update();
+
+    if(!transitionQueue_.empty())
+    {
+        SetTransition(std::move(transitionQueue_.front()));
+        transitionQueue_.pop();
+    }
+
     if (isTransition_)
     {
         transition_->Update();
@@ -78,6 +85,12 @@ void SceneManager::SetTransition(std::unique_ptr<ISceneTransition> _transition)
 {
     if (_transition != nullptr)
     {
+        if (isTransition_)
+        {
+            // すでにトランジション中なら、キューに追加
+            transitionQueue_.push(std::move(_transition));
+            return;
+        }
         transition_ = std::move(_transition);
         transition_->Initialize();
     }
@@ -98,7 +111,7 @@ void SceneManager::ReserveScene(const std::string& _name, std::unique_ptr<SceneD
 
     instance->sceneData_ = std::move(_sceneData);
 
-    if (instance->transition_ != nullptr && !instance->isTransition_)
+    if (instance->transition_ != nullptr)
     {
         instance->transition_->Start();
         instance->isTransition_ = true;

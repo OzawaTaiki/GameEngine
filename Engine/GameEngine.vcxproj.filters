@@ -633,7 +633,7 @@
     <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="TextRenderer.hlsl">
+    <FxCompile Include="..\..\Application\Resources\Shader\TextRenderer.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
