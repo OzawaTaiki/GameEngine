@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <queue>
 
 
 class SceneManager
@@ -63,6 +64,8 @@ private:
     std::unique_ptr<SceneData> sceneData_ = nullptr;
 
     bool isTransition_ = false;
+
+    std::queue<std::unique_ptr<ISceneTransition>> transitionQueue_ = {};
 
     // 現在のシーン名
     std::string currentSceneName_ = {};
