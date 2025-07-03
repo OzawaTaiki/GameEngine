@@ -1372,19 +1372,38 @@ void PSOManager::CreatePSOForText()
 
     //descriptorRange
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].BaseShaderRegister = 1;// t1
     descriptorRange[0].NumDescriptors = 1;//数は１つ
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
+    D3D12_DESCRIPTOR_RANGE descriptorRangeTrans[1] = {};
+    descriptorRangeTrans[0].BaseShaderRegister = 0;//t0
+    descriptorRangeTrans[0].NumDescriptors = 1;//数は１つ
+    descriptorRangeTrans[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//CBVを使う
+    descriptorRangeTrans[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[1] = {};
+    D3D12_ROOT_PARAMETER rootParameters[3] = {};
+
+    // orhoMat
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;		//vertexShaderで使う
+    rootParameters[0].Descriptor.ShaderRegister = 0; // 0番目のCBVを使う
 
     // テクスチャ
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-    rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-    rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+    // transform    affineMatrix
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;			//vertexShaderで使う
+    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRangeTrans;		//tableの中身の配列を指定
+    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeTrans);//tableで利用する数
+
+
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ

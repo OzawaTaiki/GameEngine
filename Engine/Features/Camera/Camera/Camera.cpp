@@ -69,6 +69,15 @@ void Camera::Draw()
 {
 }
 
+Vector2 Camera::WotldToScreen(const Vector3& _worldPos) const
+{
+    Vector3 temp = Transform(_worldPos, matViewProjection_);
+    temp = Transform(temp, MakeViewportMatrix(0, 0, winSize_.x, winSize_.y, 0.0f, 1.0f));
+
+    return Vector2(temp.x, temp.y); // x, y座標を返す
+
+}
+
 
 void Camera::TransferData()
 {
