@@ -102,6 +102,7 @@ void Framework::Update()
 
     // フレーム始め
     imguiManager_->Begin();
+    TextRenderer::GetInstance()->BeginFrame();
     ImGuiDebugManager::GetInstance()->ShowDebugWindow();
 
     Time::Update();
@@ -129,6 +130,7 @@ void Framework::Finalize()
 
     Time_MT::GetInstance()->Finalize();
     collisionManager_->Finalize();
+    textRenderer_->Finalize();
     imguiManager_->Finalize();
     delete imguiManager_;
 
