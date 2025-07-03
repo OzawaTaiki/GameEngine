@@ -77,6 +77,19 @@ public:
     /// <returns>再生開始時間(秒)</returns>
     float GetStartTime() const { return startTime_; }
 
+
+    /// <summary>
+    /// 再生速度を設定
+    /// </summary>
+    /// <param name="_speed">1.0f で通常速度</param>
+    void SetPlaySpeed(float _speed);
+
+    /// <summary>
+    /// 再生速度を取得
+    /// </summary>
+    /// <returns>再生速度</returns>
+    float GetPlaySpeed() const { return playSpeed_; }
+
 private:
     /// <summary>
     /// HRESULTをチェックし、エラーがあれば例外を投げる
@@ -97,6 +110,8 @@ private:
 
     // サンプルレート
     float sampleRate_ = 44100.0f;
+
+    float playSpeed_ = 1.0f; // 再生速度
 
     // 音声ソースボイス
     IXAudio2SourceVoice* sourceVoice_ = nullptr;

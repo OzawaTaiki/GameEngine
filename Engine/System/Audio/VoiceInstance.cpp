@@ -119,6 +119,16 @@ float VoiceInstance::GetElapsedTime() const
     return static_cast<float>(state.SamplesPlayed) / sampleRate_ + startTime_;
 }
 
+void VoiceInstance::SetPlaySpeed(float _speed)
+{
+    if (sourceVoice_)
+    {
+        hr_ = sourceVoice_->SetFrequencyRatio(_speed);
+        CheckHRESULT();
+        playSpeed_ = _speed;
+    }
+}
+
 void VoiceInstance::CheckHRESULT() const
 {
     if (FAILED(hr_))
