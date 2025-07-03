@@ -27,6 +27,8 @@ public:
     ID3D12Resource* GetResource()const { return resource_.Get(); }
     Matrix4x4 GetViewProjection()const { return matViewProjection_; }
 
+    Vector2 WotldToScreen(const Vector3& _worldPos) const;
+
 
     /// <summary>
     /// セットした行列を転送
