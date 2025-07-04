@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include <Debug/ImGuiDebugManager.h>
+
 #include <cassert>
 #include <algorithm>
 
@@ -7,6 +9,14 @@ Input* Input::GetInstance()
 {
     static Input instace;
     return &instace;
+}
+
+Input::Input()
+{
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("InputStatus", [this](bool* _open) { ImGui(_open); });
+#endif // _DEBUG
+
 }
 
 void Input::Initilize(WinApp* _winApp)
@@ -72,9 +82,6 @@ void Input::Update()
     XInputGetState(0, &xInputState_);
     UpdatePadLRTrigger();
 
-#ifdef _DEBUG
-    ImGui();
-#endif // _DEBUG
 
 }
 
@@ -316,6 +323,16 @@ void Input::SetTriggerDeadZone(float _deadZone)
     rightTrigger_.deadZone = _deadZone;
 }
 
+bool Input::IsControllerConnected()
+{
+    XINPUT_STATE state;
+    ZeroMemory(&state, sizeof(XINPUT_STATE));
+    // コントローラの状態を取得
+    DWORD result = XInputGetState(0, &state);
+    // コントローラが接続されている場合は true を返す
+    return (result == ERROR_SUCCESS);
+}
+
 void Input::UpdatePadLRTrigger()
 {
     leftTrigger_.preIsTriggered = leftTrigger_.isTriggered;
@@ -341,31 +358,45 @@ void Input::UpdatePadLRTrigger()
 
 
 #ifdef _DEBUG
-#include <imgui.h>
-void Input::ImGui()
+void Input::ImGui(bool* _open)
 {
-    ImGui::Begin("Input");
-
-    ImGui::Text("Mouse Pos : %f %f", GetMousePosition().x, GetMousePosition().y);
-
-    ImGui::Text("Left Stick : %f %f", GetPadLeftStick().x, GetPadLeftStick().y);
-    ImGui::Text("Right Stick : %f %f", GetPadRightStick().x, GetPadRightStick().y);
-
-
-    ImGui::SliderFloat("Dead Zone", &deadZone_, 0.0f, 1.0f);
-
-    ImGui::SliderFloat("Left Motor Speed", &leftMotorSpeed_, 0.0f, 1.0f);
-    ImGui::SliderFloat("Right Motor Speed", &rightMotorSpeed_, 0.0f, 1.0f);
-    ImGui::SliderFloat("Vibrate Time", &vibrateTime_, 0.0f, 10.0f);
-    if(ImGui::Button("vibratePad"))
+    ImGui::Begin("Input", _open);
     {
-        VibratePad(leftMotorSpeed_, rightMotorSpeed_, vibrateTime_);
+        ImGui::Text("Mouse left : %s", IsMousePressed(0) ? "Pressed" : "Released");
+        ImGui::Text("Mouse right : %s", IsMousePressed(1) ? "Pressed" : "Released");
+        ImGui::Text("Mouse middle : %s", IsMousePressed(2) ? "Pressed" : "Released");
+        Vector2 mousePos = GetMousePosition();
+        ImGui::Text("Mouse Pos : %f %f", mousePos.x, mousePos.y);
+        ImGui::Text("Mouse Wheel : %f", GetMouseWheel());
+
+        ImGui::SeparatorText("Controller");
+        if (IsControllerConnected())
+        {
+            ImGui::Text("Left Stick : %f %f", GetPadLeftStick().x, GetPadLeftStick().y);
+            ImGui::Text("Right Stick : %f %f", GetPadRightStick().x, GetPadRightStick().y);
+
+
+            ImGui::SliderFloat("Dead Zone", &deadZone_, 0.0f, 1.0f);
+
+            ImGui::SliderFloat("Left Motor Speed", &leftMotorSpeed_, 0.0f, 1.0f);
+            ImGui::SliderFloat("Right Motor Speed", &rightMotorSpeed_, 0.0f, 1.0f);
+            ImGui::SliderFloat("Vibrate Time", &vibrateTime_, 0.0f, 10.0f);
+            if (ImGui::Button("vibratePad"))
+            {
+                VibratePad(leftMotorSpeed_, rightMotorSpeed_, vibrateTime_);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("StopVibratePad"))
+            {
+                StopVibratePad();
+            }
+        }
+        else
+            ImGui::Text("Controller is not connected");
+
     }
-    ImGui::SameLine();
-    if (ImGui::Button("StopVibratePad"))
-    {
-        StopVibratePad();
-    }
+
+
 
     ImGui::End();
 }

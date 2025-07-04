@@ -19,6 +19,18 @@ public:
     void Initialize();
     void ShowDebugWindow();
 
+    void BeginFrame();
+
+    void EndFrame();
+
+    /// <summary>
+    /// デバッグウィンドウを開始する
+    /// </summary>
+    /// <param name="_name">window名</param>
+    /// <param name="_flags">ImGuiWindowFlags </param>
+    /// <returns> ウィンドウが開始されたかどうか </returns>
+    bool Begin(const std::string& _name = "DebugWindow", ImGuiWindowFlags _flags = ImGuiWindowFlags_None);
+
     /// <summary>
     /// デバッグウィンドウを追加する
     /// </summary>
@@ -42,6 +54,12 @@ public:
     std::string AddColliderDebugWindow(const std::string& _name, std::function<void()> _func);
 
 
+    bool RegisterMenuItem(const std::string& _name, std::function<void(bool*)> _func);
+
+private:
+
+    void MenuBar();
+
 
 private:
 #ifdef _DEBUG
@@ -54,8 +72,21 @@ private:
     std::vector<uint8_t> colliderIsSelect_;
 
 
-    ImGuiDebugManager() = default;
-    ~ImGuiDebugManager() = default;
+    bool isDemoWindowVisible_ = false;
+    bool isIDStackToolVisible_ = false;
+    //bool isStyleEditorVisible_ = false;
+
+    std::map<std::string, std::function<void(bool*)>> menuItems_;
+
+    std::map<std::string, bool> menuItemsVisibility_;
+    std::map<std::string, bool> windowsVisibility_;
+
+    // すべてのウィンドウを隠すか
+    bool isAllWindowHidden_ = false;
+
+private:
+    ImGuiDebugManager();
+    ~ImGuiDebugManager();
 
     // コピー禁止
     ImGuiDebugManager(const ImGuiDebugManager&) = delete;

@@ -1,4 +1,5 @@
 #include <System/Time/Time.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <chrono>
 
 double  Time::deltaTime_                = 1.0f / 60.0f;
@@ -23,6 +24,10 @@ void Time::Initialize()
     defaultFramerate_ = 60.0f;
     isDeltaTimeFixed_ = true;
     frameCount_ = 0;
+
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("TimeInfo", [](bool* _open) { ImGui(_open); });
+#endif // _DEBUG
 }
 
 void Time::Update()
@@ -66,3 +71,17 @@ double Time::GetCurrentTime()
     // 秒単位に変換して返す
     return static_cast<float>(duration.count()) / 1000.0f;
 }
+
+#ifdef _DEBUG
+void Time::ImGui(bool* _open)
+{
+    ImGui::Begin("Time Info", _open);
+    {
+        ImGui::Text("Framerate: %.3f fps", GetFramerate());
+        ImGui::Text("DeltaTime: %.4f ms", GetDeltaTime<double>() * 1000.0);
+        ImGui::Text("CurrentTime: %.2f s", GetCurrentTime());
+        ImGui::Checkbox("Fixed DeltaTime", &isDeltaTimeFixed_);
+    }
+    ImGui::End();
+}
+#endif // _DEBUG

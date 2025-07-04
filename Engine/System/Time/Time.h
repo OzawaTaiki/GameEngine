@@ -72,6 +72,9 @@ public:
     */
     static bool IsDeltaTimeFixed() { return isDeltaTimeFixed_; }
 
+#ifdef _DEBUG
+    static void ImGui(bool* _open);
+#endif // _DEBUG
 private:
 
     static double deltaTime_;           ///<! デルタタイム

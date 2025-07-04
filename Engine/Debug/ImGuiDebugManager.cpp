@@ -1,5 +1,6 @@
 #include "ImGuiDebugManager.h"
 
+#include <System/input/Input.h>
 #include <Debug/ImguITools.h>
 
 ImGuiDebugManager* ImGuiDebugManager::GetInstance()
@@ -8,11 +9,36 @@ ImGuiDebugManager* ImGuiDebugManager::GetInstance()
     return &instance;
 }
 
+ImGuiDebugManager::ImGuiDebugManager()
+    : tabBarFlags_(ImGuiTabBarFlags_None)
+{
+}
+
+ImGuiDebugManager::~ImGuiDebugManager()
+{
+    debugWindows_.clear();
+    colliderDebugWindows_.clear();
+    isSelect_.clear();
+
+    windowsVisibility_.clear();
+
+    for (auto& [name, func] : menuItems_)
+    {
+        if (func)
+            func = nullptr;
+    }
+    menuItems_.clear();
+}
+
 void ImGuiDebugManager::Initialize()
 {
     debugWindows_.clear();
     colliderDebugWindows_.clear();
     isSelect_.clear();
+
+    windowsVisibility_.clear();
+    menuItems_.clear();
+
 }
 
 void ImGuiDebugManager::ShowDebugWindow()
@@ -20,6 +46,15 @@ void ImGuiDebugManager::ShowDebugWindow()
 #ifdef _DEBUG
     //ImGui::ShowIDStackToolWindow();
 
+    if (Input::GetInstance()->IsKeyTriggered(DIK_F3))
+    {
+        isAllWindowHidden_ = !isAllWindowHidden_;
+    }
+
+    if(isAllWindowHidden_)
+        return;
+
+    MenuBar();
     ImGui::Begin("Debug");
     {
         static bool isSelect[9] = { true };
@@ -132,7 +167,6 @@ void ImGuiDebugManager::ShowDebugWindow()
         ImGui::EndTabBar();
 
         ImGui::SeparatorText("Colliders");
-        colliderDebugWindows_["CollisionManager"]();
         ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
         {
             size_t i = 0;
@@ -161,14 +195,42 @@ void ImGuiDebugManager::ShowDebugWindow()
     }
     ImGui::End();
 
+    for (auto& [name, func] : menuItems_)
+    {
+        if (menuItemsVisibility_[name] && func)
+        {
+            func(&menuItemsVisibility_[name]);
+        }
+    }
+
 #endif // _DEBUG
+}
+
+bool ImGuiDebugManager::Begin(const std::string& _name, ImGuiWindowFlags _flags)
+{
+    // 始めてのとき
+    // この名前が含まれていないとき
+    if (!windowsVisibility_.contains(_name))
+    {
+        // 新しいウィンドウの場合は、デフォルトで表示する
+        windowsVisibility_[_name] = true;
+    }
+
+    if (!windowsVisibility_[_name] || isAllWindowHidden_)
+    {
+        return false; // ウィンドウが非表示の場合は何もしない
+    }
+
+    ImGui::Begin(_name.c_str(), &windowsVisibility_[_name], _flags);
+
+    return true;
 }
 
 
 std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::function<void()> _func)
 {
     std::string name = _name;
-    int32_t count = 1;
+    int32_t count = 0;
 
     // すでに同じ名前のデバッグウィンドウが存在する場合、名前を変更する
     if (debugWindows_.contains(name))
@@ -180,9 +242,10 @@ std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::fun
             std::string num;
             if(count < 10)
                 num = "0";
-            num += std::to_string(count);
+            num = std::to_string(count);
             name = _name + num;
-            it++; ++count;
+            it++;
+            ++count;
         }
     }
 
@@ -209,13 +272,20 @@ void ImGuiDebugManager::RemoveDebugWindow(const std::string& _name)
         colliderDebugWindows_.erase(it);
         return;
     }
+
+    auto it2 = menuItems_.find(_name);
+    if (it2 != menuItems_.end())
+    {
+        menuItems_.erase(it2);
+        return;
+    }
 }
 
 std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, std::function<void()> _func)
 {
 
     std::string name = _name;
-    int32_t count = 1;
+    int32_t count = 0;
 
     // すでに同じ名前のデバッグウィンドウが存在する場合、名前を変更する
     if (colliderDebugWindows_.contains(name))
@@ -229,7 +299,8 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
                 num = "0";
             num += std::to_string(count);
             name = _name + num;
-            it++; ++count;
+            it++;
+            ++count;
         }
     }
 
@@ -239,4 +310,79 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
         colliderIsSelect_.push_back(false);
 
     return name;
+}
+
+bool ImGuiDebugManager::RegisterMenuItem(const std::string& _name, std::function<void(bool*)> _func)
+{
+    if (_func == nullptr)
+        return false;
+
+    menuItems_[_name] = _func;
+    menuItemsVisibility_[_name] = false; // デフォルトで非表示する
+
+    return false;
+}
+
+void ImGuiDebugManager::MenuBar()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("ImGui Tools"))
+        {
+            ImGui::MenuItem("Demo Window", nullptr, &isDemoWindowVisible_);
+            ImGui::MenuItem("IDStack", nullptr, &isIDStackToolVisible_);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();  // 区切り線
+        if (ImGui::BeginMenu("Core"))
+        {
+            ImGui::MenuItem("Time Info", nullptr, &menuItemsVisibility_["TimeInfo"]);
+            ImGui::MenuItem("Scene Manager", nullptr, &menuItemsVisibility_["SceneManager"]);
+            ImGui::MenuItem("Input Status", nullptr, &menuItemsVisibility_["InputStatus"]);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();  // 区切り線
+        if (ImGui::BeginMenu("Resource"))
+        {
+            ImGui::MenuItem("Texture Manager", nullptr, &menuItemsVisibility_["TextureManager"]);
+            ImGui::MenuItem("Model Manager", nullptr, &menuItemsVisibility_["ModelManager"]);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();  // 区切り線
+        if (ImGui::BeginMenu("System"))
+        {
+            ImGui::MenuItem("Collision Manager", nullptr, &menuItemsVisibility_["CollisionManager"]);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();  // 区切り線
+
+        // ->window Visivility
+        // ->をクリックでポップアップとかでウィンドウ表示
+        // ポップアップ内でthis->Beginのウィンドウたちの表示切り替えをおこなえるようにする チェックボックス
+        if (ImGui::BeginMenu("Windows"))
+        {
+            for (auto& [name, isVisible] : windowsVisibility_)
+            {
+                ImGui::MenuItem(name.c_str(), nullptr, &isVisible);
+                windowsVisibility_[name] = isVisible;
+            }
+            ImGui::EndMenu();
+        }
+
+        float rightItemWidth = 170.0f; // 右端要素の幅Z
+
+        // 右端に移動
+        ImGui::SameLine(ImGui::GetWindowWidth() - rightItemWidth);
+        ImGui::Separator();  // 区切り線
+        ImGui::Checkbox("Hide Windows", &isAllWindowHidden_);
+
+
+        ImGui::EndMainMenuBar();
+    }
+
+    if (isDemoWindowVisible_)
+        ImGui::ShowDemoWindow(&isDemoWindowVisible_);
+    if (isIDStackToolVisible_)
+        ImGui::ShowIDStackToolWindow(&isIDStackToolVisible_);
+
 }

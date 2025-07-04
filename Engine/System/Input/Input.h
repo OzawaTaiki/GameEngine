@@ -94,13 +94,11 @@ public:
     /// <param name="_deadZone">: 0 ~ 1 </param>
     void SetTriggerDeadZone(float _deadZone);
 
-    bool IsControllerConnected() {
-        XINPUT_STATE state; ZeroMemory(&state, sizeof(XINPUT_STATE));
-        // コントローラの状態を取得
-        DWORD result = XInputGetState(0, &state);
-        // コントローラが接続されている場合は true を返す
-        return (result == ERROR_SUCCESS);
-    }
+    /// <summary>
+    /// コントローラーが接続されているかどうかを確認
+    /// </summary>
+    /// <returns></returns>
+    bool IsControllerConnected();
 
 private:
 	Microsoft::WRL::ComPtr <IDirectInput8> directInput_ = nullptr;
@@ -136,12 +134,21 @@ private:
 
 	WinApp* winApp_ = nullptr;
 
+private:
+    // コピーコンストラクタ
+    Input();
+    ~Input() = default;
+    //代入演算子を削除
+    Input(const Input&) = delete;
+    Input& operator=(const Input&) = delete;
+
+
 #ifdef _DEBUG
     float leftMotorSpeed_ = 0.0f;
     float rightMotorSpeed_ = 0.0f;
     float vibrateTime_ = 0.0f;
 
-    void ImGui();
+    void ImGui(bool* _open);
 #endif // _DEBUG
 
 };

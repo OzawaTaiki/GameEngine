@@ -39,20 +39,20 @@ void Framework::Initialize(const std::wstring& _winTitle)
     srvManager_->Initialize();
 
 
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->Initialize();
+#endif
+    imguiManager_ = new ImGuiManager();
+    imguiManager_->Initialize();
 
     rtvManager_ = RTVManager::GetInstance();
     rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
-#ifdef _DEBUG
-    ImGuiDebugManager::GetInstance()->Initialize();
-#endif
 
     PSOManager::GetInstance()->Initialize();
 
     LightingSystem::GetInstance()->Initialize();
 
-    imguiManager_ = new ImGuiManager();
-    imguiManager_->Initialize();
 
     TextureManager* instance = TextureManager::GetInstance();
     instance->Initialize();
@@ -99,11 +99,10 @@ void Framework::Update()
     {
         endRequest_ = true;
     }
+    imguiManager_->Begin();
 
     // フレーム始め
-    imguiManager_->Begin();
     TextRenderer::GetInstance()->BeginFrame();
-    ImGuiDebugManager::GetInstance()->ShowDebugWindow();
 
     Time::Update();
 
@@ -118,6 +117,10 @@ void Framework::PreDraw()
 
 void Framework::PostDraw()
 {
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->ShowDebugWindow();
+#endif // _DEBUG
+
     imguiManager_->End();
     imguiManager_->Draw();
 

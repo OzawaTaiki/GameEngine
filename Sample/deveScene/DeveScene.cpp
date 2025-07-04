@@ -10,7 +10,7 @@
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Features/PostEffects/DepthBasedOutLine.h>
 
-#include <Debug/ImGuiManager.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <Debug/ImGuiHelper.h>
 #include  <Core/DXCommon/DXCommon.h>
 
@@ -168,20 +168,20 @@ void DeveScene::Update()
 
 
     {
-        ImGui::Begin("Engine");
+        if(ImGuiDebugManager::GetInstance()->Begin("Engine"))
         {
             // サウンドの再生
+            static float volume = 1.0f;
             if (ImGui::Button("play Sound"))
             {
                 if (soundInstance_)
                 {
                     // 返り値で VoiceInstanceを受け取る
                     // これを使用して音量やピッチの変更ができる
-                    voiceInstance_ = soundInstance_->Play();
+                    voiceInstance_ = soundInstance_->Play(volume);
                 }
             }
 
-            static float volume = 1.0f;
             if (ImGui::DragFloat("Volume", &volume, 0.0f, 1.0f))
             {
                 if (voiceInstance_)
@@ -197,10 +197,10 @@ void DeveScene::Update()
                     voiceInstance_ = nullptr; // VoiceInstanceを解放
                 }
             }
+            ImGui::End();
         }
 
 
-        ImGui::End();
 
         // light調整用
         lights_->ImGui();

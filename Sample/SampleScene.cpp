@@ -132,6 +132,7 @@ void SampleScene::Update()
     {
         ImGui::Begin("Engine");
         {
+            static float volume = 1.0f;
             // サウンドの再生
             if (ImGui::Button("play Sound"))
             {
@@ -139,11 +140,10 @@ void SampleScene::Update()
                 {
                     // 返り値で VoiceInstanceを受け取る
                     // これを使用して音量やピッチの変更ができる
-                    voiceInstance_ = soundInstance_->Play();
+                    voiceInstance_ = soundInstance_->Play(volume);
                 }
             }
 
-            static float volume = 1.0f;
             if (ImGui::DragFloat("Volume", &volume, 0.0f, 1.0f))
             {
                 if (voiceInstance_)
