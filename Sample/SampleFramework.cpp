@@ -1,6 +1,7 @@
 #include "SampleFramework.h"
 
 #include "SampleScene.h"
+#include <Debug/ImGuiDebugManager.h>
 #include <Features/Scene/ParticleTestScene.h>
 #include <Features/PostEffects/DepthBasedOutLine.h>
 #include <Features/PostEffects/Dissolve.h>
@@ -171,99 +172,100 @@ void SampleFramework::RenderUI()
     static int currentItem = 0;
 
     // ウィンドウを作成
-    ImGui::Begin("Post Effect Manager");
+    if(ImGuiDebugManager::GetInstance()->Begin("PostEffectManager"))
+    {
+        // エフェクト選択用コンボボックス
+        ImGui::Text("Select Effect:");
+        ImGui::Combo("##EffectCombo", &currentItem, availableEffects, numAvailableEffects);
 
-    // エフェクト選択用コンボボックス
-    ImGui::Text("Select Effect:");
-    ImGui::Combo("##EffectCombo", &currentItem, availableEffects, numAvailableEffects);
-
-    // エフェクト追加ボタン
-    if (ImGui::Button("Apply Effect")) {
-        // 選択されたエフェクトをアクティブリストに追加
-        std::string selectedEffect = availableEffects[currentItem];
-        activeEffects.push_back(selectedEffect);
-    }
-
-    ImGui::SameLine();
-
-    // エフェクトリストをクリアするボタン
-    if (ImGui::Button("Clear All")) {
-        activeEffects.clear();
-    }
-
-    // 現在アクティブなエフェクトの表示
-    ImGui::Separator();
-    ImGui::Text("Active Effects (in order):");
-
-    // 削除するエフェクトのインデックス (-1は削除なし)
-    static int effectToRemove = -1;
-
-    // アクティブエフェクトのリスト表示と管理
-    for (int i = 0; i < activeEffects.size(); i++) {
-        ImGui::PushID(i);
-
-        // エフェクト名の表示
-        ImGui::BulletText("%d: %s", i + 1, activeEffects[i].c_str());
-
-        ImGui::SameLine();
-
-        // エフェクトを上に移動するボタン
-        if (i > 0 && ImGui::Button("up")) {
-            std::swap(activeEffects[i], activeEffects[i - 1]);
+        // エフェクト追加ボタン
+        if (ImGui::Button("Apply Effect")) {
+            // 選択されたエフェクトをアクティブリストに追加
+            std::string selectedEffect = availableEffects[currentItem];
+            activeEffects.push_back(selectedEffect);
         }
 
         ImGui::SameLine();
 
-        // エフェクトを下に移動するボタン
-        if (i < activeEffects.size() - 1 && ImGui::Button("dowm")) {
-            std::swap(activeEffects[i], activeEffects[i + 1]);
+        // エフェクトリストをクリアするボタン
+        if (ImGui::Button("Clear All")) {
+            activeEffects.clear();
         }
 
-        ImGui::SameLine();
+        // 現在アクティブなエフェクトの表示
+        ImGui::Separator();
+        ImGui::Text("Active Effects (in order):");
 
-        // エフェクトを削除するボタン
-        if (ImGui::Button("X")) {
-            effectToRemove = i;
-        }
+        // 削除するエフェクトのインデックス (-1は削除なし)
+        static int effectToRemove = -1;
 
-        if (activeEffects[i] == "Dissolve")
-        {
-            static float threshold = 0.0f;
-            static Vector3 maskColor = { 0.0f, 0.0f, 0.0f };
-            static bool enableEdgeColor = false;
-            static Vector3 edgeColor = { 0.0f, 0.0f, 0.0f };
-            static float edgeDitectRange = 0.03f;
+        // アクティブエフェクトのリスト表示と管理
+        for (int i = 0; i < activeEffects.size(); i++) {
+            ImGui::PushID(i);
 
-            ImGui::SliderFloat("Dissolve Threshold", &threshold, 0.0f, 1.0f);
-            ImGui::ColorEdit3("Dissolve Mask Color", &maskColor.x);
-            ImGui::Checkbox("Enable Edge Color", &enableEdgeColor);
-            if (enableEdgeColor)
-            {
-                ImGui::ColorEdit3("Edge Color", &edgeColor.x);
-                ImGui::SliderFloat("Edge Range", &edgeDitectRange, 0.0f, 1.0f, "%.5f");
+            // エフェクト名の表示
+            ImGui::BulletText("%d: %s", i + 1, activeEffects[i].c_str());
+
+            ImGui::SameLine();
+
+            // エフェクトを上に移動するボタン
+            if (i > 0 && ImGui::Button("up")) {
+                std::swap(activeEffects[i], activeEffects[i - 1]);
             }
 
-            Dissolve::GetInstance()->SetThreshold(threshold);
-            Dissolve::GetInstance()->SetMaskColor(maskColor);
-            Dissolve::GetInstance()->SetEnableEdgeColor(enableEdgeColor);
-            Dissolve::GetInstance()->SetEdgeColor(edgeColor);
-            Dissolve::GetInstance()->SetEdgeDitectRange(edgeDitectRange);
+            ImGui::SameLine();
+
+            // エフェクトを下に移動するボタン
+            if (i < activeEffects.size() - 1 && ImGui::Button("dowm")) {
+                std::swap(activeEffects[i], activeEffects[i + 1]);
+            }
+
+            ImGui::SameLine();
+
+            // エフェクトを削除するボタン
+            if (ImGui::Button("X")) {
+                effectToRemove = i;
+            }
+
+            if (activeEffects[i] == "Dissolve")
+            {
+                static float threshold = 0.0f;
+                static Vector3 maskColor = { 0.0f, 0.0f, 0.0f };
+                static bool enableEdgeColor = false;
+                static Vector3 edgeColor = { 0.0f, 0.0f, 0.0f };
+                static float edgeDitectRange = 0.03f;
+
+                ImGui::SliderFloat("Dissolve Threshold", &threshold, 0.0f, 1.0f);
+                ImGui::ColorEdit3("Dissolve Mask Color", &maskColor.x);
+                ImGui::Checkbox("Enable Edge Color", &enableEdgeColor);
+                if (enableEdgeColor)
+                {
+                    ImGui::ColorEdit3("Edge Color", &edgeColor.x);
+                    ImGui::SliderFloat("Edge Range", &edgeDitectRange, 0.0f, 1.0f, "%.5f");
+                }
+
+                Dissolve::GetInstance()->SetThreshold(threshold);
+                Dissolve::GetInstance()->SetMaskColor(maskColor);
+                Dissolve::GetInstance()->SetEnableEdgeColor(enableEdgeColor);
+                Dissolve::GetInstance()->SetEdgeColor(edgeColor);
+                Dissolve::GetInstance()->SetEdgeDitectRange(edgeDitectRange);
+            }
+            else if (activeEffects[i] == "DepthBasedOutline")
+            {
+                //DepthBasedOutLine::GetInstance()->Set("default");
+            }
+
+            ImGui::PopID();
         }
-        else if (activeEffects[i] == "DepthBasedOutline")
-        {
-            //DepthBasedOutLine::GetInstance()->Set("default");
+
+        // 削除処理（forループの外で行う）
+        if (effectToRemove >= 0) {
+            activeEffects.erase(activeEffects.begin() + effectToRemove);
+            effectToRemove = -1;
         }
 
-        ImGui::PopID();
+        ImGui::End();
     }
-
-    // 削除処理（forループの外で行う）
-    if (effectToRemove >= 0) {
-        activeEffects.erase(activeEffects.begin() + effectToRemove);
-        effectToRemove = -1;
-    }
-
-    ImGui::End();
 #endif // _DEBUG
 
 }

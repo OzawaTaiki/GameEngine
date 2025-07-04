@@ -1,4 +1,5 @@
 #include "LightGroup.h"
+#include <Debug/ImGuiDebugManager.h> 
 
 uint32_t LightGroup::shadowMapSize_ = 4096;
 
@@ -196,7 +197,7 @@ void LightGroup::ImGui()
 {
 #ifdef _DEBUG
 
-    ImGui::Begin("Light Settings"); 
+    if(ImGuiDebugManager::GetInstance()->Begin("LightGroup"))
     {
         if (ImGui::CollapsingHeader("Light Group Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Enable Directional Light", &enableDirectionalLight_);
@@ -216,8 +217,8 @@ void LightGroup::ImGui()
             DrawSpotLightsImGui();
         }
 
+        ImGui::End();
     }
-    ImGui::End();
 #endif // _DEBUG
 }
 
