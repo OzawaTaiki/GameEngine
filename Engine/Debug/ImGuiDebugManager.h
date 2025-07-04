@@ -19,9 +19,6 @@ public:
     void Initialize();
     void ShowDebugWindow();
 
-    void BeginFrame();
-
-    void EndFrame();
 
     /// <summary>
     /// デバッグウィンドウを開始する
@@ -29,7 +26,7 @@ public:
     /// <param name="_name">window名</param>
     /// <param name="_flags">ImGuiWindowFlags </param>
     /// <returns> ウィンドウが開始されたかどうか </returns>
-    bool Begin(const std::string& _name = "DebugWindow", ImGuiWindowFlags _flags = ImGuiWindowFlags_None);
+    bool Begin(const std::string& _name = "DebugWindow" /*,ImGuiWindowFlags _flags = ImGuiWindowFlags_None*/);
 
     /// <summary>
     /// デバッグウィンドウを追加する
