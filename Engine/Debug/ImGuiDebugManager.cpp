@@ -10,7 +10,6 @@ ImGuiDebugManager* ImGuiDebugManager::GetInstance()
 }
 
 ImGuiDebugManager::ImGuiDebugManager()
-    : tabBarFlags_(ImGuiTabBarFlags_None)
 {
 }
 
@@ -206,8 +205,9 @@ void ImGuiDebugManager::ShowDebugWindow()
 #endif // _DEBUG
 }
 
-bool ImGuiDebugManager::Begin(const std::string& _name, ImGuiWindowFlags _flags)
+bool ImGuiDebugManager::Begin(const std::string& _name/*, ImGuiWindowFlags _flags*/)
 {
+#ifdef _DEBUG
     // 始めてのとき
     // この名前が含まれていないとき
     if (!windowsVisibility_.contains(_name))
@@ -223,6 +223,7 @@ bool ImGuiDebugManager::Begin(const std::string& _name, ImGuiWindowFlags _flags)
 
     ImGui::Begin(_name.c_str(), &windowsVisibility_[_name], _flags);
 
+#endif // _DEBUG
     return true;
 }
 
@@ -325,6 +326,7 @@ bool ImGuiDebugManager::RegisterMenuItem(const std::string& _name, std::function
 
 void ImGuiDebugManager::MenuBar()
 {
+#ifdef _DEBUG
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("ImGui Tools"))
@@ -385,4 +387,5 @@ void ImGuiDebugManager::MenuBar()
     if (isIDStackToolVisible_)
         ImGui::ShowIDStackToolWindow(&isIDStackToolVisible_);
 
+#endif // _DEBUG
 }
