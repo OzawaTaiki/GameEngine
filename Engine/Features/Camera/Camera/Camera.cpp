@@ -4,14 +4,12 @@
 #include <System/Input/Input.h>
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Random/RandomGenerator.h>
-#ifdef _DEBUG
-#include <imgui.h>
-#endif // _DEBUG
+
+#include <Debug/ImGuiDebugManager.h>
 
 
 void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
 {
-
     cameraType_ = _cameraType;
     winSize_ = _winSize;
     aspectRatio_ = winSize_.x / winSize_.y;
@@ -31,23 +29,9 @@ void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
     gameTime_ = GameTime::GetInstance();
 }
 
-void Camera::Update(bool _showImGui)
+void Camera::Update()
 {
-#ifdef _DEBUG
-    if(_showImGui)
-    {
-        if (ImGui::BeginTabBar("camera"))
-        {
-            if (ImGui::BeginTabItem("camera"))
-            {
-                ImGui::DragFloat3("translate", &translate_.x, 0.01f);
-                ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
-        }
-    }
-#endif // _DEBUG
+
 
     if (shaking_)
     {
@@ -148,6 +132,21 @@ void Camera::ShakeParametaerSettingFromImGui()
 void Camera::QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) const
 {
     _cmdList->SetGraphicsRootConstantBufferView(_index, resource_->GetGPUVirtualAddress());
+}
+
+void Camera::ImGui()
+{
+#ifdef _DEBUG
+    if (ImGuiDebugManager::GetInstance()->Begin("Camera"))
+    {
+        ImGui::DragFloat3("translate", &translate_.x, 0.01f);
+        ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
+
+        ShakeParametaerSettingFromImGui();
+
+        ImGui::End();
+    }
+#endif // _DEBUG
 }
 
 void Camera::UpdateShake()

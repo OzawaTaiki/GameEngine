@@ -21,7 +21,7 @@ public:
     ~Camera() = default;
 
     void Initialize(CameraType _cameraType = CameraType::Perspective, const Vector2& _winSize = { 1280.0f, 720.0f });
-    void Update(bool _showImGui = true);
+    void Update();
     void Draw();
 
     ID3D12Resource* GetResource()const { return resource_.Get(); }
@@ -72,6 +72,10 @@ public:
 
     // 透視投影か正射影投影か
     CameraType cameraType_ = CameraType::Perspective;
+
+    void ImGui();
+private:
+
 
 private:
     // ortho用
