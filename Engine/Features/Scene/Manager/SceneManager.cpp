@@ -1,8 +1,7 @@
 #include <Features/Scene/Manager/SceneManager.h>
-#include <System/Input/Input.h>
-#include <System/Time/Time.h>
-#include <System/Time/GameTime.h>
-#include <System/Time/Time_MT.h>
+
+#include <Debug/ImGuiDebugManager.h>
+
 #include <cassert>
 
 SceneManager* SceneManager::GetInstance()
@@ -11,19 +10,26 @@ SceneManager* SceneManager::GetInstance()
     return &instance;
 }
 
+SceneManager::SceneManager()
+    : sceneFactory_(nullptr),
+    currentSceneName_("empty"),
+    nextSceneName_("empty"),
+    isTransition_(false)
+{
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("SceneManager", [this](bool* _open) {ImGui(_open); });
+#endif // _DEBUG
+
+}
+
 SceneManager::~SceneManager()
 {
-    //scenes_.clear();
-    //currentScene_.reset();
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("SceneManager");
+#endif // _DEBUG
 
     delete sceneFactory_;
 }
-//
-//void SceneManager::RegisterScene(const std::string& _name, SceneFactory _scene)
-//{
-//    auto instance = GetInstance();
-//    //instance->scenes_[_name] = _scene;
-//}
 
 void SceneManager::SetSceneFactory(ISceneFactory* _sceneFactory)
 {
@@ -46,9 +52,6 @@ void SceneManager::Update()
 {
     assert(sceneFactory_ != nullptr);
 
-#ifdef _DEBUG
-    ImGui();
-#endif // _DEBUG
     currentScene_->Update();
 
     if(!transitionQueue_.empty())
@@ -161,11 +164,28 @@ void SceneManager::Finalize()
 
 #ifdef _DEBUG
 #include <imgui.h>
-void SceneManager::ImGui()
+void SceneManager::ImGui(bool* _open)
 {
-    //char comboLabel[128];
+    ImGui::Begin("SceneManager", _open);
+    {
+        ImGui::Text("Current Scene : %s", currentSceneName_.c_str());
 
-    ImGui::Begin("SceneManager");
+        std::string name = sceneFactory_->ShowDebugWindow();
+        if (!name.empty())
+        {
+            ReserveScene(name, nullptr);
+        }
+
+        ImGui::Text("-----Transition-----");
+        ImGui::Text("Transitioning : %s", isTransition_ ? "true" : "false");
+    }
+    ImGui::End();
+}
+#endif // _DEBUG
+
+
+/*
+
     ImGui::SeparatorText("TIME_MT");
     ImGui::Text("Frametate: %.3f fps", Time_MT::GetFramerate());
     ImGui::Text("DeltaTime: %4.2f ms", Time_MT::GetDeltaTime<double>() * 1000.0);
@@ -178,17 +198,4 @@ void SceneManager::ImGui()
 
     ImGui::Text("Frametate: %.3f fps", GameTime::GetInstance()->GetFramerate());
     ImGui::Text("DeltaTime: %4.2f ms", GameTime::GetInstance()->GetDeltaTime() * 1000.0);
-
-    std::string name = sceneFactory_->ShowDebugWindow();
-    if (!name.empty())
-    {
-        ReserveScene(name, nullptr);
-    }
-
-
-    ImGui::Text("Current Scene : %s", currentSceneName_.c_str());
-
-
-    ImGui::End();
-}
-#endif // _DEBUG
+*/

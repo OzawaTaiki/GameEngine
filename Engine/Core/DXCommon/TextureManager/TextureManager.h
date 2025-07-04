@@ -48,13 +48,15 @@ private:
     };
 
     std::unordered_map<std::string, uint32_t> keys_ = {};
-    std::map<uint32_t, Texture> textures_ = {};
+    std::unordered_map<uint32_t, Texture> textures_ = {};
+
+    bool needSort_ = false; // ソートが必要かどうか
 
     TextureManager();
     ~TextureManager();
     TextureManager(const TextureManager&) = delete;
     TextureManager operator=(const TextureManager&) = delete;
 
-    void ImGui();
+    void ImGui(bool* _open);
 
 };

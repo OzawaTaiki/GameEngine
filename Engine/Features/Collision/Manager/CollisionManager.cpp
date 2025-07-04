@@ -279,9 +279,11 @@ void CollisionManager::DrawColliders()
     }
 }
 
-void CollisionManager::ImGui()
+void CollisionManager::ImGui(bool* _open)
 {
 #ifdef _DEBUG
+    ImGui::Begin("CollisionManager", _open);
+
     ImGui::PushID(this);
 
     // デバッグ描画の有効/無効を設定
@@ -294,6 +296,8 @@ void CollisionManager::ImGui()
     ImGui::Text("Active Collisions: %zu", collisionPairs_.size());
 
     ImGui::PopID();
+
+    ImGui::End();
 #endif // _DEBUG
 }
 
@@ -360,6 +364,6 @@ CollisionManager::CollisionManager()
     : isDrawEnabled_(true)
 {
 #ifdef _DEBUG
-    ImGuiDebugManager::GetInstance()->AddColliderDebugWindow("CollisionManager", [&]() {ImGui(); });
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("CollisionManager", [this](bool* _open) { ImGui(_open); });
 #endif // DEBUG
 }

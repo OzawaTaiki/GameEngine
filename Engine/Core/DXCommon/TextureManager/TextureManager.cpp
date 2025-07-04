@@ -4,7 +4,7 @@
 #include <Utility/ConvertString/ConvertString.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
 #include <Debug/ImGuiDebugManager.h>
-
+#include <Utility/StringUtils/StringUitls.h>
 #include <cassert>
 
 
@@ -24,6 +24,8 @@ void TextureManager::Initialize()
     Load("white.png");
     Load("cube.jpg");
     Load("uvChecker.png");
+
+	needSort_ = true;
 }
 
 uint32_t TextureManager::Load(const std::string& _filepath, const std::string& defaultDirpath_)
@@ -91,6 +93,7 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 	//キーの保存
 	keys_[_filepath] = index;
 
+    needSort_ = true;
 	return static_cast<uint32_t>(index);
 }
 
@@ -232,22 +235,58 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 
 TextureManager::TextureManager()
 {
-    ImGuiDebugManager::GetInstance()->AddDebugWindow("TextureManager", [&]() {ImGui(); });
+#ifdef _DEBUG
+	ImGuiDebugManager::GetInstance()->RegisterMenuItem("TextureManager", [this](bool* _open) {ImGui(_open); });
+#endif // _DEBUG
 }
 
 TextureManager::~TextureManager()
 {
+#ifdef _DEBUG
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow("TextureManager");
+#endif // _DEBUG
 }
 
-void TextureManager::ImGui()
+void TextureManager::ImGui(bool* _open)
 {
 #ifdef _DEBUG
-    ImGui::Begin("TextureManager");
-    for (auto& [key, value] : keys_)
+    ImGui::Begin("TextureManager",_open);
+    ImGui::PushID(this);
+
+	std::list<std::pair<std::string, uint32_t>> keysList(keys_.begin(), keys_.end());
+    if (needSort_)
+	{
+		keysList.sort([](const std::pair<std::string, uint32_t>& a, const std::pair<std::string, uint32_t>& b) {
+			return a.second < b.second; // valueでソート
+			});
+        needSort_ = false; // ソート後はフラグをリセット
+	}
+
+	uint32_t hoveredIndex = UINT32_MAX;
+    for (const auto& key : keysList)
     {
-        ImGui::Text(key.c_str());
+        ImGui::Text("%d: %s", key.second, key.first.c_str());
+		if (ImGui::IsItemHovered())
+		{
+			std::string extension = StringUtils::GetExtension(key.first);
+			ImGui::SameLine();
+            if (extension == "dds")
+            {
+                ImGui::Text("Type: CubeMap");
+            }
+            else
+            {
+                ImGui::Text("Type: Texture2D");
+				hoveredIndex = key.second;
+            }
+		}
     }
+    if (hoveredIndex != UINT32_MAX)
+    {
+		ImGui::Image(GetGPUHandle(hoveredIndex).ptr, ImVec2(100, 100));
+    }
+
+	ImGui::PopID();
     ImGui::End();
 #endif // _DEBUG
 }

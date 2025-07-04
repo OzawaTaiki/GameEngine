@@ -50,7 +50,7 @@ public:
     void UnregisterCollider(Collider* _collider);
 
     // デバッグUI
-    void ImGui();
+    void ImGui(bool* _oopen);
 
 private:
     // 衝突応答を実行する

@@ -50,16 +50,12 @@ void ImGuiManager::Begin()
 
     ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),ImGuiDockNodeFlags_PassthruCentralNode);
 
-    ImGui::Begin("Engine");
-
-
 #endif // _DEBUG
 }
 
 void ImGuiManager::End()
 {
 #ifdef _DEBUG
-    ImGui::End();
     ImGui::Render();
 #endif // _DEBUG
 }
