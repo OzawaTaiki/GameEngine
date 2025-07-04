@@ -26,7 +26,7 @@ public:
     /// <param name="_name">window名</param>
     /// <param name="_flags">ImGuiWindowFlags </param>
     /// <returns> ウィンドウが開始されたかどうか </returns>
-    bool Begin(const std::string& _name = "DebugWindow" /*,ImGuiWindowFlags _flags = ImGuiWindowFlags_None*/);
+    bool Begin(const std::string& _name = "DebugWindow");
 
     /// <summary>
     /// デバッグウィンドウを追加する

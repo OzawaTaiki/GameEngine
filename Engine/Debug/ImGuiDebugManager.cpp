@@ -205,7 +205,7 @@ void ImGuiDebugManager::ShowDebugWindow()
 #endif // _DEBUG
 }
 
-bool ImGuiDebugManager::Begin(const std::string& _name/*, ImGuiWindowFlags _flags*/)
+bool ImGuiDebugManager::Begin(const std::string& _name)
 {
 #ifdef _DEBUG
     // 始めてのとき
@@ -221,7 +221,7 @@ bool ImGuiDebugManager::Begin(const std::string& _name/*, ImGuiWindowFlags _flag
         return false; // ウィンドウが非表示の場合は何もしない
     }
 
-    ImGui::Begin(_name.c_str(), &windowsVisibility_[_name], _flags);
+    ImGui::Begin(_name.c_str(), &windowsVisibility_[_name]);
 
 #endif // _DEBUG
     return true;
