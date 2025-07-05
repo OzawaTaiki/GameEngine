@@ -16,12 +16,14 @@ std::string FileFilterBuilder::GetFilterString(FilterType filterType)
     auto it = filterMap.find(filterType);
     if (it != filterMap.end())
     {
-        return it->second.first + '\0' + it->second.second + '\0';
+        // Windows API用：説明\0パターン\0\0 形式
+        std::string result = it->second.first + '\0' + it->second.second + '\0' + '\0';
+        return result;
     }
     else
     {
-        static const std::string emptyFilter = "All Files(*.*)\0*.*\0";
-        return emptyFilter; // デフォルトのフィルター名を返す
+        // デフォルトフィルター
+        return std::string("All Files (*.*)\0*.*\0\0", 18);
     }
 }
 
@@ -30,23 +32,19 @@ FileFilterBuilder& FileFilterBuilder::Add(FilterType _filterType)
     auto it = filterMap.find(_filterType);
     if (it != filterMap.end())
     {
-        std::string filterString = it->second.first + '\0' + it->second.second + '\0';
-        combinatedFilter_.insert(combinatedFilter_.end(), filterString.begin(), filterString.end());
+        AppendFilter(it->second.first, it->second.second);
     }
     else
     {
-        // フィルターが見つからない場合はデフォルトのフィルターを追加
-        std::string defaultFilter = GetFilterString(FilterType::AllFiles);
-        AppendString(defaultFilter);
-        AppendNull(); // 文字列の終端を追加
+        // 見つからない場合はAllFilesを追加
+        AppendFilter("All Files (*.*)", "*.*");
     }
     return *this;
 }
 
 FileFilterBuilder& FileFilterBuilder::AddCustom(const std::string& _description, const std::string& _extension)
 {
-    std::string filterString = _description + '\0' + _extension + '\0';
-    combinatedFilter_.insert(combinatedFilter_.end(), filterString.begin(), filterString.end());
+    AppendFilter(_description, _extension);
     return *this;
 }
 
@@ -54,69 +52,77 @@ std::string FileFilterBuilder::Build()
 {
     if (combinatedFilter_.empty())
     {
-        std::string defaultFilter = GetFilterString(FilterType::AllFiles);
-        AppendString(defaultFilter);
-        AppendNull(); // 文字列の終端を追加
+        // 空の場合はデフォルトのAll Filesを追加
+        AppendFilter("All Files (*.*)", "*.*");
     }
+
+    // 最終的な終端文字を追加（\0\0にするため）
+    combinatedFilter_.push_back('\0');
+
     return std::string(combinatedFilter_.data(), combinatedFilter_.size());
+}
+
+FileFilterBuilder& FileFilterBuilder::Reset()
+{
+    combinatedFilter_.clear();
+    return *this;
 }
 
 FileFilterBuilder& FileFilterBuilder::AddSeparateExtensions(FilterType _filterType)
 {
     switch (_filterType)
     {
-    case FileFilterBuilder::FilterType::AllFiles:
-        Add(FileFilterBuilder::FilterType::AllFiles);
+    case FilterType::AllFiles:
+        Add(FilterType::AllFiles);
         break;
-    case FileFilterBuilder::FilterType::TextFiles:
-        Add(FileFilterBuilder::FilterType::TextFiles);
+    case FilterType::TextFiles:
+        Add(FilterType::TextFiles);
         break;
-    case FileFilterBuilder::FilterType::ImageFiles:
+    case FilterType::ImageFiles:
         AddImageExtensions();
         break;
-    case FileFilterBuilder::FilterType::AudioFiles:
+    case FilterType::AudioFiles:
         AddAudioExtensions();
         break;
-    case FileFilterBuilder::FilterType::DataFiles:
+    case FilterType::DataFiles:
         AddDataExtensions();
         break;
     default:
         break;
     }
-
     return *this;
-
 }
 
-void  FileFilterBuilder::AddImageExtensions()
+void FileFilterBuilder::AddImageExtensions()
 {
-    AddCustom("png files", "*.png");
-    AddCustom("jpg files", "*.jpg");
-    AddCustom("jpeg files", "*.jpeg");
+    AddCustom("PNG Files (*.png)", "*.png");
+    AddCustom("JPG Files (*.jpg)", "*.jpg");
+    AddCustom("JPEG Files (*.jpeg)", "*.jpeg");
 }
 
 void FileFilterBuilder::AddAudioExtensions()
 {
-    AddCustom("mp3 files", "*.mp3");
-    AddCustom("wav files", "*.wav");
+    AddCustom("MP3 Files (*.mp3)", "*.mp3");
+    AddCustom("WAV Files (*.wav)", "*.wav");
 }
 
 void FileFilterBuilder::AddDataExtensions()
 {
-    AddCustom("json files", "*.json");
-    AddCustom("csv files", "*.csv");
-    AddCustom("xml files", "*.xml");
-    AddCustom("dat files", "*.dat");
+    AddCustom("JSON Files (*.json)", "*.json");
+    AddCustom("CSV Files (*.csv)", "*.csv");
+    AddCustom("XML Files (*.xml)", "*.xml");
+    AddCustom("DAT Files (*.dat)", "*.dat");
 }
 
-void FileFilterBuilder::AppendString(const std::string& _str)
+void FileFilterBuilder::AppendFilter(const std::string& _description, const std::string& _extension)
 {
-    combinatedFilter_.insert(combinatedFilter_.end(), _str.begin(), _str.end());
-}
+    // 説明文字列を追加
+    combinatedFilter_.insert(combinatedFilter_.end(), _description.begin(), _description.end());
+    combinatedFilter_.push_back('\0');
 
-void FileFilterBuilder::AppendNull()
-{
-    combinatedFilter_.push_back('\0'); // 文字列の終端を追加
+    // パターン文字列を追加
+    combinatedFilter_.insert(combinatedFilter_.end(), _extension.begin(), _extension.end());
+    combinatedFilter_.push_back('\0');
 }
 
 

@@ -31,32 +31,34 @@ public:
     };
 
 public:
-
+    // 単体フィルター文字列取得（Windows API直接使用時）
     static std::string GetFilterString(FilterType _filterType);
 
+    // ビルダーにフィルターを追加
     FileFilterBuilder& Add(FilterType _filterType);
 
+    // カスタムフィルターを追加
     FileFilterBuilder& AddCustom(const std::string& _description, const std::string& _extension);
 
+    // 個別拡張子として追加
     FileFilterBuilder& AddSeparateExtensions(FilterType _filterType);
 
+    // 最終的なフィルター文字列を構築
     std::string Build();
 
+    // ビルダーをリセット
+    FileFilterBuilder& Reset();
+
 private:
-
     void AddImageExtensions();
-
     void AddAudioExtensions();
-
     void AddDataExtensions();
-
-    void AppendString(const std::string& _str);
-    void AppendNull();
+    void AppendFilter(const std::string& _description, const std::string& _extension);
 
     static std::map<FilterType, std::pair<std::string, std::string>> filterMap;
     std::vector<char> combinatedFilter_;
-
 };
+
 
 
 
