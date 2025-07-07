@@ -20,6 +20,26 @@ std::string StringUtils::GetAfter(const std::string& _str, const std::string& _d
     return  ""; // デリミタが見つからない場合は空文字列を返す
 }
 
+std::string StringUtils::GetAfterLast(const std::string& _str, char _delimiter)
+{
+    size_t pos = _str.find_last_of(_delimiter);
+    if (pos != std::string::npos && pos + 1 < _str.size())
+    {
+        return _str.substr(pos + 1);
+    }
+    return ""; // デリミタが見つからない場合は空文字列を返す
+}
+
+std::string StringUtils::GetAfterLast(const std::string& _str, const std::string& _delimiter)
+{
+    size_t pos = _str.find_last_of(_delimiter);
+    if (pos != std::string::npos && pos + _delimiter.size() < _str.size())
+    {
+        return _str.substr(pos + _delimiter.size());
+    }
+    return ""; // デリミタが見つからない場合は空文字列を返す
+}
+
 std::string StringUtils::GetBefore(const std::string& _str, char _delimiter)
 {
     size_t pos = _str.find(_delimiter);
@@ -38,6 +58,26 @@ std::string StringUtils::GetBefore(const std::string& _str, const std::string& _
         return _str.substr(0, pos);
     }
     return  ""; // デリミタが見つからない場合は空文字列を返す
+}
+
+std::string StringUtils::GetBeforeLast(const std::string& _str, char _delimiter)
+{
+    size_t pos = _str.find_last_of(_delimiter);
+    if (pos != std::string::npos)
+    {
+        return _str.substr(0, pos);
+    }
+    return ""; // デリミタが見つからない場合は空文字列を返す
+}
+
+std::string StringUtils::GetBeforeLast(const std::string& _str, const std::string& _delimiter)
+{
+    size_t pos = _str.find_last_of(_delimiter);
+    if (pos != std::string::npos)
+    {
+        return _str.substr(0, pos);
+    }
+    return ""; // デリミタが見つからない場合は空文字列を返す
 }
 
 std::string StringUtils::GetExtension(const std::string& _str)
