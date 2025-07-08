@@ -32,7 +32,7 @@ std::string StringUtils::GetAfterLast(const std::string& _str, char _delimiter)
 
 std::string StringUtils::GetAfterLast(const std::string& _str, const std::string& _delimiter)
 {
-    size_t pos = _str.find_last_of(_delimiter);
+    size_t pos = _str.rfind(_delimiter);
     if (pos != std::string::npos && pos + _delimiter.size() < _str.size())
     {
         return _str.substr(pos + _delimiter.size());
@@ -72,7 +72,7 @@ std::string StringUtils::GetBeforeLast(const std::string& _str, char _delimiter)
 
 std::string StringUtils::GetBeforeLast(const std::string& _str, const std::string& _delimiter)
 {
-    size_t pos = _str.find_last_of(_delimiter);
+    size_t pos = _str.rfind(_delimiter);
     if (pos != std::string::npos)
     {
         return _str.substr(0, pos);
