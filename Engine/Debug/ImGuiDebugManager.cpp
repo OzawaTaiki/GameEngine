@@ -79,8 +79,8 @@ bool ImGuiDebugManager::Begin(const std::string& _name)
     // この名前が含まれていないとき
     if (!windowsVisibility_.contains(_name))
     {
-        // 新しいウィンドウの場合は、デフォルトで表示する
-        windowsVisibility_[_name] = true;
+        // 新しいウィンドウの場合は、デフォルトで非表示にする
+        windowsVisibility_[_name] = false;
     }
 
     if (!windowsVisibility_[_name] || isAllWindowHidden_)
