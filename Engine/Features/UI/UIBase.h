@@ -39,6 +39,7 @@ public:
     void SetRotate(float _rotate) { rotate_ = _rotate; }
     float GetRotate() const { return rotate_; }
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
+    const Vector2& GetAnchor() const { return anchor_; }
 
     void SetUVTranslate(const Vector2& _uvTranslate) { sprite_->uvTranslate_ = _uvTranslate; }
     void SetUVScale(const Vector2& _uvScale) { sprite_->uvScale_ = _uvScale; }
