@@ -57,6 +57,11 @@ private:
 
     void MenuBar();
 
+    void SelectItemWindow();
+
+    void SelectedItemWindow();
+
+    void TabFlagsWindow();
 
 private:
 #ifdef _DEBUG

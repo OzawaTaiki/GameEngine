@@ -38,12 +38,13 @@ void ImGuiDebugManager::Initialize()
     windowsVisibility_.clear();
     menuItems_.clear();
 
+    isAllWindowHidden_ = false;
+
 }
 
 void ImGuiDebugManager::ShowDebugWindow()
 {
 #ifdef _DEBUG
-    //ImGui::ShowIDStackToolWindow();
 
     if (Input::GetInstance()->IsKeyTriggered(DIK_F3))
     {
@@ -54,145 +55,7 @@ void ImGuiDebugManager::ShowDebugWindow()
         return;
 
     MenuBar();
-    ImGui::Begin("Debug");
-    {
-        static bool isSelect[9] = { true };
-        if (ImGui::CollapsingHeader("tabBarFlags"))
-        {
-            ImGui::Checkbox("ImGuiTabBarFlags_None", &isSelect[0]);
 
-            ImGui::BeginDisabled(isSelect[0]);
-            {
-                ImGui::Checkbox("ImGuiTabBarFlags_Reorderable", &isSelect[1]);
-                ImGui::Checkbox("ImGuiTabBarFlags_AutoSelectNewTabs", &isSelect[2]);
-                ImGui::Checkbox("ImGuiTabBarFlags_TabListPopupButton", &isSelect[3]);
-                ImGui::Checkbox("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton", &isSelect[4]);
-                ImGui::Checkbox("ImGuiTabBarFlags_NoTabListScrollingButtons", &isSelect[5]);
-                ImGui::Checkbox("ImGuiTabBarFlags_NoTooltip", &isSelect[6]);
-                ImGui::Checkbox("ImGuiTabBarFlags_FittingPolicyResizeDown", &isSelect[7]);
-                ImGui::Checkbox("ImGuiTabBarFlags_FittingPolicyScroll", &isSelect[8]);
-            }
-            ImGui::EndDisabled();
-
-            if(isSelect[0])
-                tabBarFlags_ = ImGuiTabBarFlags_None;
-
-            else
-            {
-                if (isSelect[1])
-                    tabBarFlags_ |= ImGuiTabBarFlags_Reorderable;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_Reorderable;
-                if (isSelect[2])
-                    tabBarFlags_ |= ImGuiTabBarFlags_AutoSelectNewTabs;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_AutoSelectNewTabs;
-                if (isSelect[3])
-                    tabBarFlags_ |= ImGuiTabBarFlags_TabListPopupButton;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_TabListPopupButton;
-                if (isSelect[4])
-                    tabBarFlags_ |= ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
-                if (isSelect[5])
-                    tabBarFlags_ |= ImGuiTabBarFlags_NoTabListScrollingButtons;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoTabListScrollingButtons;
-                if (isSelect[6])
-                    tabBarFlags_ |= ImGuiTabBarFlags_NoTooltip;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoTooltip;
-                if (isSelect[7])
-                    tabBarFlags_ |= ImGuiTabBarFlags_FittingPolicyResizeDown;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_FittingPolicyResizeDown;
-                if (isSelect[8])
-                    tabBarFlags_ |= ImGuiTabBarFlags_FittingPolicyScroll;
-                else
-                    tabBarFlags_ &= ~ImGuiTabBarFlags_FittingPolicyScroll;
-            }
-
-        }
-
-        ImGui::Separator();
-
-        size_t i = 0;
-        for (auto& [name, func] : debugWindows_)
-        {
-            bool flag = isSelect_[i];
-            if (ImGui::Selectable((name + "##Debug").c_str(), &flag))
-                isSelect_[i] = flag;
-
-            ++i;
-        }
-
-        ImGui::SeparatorText("Colliders");
-        i = 0;
-        for (auto& [name, func] : colliderDebugWindows_)
-        {
-            if (name == "CollisionManager") continue;
-            bool flag = colliderIsSelect_[i];
-            if (ImGui::Selectable((name + "##ColliderDebug").c_str(), &flag))
-                colliderIsSelect_[i] = flag;
-            ++i;
-        }
-
-    }
-    ImGui::End();
-
-    ImGui::Begin("DebugWindow");
-    {
-        ImGui::BeginTabBar("DebugWindow",tabBarFlags_);
-        {
-            size_t i = 0;
-            for (auto& [name, func] : debugWindows_)
-            {
-                std::string label = name + "##Debug";
-
-                if (isSelect_[i])
-                {
-                    bool flag = isSelect_[i];
-                    if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
-                    {
-                        func();
-                        ImGui::EndTabItem();
-                    }
-                    isSelect_[i] = flag;
-                }
-                i++;
-            }
-        }
-        ImGui::EndTabBar();
-
-        ImGui::SeparatorText("Colliders");
-        ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
-        {
-            size_t i = 0;
-            std::string label = "CollisionManager##Debug";
-
-            for (auto& [name, func] : colliderDebugWindows_)
-            {
-                if (name == "CollisionManager") continue;
-
-                if (colliderIsSelect_[i])
-                {
-                    label = name + "##ColliderDebug";
-
-                    bool flag = colliderIsSelect_[i];
-                    if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
-                    {
-                        func();
-                        ImGui::EndTabItem();
-                    }
-                    colliderIsSelect_[i] = flag;
-                }
-                i++;
-            }
-        }
-        ImGui::EndTabBar();
-    }
-    ImGui::End();
 
     for (auto& [name, func] : menuItems_)
     {
@@ -201,6 +64,10 @@ void ImGuiDebugManager::ShowDebugWindow()
             func(&menuItemsVisibility_[name]);
         }
     }
+
+    SelectedItemWindow();
+    SelectItemWindow();
+    TabFlagsWindow();
 
 #endif // _DEBUG
 }
@@ -387,5 +254,177 @@ void ImGuiDebugManager::MenuBar()
     if (isIDStackToolVisible_)
         ImGui::ShowIDStackToolWindow(&isIDStackToolVisible_);
 
+#endif // _DEBUG
+}
+
+void ImGuiDebugManager::SelectItemWindow()
+{
+    // アイテムを選択するウィンドウ
+#ifdef _DEBUG
+    if (this->Begin("Select Item"))
+    {
+        size_t i = 0;
+        for (auto& [name, func] : debugWindows_)
+        {
+            bool flag = isSelect_[i];
+            if (ImGui::Selectable((name + "##Debug").c_str(), &flag))
+                isSelect_[i] = flag;
+
+            ++i;
+        }
+
+        ImGui::SeparatorText("Colliders");
+        i = 0;
+        for (auto& [name, func] : colliderDebugWindows_)
+        {
+            if (name == "CollisionManager") continue;
+            bool flag = colliderIsSelect_[i];
+            if (ImGui::Selectable((name + "##ColliderDebug").c_str(), &flag))
+                colliderIsSelect_[i] = flag;
+            ++i;
+        }
+        ImGui::End();
+    }
+#endif // _DEBUG
+}
+
+void ImGuiDebugManager::SelectedItemWindow()
+{
+#ifdef _DEBUG
+
+    static bool openDebugWindow = true;
+    static bool openColliderDebugWindow = true;
+
+    if (this->Begin("Selected Items"))
+    {
+        ImGui::Checkbox("DebugWindow", &openDebugWindow);
+        ImGui::Checkbox("ColliderWindow", &openColliderDebugWindow);
+
+        if (openDebugWindow)
+        {
+
+            ImGui::BeginTabBar("DebugWindow", tabBarFlags_);
+            {
+                size_t i = 0;
+                for (auto& [name, func] : debugWindows_)
+                {
+                    std::string label = name + "##Debug";
+
+                    if (isSelect_[i])
+                    {
+                        bool flag = isSelect_[i];
+                        if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
+                        {
+                            func();
+                            ImGui::EndTabItem();
+                        }
+                        isSelect_[i] = flag;
+                    }
+                    i++;
+                }
+            }
+            ImGui::EndTabBar();
+        }
+
+        if (openColliderDebugWindow)
+        {
+            ImGui::SeparatorText("Colliders");
+            ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
+            {
+                size_t i = 0;
+                std::string label = "CollisionManager##Debug";
+
+                for (auto& [name, func] : colliderDebugWindows_)
+                {
+                    if (name == "CollisionManager") continue;
+
+                    if (colliderIsSelect_[i])
+                    {
+                        label = name + "##ColliderDebug";
+
+                        bool flag = colliderIsSelect_[i];
+                        if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
+                        {
+                            func();
+                            ImGui::EndTabItem();
+                        }
+                        colliderIsSelect_[i] = flag;
+                    }
+                    i++;
+                }
+            }
+            ImGui::EndTabBar();
+        }
+        ImGui::End();
+    }
+#endif // _DEBUG
+}
+
+void ImGuiDebugManager::TabFlagsWindow()
+{
+#ifdef _DEBUG
+    if(this->Begin("Tab Flags"))
+    {
+        static bool isSelect[9] = { true };
+        if (ImGui::CollapsingHeader("tabBarFlags"))
+        {
+            ImGui::Checkbox("ImGuiTabBarFlags_None", &isSelect[0]);
+
+            ImGui::BeginDisabled(isSelect[0]);
+            {
+                ImGui::Checkbox("ImGuiTabBarFlags_Reorderable", &isSelect[1]);
+                ImGui::Checkbox("ImGuiTabBarFlags_AutoSelectNewTabs", &isSelect[2]);
+                ImGui::Checkbox("ImGuiTabBarFlags_TabListPopupButton", &isSelect[3]);
+                ImGui::Checkbox("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton", &isSelect[4]);
+                ImGui::Checkbox("ImGuiTabBarFlags_NoTabListScrollingButtons", &isSelect[5]);
+                ImGui::Checkbox("ImGuiTabBarFlags_NoTooltip", &isSelect[6]);
+                ImGui::Checkbox("ImGuiTabBarFlags_FittingPolicyResizeDown", &isSelect[7]);
+                ImGui::Checkbox("ImGuiTabBarFlags_FittingPolicyScroll", &isSelect[8]);
+            }
+            ImGui::EndDisabled();
+
+            if (isSelect[0])
+                tabBarFlags_ = ImGuiTabBarFlags_None;
+
+            else
+            {
+                if (isSelect[1])
+                    tabBarFlags_ |= ImGuiTabBarFlags_Reorderable;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_Reorderable;
+                if (isSelect[2])
+                    tabBarFlags_ |= ImGuiTabBarFlags_AutoSelectNewTabs;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_AutoSelectNewTabs;
+                if (isSelect[3])
+                    tabBarFlags_ |= ImGuiTabBarFlags_TabListPopupButton;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_TabListPopupButton;
+                if (isSelect[4])
+                    tabBarFlags_ |= ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
+                if (isSelect[5])
+                    tabBarFlags_ |= ImGuiTabBarFlags_NoTabListScrollingButtons;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoTabListScrollingButtons;
+                if (isSelect[6])
+                    tabBarFlags_ |= ImGuiTabBarFlags_NoTooltip;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_NoTooltip;
+                if (isSelect[7])
+                    tabBarFlags_ |= ImGuiTabBarFlags_FittingPolicyResizeDown;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_FittingPolicyResizeDown;
+                if (isSelect[8])
+                    tabBarFlags_ |= ImGuiTabBarFlags_FittingPolicyScroll;
+                else
+                    tabBarFlags_ &= ~ImGuiTabBarFlags_FittingPolicyScroll;
+            }
+
+        }
+
+        ImGui::End();
+    }
 #endif // _DEBUG
 }
