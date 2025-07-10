@@ -46,7 +46,7 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
     collisionManager_->Initialize(fieldSize, 5, leftBottom, gridSize);
 
     // 最初のシーンで初期化
-    sceneManager_->Initialize("Develop");
+    sceneManager_->Initialize("Sample");
 
     currentTex_ = "default";
     redertextureName_["default"] = "postEffect";

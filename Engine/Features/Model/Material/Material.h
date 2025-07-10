@@ -2,6 +2,7 @@
 
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector3.h>
+#include <Math/Vector/Vector4.h>
 #include <Math/Matrix/Matrix4x4.h>
 
 #include <Features/UVTransform/UVTransform.h>
@@ -12,6 +13,7 @@
 #include <wrl.h>
 #include <string>
 
+struct aiMaterial;
 class Material
 {
 public:
@@ -35,9 +37,15 @@ public:
     void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const;
     void TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index,uint32_t _textureHandle) const;
 
+    void AnalyzeMaterial(const aiMaterial* _material);
+private:
+
+
 private:
 
     UVTransform     uvTransform_ = {};
+    Vector3 deffuseColor_ = { 1.0f, 1.0f, 1.0f }; // ディフューズカラー
+    bool hasTexture_ = true;
 
     std::string     name_                           = {};
     std::string     texturePath_                    = {};
@@ -46,9 +54,11 @@ private:
     struct DataForGPU
     {
         Matrix4x4       uvTransform;
+        Vector4         deffuseColor;
         float           shininess;
         int32_t         enabledLighthig;
-        float           padding[2];
+        int32_t         hasTexture;
+        float           padding;
     };
 
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_               = nullptr;

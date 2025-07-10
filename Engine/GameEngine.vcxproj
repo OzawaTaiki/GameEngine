@@ -189,6 +189,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Model\Color\ObjectColor.cpp" />
     <ClCompile Include="Features\Model\Manager\ModelManager.cpp" />
     <ClCompile Include="Features\Model\Material\Material.cpp" />
+    <ClCompile Include="Features\Model\Mesh\MargedMesh.cpp" />
     <ClCompile Include="Features\Model\Mesh\Mesh.cpp" />
     <ClCompile Include="Features\Model\Model.cpp" />
     <ClCompile Include="Features\Model\ObjectModel.cpp" />
@@ -304,6 +305,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Model\Color\ObjectColor.h" />
     <ClInclude Include="Features\Model\Manager\ModelManager.h" />
     <ClInclude Include="Features\Model\Material\Material.h" />
+    <ClInclude Include="Features\Model\Mesh\MargedMesh.h" />
     <ClInclude Include="Features\Model\Mesh\Mesh.h" />
     <ClInclude Include="Features\Model\Model.h" />
     <ClInclude Include="Features\Model\ObjectModel.h" />

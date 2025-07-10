@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cassert>
 
+#include <Debug/Debug.h>
+
 void SkinCluster::CreateResources(uint32_t _jointsSize, uint32_t _vertexSize, const std::map<std::string, int32_t>& _jointMap)
 {
     paletteResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(WellForGPU) * _jointsSize);
@@ -41,6 +43,7 @@ void SkinCluster::CreateResources(uint32_t _jointsSize, uint32_t _vertexSize, co
             continue;
         }
         inverseBindPoseMatrices_[it->second] = jointweight.second.inverseBindPoseMatrix;
+        int i = 0;
         for (const auto& vertexWeight : jointweight.second.vertexWeights)
         {
             VertexInfluenceData& influenceData = mappedInfluence_[vertexWeight.vertexIndex];
@@ -71,7 +74,7 @@ void SkinCluster::Draw()
 {
 }
 
-void SkinCluster::CreateSkinCluster(aiBone* _bone)
+void SkinCluster::CreateSkinCluster(aiBone* _bone,uint32_t _meshoffset)
 {
     std::string jointName = _bone->mName.C_Str();
     JointWeightData& jointWeightData = skinClusterData_[jointName];
@@ -85,7 +88,7 @@ void SkinCluster::CreateSkinCluster(aiBone* _bone)
 
     for (uint32_t weightIndex = 0; weightIndex < _bone->mNumWeights; ++weightIndex)
     {
-        jointWeightData.vertexWeights.push_back({ _bone->mWeights[weightIndex].mWeight,_bone->mWeights[weightIndex].mVertexId });
+        jointWeightData.vertexWeights.push_back({ _bone->mWeights[weightIndex].mWeight,_bone->mWeights[weightIndex].mVertexId + _meshoffset });
     }
 }
 

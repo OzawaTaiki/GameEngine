@@ -3,6 +3,8 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
+#include <assimp/material.h>
+
 void Material::Initialize(const std::string& _texturepath)
 {
 	DXCommon* dxCommon = DXCommon::GetInstance();
@@ -39,8 +41,10 @@ void Material::TransferData()
 	Matrix4x4 affine = uvTransform_.GetMatrix();
 
 	constMap_->uvTransform = affine;
+    constMap_->deffuseColor = Vector4(deffuseColor_.x, deffuseColor_.y, deffuseColor_.z, 1.0f);
 	constMap_->shininess = shiness_;
 	constMap_->enabledLighthig = enableLighting_;
+    constMap_->hasTexture = hasTexture_ ? 1 : 0;
 }
 
 void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
@@ -56,4 +60,40 @@ void Material::TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT
 void Material::TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index, uint32_t _textureHandle) const
 {
 	_commandList->SetGraphicsRootDescriptorTable(_index, TextureManager::GetInstance()->GetGPUHandle(_textureHandle));
+}
+
+void Material::AnalyzeMaterial(const aiMaterial* _material)
+{
+    aiUVTransform uvTransform;
+	if (_material->Get(AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE, 0), uvTransform_) == AI_SUCCESS)
+	{
+        uvTransform_.SetOffset(Vector2(uvTransform.mTranslation.x, uvTransform.mTranslation.y));
+        uvTransform_.SetScale(Vector2(uvTransform.mScaling.x, uvTransform.mScaling.y));
+        uvTransform_.SetRotation(uvTransform.mRotation);
+    }
+    else
+    {
+        uvTransform_.SetOffset(Vector2(0.0f, 0.0f));
+        uvTransform_.SetScale(Vector2(1.0f, 1.0f));
+        uvTransform_.SetRotation(0.0f);
+    }
+
+	aiColor3D meshColor;
+	if (_material->Get(AI_MATKEY_COLOR_DIFFUSE, meshColor) == AI_SUCCESS)
+	{
+        deffuseColor_ = Vector3(meshColor.r, meshColor.g, meshColor.b);
+	}
+    else
+    {
+        deffuseColor_ = Vector3(1.0f, 1.0f, 1.0f); // デフォルトの色
+    }
+    if (_material->Get(AI_MATKEY_SHININESS, shiness_) != AI_SUCCESS)
+    {
+        shiness_ = 40.0f; // デフォルトのシニアス値
+    }
+
+	if (_material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
+		hasTexture_ = true;
+	else
+		hasTexture_ = false;
 }

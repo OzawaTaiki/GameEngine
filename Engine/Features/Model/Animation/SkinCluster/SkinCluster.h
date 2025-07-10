@@ -49,7 +49,7 @@ public:
     void Update(std::vector<Joint>& _joints);
     void Draw();
 
-    void CreateSkinCluster(aiBone* _bone);
+    void CreateSkinCluster(aiBone* _bone, uint32_t _meshoffset);
 
     VertexInfluenceData* GetMappedInfluence() { return mappedInfluence_.data(); }
     WellForGPU* GetMappedPalette() { return mappedPalette_.data(); }

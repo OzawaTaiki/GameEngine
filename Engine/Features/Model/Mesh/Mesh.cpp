@@ -22,21 +22,15 @@ struct std::hash<VertexData> {
 };
 
 
-void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i)
+void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i, const std::string& _name)
 {
     dxCommon = DXCommon::GetInstance();
+    name_ = _name;
     vertices_ = _v;
     indices_ = _i;
     InitializeReources();
     TransferData();
 
-}
-
-void Mesh::SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource)
-{
-    outPutVertexResource_ = _resource;
-
-    vertexBufferView_.BufferLocation = outPutVertexResource_->GetGPUVirtualAddress();
 }
 
 void Mesh::TransferData()
@@ -55,14 +49,6 @@ void Mesh::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
     _commandList->IASetIndexBuffer(&indexBufferView_);
 }
 
-void Mesh::QueueCommand(ID3D12GraphicsCommandList* _commandList, const D3D12_VERTEX_BUFFER_VIEW& _vbv) const
-{
-    D3D12_VERTEX_BUFFER_VIEW vbv[2] = { vertexBufferView_, _vbv };
-
-    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    _commandList->IASetVertexBuffers(0, 2, vbv);
-    _commandList->IASetIndexBuffer(&indexBufferView_);
-}
 
 void Mesh::InitializeReources()
 {

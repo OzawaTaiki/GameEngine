@@ -143,11 +143,12 @@ Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<
     Model* model = ModelManager::GetInstance()->Create(_name);
 
     std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
-    mesh->Initialize(_vertices, _indices);
+    mesh->Initialize(_vertices, _indices, _name);
     model->mesh_.push_back(std::move(mesh));
 
-    model->material_.push_back(std::make_unique<Material>());
-    model->material_[0]->Initialize("");
+    std::unique_ptr<Material> material = std::make_unique<Material>();
+    material->Initialize("");
+    model->material_.push_back(std::move(material));
 
     model->lightGroup_ = std::make_unique<LightGroup>();
     model->lightGroup_->Initialize();
@@ -160,14 +161,34 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
 {
     QueueLightCommand(_commandList, 5);
 
-    for (auto& mesh : mesh_)
+    if(margedMesh_)
     {
-        mesh->QueueCommand(_commandList);
-        material_[mesh->GetUseMaterialIndex()]->TransferData();
-        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
-        material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
-        _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+        _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        margedMesh_->QueueCommand(_commandList);
+        for (size_t meshIndex = 0; meshIndex < margedMesh_->GetMeshCount(); ++meshIndex)
+        {
+            UINT vertexOffset = margedMesh_->GetVertexOffset(meshIndex);
+            UINT indexOffset = margedMesh_->GetIndexOffset(meshIndex);
+            UINT indexCount = margedMesh_->GetIndexCount(meshIndex);
+
+            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TransferData();
+            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
+            _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
+        }
     }
+    else
+    {
+        for (auto& mesh : mesh_)
+        {
+            mesh->QueueCommand(_commandList);
+            material_[mesh->GetUseMaterialIndex()]->TransferData();
+            material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+            material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
+            _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+        }
+    }
+
 }
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle) const
@@ -255,40 +276,9 @@ void Model::LoadAnimation(const std::string& _filePath, const std::string& _name
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(defaultDirpath_ + _filePath, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
     assert(scene->HasAnimations());
+    //LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
+
     LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
-
-
-    if (!currentAnimation_)
-    {
-        LoadNode(scene);
-        CreateSkeleton();
-
-        currentAnimation_ = std::make_unique<ModelAnimation>();
-        currentAnimation_->Initialize();
-
-        if (!skeleton_.GetJoints().empty() && !mesh_.empty())
-        {
-            for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
-            {
-                aiMesh* mesh = scene->mMeshes[meshIndex];
-                for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-                {
-                    skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
-                }
-            }
-
-            skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
-
-
-            mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
-
-            skinningCS_ = std::make_unique<SkinningCS>();
-            skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
-            skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
-            skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
-            skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
-        }
-    }
 }
 
 ID3D12Resource* Model::GetIndexResource(size_t _index)
@@ -366,24 +356,6 @@ void Model::LoadFile(const std::string& _filepath)
     if (scene->HasAnimations())
     {
         LoadAnimation(scene, filepath,"");
-        LoadNode(scene);
-        CreateSkeleton();
-
-
-        currentAnimation_ = std::make_unique<ModelAnimation>();
-        currentAnimation_->Initialize();
-
-        skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), mesh_[0]->GetVertexNum(), skeleton_.GetJointMap());
-
-
-        mesh_[0]->SetOutputVertexResource(SkinningCS::CreateOutputVertexResource(mesh_[0]->GetVertexNum()));
-
-        skinningCS_ = std::make_unique<SkinningCS>();
-        skinningCS_->CreateSRVForInputVertexResource(mesh_[0]->GetVertexResource(), mesh_[0]->GetVertexNum());
-        skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), mesh_[0]->GetVertexNum());
-        skinningCS_->CreateSRVForOutputVertexResource(mesh_[0]->GetOutputVertexResource(), mesh_[0]->GetVertexNum());
-        skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
-
     }
 
 #ifdef _DEBUG
@@ -401,10 +373,13 @@ void Model::LoadFile(const std::string& _filepath)
 void Model::LoadMesh(const aiScene* _scene)
 {
     // メッシュの読み込み
+
+    uint32_t currentVertexOffset = 0;
+
     for (uint32_t meshIndex = 0; meshIndex < _scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = _scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
-        assert(mesh->HasTextureCoords(0));				    // TexcoordがないMeshは今回は非対応
+        bool hasTexCoords = mesh->HasTextureCoords(0); // テクスチャ座標があるかどうか
         std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
         std::vector<VertexData> vertices;
         std::vector<uint32_t> indices;
@@ -416,7 +391,12 @@ void Model::LoadMesh(const aiScene* _scene)
             VertexData vertex = {};
             vertex.position = { -mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, mesh->mVertices[vertexIndex].z, 1.0f };
             vertex.normal = { -mesh->mNormals[vertexIndex].x, mesh->mNormals[vertexIndex].y, mesh->mNormals[vertexIndex].z };
-            vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
+            if (hasTexCoords)
+            {
+                vertex.texcoord = { mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y };
+            }
+            else
+                vertex.texcoord = { 0.0f, 0.0f }; // テクスチャ座標がない場合はデフォルト値
 
             vertices.push_back(vertex);
 
@@ -436,10 +416,12 @@ void Model::LoadMesh(const aiScene* _scene)
 
         for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
         {
-            skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex]);
+            skinCluster_.CreateSkinCluster(mesh->mBones[boneIndex], currentVertexOffset);
         }
 
-        pMesh->Initialize(vertices, indices);
+        currentVertexOffset += mesh->mNumVertices;
+
+        pMesh->Initialize(vertices, indices,mesh->mName.C_Str());
         pMesh->SetMin(min);
         pMesh->SetMax(max);
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);
@@ -457,6 +439,8 @@ void Model::LoadMaterial(const aiScene* _scene)
 
         std::string path = "";
         material_[materialIndex] = std::make_unique<Material>();
+
+        material_[materialIndex]->AnalyzeMaterial(material);
 
         if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
             aiString textureFilePath;
@@ -508,6 +492,40 @@ void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath, c
         animation_[name]->ReadSampler(_filepath);
         animation_[name]->ReadAnimation(_scene->mAnimations[animationIndex]);
     }
+
+    if (margedMesh_) // 既に生成済みなら
+        return;
+
+    LoadNode(_scene);
+    CreateSkeleton();
+
+    margedMesh_ = std::make_unique<MargedMesh>();
+    margedMesh_->Initialize(mesh_);
+
+    currentAnimation_ = std::make_unique<ModelAnimation>();
+    currentAnimation_->Initialize();
+
+    uint32_t vertexCount = static_cast<uint32_t>(margedMesh_->GetVertexCount());
+    skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), vertexCount, skeleton_.GetJointMap());
+
+
+    margedMesh_->SetSkinnedVertexBufferView(SkinningCS::CreateOutputVertexResource(vertexCount));
+
+    skinningCS_ = std::make_unique<SkinningCS>();
+    skinningCS_->CreateSRVForInputVertexResource(margedMesh_->GetVertexResource(), vertexCount);
+    skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), vertexCount);
+    skinningCS_->CreateSRVForOutputVertexResource(margedMesh_->GetSkinnedVertexResource(), vertexCount);
+    skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
+
+
+    currentAnimation_->Update(skeleton_.GetJoints(), 0);
+
+    skeleton_.Update();
+    skinCluster_.Update(skeleton_.GetJoints());
+
+    if (skinningCS_)
+        skinningCS_->Execute();
+
 }
 
 void Model::LoadNode(const aiScene* _scene)

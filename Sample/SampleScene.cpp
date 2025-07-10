@@ -70,14 +70,14 @@ void SampleScene::Initialize(SceneData* _sceneData)
 
     human_ = std::make_unique<ObjectModel>("human");
     // モデルのを読み込む
-    human_->Initialize("human/walk.gltf");
+    human_->Initialize("BrainStem/BrainStem.gltf");
     // アニメーション読み込み
     // 任意の名前を設定できる
-    human_->LoadAnimation("human/walk.gltf", "walk");
+    human_->LoadAnimation("BrainStem/BrainStem.gltf", "anim");
 
     bool loop = true;
     // アニメーションを再生する
-    human_->SetAnimation("walk", loop);
+    //human_->SetAnimation("anim", loop);
 
 
     // 地面ようのいたポリを生成する
@@ -158,6 +158,15 @@ void SampleScene::Update()
                     voiceInstance_->Stop();
                     voiceInstance_ = nullptr; // VoiceInstanceを解放
                 }
+            }
+
+            static bool loop = true;
+            ImGui::Checkbox("Loop", &loop);
+            if(ImGui::Button("Anim"))
+                human_->SetAnimation("anim", loop);
+            if (ImGui::Button("StopAnim"))
+            {
+                human_->SetAnimation("Anim", false);
             }
         }
         ImGui::End();
