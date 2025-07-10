@@ -180,6 +180,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Features\Light\Spot\SpotLight.cpp" />
     <ClCompile Include="Features\Light\System\LightingSystem.cpp" />
     <ClCompile Include="Features\LineDrawer\LineDrawer.cpp" />
+    <ClCompile Include="Features\Model\Animation\Controller\AnimationController.cpp" />
     <ClCompile Include="Features\Model\Animation\Joint\Joint.cpp" />
     <ClCompile Include="Features\Model\Animation\ModelAnimation.cpp" />
     <ClCompile Include="Features\Model\Animation\Node\Node.cpp" />
@@ -296,6 +297,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Features\Light\Spot\SpotLight.h" />
     <ClInclude Include="Features\Light\System\LightingSystem.h" />
     <ClInclude Include="Features\LineDrawer\LineDrawer.h" />
+    <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h" />
     <ClInclude Include="Features\Model\Animation\Joint\Joint.h" />
     <ClInclude Include="Features\Model\Animation\ModelAnimation.h" />
     <ClInclude Include="Features\Model\Animation\Node\Node.h" />

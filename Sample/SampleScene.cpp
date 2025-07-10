@@ -77,8 +77,12 @@ void SampleScene::Initialize(SceneData* _sceneData)
 
     bool loop = true;
     // アニメーションを再生する
-    //human_->SetAnimation("anim", loop);
+    human_->SetAnimation("anim", loop);
 
+     human2_ = std::make_unique<ObjectModel>("human2");
+
+     human2_->Initialize("BrainStem/BrainStem.gltf");
+     // アニメーションを再生する
 
     // 地面ようのいたポリを生成する
     Plane groundPlane;
@@ -164,10 +168,9 @@ void SampleScene::Update()
             ImGui::Checkbox("Loop", &loop);
             if(ImGui::Button("Anim"))
                 human_->SetAnimation("anim", loop);
-            if (ImGui::Button("StopAnim"))
-            {
-                human_->SetAnimation("Anim", false);
-            }
+
+            if(ImGui::Button("anim##2"))
+                human2_->SetAnimation("anim", loop);
         }
         ImGui::End();
 
@@ -180,6 +183,7 @@ void SampleScene::Update()
 
     // モデルの更新
     human_->Update();
+    human2_->Update();
     ground_->Update();
 
 
@@ -220,6 +224,7 @@ void SampleScene::Draw()
     // humanの描画
     human_->Draw(&SceneCamera_, drawColor_);
 
+    human2_->Draw(&SceneCamera_, drawColor_);
 
     // Sprite用のPSO等をセット
     Sprite::PreDraw();

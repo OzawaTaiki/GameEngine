@@ -24,25 +24,6 @@ void Model::Initialize()
 
 void Model::Update(float _deltaTime)
 {
-    if (!currentAnimation_ || !currentAnimation_->IsPlaying())
-    {
-        return;
-    }
-
-    currentAnimation_->Update(skeleton_.GetJoints(), _deltaTime);
-
-    // アニメーションが終わったらアニメーションを解除
-    if (!currentAnimation_->IsPlaying())
-    {
-        preAnimation_ = currentAnimation_.get();
-        return;
-    }
-
-    skeleton_.Update();
-    skinCluster_.Update(skeleton_.GetJoints());
-
-    if (skinningCS_)
-        skinningCS_->Execute();
 }
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
@@ -101,10 +82,6 @@ void Model::Draw(const WorldTransform& _transform, const Camera* _camera, Object
     }
 }
 
-void Model::DrawSkeleton(const Matrix4x4& _wMat)
-{
-    skeleton_.Draw(_wMat);
-}
 
 
 Model* Model::CreateFromFile(const std::string& _filePath)
@@ -161,40 +138,19 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const
 {
     QueueLightCommand(_commandList, 5);
 
-    if(margedMesh_)
+    for (auto& mesh : mesh_)
     {
-        _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        margedMesh_->QueueCommand(_commandList);
-        for (size_t meshIndex = 0; meshIndex < margedMesh_->GetMeshCount(); ++meshIndex)
-        {
-            UINT vertexOffset = margedMesh_->GetVertexOffset(meshIndex);
-            UINT indexOffset = margedMesh_->GetIndexOffset(meshIndex);
-            UINT indexCount = margedMesh_->GetIndexCount(meshIndex);
-
-            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TransferData();
-            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
-            material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
-            _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
-        }
+        mesh->QueueCommand(_commandList);
+        material_[mesh->GetUseMaterialIndex()]->TransferData();
+        material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+        material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
+        _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
-    else
-    {
-        for (auto& mesh : mesh_)
-        {
-            mesh->QueueCommand(_commandList);
-            material_[mesh->GetUseMaterialIndex()]->TransferData();
-            material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
-            material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
-            _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
-        }
-    }
-
 }
 
 void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle) const
 {
     QueueLightCommand(_commandList, 5);
-
 
     for (auto& mesh : mesh_)
     {
@@ -206,6 +162,40 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
     }
 }
 
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh) const
+{
+    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    _margedMesh->QueueCommand(_commandList);
+    for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
+    {
+        UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
+        UINT indexOffset = _margedMesh->GetIndexOffset(meshIndex);
+        UINT indexCount = _margedMesh->GetIndexCount(meshIndex);
+
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TransferData();
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
+        _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
+    }
+}
+
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh, uint32_t _textureHandle) const
+{
+    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    _margedMesh->QueueCommand(_commandList);
+    for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
+    {
+        UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
+        UINT indexOffset = _margedMesh->GetIndexOffset(meshIndex);
+        UINT indexCount = _margedMesh->GetIndexCount(meshIndex);
+
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TransferData();
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+        material_[mesh_[meshIndex]->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4,_textureHandle);
+        _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
+    }
+}
+
 void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
 {
     QueueLightCommand(_commandList, 2);
@@ -214,61 +204,11 @@ void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
         mesh->QueueCommand(_commandList);
         _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
     }
-
 }
 
 void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _index) const
 {
     LightingSystem::GetInstance()->QueueGraphicsCommand(_commandList, _index);
-}
-
-void Model::SetAnimation(const std::string& _name,bool _loop)
-{
-    if (!currentAnimation_)
-    {
-        return;
-    }
-
-    if (animation_.find(_name) == animation_.end())
-    {
-        assert(false && "アニメーションが見つかりません");
-        return;
-    }
-    currentAnimation_->Reset();
-    currentAnimation_->SetAnimation(animation_[_name]->GetAnimation());
-    currentAnimation_->SetLoop(_loop);
-
-}
-
-void Model::ChangeAnimation(const std::string& _name,float _blendTime, bool _loop)
-{
-    if (!currentAnimation_)
-    {
-        return;
-    }
-
-    if (animation_.find(_name) == animation_.end())
-    {
-        assert(false && "アニメーションが見つかりません");
-        return;
-    }
-    currentAnimation_->Reset();
-    currentAnimation_->ChangeAnimation(animation_[_name]->GetAnimation(), _blendTime);
-    //currentAnimation_ = animation_[_name].get();
-    currentAnimation_->SetLoop(_loop);
-}
-
-void Model::ToIdle(float _timeToIdle)
-{
-    if (currentAnimation_)
-    {
-        currentAnimation_->ToIdle(_timeToIdle);
-    }
-    else if(preAnimation_)
-    {
-        //currentAnimation_ = preAnimation_;
-        currentAnimation_->ToIdle(_timeToIdle);
-    }
 }
 
 void Model::LoadAnimation(const std::string& _filePath, const std::string& _name)
@@ -279,6 +219,21 @@ void Model::LoadAnimation(const std::string& _filePath, const std::string& _name
     //LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
 
     LoadAnimation(scene, defaultDirpath_ + _filePath, _name);
+}
+
+const ModelAnimation* Model::GetAnimation(const std::string& _name) const
+{
+    auto it = animation_.find(_name);
+    if (it != animation_.end())
+    {
+        return it->second.get();
+    }
+    else
+    {
+        Debug::Log("Animation not found: " + _name + "\n");
+        return nullptr;
+    }
+
 }
 
 ID3D12Resource* Model::GetIndexResource(size_t _index)
@@ -322,12 +277,7 @@ Vector3 Model::GetMax(size_t _index) const
 
 bool Model::HasAnimation() const
 {
-    return currentAnimation_ != nullptr && !animation_.empty();
-}
-
-bool Model::IsAnimationPlaying() const
-{
-    return currentAnimation_ && currentAnimation_->IsPlaying();
+    return !animation_.empty();
 }
 
 void Model::LoadFile(const std::string& _filepath)
@@ -493,38 +443,7 @@ void Model::LoadAnimation(const aiScene* _scene, const std::string& _filepath, c
         animation_[name]->ReadAnimation(_scene->mAnimations[animationIndex]);
     }
 
-    if (margedMesh_) // 既に生成済みなら
-        return;
-
     LoadNode(_scene);
-    CreateSkeleton();
-
-    margedMesh_ = std::make_unique<MargedMesh>();
-    margedMesh_->Initialize(mesh_);
-
-    currentAnimation_ = std::make_unique<ModelAnimation>();
-    currentAnimation_->Initialize();
-
-    uint32_t vertexCount = static_cast<uint32_t>(margedMesh_->GetVertexCount());
-    skinCluster_.CreateResources(static_cast<uint32_t>(skeleton_.GetJoints().size()), vertexCount, skeleton_.GetJointMap());
-
-
-    margedMesh_->SetSkinnedVertexBufferView(SkinningCS::CreateOutputVertexResource(vertexCount));
-
-    skinningCS_ = std::make_unique<SkinningCS>();
-    skinningCS_->CreateSRVForInputVertexResource(margedMesh_->GetVertexResource(), vertexCount);
-    skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), vertexCount);
-    skinningCS_->CreateSRVForOutputVertexResource(margedMesh_->GetSkinnedVertexResource(), vertexCount);
-    skinningCS_->CreateSRVForMatrixPaletteResource(skinCluster_.GetPaletteResource(), static_cast<uint32_t>(skeleton_.GetJoints().size()));
-
-
-    currentAnimation_->Update(skeleton_.GetJoints(), 0);
-
-    skeleton_.Update();
-    skinCluster_.Update(skeleton_.GetJoints());
-
-    if (skinningCS_)
-        skinningCS_->Execute();
 
 }
 
@@ -533,22 +452,4 @@ void Model::LoadNode(const aiScene* _scene)
     assert(_scene->mRootNode != nullptr);
 
     node_.ReadNode(_scene->mRootNode);
-}
-
-void Model::CreateSkeleton()
-{
-    skeleton_.CreateSkeleton(node_);
-}
-
-void Model::CreateSkinCluster(const aiMesh* _mesh)
-{
-    for (uint32_t boneIndex = 0; boneIndex < _mesh->mNumBones; ++boneIndex)
-    {
-        aiBone* bone = _mesh->mBones[boneIndex];
-        std::string boneName = bone->mName.C_Str();
-
-        for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
-        {
-        }
-    }
 }

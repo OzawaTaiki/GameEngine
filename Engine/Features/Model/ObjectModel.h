@@ -4,6 +4,7 @@
 #include <Features/Model/Color/ObjectColor.h>
 #include <Math/Quaternion/Quaternion.h>
 #include <Features/Camera/Camera/Camera.h>
+#include <Features/Model/Animation/Controller/AnimationController.h>
 
 class ObjectModel
 {
@@ -29,14 +30,13 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
-    bool IsEndAnimation() const { return !model_->IsAnimationPlaying(); }
+    //TODO
+    //bool IsEndAnimation() const { return !model_->IsAnimationPlaying(); }
 
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
 
     WorldTransform* GetWorldTransform() { return &worldTransform_; }
-
-    uint32_t GetVertexSrvIndex() { return model_->GetVertexSrvIndex(); }
 
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     Vector3 GetMin()const { return model_->GetMin(); }
@@ -54,15 +54,19 @@ public:
     Quaternion quaternion_ = { 0,0,0,1 };
     bool useQuaternion_ = false;
 
+    bool drawSkeleton_ = false; // スケルトンを描画するかどうか
+
 
     void ImGui();
-
 
 private:
     void InitializeCommon(); // 共通初期化
 
     WorldTransform worldTransform_;
+
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;
+    std::unique_ptr<AnimationController> animationController_ = nullptr;
+
     Model* model_ = nullptr;
     std::string name_ = "";
 

@@ -49,10 +49,9 @@ void ObjectModel::Update()
     else
         worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData(useQuaternion_);
-
-    if (model_->HasAnimation() && model_->IsAnimationPlaying())
+    if (model_->HasAnimation() && animationController_->IsAnimationPlaying())
     {
-        model_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+        animationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
     }
 
 }
@@ -78,8 +77,10 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList);// BVB IBV MTL2 TEX4 LIGHT567
+    model_->QueueCommandAndDraw(commandList,animationController_->GetMargedMesh());
 
+    if (drawSkeleton_)
+        animationController_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
@@ -104,7 +105,8 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     objectColor_->QueueCommand(commandList, 3);
     model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
 
-    //model_->DrawSkeleton(worldTransform_.matWorld_);
+    if(drawSkeleton_)
+        animationController_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)
@@ -116,7 +118,7 @@ void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
 {
     if (model_->HasAnimation())
     {
-        model_->SetAnimation(_name, _isLoop);
+        animationController_->SetAnimation(_name, _isLoop);
     }
 }
 
@@ -124,7 +126,7 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
 {
     if (model_->HasAnimation())
     {
-        model_->ChangeAnimation(_name, _blendTime, _isLoop);
+        animationController_->ChangeAnimation(_name, _blendTime, _isLoop);
     }
 }
 
@@ -191,6 +193,9 @@ void ObjectModel::ImGui()
 
     ImGui::Checkbox("UseQuaternion", &useQuaternion_);
 
+    ImGui::Dummy(ImVec2(0, 10));
+    ImGui::Checkbox("DrawSkeleton", &drawSkeleton_);
+
     ImGui::InputText("use Model", filePathBuffer_, 128);
     if (ImGui::Button("SetModel"))
     {
@@ -204,7 +209,12 @@ void ObjectModel::ImGui()
 void ObjectModel::InitializeCommon()
 {
     worldTransform_.Initialize();
+
+    animationController_ = std::make_unique<AnimationController>(model_);
+    animationController_->Initialize();
+
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();
+
     gameTime_ = GameTime::GetInstance();
 }

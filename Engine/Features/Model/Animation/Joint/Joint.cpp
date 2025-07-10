@@ -26,8 +26,9 @@ void Joint::Update(std::vector<Joint>& _joints)
 void Joint::Draw(const Matrix4x4& _wMat, std::vector <Joint>& _joints)
 {
     Matrix4x4 wMat = SkeletonSpcaceMatrix_ * _wMat;
+    static Matrix4x4 sMat = MakeScaleMatrix({ 0.1f,0.1f ,0.1f });
 
-    LineDrawer::GetInstance()->DrawOBB(wMat);
+    LineDrawer::GetInstance()->DrawOBB(sMat * wMat);
 
     Vector3 pos = Transform({ 0,0,0 }, wMat);
     for (int32_t childIndex : children_)
