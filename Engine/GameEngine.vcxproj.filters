@@ -562,6 +562,9 @@
     <ClCompile Include="System\Audio\SoundInstance.cpp">
       <Filter>System\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Model\Mesh\MargedMesh.cpp">
+      <Filter>Features\Model\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
@@ -1018,6 +1021,9 @@
     </ClInclude>
     <ClInclude Include="Utility\StringUtils\StringUitls.h">
       <Filter>Utility\StringUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Mesh\MargedMesh.h">
+      <Filter>Features\Model\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

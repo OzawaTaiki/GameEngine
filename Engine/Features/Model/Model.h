@@ -6,6 +6,7 @@
 #include <Math/Matrix/Matrix4x4.h>
 #include <Features/Model/Material/Material.h>
 #include <Features/Model/Mesh/Mesh.h>
+#include <Features/Model/Mesh/MargedMesh.h>
 #include <Features/Model/Animation/ModelAnimation.h>
 #include <Features/Model/Animation/Node/Node.h>
 #include <Features/Model/Animation/SkinningCS.h>
@@ -80,6 +81,7 @@ private:
     std::string name_ = {};
 
     std::vector<std::unique_ptr<Mesh>> mesh_ = {};
+    std::unique_ptr<MargedMesh> margedMesh_ = nullptr; // マージされたメッシュ
     std::vector<std::unique_ptr<Material>> material_ = {};
     std::map<std::string,std::unique_ptr<ModelAnimation>> animation_ = {};
     std::unique_ptr<ModelAnimation> currentAnimation_ = nullptr;

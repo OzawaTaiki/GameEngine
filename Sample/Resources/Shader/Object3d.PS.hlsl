@@ -5,14 +5,14 @@
 cbuffer gMaterial : register(b1)
 {
     float4x4 unTransform;
+
+    float4 deffuseColor;
+
     float shininess;
     int enableLighting;
+    int hasTexture;
+    float pad;
 };
-
-//cbuffer gTexVisibility : register(b1)
-//{
-//    float isVisible;
-//};
 
 cbuffer gColor : register(b2)
 {
@@ -107,29 +107,32 @@ PixelShaderOutput main(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
     output.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 textureColor;
+    float4 textureColor = deffuseColor;
 
-    float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
-    textureColor = materialColor * gTexture.Sample(gSampler, transformedUV.xy);
+    if (hasTexture != 0)
+    {
+        float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
+        textureColor *= gTexture.Sample(gSampler, transformedUV.xy);
+    }
 
     float3 toEye = normalize(worldPosition - _input.worldPosition);
 
     float shadowFactor = ComputeShadow(_input.shadowPos);
 
-    // シャドウファクターを適用したライティング
-    float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor) * shadowFactor;
-    float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
-    float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor);
-
-    float3 envColor = CalculateEnViromentColor(_input, worldPosition);
-
     if (enableLighting != 0)
     {
+        // シャドウファクターを適用したライティング
+        float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor) * shadowFactor;
+        float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
+        float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor);
+
+        float3 envColor = CalculateEnViromentColor(_input, worldPosition);
+
         output.color.rgb = directionalLight + pointLight + spotLightcColor;//        +envColor;
-        output.color.a = materialColor.a * textureColor.a;
+        output.color.a = deffuseColor.a * textureColor.a;
     }
     else
-        output.color = materialColor * textureColor;
+        output.color = deffuseColor * textureColor;
 
     if (textureColor.a == 0.0 ||
         output.color.a == 0.0)
@@ -153,7 +156,7 @@ float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, fl
     {
         cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     }
-    float3 diffuse = materialColor.rgb * _textureColor.rgb * DL.color.rgb * cos * DL.intensity;
+    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * DL.color.rgb * cos * DL.intensity;
     float3 specular = DL.color.rgb * DL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
 
     return diffuse + specular;
@@ -178,7 +181,7 @@ float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _li
 
     float shadowFactor = ComputePointLightShadow(_lightIndex, _input.worldPosition, _PL);
 
-    float3 diffuse = materialColor.rgb * _textureColor.rgb * _PL.color.rgb * cos * _PL.intensity * factor * shadowFactor;
+    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _PL.color.rgb * cos * _PL.intensity * factor * shadowFactor;
     float3 specular = _PL.color.rgb * _PL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * shadowFactor;
 
     return diffuse + specular;
@@ -212,7 +215,7 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
     }
 
 
-    float3 diffuse = materialColor.rgb * _textureColor.rgb * _SL.color.rgb * cos * _SL.intensity * factor * falloffFactor;
+    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _SL.color.rgb * cos * _SL.intensity * factor * falloffFactor;
     float3 specular = _SL.color.rgb * _SL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
 
     return diffuse + specular;

@@ -23,20 +23,18 @@ struct VertexData
     }
 };
 
-struct VertexInfluenceData;
 class DXCommon;
 class Mesh
 {
 public:
 
 
-    void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i);
-    void SetOutputVertexResource(Microsoft::WRL::ComPtr<ID3D12Resource> _resource);
-    //void LoadFile(const std::string& _filepath,  const std::string& _directoryPath="Resources/models/");
+    void Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i,const std::string& _name);
 
     void TransferData();
     void QueueCommand(ID3D12GraphicsCommandList* _commandList) const;
-    void QueueCommand(ID3D12GraphicsCommandList* _commandList, const D3D12_VERTEX_BUFFER_VIEW& _vbv)const;
+
+    std::string GetName() const { return name_; }
 
     uint32_t GetIndexNum() const { return static_cast<uint32_t>(indices_.size()); }
     uint32_t GetVertexNum() const { return static_cast<uint32_t>(vertices_.size()); }
@@ -60,9 +58,13 @@ public:
     void SetMin(const Vector3& _min) { min = _min; }
     void SetMax(const Vector3& _max) { max = _max; }
 
+    const std::vector<VertexData>& GetVertices() const { return vertices_; }
+    const std::vector<uint32_t>& GetIndices() const { return indices_; }
+
+
+private:
     std::vector<VertexData>                     vertices_ = {};                   // データ格納用
     std::vector<uint32_t>                       indices_ = {};                   // データ格納用
-private:
 
     DXCommon* dxCommon = nullptr;
 
