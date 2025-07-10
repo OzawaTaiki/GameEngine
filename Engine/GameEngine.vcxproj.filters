@@ -247,6 +247,9 @@
     <Filter Include="Utility\StringUtils">
       <UniqueIdentifier>{f986a21b-7b23-4181-bb5b-144f7a0454bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Model\Animation\Controller">
+      <UniqueIdentifier>{a2dab9cd-9e93-4bde-9508-eb15a103c35d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -564,6 +567,9 @@
     </ClCompile>
     <ClCompile Include="Features\Model\Mesh\MargedMesh.cpp">
       <Filter>Features\Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Animation\Controller\AnimationController.cpp">
+      <Filter>Features\Model\Animation\Controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1024,6 +1030,9 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Mesh\MargedMesh.h">
       <Filter>Features\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h">
+      <Filter>Features\Model\Animation\Controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
