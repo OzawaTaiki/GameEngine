@@ -31,6 +31,13 @@ void LineDrawer::Initialize()
     assert(rootSignature.has_value() && rootSignature != nullptr);
     rootSignature_ = rootSignature.value();
 
+
+    PSOFlags psoFlagsForAlways = PSOFlags::ForLineDrawerAlways();
+    auto psoForAlways = PSOManager::GetInstance()->GetPipeLineStateObject(psoFlagsForAlways);
+    // PSOが生成されているか確認
+    assert(psoForAlways.has_value() && psoForAlways != nullptr);
+    graphicsPipelineStateForAlways_ = psoForAlways.value();
+
     // まｐ
     resourcesForMat3D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
     resourcesForMat3D_->Map(0, nullptr, reinterpret_cast<void**>(&matFor3dConstMap_));
@@ -42,6 +49,12 @@ void LineDrawer::Initialize()
     vertexBufferViewFor3D_.SizeInBytes = sizeof(PointData) * kMaxNum;
     vertexBufferViewFor3D_.StrideInBytes = sizeof(PointData);
 
+    vertexResourceFor3DAlways_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
+    vertexResourceFor3DAlways_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMapFor3DAlways_));
+
+    vertexBufferViewFor3DAlways_.BufferLocation = vertexResourceFor3DAlways_->GetGPUVirtualAddress();
+    vertexBufferViewFor3DAlways_.SizeInBytes = sizeof(PointData) * kMaxNum;
+    vertexBufferViewFor3DAlways_.StrideInBytes = sizeof(PointData);
 
 
     resourceForMat2D_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
@@ -59,20 +72,31 @@ void LineDrawer::Initialize()
     SetVerties();
 }
 
-void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end)
+void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, bool _frontDraw)
 {
-    RegisterPoint(_start, _end, color_);
+    RegisterPoint(_start, _end, color_,_frontDraw);
 }
 
-void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, const Vector4& _color)
+void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, const Vector4& _color, bool _frontDraw)
 {
     assert(indexFor3d_ + 2 < kMaxNum && "The line instance is too large");
 
-    vConstMapFor3D_[indexFor3d_].position = { _start, 1.0f };
-    vConstMapFor3D_[indexFor3d_++].color = _color;
+    if(!_frontDraw)
+    {
+        vConstMapFor3D_[indexFor3d_].position = { _start, 1.0f };
+        vConstMapFor3D_[indexFor3d_++].color = _color;
 
-    vConstMapFor3D_[indexFor3d_].position = { _end, 1.0f };
-    vConstMapFor3D_[indexFor3d_++].color = _color;
+        vConstMapFor3D_[indexFor3d_].position = { _end, 1.0f };
+        vConstMapFor3D_[indexFor3d_++].color = _color;
+    }
+    else
+    {
+        vConstMapFor3DAlways_[indexFor3dAlways_].position = { _start, 1.0f };
+        vConstMapFor3DAlways_[indexFor3dAlways_++].color = _color;
+
+        vConstMapFor3DAlways_[indexFor3dAlways_].position = { _end, 1.0f };
+        vConstMapFor3DAlways_[indexFor3dAlways_++].color = _color;
+    }
 }
 
 void LineDrawer::RegisterPoint(const Vector2& _start, const Vector2& _end)
@@ -94,7 +118,7 @@ void LineDrawer::RegisterPoint(const Vector2& _start, const Vector2& _end, const
 void LineDrawer::Draw()
 {
 
-    if (indexFor3d_ == 0u && indexFor2d_ == 0u) return;
+    if (indexFor3d_ == 0u && indexFor2d_ == 0u && indexFor3dAlways_ == 0) return;
 
     TransferData();
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -105,6 +129,7 @@ void LineDrawer::Draw()
 
     Draw3Dlines();
     Draw2Dlines();
+    Draw3DlinesAlways();
 }
 
 void LineDrawer::Draw3Dlines()
@@ -135,12 +160,29 @@ void LineDrawer::Draw2Dlines()
     indexFor2d_ = 0u;
 }
 
-void LineDrawer::DrawOBB(const Matrix4x4& _affineMat)
+void LineDrawer::Draw3DlinesAlways()
 {
-    DrawOBB(_affineMat, color_);
+    if (indexFor3dAlways_ == 0u) return;
+    assert(cameraFor3dptr_ != nullptr);
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    commandList->SetPipelineState(graphicsPipelineStateForAlways_);
+
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewFor3DAlways_);
+    commandList->SetGraphicsRootConstantBufferView(0, resourcesForMat3D_->GetGPUVirtualAddress());
+    commandList->DrawInstanced(indexFor3dAlways_, indexFor3dAlways_ / 2, 0, 0);
+
+    indexFor3dAlways_ = 0u;
 }
 
-void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color)
+void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, bool _frontDraw)
+{
+    DrawOBB(_affineMat, color_, _frontDraw);
+}
+
+void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color, bool _frontDraw)
 {
     for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
     {
@@ -148,16 +190,16 @@ void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color)
         uint32_t eIndex = obbIndices_[index];
         Vector3 spos = Transform(obbVertices_[sIndex], _affineMat);
         Vector3 epos = Transform(obbVertices_[eIndex], _affineMat);
-        RegisterPoint(spos, epos, _color);
+        RegisterPoint(spos, epos, _color, _frontDraw);
     }
 }
 
-void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices)
+void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices, bool _frontDraw)
 {
-    DrawOBB(_vertices, color_);
+    DrawOBB(_vertices, color_, _frontDraw);
 }
 
-void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices, const Vector4& _color)
+void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices, const Vector4& _color, bool _frontDraw)
 {
     for (uint32_t index = 1; index < obbIndices_.size(); index += 2)
     {
@@ -167,16 +209,16 @@ void LineDrawer::DrawOBB(const std::array<Vector3, 8>& _vertices, const Vector4&
         Vector3 spos = _vertices[sIndex];
         Vector3 epos = _vertices[eIndex];
 
-        RegisterPoint(spos, epos, _color);
+        RegisterPoint(spos, epos, _color, _frontDraw);
     }
 }
 
-void LineDrawer::DrawSphere(const Matrix4x4& _affineMat)
+void LineDrawer::DrawSphere(const Matrix4x4& _affineMat, bool _frontDraw)
 {
-    DrawSphere(_affineMat, color_);
+    DrawSphere(_affineMat, color_, _frontDraw);
 }
 
-void LineDrawer::DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color)
+void LineDrawer::DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color, bool _frontDraw)
 {
     for (uint32_t index = 1; index < sphereIndices_.size(); index += 2)
     {
@@ -186,16 +228,16 @@ void LineDrawer::DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color)
         Vector3 spos = Transform(sphereVertices_[sIndex], _affineMat);
         Vector3 epos = Transform(sphereVertices_[eIndex], _affineMat);
 
-        RegisterPoint(spos, epos, _color);
+        RegisterPoint(spos, epos, _color, _frontDraw);
     }
 }
 
-void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal)
+void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, bool _frontDraw)
 {
-    DrawCircle(_center, _radius, _segmentCount, _normal, color_);
+    DrawCircle(_center, _radius, _segmentCount, _normal, color_, _frontDraw);
 }
 
-void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color)
+void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color, bool _frontDraw)
 {
     // 法線を正規化
     Vector3 normal = _normal.Normalize();
@@ -237,7 +279,7 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
             tangent2 * std::sin(nextRad) * _radius;
 
         // 線分を登録
-        RegisterPoint(spos, epos);
+        RegisterPoint(spos, epos, _frontDraw);
     }
 }
 

@@ -507,6 +507,7 @@ void PSOManager::CreateDefaultPSOs()
     CreatePSOForModel(PSOFlags::ForAlphaModel());
     CreatePSOForSprite(PSOFlags::ForSprite());
     CreatePSOForLineDrawer(PSOFlags::ForLineDrawer());
+    CreatePSOForLineDrawer(PSOFlags::ForLineDrawerAlways());
     CreatePSOForParticle(PSOFlags::ForAddBlendParticle());
 
     CreatePSOForText();
@@ -1926,6 +1927,13 @@ D3D12_DEPTH_STENCIL_DESC PSOManager::GetDepthStencilDesc(PSOFlags _flag)
         depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+        return depthStencilDesc;
+    }
+    else if (depthMode == PSOFlags::DepthMode::Comb_mZero_fAlways)
+    {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
         return depthStencilDesc;
     }
 

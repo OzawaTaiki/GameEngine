@@ -13,7 +13,6 @@ public:
     Skeleton() = default;
     ~Skeleton() = default;
 
-    void Initialize();
     void Update();
     void Draw(const Matrix4x4& _wMat);
 
@@ -21,9 +20,19 @@ public:
     std::vector<Joint>& GetJoints() { return joints_; }
     std::map<std::string, int32_t>& GetJointMap() { return jointMap_; }
     Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return joints_[_index].GetSkeletonSpaceMatrix(); }
+
+
+#ifdef _DEBUG
+    std::unordered_map<std::string, int32_t> debugJointMap_ = {};
+    void ImGui();
+
+    void Show(Joint& _joint, uint32_t _indent);
+#endif // _DEBUG
+
 private:
     int32_t rootIndex_ = 0;
     std::map<std::string, int32_t> jointMap_ = {};
     std::vector<Joint> joints_ = {};
+
 
 };

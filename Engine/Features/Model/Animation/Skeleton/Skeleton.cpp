@@ -1,10 +1,6 @@
 #include <Features/Model/Animation/Skeleton/Skeleton.h>
 #include <Features/Model/Animation/Node/Node.h>
 
-void Skeleton::Initialize()
-{
-}
-
 void Skeleton::Update()
 {
     for (Joint& joint : joints_)
@@ -28,4 +24,36 @@ void Skeleton::CreateSkeleton(const Node& _node)
     {
         jointMap_.emplace(joint.name_, joint.index_);
     }
+}
+
+void Skeleton::ImGui()
+{
+#ifdef _DEBUG
+
+    ImGui::SeparatorText("Skeleton");
+    ImGui::Text("Root Joint : %s", joints_[rootIndex_].name_.c_str());
+    ImGui::Text("Joint Count : %d", static_cast<int32_t>(joints_.size()));
+
+    debugJointMap_.clear();
+
+    Joint& joint = joints_[rootIndex_];
+
+    Show(joint, 0);
+
+#endif // _DEBUG
+}
+
+void Skeleton::Show(Joint& _joint, uint32_t _indent)
+{
+
+    _joint.ImGui(debugJointMap_, _indent);
+
+    auto children = _joint.GetChildren();
+    for (int32_t childIndex : children)
+    {
+        if (debugJointMap_.contains(joints_[childIndex].name_))
+            continue;
+        Show(joints_[childIndex], _indent + 1);
+    }
+
 }

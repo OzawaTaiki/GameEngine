@@ -28,13 +28,14 @@ void Joint::Draw(const Matrix4x4& _wMat, std::vector <Joint>& _joints)
     Matrix4x4 wMat = SkeletonSpcaceMatrix_ * _wMat;
     static Matrix4x4 sMat = MakeScaleMatrix({ 0.1f,0.1f ,0.1f });
 
-    LineDrawer::GetInstance()->DrawOBB(sMat * wMat);
+    Vector4 color = openTree_ ? Vector4{ 1,0,0,1 } : Vector4{ 1,1,1,1 };
 
+    LineDrawer::GetInstance()->DrawOBB(sMat * wMat, color, true);
     Vector3 pos = Transform({ 0,0,0 }, wMat);
     for (int32_t childIndex : children_)
     {
         Vector3 childPos = Transform({ 0,0,0 }, _joints[childIndex].SkeletonSpcaceMatrix_ * _wMat);
-        LineDrawer::GetInstance()->RegisterPoint(pos, childPos);
+        LineDrawer::GetInstance()->RegisterPoint(pos, childPos, color, true);
     }
 }
 
@@ -58,4 +59,39 @@ int32_t Joint::CreateJoint(const Node& _node, const std::optional<int32_t>& _par
 
 
     return joint.index_;
+}
+
+void Joint::ImGui(std::unordered_map<std::string, int32_t>& _map, int32_t indent)
+{
+#ifdef _DEBUG
+
+    if (_map.contains(name_))
+        return;
+
+    _map[name_] = index_;
+
+    ImGui::PushID(this);
+    std::string label = std::string(indent, '\t') + name_;
+
+    openTree_ = false;
+
+    if (ImGui::TreeNode(label.c_str()))
+    {
+        ImGui::Text("Index : %d", index_);
+        ImGui::Text("Children Count : %d", static_cast<int32_t>(children_.size()));
+        ImGui::Text("Transform : ");
+        ImGui::Text("  Scale : %.2f, %.2f, %.2f", transform_.scale.x, transform_.scale.y, transform_.scale.z);
+        ImGui::Text("  Rotation : %.2f, %.2f, %.2f", transform_.rotation.x, transform_.rotation.y, transform_.rotation.z);
+        ImGui::Text("  Translate : %.2f, %.2f, %.2f", transform_.translate.x, transform_.translate.y, transform_.translate.z);
+
+        openTree_ = true;
+
+        ImGui::TreePop();
+    }
+
+    ImGui::PopID();
+
+    indent += 2;
+
+#endif // _DEBUG
 }
