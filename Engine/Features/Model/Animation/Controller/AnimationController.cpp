@@ -129,7 +129,7 @@ void AnimationController::ToIdle(float _timeToIdle)
     currentAnimation_->ToIdle(_timeToIdle);
 }
 
-Matrix4x4 AnimationController::GetSkeletonSpaceMatrix(uint32_t _index) const
+const Matrix4x4* AnimationController::GetSkeletonSpaceMatrix(uint32_t _index) const
 {
     return skeleton_.GetSkeletonSpaceMatrix(_index);
 }
@@ -137,6 +137,11 @@ Matrix4x4 AnimationController::GetSkeletonSpaceMatrix(uint32_t _index) const
 bool AnimationController::IsAnimationPlaying() const
 {
     return currentAnimation_ && currentAnimation_->IsPlaying();
+}
+
+const Matrix4x4* AnimationController::GetSkeletonSpaceMatrix(const std::string& _name) const
+{
+    return skeleton_.GetSkeletonSpaceMatrix(_name);
 }
 
 void AnimationController::ImGui()

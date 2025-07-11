@@ -62,6 +62,7 @@ private:
 
     std::unique_ptr<ObjectModel> human_= nullptr;
     std::unique_ptr<ObjectModel> human2_= nullptr;
+    std::unique_ptr<ObjectModel> weapon_ = nullptr;
     std::unique_ptr<ObjectModel> ground_ = nullptr;
 
     uint32_t groundTextureHandle_ = 0;

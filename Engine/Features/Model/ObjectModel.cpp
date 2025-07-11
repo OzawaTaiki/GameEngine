@@ -48,8 +48,10 @@ void ObjectModel::Update()
         worldTransform_.quaternion_ = quaternion_.Normalize();
     else
         worldTransform_.rotate_ = euler_;
+
     worldTransform_.UpdateData(useQuaternion_);
-    if (model_->HasAnimation() && animationController_->IsAnimationPlaying())
+
+    if (animationController_ && model_->HasAnimation() && animationController_->IsAnimationPlaying())
     {
         animationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
     }
@@ -77,7 +79,10 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList,animationController_->GetMargedMesh());
+    if(animationController_)
+        model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList);
 
     if (drawSkeleton_)
         animationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -112,6 +117,8 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     model_->LoadAnimation(_filePath, _name);
+    animationController_ = std::make_unique<AnimationController>(model_);
+    animationController_->Initialize();
 }
 
 void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
@@ -177,6 +184,34 @@ void ObjectModel::DrawShadow(const Camera* _camera)
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromFile(_filePath);
+
+
+}
+
+const AnimationController* ObjectModel::GetAnimationController()
+{
+    if (animationController_)
+    {
+        return animationController_.get();
+    }
+    else
+    {
+        Debug::Log("AnimationController is not initialized.\n");
+        return nullptr;
+    }
+}
+
+const Matrix4x4* ObjectModel::GetSkeletonSpaceMatrix(const std::string& _jointName) const
+{
+    if (animationController_)
+    {
+        return animationController_->GetSkeletonSpaceMatrix(_jointName);
+    }
+    else
+    {
+        Debug::Log("AnimationController is not initialized.\n");
+        return nullptr;
+    }
 }
 
 void ObjectModel::ImGui()
@@ -216,9 +251,6 @@ void ObjectModel::ImGui()
 void ObjectModel::InitializeCommon()
 {
     worldTransform_.Initialize();
-
-    animationController_ = std::make_unique<AnimationController>(model_);
-    animationController_->Initialize();
 
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();

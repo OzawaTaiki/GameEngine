@@ -22,7 +22,7 @@ public:
     static int32_t CreateJoint(const Node& _node, const std::optional<int32_t>& _parent, std::vector<Joint>& _joints);
 
     void SetTransform(const QuaternionTransform& _transform) { transform_ = _transform; }
-    Matrix4x4 GetSkeletonSpaceMatrix() const { return SkeletonSpcaceMatrix_; }
+    const Matrix4x4* GetSkeletonSpaceMatrix() const { return (&SkeletonSpcaceMatrix_); }
     QuaternionTransform GetTransform() const { return transform_; }
     QuaternionTransform GetIdleTransform() const { return idleTransform_; }
 

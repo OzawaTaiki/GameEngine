@@ -30,11 +30,10 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
-    //TODO
-    //bool IsEndAnimation() const { return !model_->IsAnimationPlaying(); }
 
     void SetModel(const std::string& _filePath);
-    void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
+    void SetParent(const WorldTransform* _parent) { worldTransform_.SetParent(_parent); }
+    void SetParent(const Matrix4x4* _parentMatrix) { worldTransform_.SetParent(_parentMatrix); }
 
     WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
@@ -45,7 +44,10 @@ public:
 
     std::string GetName() const{ return name_; }
 
-    ID3D12Resource* GetIndexResource(size_t _index = -1) { return model_->GetIndexResource(_index); }
+    const AnimationController* GetAnimationController();
+
+
+    const Matrix4x4* GetSkeletonSpaceMatrix(const std::string& _jointName)  const;
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };

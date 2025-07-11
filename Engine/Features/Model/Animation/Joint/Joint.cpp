@@ -61,9 +61,9 @@ int32_t Joint::CreateJoint(const Node& _node, const std::optional<int32_t>& _par
     return joint.index_;
 }
 
+#ifdef _DEBUG
 void Joint::ImGui(std::unordered_map<std::string, int32_t>& _map, int32_t indent)
 {
-#ifdef _DEBUG
 
     if (_map.contains(name_))
         return;
@@ -93,5 +93,5 @@ void Joint::ImGui(std::unordered_map<std::string, int32_t>& _map, int32_t indent
 
     indent += 2;
 
-#endif // _DEBUG
 }
+#endif // _DEBUG
