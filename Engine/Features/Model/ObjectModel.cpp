@@ -48,9 +48,10 @@ void ObjectModel::Update()
         worldTransform_.quaternion_ = quaternion_.Normalize();
     else
         worldTransform_.rotate_ = euler_;
+
     worldTransform_.UpdateData(useQuaternion_);
 
-    if (model_->HasAnimation() && animationController_->IsAnimationPlaying())
+    if (animationController_ && model_->HasAnimation() && animationController_->IsAnimationPlaying())
     {
         animationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
     }
@@ -191,6 +192,34 @@ void ObjectModel::DrawShadow(const Camera* _camera)
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromFile(_filePath);
+
+
+}
+
+const AnimationController* ObjectModel::GetAnimationController()
+{
+    if (animationController_)
+    {
+        return animationController_.get();
+    }
+    else
+    {
+        Debug::Log("AnimationController is not initialized.\n");
+        return nullptr;
+    }
+}
+
+const Matrix4x4* ObjectModel::GetSkeletonSpaceMatrix(const std::string& _jointName) const
+{
+    if (animationController_)
+    {
+        return animationController_->GetSkeletonSpaceMatrix(_jointName);
+    }
+    else
+    {
+        Debug::Log("AnimationController is not initialized.\n");
+        return nullptr;
+    }
 }
 
 void ObjectModel::ImGui()

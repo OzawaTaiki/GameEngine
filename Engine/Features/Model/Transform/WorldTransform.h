@@ -27,6 +27,10 @@ public:
 
     Vector3 GetWorldPosition()const;
 
+    void SetParent(const WorldTransform* _parent);
+    void SetParent(const Matrix4x4* _parentMatrix);
+
+
 
     Vector3 scale_ = { 1.0f,1.0f ,1.0f };
     Vector3 rotate_ = { 0.0f,0.0f ,0.0f };
@@ -34,9 +38,10 @@ public:
     Quaternion quaternion_ = { 0,0,0,1 };
     Matrix4x4 matWorld_ = {};
 
-    const WorldTransform* parent_ = nullptr;
 
 private:
+    const Matrix4x4* parentMatrix_ = nullptr;
+    const WorldTransform* parent_ = nullptr;
 
 
     struct DataForGPU

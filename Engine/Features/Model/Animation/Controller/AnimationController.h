@@ -43,7 +43,7 @@ public:
     void DrawSkeleton(const Matrix4x4& _worldMat);
 
     // スケルトンのワールド空間行列を取得
-    Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0) const;
+    const Matrix4x4* GetSkeletonSpaceMatrix(uint32_t _index = 0) const;
 
     // margedMeshを取得
     MargedMesh* GetMargedMesh() const { return margedMesh_.get(); }
@@ -51,6 +51,7 @@ public:
     // アニメーションが再生中かどうか
     bool IsAnimationPlaying() const;
 
+    const Matrix4x4* GetSkeletonSpaceMatrix(const std::string& _name) const;
 
     void ImGui();
     

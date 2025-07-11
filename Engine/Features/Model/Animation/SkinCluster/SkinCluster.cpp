@@ -65,7 +65,7 @@ void SkinCluster::Update(std::vector<Joint>& _joints)
     for (size_t index = 0; index < _joints.size(); ++index)
     {
         assert(index < inverseBindPoseMatrices_.size());
-        mappedPalette_[index].skeletonSpaceMatrix = inverseBindPoseMatrices_[index] * _joints[index].GetSkeletonSpaceMatrix();
+        mappedPalette_[index].skeletonSpaceMatrix = inverseBindPoseMatrices_[index] * (*_joints[index].GetSkeletonSpaceMatrix());
         mappedPalette_[index].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(mappedPalette_[index].skeletonSpaceMatrix));
     }
 }

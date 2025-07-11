@@ -322,13 +322,6 @@ const ModelAnimation* Model::GetAnimation(const std::string& _name) const
 
 }
 
-ID3D12Resource* Model::GetIndexResource(size_t _index)
-{
-    if (_index == -1)
-        return mesh_[0]->GetIndexResource();
-    else
-        return mesh_[_index]->GetIndexResource();
-}
 
 Vector3 Model::GetMin(size_t _index) const
 {

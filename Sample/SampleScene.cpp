@@ -79,10 +79,17 @@ void SampleScene::Initialize(SceneData* _sceneData)
     // アニメーションを再生する
     human_->SetAnimation("anim", loop);
 
-     human2_ = std::make_unique<ObjectModel>("human2");
+    human2_ = std::make_unique<ObjectModel>("human2");
 
-     human2_->Initialize("BrainStem/BrainStem.gltf");
-     // アニメーションを再生する
+    human2_->Initialize("BrainStem/BrainStem.gltf");
+    human2_->LoadAnimation("BrainStem/BrainStem.gltf", "anim");
+    human2_->translate_.x = 2.0f;
+
+
+    weapon_ = std::make_unique<ObjectModel>("weapon");
+    weapon_->Initialize("Weapon/Sword.gltf");
+    weapon_->scale_ = { 0.5f,0.5f,0.5f };
+    weapon_->SetParent(human_->GetSkeletonSpaceMatrix("nodes[17]"));
 
     // 地面ようのいたポリを生成する
     Plane groundPlane;
@@ -181,11 +188,16 @@ void SampleScene::Update()
 
 #endif // _DEBUG
 
+    if (input_->IsKeyTriggered(DIK_SPACE))
+    {
+        human2_->SetAnimation("anim", true);
+    }
+
     // モデルの更新
     human_->Update();
     human2_->Update();
     ground_->Update();
-
+    weapon_->Update();
 
 
 
@@ -225,6 +237,8 @@ void SampleScene::Draw()
     human_->Draw(&SceneCamera_, drawColor_);
 
     human2_->Draw(&SceneCamera_, drawColor_);
+
+    weapon_->Draw(&SceneCamera_, drawColor_);
 
     // Sprite用のPSO等をセット
     Sprite::PreDraw();

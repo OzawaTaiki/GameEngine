@@ -33,7 +33,8 @@ public:
     bool IsEndAnimation() const { return !animationController_ || !animationController_->IsAnimationPlaying(); }
 
     void SetModel(const std::string& _filePath);
-    void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }
+    void SetParent(const WorldTransform* _parent) { worldTransform_.SetParent(_parent); }
+    void SetParent(const Matrix4x4* _parentMatrix) { worldTransform_.SetParent(_parentMatrix); }
 
     WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
@@ -44,7 +45,10 @@ public:
 
     std::string GetName() const{ return name_; }
 
-    ID3D12Resource* GetIndexResource(size_t _index = -1) { return model_->GetIndexResource(_index); }
+    const AnimationController* GetAnimationController();
+
+
+    const Matrix4x4* GetSkeletonSpaceMatrix(const std::string& _jointName)  const;
 
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };

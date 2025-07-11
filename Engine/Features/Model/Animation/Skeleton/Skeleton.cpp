@@ -26,6 +26,17 @@ void Skeleton::CreateSkeleton(const Node& _node)
     }
 }
 
+const Matrix4x4* Skeleton::GetSkeletonSpaceMatrix(const std::string& _name) const
+{
+    auto it = jointMap_.find(_name);
+    if (it != jointMap_.end())
+    {
+        return joints_[it->second].GetSkeletonSpaceMatrix();
+    }
+
+    return nullptr;
+}
+
 #ifdef _DEBUG
 void Skeleton::ImGui()
 {

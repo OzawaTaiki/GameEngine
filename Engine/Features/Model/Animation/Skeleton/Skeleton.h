@@ -19,7 +19,8 @@ public:
     void CreateSkeleton(const Node& _node);
     std::vector<Joint>& GetJoints() { return joints_; }
     std::map<std::string, int32_t>& GetJointMap() { return jointMap_; }
-    Matrix4x4 GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return joints_[_index].GetSkeletonSpaceMatrix(); }
+    const Matrix4x4* GetSkeletonSpaceMatrix(uint32_t _index = 0)const { return joints_[_index].GetSkeletonSpaceMatrix(); }
+    const Matrix4x4* GetSkeletonSpaceMatrix(const std::string& _name) const;
 
 
 #ifdef _DEBUG
