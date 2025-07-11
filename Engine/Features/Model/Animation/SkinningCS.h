@@ -16,10 +16,9 @@ class SRVManager;
 class SkinningCS
 {
 public:
-    SkinningCS();
+    SkinningCS(ID3D12PipelineState* _computePipeline, ID3D12RootSignature* _rootSignature);
     ~SkinningCS();
 
-    void Initialize();
     void Execute();
 
     uint32_t CreateSRVForInputVertexResource(ID3D12Resource* _resource, uint32_t _vertexNum);
@@ -40,11 +39,8 @@ public:
 private:
     void CreateInfoResource(uint32_t _vertexNum);
 
-    void CreateComputePipeline();
-
-    static bool isCreated_;
-    static Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipeline_;
-    static Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+    ID3D12PipelineState* computePipeline_;
+    ID3D12RootSignature* rootSignature_;
 
     DXCommon* dxCommon_;
     ID3D12GraphicsCommandList* commandList_;

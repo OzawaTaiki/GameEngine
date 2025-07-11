@@ -10,7 +10,7 @@ AnimationController::AnimationController(Model* _model) :
 {
 }
 
-void AnimationController::Initialize()
+void AnimationController::Initialize(ID3D12PipelineState* _computePipeline, ID3D12RootSignature* _rootSignature)
 {
     if (!model_)
         return;
@@ -31,7 +31,7 @@ void AnimationController::Initialize()
 
     margedMesh_->SetSkinnedVertexBufferView(SkinningCS::CreateOutputVertexResource(vertexCount));
 
-    skinningCS_ = std::make_unique<SkinningCS>();
+    skinningCS_ = std::make_unique<SkinningCS>(_computePipeline, _rootSignature);
 
     skinningCS_->CreateSRVForInputVertexResource(margedMesh_->GetVertexResource(), vertexCount);
     skinningCS_->CreateSRVForInfluenceResource(skinCluster_.GetInfluenceResource(), vertexCount);

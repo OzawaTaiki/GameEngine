@@ -21,7 +21,7 @@ public:
     ~AnimationController() = default;
 
     // 初期化
-    void Initialize();
+    void Initialize(ID3D12PipelineState* _computePipeline, ID3D12RootSignature* _rootSignature);
 
     // 更新
     void Update(float _deltaTime);

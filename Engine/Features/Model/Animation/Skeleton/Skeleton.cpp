@@ -37,9 +37,9 @@ const Matrix4x4* Skeleton::GetSkeletonSpaceMatrix(const std::string& _name) cons
     return nullptr;
 }
 
+#ifdef _DEBUG
 void Skeleton::ImGui()
 {
-#ifdef _DEBUG
 
     ImGui::SeparatorText("Skeleton");
     ImGui::Text("Root Joint : %s", joints_[rootIndex_].name_.c_str());
@@ -51,7 +51,6 @@ void Skeleton::ImGui()
 
     Show(joint, 0);
 
-#endif // _DEBUG
 }
 
 void Skeleton::Show(Joint& _joint, uint32_t _indent)
@@ -68,3 +67,4 @@ void Skeleton::Show(Joint& _joint, uint32_t _indent)
     }
 
 }
+#endif // _DEBUG
