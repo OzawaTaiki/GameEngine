@@ -26,6 +26,12 @@ public:
     QuaternionTransform GetTransform() const { return transform_; }
     QuaternionTransform GetIdleTransform() const { return idleTransform_; }
 
+    const std::vector<int32_t>& GetChildren() const { return children_; }
+
+#ifdef _DEBUG
+    void ImGui(std::unordered_map<std::string, int32_t>& _map, int32_t indent);
+#endif // _DEBUG
+
     std::string name_ = {};
     int32_t index_ = 0;
 private:
@@ -37,5 +43,5 @@ private:
 
     QuaternionTransform idleTransform_ = {};
 
-
+    bool openTree_ = false;
 };

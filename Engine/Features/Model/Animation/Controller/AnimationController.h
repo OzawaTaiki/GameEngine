@@ -51,6 +51,9 @@ public:
     // アニメーションが再生中かどうか
     bool IsAnimationPlaying() const;
 
+
+    void ImGui();
+    
 private:
 
     Model* model_ = nullptr;

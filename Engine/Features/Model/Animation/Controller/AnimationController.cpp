@@ -138,3 +138,13 @@ bool AnimationController::IsAnimationPlaying() const
 {
     return currentAnimation_ && currentAnimation_->IsPlaying();
 }
+
+void AnimationController::ImGui()
+{
+#ifdef _DEBUG
+
+    skeleton_.ImGui();
+
+
+#endif // _DEBUG
+}

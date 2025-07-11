@@ -58,6 +58,8 @@ struct PSOFlags
         Comb_mZero_fLessEqual = Enable | MaskZero | FuncLessEqual,
         // 書き込まない 奥を描画する 壁の向こうのシルエットとか
         Comb_mAll_fGreater = Enable | MaskAll | FuncGreater,
+
+        Comb_mZero_fAlways = Enable | MaskZero | FuncAlways, // 書き込まない 常に描画する
     };
 
     static constexpr uint64_t TypeShift = 0;          // Typeのビットシフト
@@ -151,6 +153,9 @@ struct PSOFlags
     }
     static constexpr PSOFlags ForLineDrawer() {
         return Combine(Type::LineDrawer, BlendMode::Normal, CullMode::None, DepthMode::Comb_mZero_fLessEqual);
+    }
+    static constexpr PSOFlags ForLineDrawerAlways() {
+        return Combine(Type::LineDrawer, BlendMode::Normal, CullMode::None, DepthMode::Comb_mZero_fAlways);
     }
     static constexpr PSOFlags ForAddBlendParticle() {
         return Combine(Type::Particle, BlendMode::Add, CullMode::None, DepthMode::Comb_mZero_fLessEqual);

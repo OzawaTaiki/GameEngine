@@ -21,25 +21,26 @@ public:
     void SetCameraPtr(const Camera* _cameraPtr) { cameraFor3dptr_ = _cameraPtr; }
     void SetCameraPtr2D(const Camera* _cameraPtr) { cameraFor2dptr_ = _cameraPtr; }
     void SetColor(const Vector4& _color) { color_ = _color; }
-    void RegisterPoint(const Vector3& _start, const Vector3& _end);
-    void RegisterPoint(const Vector3& _start, const Vector3& _end,const Vector4& _color);
+    void RegisterPoint(const Vector3& _start, const Vector3& _end, bool _frontDraw = false);
+    void RegisterPoint(const Vector3& _start, const Vector3& _end,const Vector4& _color, bool _frontDraw = false);
     void RegisterPoint(const Vector2& _start, const Vector2& _end);
     void RegisterPoint(const Vector2& _start, const Vector2& _end, const Vector4& _color);
     void Draw();
 
-    void DrawOBB(const Matrix4x4& _affineMat);
-    void DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color);
-    void DrawOBB(const std::array <Vector3, 8>& _vertices);
-    void DrawOBB(const std::array <Vector3, 8>& _vertices, const Vector4& _color);
+    void DrawOBB(const Matrix4x4& _affineMat, bool _frontDraw = false);
+    void DrawOBB(const Matrix4x4& _affineMat, const Vector4& _color, bool _frontDraw = false);
+    void DrawOBB(const std::array <Vector3, 8>& _vertices, bool _frontDraw = false);
+    void DrawOBB(const std::array <Vector3, 8>& _vertices, const Vector4& _color, bool _frontDraw = false);
 
-    void DrawSphere(const Matrix4x4& _affineMat);
-    void DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color);
-    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal);
-    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color);
+    void DrawSphere(const Matrix4x4& _affineMat, bool _frontDraw = false);
+    void DrawSphere(const Matrix4x4& _affineMat, const Vector4& _color, bool _frontDraw = false);
+    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, bool _frontDraw = false);
+    void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color, bool _frontDraw = false);
 
 private:
     void Draw3Dlines();
     void Draw2Dlines();
+    void Draw3DlinesAlways();
 
     void TransferData();
 
@@ -47,12 +48,16 @@ private:
 
     const uint32_t kMaxNum = 4096u * 24u;
     uint32_t indexFor3d_ = 0u;
+    uint32_t indexFor3dAlways_ = 0u;
     uint32_t indexFor2d_ = 0u;
     Vector4 color_ = { 0,0,0,1 };
     const Camera* cameraFor3dptr_=nullptr;
     const Camera* cameraFor2dptr_ = nullptr;
     ID3D12RootSignature* rootSignature_ = nullptr;
     ID3D12PipelineState* graphicsPipelineState_ = nullptr;
+
+    // 常時描画のためのPipelineStateObject
+    ID3D12PipelineState* graphicsPipelineStateForAlways_ = nullptr;
 
     struct ConstantBufferData
     {
@@ -78,6 +83,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceFor2D_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewFor2D_ = {};
 
+    PointData* vConstMapFor3DAlways_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceFor3DAlways_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewFor3DAlways_ = {};
+
 
     void SetVerties();
 
@@ -88,6 +97,8 @@ private:
     const float kDivision = 8;
     std::vector <Vector3> sphereVertices_;
     std::vector <uint32_t> sphereIndices_;
+
+private:
 
     LineDrawer() = default;
     ~LineDrawer() = default;

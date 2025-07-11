@@ -201,6 +201,13 @@ void ObjectModel::ImGui()
     {
         SetModel(filePathBuffer_);
     }
+
+    if(animationController_)
+    {
+        if(ImGui::CollapsingHeader("Skeleton"))
+            animationController_->ImGui();
+    }
+
     ImGui::PopID();
 
 #endif // _DEBUG
