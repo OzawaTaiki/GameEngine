@@ -20,9 +20,14 @@ public:
     void PreDrawForObjectModel() const;
     void PreDrawForAlphaObjectModel() const;
 
+    ID3D12PipelineState* GetComputePipeline() const { return computePipeline_.Get(); }
+    ID3D12RootSignature* GetComputeRootSignature() const { return rootSignatureForCompute_.Get(); }
+
     Model* FindSameModel(const std::string& _name);
     Model* Create(const std::string& _name);
 private:
+
+    void CreateComputePipeline();
 
     std::unordered_map < std::string, std::unique_ptr<Model>> models_ = {};
 
@@ -31,6 +36,8 @@ private:
 
     ID3D12PipelineState* graphicsPipelineStateForAlpha_ = {};
 
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipeline_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureForCompute_ = nullptr;
 
     PSOFlags psoFlags_ = {};
     PSOFlags psoFlagsForAlpha_{};

@@ -9,48 +9,30 @@
 #include <dxcapi.h>
 
 
-Microsoft::WRL::ComPtr<ID3D12PipelineState> SkinningCS::computePipeline_ = nullptr;
-Microsoft::WRL::ComPtr<ID3D12RootSignature> SkinningCS::rootSignature_ = nullptr;
-
-bool SkinningCS::isCreated_ = false;
-
-
-
-SkinningCS::SkinningCS()
+SkinningCS::SkinningCS(ID3D12PipelineState* _computePipeline, ID3D12RootSignature* _rootSignature)
+    : computePipeline_(_computePipeline), rootSignature_(_rootSignature)
 {
     dxCommon_ = DXCommon::GetInstance();
     commandList_ = dxCommon_->GetCommandList();
     srvManager_ = SRVManager::GetInstance();
-
-
-    if (!isCreated_)
-    {
-        CreateComputePipeline();
-        isCreated_ = true;
-    }
 }
 
 SkinningCS::~SkinningCS()
 {
-    if (computePipeline_)
-        computePipeline_.Reset();
+    if(computePipeline_)
+        computePipeline_ = nullptr;
 
     if (rootSignature_)
-        rootSignature_.Reset();
+        rootSignature_ = nullptr;
 
-}
-
-void SkinningCS::Initialize()
-{
-    //CreateInputVertexResource( _vertexSize);
 }
 
 void SkinningCS::Execute()
 {
     srvManager_->PreDraw();
 
-    commandList_->SetPipelineState(computePipeline_.Get());
-    commandList_->SetComputeRootSignature(rootSignature_.Get());
+    commandList_->SetPipelineState(computePipeline_);
+    commandList_->SetComputeRootSignature(rootSignature_);
     commandList_->SetComputeRootDescriptorTable(0, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(matrixPaletteSrvIndex_));
     commandList_->SetComputeRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(inputVertexSrvIndex_));
     commandList_->SetComputeRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(influenceSrvIndex_));
@@ -91,7 +73,7 @@ uint32_t SkinningCS::CreateSRVForMatrixPaletteResource(ID3D12Resource* _resource
     return matrixPaletteSrvIndex_;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> SkinningCS::CreateOutputVertexResource(size_t _vertexSize) 
+Microsoft::WRL::ComPtr<ID3D12Resource> SkinningCS::CreateOutputVertexResource(size_t _vertexSize)
 {
     DXCommon* dxCommon = DXCommon::GetInstance();
 
@@ -123,137 +105,9 @@ Microsoft::WRL::ComPtr<ID3D12Resource> SkinningCS::CreateOutputVertexResource(si
     return outputVertexResource;
 }
 
-//void SkinningCS::CreateInfluenceResource( uint32_t _influenceSize)
-//{
-//    influenceResource_ = dxCommon_->CreateBufferResource(sizeof(VertexInfluenceData) * _influenceSize);
-//
-//    influenceSrvIndex_ = srvManager_->Allocate();
-//    srvManager_->CreateSRVForStructureBuffer(influenceSrvIndex_, influenceResource_.Get(), _influenceSize, sizeof(VertexInfluenceData));
-//
-//    influenceResource_->Map(0, nullptr, reinterpret_cast<void**>(&influence_));
-//
-//}
-//
-//void SkinningCS::CreateMatrixPaletteResource( uint32_t _influenceSize)
-//{
-//    matrixPaletteResource_ = dxCommon_->CreateBufferResource(sizeof(WellForGPU) * _influenceSize);
-//
-//    matrixPaletteSrvIndex_ = srvManager_->Allocate();
-//    srvManager_->CreateSRVForStructureBuffer(matrixPaletteSrvIndex_, matrixPaletteResource_.Get(), _influenceSize, sizeof(WellForGPU));
-//
-//    matrixPaletteResource_->Map(0, nullptr, reinterpret_cast<void**>(&matrixPalette_));
-//}
-//
-//void SkinningCS::CreateVertexNumResource(uint32_t _vertexNum)
-//{
-//    skinnedInformationResources_ = dxCommon_->CreateBufferResource(sizeof(uint32_t));
-//
-//    skinnedInformationResources_->Map(0, nullptr, reinterpret_cast<void**>(&_vertexNum));
-//}
-
 void SkinningCS::CreateInfoResource(uint32_t _vertexNum)
 {
     skinnedInformationResources_ = dxCommon_->CreateBufferResource(sizeof(uint32_t));
     skinnedInformationResources_->Map(0, nullptr, reinterpret_cast<void**>(&vertexNum_));
     *vertexNum_ = _vertexNum;
-}
-
-void SkinningCS::CreateComputePipeline()
-{
-    isCreated_ = true;
-    HRESULT hr = S_FALSE;
-
-
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-    D3D12_DESCRIPTOR_RANGE descriptorRanges[4] = {};
-    // gMatrixPalette
-    descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    descriptorRanges[0].NumDescriptors = 1;
-    descriptorRanges[0].BaseShaderRegister = 0;
-    descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-    // inputVertex
-    descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    descriptorRanges[1].NumDescriptors = 1;
-    descriptorRanges[1].BaseShaderRegister = 1;
-    descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-    // gInfluence
-    descriptorRanges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    descriptorRanges[2].NumDescriptors = 1;
-    descriptorRanges[2].BaseShaderRegister = 2;
-    descriptorRanges[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-    // outputVertex
-    descriptorRanges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-    descriptorRanges[3].NumDescriptors = 1;
-    descriptorRanges[3].BaseShaderRegister = 0;
-    descriptorRanges[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-
-    D3D12_ROOT_PARAMETER rootParameters[5] = {};
-
-    // gMatrixPalette
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
-    rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-
-    // inputVertex
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
-
-    // gInfluence
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[2];
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
-
-    // outputVertex
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRanges[3];
-    rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
-
-    // skinnedInformation
-    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[4].Descriptor.ShaderRegister = 0;
-
-
-    descriptionRootSignature.pParameters = rootParameters;
-    descriptionRootSignature.NumParameters = _countof(rootParameters);
-
-
-    //シリアライズしてバイナリする
-    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-    if (FAILED(hr))
-    {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        assert(false);
-    }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-    assert(SUCCEEDED(hr));
-
-
-    // ComputeShaderの設定
-    Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob = nullptr;
-    // ComputeShaderのコンパイル
-    computeShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Skinning.CS.hlsl", L"cs_6_0");
-    assert(computeShaderBlob != nullptr);
-
-    D3D12_COMPUTE_PIPELINE_STATE_DESC computePsoDesc = {};
-    computePsoDesc.pRootSignature = rootSignature_.Get();
-    computePsoDesc.CS = { computeShaderBlob->GetBufferPointer(), computeShaderBlob->GetBufferSize() };
-
-    hr = dxCommon_->GetDevice()->CreateComputePipelineState(&computePsoDesc, IID_PPV_ARGS(&computePipeline_));
-    assert(SUCCEEDED(hr));
-
-
 }

@@ -49,6 +49,7 @@ void ObjectModel::Update()
     else
         worldTransform_.rotate_ = euler_;
     worldTransform_.UpdateData(useQuaternion_);
+
     if (model_->HasAnimation() && animationController_->IsAnimationPlaying())
     {
         animationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
@@ -77,7 +78,10 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList,animationController_->GetMargedMesh());
+    if(animationController_)
+        model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList, _color);
 
     if (drawSkeleton_)
         animationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -103,7 +107,11 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    model_->QueueCommandAndDraw(commandList, _textureHandle);// BVB IBV MTL2 TEX4 LIGHT567
+
+    if (animationController_)
+        model_->QueueCommandAndDraw(commandList, _textureHandle, _color, animationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList, _textureHandle, _color);
 
     if(drawSkeleton_)
         animationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -112,6 +120,12 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     model_->LoadAnimation(_filePath, _name);
+    if (!animationController_)
+    {
+        animationController_ = std::make_unique<AnimationController>(model_);
+        auto modelManager = ModelManager::GetInstance();
+        animationController_->Initialize(modelManager->GetComputePipeline(), modelManager->GetComputeRootSignature());
+    }
 }
 
 void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
@@ -217,8 +231,12 @@ void ObjectModel::InitializeCommon()
 {
     worldTransform_.Initialize();
 
-    animationController_ = std::make_unique<AnimationController>(model_);
-    animationController_->Initialize();
+    if (model_->HasAnimation())
+    {
+        animationController_ = std::make_unique<AnimationController>(model_);
+        auto modelManager = ModelManager::GetInstance();
+        animationController_->Initialize(modelManager->GetComputePipeline(), modelManager->GetComputeRootSignature());
+    }
 
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();

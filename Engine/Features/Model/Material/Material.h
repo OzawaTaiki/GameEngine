@@ -31,6 +31,8 @@ public:
 
     UVTransform& GetUVTransform() { return uvTransform_; }
 
+    void SetColor(const Vector4& _color) { deffuseColor_ = _color; }
+
 
     void TransferData();
     void MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _index) const;
@@ -44,7 +46,7 @@ private:
 private:
 
     UVTransform     uvTransform_ = {};
-    Vector3 deffuseColor_ = { 1.0f, 1.0f, 1.0f }; // ディフューズカラー
+    Vector4 deffuseColor_ = { 1.0f, 1.0f, 1.0f , 1.0f }; // ディフューズカラー
     bool hasTexture_ = true;
 
     std::string     name_                           = {};
