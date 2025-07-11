@@ -86,7 +86,8 @@
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shader\"
+mkdir "$(solutionDir)Resources\Shader\"
+xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shader\"
 
 
 </Command>
@@ -128,7 +129,8 @@ xcopy "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shader\"
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shader\"
+mkdir "$(solutionDir)Resources\Shader\"
+xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shader\"
 
 
 </Command>
