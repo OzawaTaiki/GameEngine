@@ -163,9 +163,6 @@
     <Filter Include="Utility\ConvertString">
       <UniqueIdentifier>{CA125FFB-B0E4-4016-892A-CCCC6AF6D3CA6BBF}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HLSL">
-      <UniqueIdentifier>{5a86c1ea-ecf1-4be9-bddc-a3ce876dd994}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\DXCommon\RTV">
       <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
@@ -220,9 +217,6 @@
     <Filter Include="Features\Effect\Modifier\Preset">
       <UniqueIdentifier>{9a979377-feee-4e10-a9ea-5feee9e98dfc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HLSL\postEffects">
-      <UniqueIdentifier>{a7a2c9b1-a36b-4f7a-a97f-fa4b9def2dc5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\PosttEffects">
       <UniqueIdentifier>{0d12b7c9-3a88-4e79-b72f-0a20aa417cf9}</UniqueIdentifier>
     </Filter>
@@ -249,6 +243,12 @@
     </Filter>
     <Filter Include="Features\Model\Animation\Controller">
       <UniqueIdentifier>{a2dab9cd-9e93-4bde-9508-eb15a103c35d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{160aacb6-6a9e-474d-8fe8-9a3e0e820582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffects">
+      <UniqueIdentifier>{7e57f265-25f1-4991-8573-e6274ac52084}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -573,95 +573,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.PS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\LineDrawer.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Object3d.PS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Object3d.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Particle.PS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Particle.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\SkinningObject3d.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Sprite.PS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Sprite.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.PS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\FullScreen.VS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\ShadowMap.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Skinning.CS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="PointLightShadowMap.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\BoxFilter.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\GaussianFilter.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\GrayScale.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Vignetting.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\LuminanceBasedOutline.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\DepthBasedOutline.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\RadialBlur.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\Dissolve.hlsl">
-      <Filter>HLSL\postEffects</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Sample\Resources\Shader\SkyBox.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\Application\Resources\Shader\TextRenderer.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="..\Sample\Resources\Shader\LineDrawer.hlsli">
-      <Filter>HLSL</Filter>
+    <None Include="Resources\Shader\FullScreen.hlsli">
+      <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Sample\Resources\Shader\Object3d.hlsli">
-      <Filter>HLSL</Filter>
+    <None Include="Resources\Shader\LineDrawer.hlsli">
+      <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Sample\Resources\Shader\Particle.hlsli">
-      <Filter>HLSL</Filter>
+    <None Include="Resources\Shader\Object3d.hlsli">
+      <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Sample\Resources\Shader\Sprite.hlsli">
-      <Filter>HLSL</Filter>
+    <None Include="Resources\Shader\Particle.hlsli">
+      <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Sample\Resources\Shader\FullScreen.hlsli">
-      <Filter>HLSL</Filter>
+    <None Include="Resources\Shader\Sprite.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1034,5 +960,79 @@
     <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\FullScreen.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\LineDrawer.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\LineDrawer.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Object3d.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Particle.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Particle.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\PointLightShadowMap.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\ShadowMap.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Skinning.CS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\SkinningObject3d.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\SkyBox.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Sprite.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Sprite.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\TextRenderer.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BoxFilter.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\DepthBasedOutline.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Dissolve.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\GaussianFilter.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\GrayScale.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\LuminanceBasedOutline.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Vignetting.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\RadialBlur.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
