@@ -39,11 +39,10 @@ public:
     void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
     void Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color);
 
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle) const;
-
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh, uint32_t _textureHandle) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const Vector4& _color, MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, MargedMesh* _margedMesh = nullptr) const;
 
     void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const;
 

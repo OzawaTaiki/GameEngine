@@ -30,8 +30,7 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
-    //TODO
-    //bool IsEndAnimation() const { return !model_->IsAnimationPlaying(); }
+    bool IsEndAnimation() const { return !animationController_ || !animationController_->IsAnimationPlaying(); }
 
     void SetModel(const std::string& _filePath);
     void SetParent(const WorldTransform* _parent) { worldTransform_.parent_ = _parent; }

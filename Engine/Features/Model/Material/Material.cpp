@@ -41,7 +41,7 @@ void Material::TransferData()
 	Matrix4x4 affine = uvTransform_.GetMatrix();
 
 	constMap_->uvTransform = affine;
-    constMap_->deffuseColor = Vector4(deffuseColor_.x, deffuseColor_.y, deffuseColor_.z, 1.0f);
+	constMap_->deffuseColor = deffuseColor_;
 	constMap_->shininess = shiness_;
 	constMap_->enabledLighthig = enableLighting_;
     constMap_->hasTexture = hasTexture_ ? 1 : 0;
@@ -65,7 +65,7 @@ void Material::TextureQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT
 void Material::AnalyzeMaterial(const aiMaterial* _material)
 {
     aiUVTransform uvTransform;
-	if (_material->Get(AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE, 0), uvTransform_) == AI_SUCCESS)
+	if (_material->Get(AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE, 0), uvTransform) == AI_SUCCESS)
 	{
         uvTransform_.SetOffset(Vector2(uvTransform.mTranslation.x, uvTransform.mTranslation.y));
         uvTransform_.SetScale(Vector2(uvTransform.mScaling.x, uvTransform.mScaling.y));
@@ -81,11 +81,11 @@ void Material::AnalyzeMaterial(const aiMaterial* _material)
 	aiColor3D meshColor;
 	if (_material->Get(AI_MATKEY_COLOR_DIFFUSE, meshColor) == AI_SUCCESS)
 	{
-        deffuseColor_ = Vector3(meshColor.r, meshColor.g, meshColor.b);
+		deffuseColor_ = Vector4(meshColor.r, meshColor.g, meshColor.b, 1.0f);
 	}
     else
     {
-        deffuseColor_ = Vector3(1.0f, 1.0f, 1.0f); // デフォルトの色
+        deffuseColor_ = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // デフォルトの色
     }
     if (_material->Get(AI_MATKEY_SHININESS, shiness_) != AI_SUCCESS)
     {
