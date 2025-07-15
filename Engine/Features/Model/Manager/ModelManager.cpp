@@ -2,6 +2,7 @@
 
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Debug/Debug.h>
 #include <cassert>
 
 ModelManager* ModelManager::GetInstance()
