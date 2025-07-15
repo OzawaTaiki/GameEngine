@@ -23,7 +23,6 @@ void ObjectModel::Initialize(const std::string& _filePath)
     model_ = Model::CreateFromFile(_filePath);
 
     InitializeCommon();
-
 }
 
 void ObjectModel::Initialize(std::unique_ptr<Mesh>  _mesh)
@@ -58,6 +57,36 @@ void ObjectModel::Update()
 
 }
 
+void ObjectModel::Draw(const Camera* _camera)
+{
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+    if (lightGroup)
+    {
+        auto pointLights = lightGroup->GetAllPointLights();
+        if (!pointLights.empty())
+        {
+            auto handles = pointLights[0]->GetShadowMapHandles();
+            uint32_t handle = handles[0];
+            RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+        }
+    }
+
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+
+    if (animationController_)
+        model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList);
+
+    if (drawSkeleton_)
+        animationController_->DrawSkeleton(worldTransform_.matWorld_);
+}
+
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 {
     objectColor_->SetColor(_color);
@@ -82,7 +111,7 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     if(animationController_)
         model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
     else
-        model_->QueueCommandAndDraw(commandList, _color);
+        model_->QueueCommandAndDraw(commandList);
 
     if (drawSkeleton_)
         animationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -110,9 +139,9 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     objectColor_->QueueCommand(commandList, 3);
 
     if (animationController_)
-        model_->QueueCommandAndDraw(commandList, _textureHandle, _color, animationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, _textureHandle, animationController_->GetMargedMesh());
     else
-        model_->QueueCommandAndDraw(commandList, _textureHandle, _color);
+        model_->QueueCommandAndDraw(commandList, _textureHandle);
 
     if(drawSkeleton_)
         animationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -259,13 +288,6 @@ void ObjectModel::ImGui()
 void ObjectModel::InitializeCommon()
 {
     worldTransform_.Initialize();
-
-    if (model_->HasAnimation())
-    {
-        animationController_ = std::make_unique<AnimationController>(model_);
-        auto modelManager = ModelManager::GetInstance();
-        animationController_->Initialize(modelManager->GetComputePipeline(), modelManager->GetComputeRootSignature());
-    }
 
     objectColor_ = std::make_unique<ObjectColor>();
     objectColor_->Initialize();

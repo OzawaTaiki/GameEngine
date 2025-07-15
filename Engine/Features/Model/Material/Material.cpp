@@ -47,8 +47,9 @@ void Material::TransferData()
     constMap_->hasTexture = hasTexture_ ? 1 : 0;
 }
 
-void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) const
+void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) 
 {
+	TransferData();
     _commandList->SetGraphicsRootConstantBufferView(_index, resorces_->GetGPUVirtualAddress());
 }
 
