@@ -235,7 +235,6 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const V
             size_t materialIndex = mesh->GetUseMaterialIndex();
 
             material_[materialIndex]->SetColor(_color);
-            material_[materialIndex]->TransferData();
             material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
             material_[materialIndex]->TextureQueueCommand(_commandList, 4);
             _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);

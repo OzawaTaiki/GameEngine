@@ -19,6 +19,7 @@ public:
 
     void Update();
 
+    void Draw(const Camera* _camera);
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
     void DrawShadow(const Camera* _camera);
@@ -43,7 +44,10 @@ public:
     Vector3 GetMax()const { return model_->GetMax(); }
     Material* GetMaterial() { return model_->GetMaterialPtr(); }
 
+    void SetTimeChannel(const std::string& _channelName) { timeChannel = _channelName; }
+
     std::string GetName() const{ return name_; }
+
 
     const AnimationController* GetAnimationController();
 

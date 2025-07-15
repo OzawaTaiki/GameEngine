@@ -21,14 +21,15 @@ void WorldTransform::UpdateData(bool _useQuaternion)
         matWorld_ = MakeAffineMatrix(scale_, quaternion_, transform_);
     else
         matWorld_ = MakeAffineMatrix(scale_, rotate_, transform_);
+    if (parentMatrix_)
+    {
+        matWorld_ *= *parentMatrix_;
+    }
     if (parent_)
     {
         matWorld_ *= parent_->matWorld_;
     }
-    else if (parentMatrix_)
-    {
-        matWorld_ *= *parentMatrix_;
-    }
+
     TransferData();
 }
 
@@ -44,13 +45,11 @@ Vector3 WorldTransform::GetWorldPosition() const
 void WorldTransform::SetParent(const WorldTransform* _parent)
 {
     parent_ = _parent;
-    parentMatrix_ = nullptr;
 }
 
 void WorldTransform::SetParent(const Matrix4x4* _parentMatrix)
 {
     parentMatrix_ = _parentMatrix;
-    parent_ = nullptr;
 }
 
 void WorldTransform::UpdateData(const std::initializer_list<Matrix4x4>& _mat)
