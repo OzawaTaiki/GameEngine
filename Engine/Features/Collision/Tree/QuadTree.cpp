@@ -16,7 +16,7 @@ QuadTree::~QuadTree()
     cells_.clear();
 }
 
-void QuadTree::Initialize(const Vector2& _rootSize, uint32_t _level, const Vector2& _leftBottom)
+void QuadTree::Initialize(const Vector2& _rootSize, int32_t _level, const Vector2& _leftBottom)
 {
     if (_rootSize.x <= 0 || _rootSize.y <= 0 || _level > kMaxLevel_)
         return;
@@ -26,7 +26,7 @@ void QuadTree::Initialize(const Vector2& _rootSize, uint32_t _level, const Vecto
     leftBottom_ = _leftBottom;
 
     quadNodesPerLevel_[0] = 1;
-    for (uint32_t i = 1; i <= kMaxLevel_; ++i)
+    for (size_t i = 1; i <= kMaxLevel_; ++i)
     {
         quadNodesPerLevel_[i] = quadNodesPerLevel_[i - 1] * 4;
     }
@@ -180,10 +180,10 @@ MortonResult QuadTree::CalculateObjectMortonNumberAndLevel(const Vector2& _pos, 
     if (xorResult == 0)
         return { lt_index , level_ };
 
-    uint32_t shiftCount = 0;
+    int32_t shiftCount = 0;
     for (int i = 30; i >= 0; i -= 2)
     {
-        uint32_t bitPair = (xorResult >> i) & 0x3;
+        int32_t bitPair = (xorResult >> i) & 0x3;
         if (bitPair != 0)
         {
             shiftCount = i + 2;
@@ -191,8 +191,8 @@ MortonResult QuadTree::CalculateObjectMortonNumberAndLevel(const Vector2& _pos, 
         }
     }
 
-    uint32_t levelDiff = shiftCount / 2;
-    uint32_t objectLevel = level_ - levelDiff;
+    int32_t levelDiff = shiftCount / 2;
+    int32_t objectLevel = level_ - levelDiff;
     int32_t belongingNumber = rb_index >> shiftCount;
 
     return { belongingNumber, objectLevel };

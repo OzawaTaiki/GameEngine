@@ -10,7 +10,7 @@
 struct MortonResult
 {
     int32_t mortonNumber;
-    uint32_t level;
+    int32_t level;
 };
 
 class QuadTree
@@ -19,7 +19,7 @@ public:
     QuadTree() = default;
     ~QuadTree();
 
-    void Initialize(const Vector2& _rootSize, uint32_t _level,const Vector2& _leftTop);
+    void Initialize(const Vector2& _rootSize, int32_t _level,const Vector2& _leftTop);
     void RegisterObj(Collider* _obj);
     void GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*, Collider*>>& _pair, std::list<Collider*>& _stac);
 
@@ -39,7 +39,7 @@ private:
     Vector2 minSpaceSize_ = { 1.0f, 1.0f };
     Vector2 leftBottom_ = { 0.0f, 0.0f };
     std::array<uint32_t, kMaxLevel_ + 1> quadNodesPerLevel_{};
-    uint32_t level_ = 3;
+    int32_t level_ = 3;
     std::vector<Cell*> cells_;
     uint32_t cellCount_ = 0;
 };
