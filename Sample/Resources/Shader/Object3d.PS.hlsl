@@ -107,7 +107,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
     output.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 textureColor = deffuseColor;
+    float4 textureColor = deffuseColor * materialColor;
 
     if (hasTexture != 0)
     {

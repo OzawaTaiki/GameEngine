@@ -108,49 +108,8 @@ void DeveScene::Initialize(SceneData* _sceneData)
     skyBox_->Initialize(30.0f);
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
-    LevelEditorLoader loader;
-
-    loader.Load("Resources/testData/test.json");
-
-    auto objectParams = loader.GetAllObjectParameters();
-
-    for (const auto& [name, params] : objectParams)
-    {
-        if (params.name == "Camera")
-            continue;
-
-        auto model = std::make_unique<ObjectModel>(params.name);
-        // モデルのを読み込む
-        model->Initialize(params.modelPath);
-
-        model->translate_ = params.position;
-        model->euler_ = params.rotation;
-        model->scale_ = params.scale;
-
-
-        if (params.hasChild)
-        {
-            for (const auto& child : params.childParameters)
-            {
-                auto childModel = std::make_unique<ObjectModel>(child.name);
-                childModel->Initialize(child.modelPath);
-                childModel->translate_ = child.position;
-                childModel->euler_ = child.rotation;
-                childModel->scale_ = child.scale;
-
-                childModel->SetParent(model->GetWorldTransform());
-
-                models_.push_back(std::move(childModel));
-
-            }
-        }
-
-        models_.push_back(std::move(model));
-    }
-
-    SceneCamera_.translate_ = objectParams["Camera"].position;
-    SceneCamera_.rotate_ = objectParams["Camera"].rotation;
-
+    Rand();
+    
 
     textRenderer_ = TextRenderer::GetInstance();
 }
@@ -207,9 +166,16 @@ void DeveScene::Update()
 
     }
 
-
+    if (input_->IsKeyTriggered(DIK_F2))
+    {
+        // ランダムにモデルを生成
+        Rand();
+    }
 
 #endif // _DEBUG
+
+    for (auto& col : colliders_)
+        CollisionManager::GetInstance()->RegisterCollider(col.get());
 
 
     // モデルの更新
@@ -274,4 +240,47 @@ void DeveScene::Draw()
 
 void DeveScene::DrawShadow()
 {
+}
+
+void DeveScene::Rand()
+{
+    models_.clear();
+    colliders_.clear();
+
+    RandomGenerator* rand = RandomGenerator::GetInstance();
+    for (size_t i = 0; i < 100; ++i)
+    {
+        auto model = std::make_unique<ObjectModel>("model");
+        model->Initialize("cube/cube.obj");
+        model->translate_ = rand->GetRandValue(Vector3(-48, 1, -48), Vector3(48, 1, 48));
+
+        model->Update();
+
+
+        auto col = std::make_unique<OBBCollider>("col");
+        col->Initialize();
+        col->SetHalfExtents((model->GetMax() - model->GetMin()) * 0.5f);
+        col->SetCollisionLayer("box");
+        col->SetWorldTransform(model->GetWorldTransform());
+
+
+        models_.push_back(std::move(model));
+        colliders_.push_back(std::move(col));
+    }
+
+    auto model = std::make_unique<ObjectModel>("model");
+    model->Initialize("cube/cube.obj");
+    model->translate_ = rand->GetRandValue(Vector3(-0, 0, -0), Vector3(0, 0, 0));
+    model->scale_ = Vector3(20, 1, 10);
+    model->Update();
+
+
+    auto col = std::make_unique<OBBCollider>("col");
+    col->Initialize();
+    col->SetHalfExtents((model->GetMax() - model->GetMin()) * 0.5f);
+    col->SetCollisionLayer("box");
+    col->SetWorldTransform(model->GetWorldTransform());
+
+    models_.push_back(std::move(model));
+    colliders_.push_back(std::move(col));
 }

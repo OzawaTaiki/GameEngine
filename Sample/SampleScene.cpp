@@ -70,10 +70,10 @@ void SampleScene::Initialize(SceneData* _sceneData)
 
     human_ = std::make_unique<ObjectModel>("human");
     // モデルのを読み込む
-    human_->Initialize("BrainStem/BrainStem.gltf");
+    human_->Initialize("human/walk.gltf");
     // アニメーション読み込み
     // 任意の名前を設定できる
-    human_->LoadAnimation("BrainStem/BrainStem.gltf", "anim");
+    human_->LoadAnimation("human/walk.gltf", "anim");
 
     bool loop = true;
     // アニメーションを再生する
@@ -81,8 +81,8 @@ void SampleScene::Initialize(SceneData* _sceneData)
 
     human2_ = std::make_unique<ObjectModel>("human2");
 
-    human2_->Initialize("BrainStem/BrainStem.gltf");
-    human2_->LoadAnimation("BrainStem/BrainStem.gltf", "anim");
+    human2_->Initialize("human/walk.gltf");
+    human2_->LoadAnimation("human/walk.gltf", "anim");
     human2_->translate_.x = 2.0f;
 
 
@@ -187,6 +187,7 @@ void SampleScene::Update()
     }
 
 #endif // _DEBUG
+
 
     if (input_->IsKeyTriggered(DIK_SPACE))
     {
