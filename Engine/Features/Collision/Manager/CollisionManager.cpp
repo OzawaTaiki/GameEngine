@@ -20,7 +20,7 @@ void CollisionManager::Initialize(const Vector2& _fieldSize, uint32_t _level, co
     quadTree_->Initialize(_fieldSize, _level, _leftBotom);
 
     // スパイラルハッシュグリッドの初期化
-    spiralHashGrid_ = std::make_unique<SpiralHashGrid>(_gridSize);
+    spiralHashGrid_ = std::make_unique<SpatialHashGrid>(_gridSize);
     spiralHashGrid_->Clear();
 }
 
@@ -112,26 +112,11 @@ void CollisionManager::CheckCollisions()
         for (size_t j = i + 1; j < colliders_.size(); ++j)
         {
             Collider* colliderB = colliders_[j];
-
-            // レイヤーマスクでフィルタリング
-            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
-                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
-            {
-                continue; // 衝突しないように設定されている
-            }
-
             potentialCollisions_.emplace_back(colliderA, colliderB);
         }
         for (auto& staticColliders_ : staticColliders_)
         {
             Collider* colliderB = staticColliders_;
-
-            // レイヤーマスクでフィルタリング
-            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
-                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
-            {
-                continue; // 衝突しないように設定されている
-            }
             potentialCollisions_.emplace_back(colliderA, colliderB);
         }
     }

@@ -7,11 +7,11 @@
 #include <unordered_map>
 #include <vector>
 
-class SpiralHashGrid
+class SpatialHashGrid
 {
 public:
-    SpiralHashGrid(float _cellSize) : cellSize_(_cellSize) {};
-    ~SpiralHashGrid() = default;
+    SpatialHashGrid(float _cellSize) : cellSize_(_cellSize) {};
+    ~SpatialHashGrid() = default;
 
     void Clear() { grid_.clear(); }
     void Reset() { Clear(); }

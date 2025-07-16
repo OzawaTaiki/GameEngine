@@ -167,7 +167,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Collision\RayCast\Ray.cpp" />
     <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp" />
     <ClCompile Include="Features\Collision\Shapes.cpp" />
-    <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGrid.cpp" />
+    <ClCompile Include="Features\Collision\SpiralHashGird\SpatialHashGrid.cpp" />
     <ClCompile Include="Features\Collision\Tree\Cell.cpp" />
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp" />
     <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp" />
@@ -277,7 +277,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Collision\RayCast\Ray.h" />
     <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h" />
     <ClInclude Include="Features\Collision\Shapes.h" />
-    <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGrid.h" />
+    <ClInclude Include="Features\Collision\SpiralHashGird\SpatialHashGrid.h" />
     <ClInclude Include="Features\Collision\Tree\Cell.h" />
     <ClInclude Include="Features\Collision\Tree\QuadTree.h" />
     <ClInclude Include="Features\Effect\Editor\ParticleEditor.h" />
