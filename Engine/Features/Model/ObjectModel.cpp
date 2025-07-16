@@ -50,9 +50,13 @@ void ObjectModel::Update()
 
     worldTransform_.UpdateData(useQuaternion_);
 
-    if (animationController_ && model_->HasAnimation() && animationController_->IsAnimationPlaying())
+    if(model_->HasAnimation())
     {
-        animationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+        if (uniqueAnimationController_ &&uniqueAnimationController_->IsAnimationPlaying())
+        {
+            uniqueAnimationController_->Update(gameTime_->GetChannel(timeChannel).GetDeltaTime<float>());
+        }
+        // sharedはフレーム内更新を一度にしたいためここでは更新しない
     }
 
 }
@@ -108,13 +112,20 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
-    if(animationController_)
-        model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
+    if(uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, sharedAnimationController_->GetMargedMesh());
     else
         model_->QueueCommandAndDraw(commandList);
 
     if (drawSkeleton_)
-        animationController_->DrawSkeleton(worldTransform_.matWorld_);
+    {
+        if (uniqueAnimationController_)
+            uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+        else if (sharedAnimationController_)
+            sharedAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+    }
 }
 
 void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
@@ -138,23 +149,25 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
 
-    if (animationController_)
-        model_->QueueCommandAndDraw(commandList, _textureHandle, animationController_->GetMargedMesh());
+    if (uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, _textureHandle, uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, _textureHandle, sharedAnimationController_->GetMargedMesh());
     else
         model_->QueueCommandAndDraw(commandList, _textureHandle);
 
     if(drawSkeleton_)
-        animationController_->DrawSkeleton(worldTransform_.matWorld_);
+        uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
 void ObjectModel::LoadAnimation(const std::string& _filePath, const std::string& _name)
 {
     model_->LoadAnimation(_filePath, _name);
-    if (!animationController_)
+    if (!uniqueAnimationController_)
     {
-        animationController_ = std::make_unique<AnimationController>(model_);
+        uniqueAnimationController_ = std::make_unique<AnimationController>(model_);
         auto modelManager = ModelManager::GetInstance();
-        animationController_->Initialize(modelManager->GetComputePipeline(), modelManager->GetComputeRootSignature());
+        uniqueAnimationController_->Initialize(modelManager->GetComputePipeline(), modelManager->GetComputeRootSignature());
     }
 }
 
@@ -162,7 +175,10 @@ void ObjectModel::SetAnimation(const std::string& _name, bool _isLoop)
 {
     if (model_->HasAnimation())
     {
-        animationController_->SetAnimation(_name, _isLoop);
+        if (uniqueAnimationController_)
+            uniqueAnimationController_->SetAnimation(_name, _isLoop);
+        else if (sharedAnimationController_)
+            sharedAnimationController_->SetAnimation(_name, _isLoop);
     }
 }
 
@@ -170,7 +186,10 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
 {
     if (model_->HasAnimation())
     {
-        animationController_->ChangeAnimation(_name, _blendTime, _isLoop);
+        if(uniqueAnimationController_)
+            uniqueAnimationController_->ChangeAnimation(_name, _blendTime, _isLoop);
+        else if(sharedAnimationController_)
+            sharedAnimationController_->ChangeAnimation(_name, _blendTime, _isLoop);
     }
 }
 
@@ -221,15 +240,26 @@ void ObjectModel::DrawShadow(const Camera* _camera)
 void ObjectModel::SetModel(const std::string& _filePath)
 {
     model_ = Model::CreateFromFile(_filePath);
-
-
 }
 
-const AnimationController* ObjectModel::GetAnimationController()
+void ObjectModel::SetSharedAnimationController(AnimationController* _controller)
 {
-    if (animationController_)
+    if (_controller)
     {
-        return animationController_.get();
+        sharedAnimationController_ = _controller;
+        uniqueAnimationController_ = nullptr; // uniqueAnimationControllerは使用しない
+    }
+    else
+    {
+        Debug::Log("Shared AnimationController is null.\n");
+    }
+}
+
+std::unique_ptr<AnimationController> ObjectModel::GetAnimationController()
+{
+    if (uniqueAnimationController_)
+    {
+        return std::move(uniqueAnimationController_);
     }
     else
     {
@@ -240,9 +270,13 @@ const AnimationController* ObjectModel::GetAnimationController()
 
 const Matrix4x4* ObjectModel::GetSkeletonSpaceMatrix(const std::string& _jointName) const
 {
-    if (animationController_)
+    if (uniqueAnimationController_)
     {
-        return animationController_->GetSkeletonSpaceMatrix(_jointName);
+        return uniqueAnimationController_->GetSkeletonSpaceMatrix(_jointName);
+    }
+    else if (sharedAnimationController_)
+    {
+        return sharedAnimationController_->GetSkeletonSpaceMatrix(_jointName);
     }
     else
     {
@@ -274,10 +308,15 @@ void ObjectModel::ImGui()
         SetModel(filePathBuffer_);
     }
 
-    if(animationController_)
+    if(uniqueAnimationController_)
     {
         if(ImGui::CollapsingHeader("Skeleton"))
-            animationController_->ImGui();
+            uniqueAnimationController_->ImGui();
+    }
+    if (sharedAnimationController_)
+    {
+        if (ImGui::CollapsingHeader("Shared Skeleton"))
+            sharedAnimationController_->ImGui();
     }
 
     ImGui::PopID();
