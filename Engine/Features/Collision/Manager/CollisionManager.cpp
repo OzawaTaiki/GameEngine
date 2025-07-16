@@ -33,7 +33,10 @@ void CollisionManager::Finalize()
 void CollisionManager::Update()
 {
     // 衝突判定を実行
-    CheckCollisions();
+    if(enableBroadPhase_)
+        CheckCollisionsWithBroadPhase();
+    else
+        CheckCollisions();
 
     // 衝突応答を実行
     //ResolveCollisions();
@@ -42,6 +45,11 @@ void CollisionManager::Update()
     UpdateCollisionStates();
 
     DrawColliders();
+
+#ifdef _DEBUG
+    colliderCount_ = static_cast<int32_t>(colliders_.size());
+    collisionPairCount_ = static_cast<int32_t>(collisionPairs_.size());
+#endif // _DEBUG
 
     // 全てのコライダーをクリア（次のフレームのために）
     colliders_.clear();
@@ -82,10 +90,52 @@ void CollisionManager::RegisterStaticCollider(Collider* _collider)
     spiralHashGrid_->AddCollider(_collider);
 }
 
-void CollisionManager::CheckCollisions()
+void CollisionManager::CheckCollisionsWithBroadPhase()
 {
     // ブロードフェーズの更新（空間分割等の最適化）
     UpdateBroadPhase();
+
+    // 判定対象がない場合は早期リターン
+    if (potentialCollisions_.empty())
+        return;
+
+    CheckCollisionsRange();
+}
+
+void CollisionManager::CheckCollisions()
+{
+    potentialCollisions_.clear();
+
+    for (size_t i = 0; i < colliders_.size(); ++i)
+    {
+        Collider* colliderA = colliders_[i];
+        for (size_t j = i + 1; j < colliders_.size(); ++j)
+        {
+            Collider* colliderB = colliders_[j];
+
+            // レイヤーマスクでフィルタリング
+            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
+            {
+                continue; // 衝突しないように設定されている
+            }
+
+            potentialCollisions_.emplace_back(colliderA, colliderB);
+        }
+        for (auto& staticColliders_ : staticColliders_)
+        {
+            Collider* colliderB = staticColliders_;
+
+            // レイヤーマスクでフィルタリング
+            if ((colliderA->GetLayer() & colliderB->GetLayerMask()) != 0 ||
+                (colliderB->GetLayer() & colliderA->GetLayerMask()) != 0)
+            {
+                continue; // 衝突しないように設定されている
+            }
+            potentialCollisions_.emplace_back(colliderA, colliderB);
+        }
+    }
+
 
     // 判定対象がない場合は早期リターン
     if (potentialCollisions_.empty())
@@ -290,10 +340,12 @@ void CollisionManager::ImGui(bool* _open)
     ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
 
     // 統計情報表示
-    ImGui::Text("Registered Colliders: %zu", colliders_.size());
-    ImGui::Text("Static Colliders: %zu", staticColliders_.size());
-    ImGui::Text("Potential Collisions: %zu", potentialCollisions_.size());
-    ImGui::Text("Active Collisions: %zu", collisionPairs_.size());
+    ImGui::Text("Registered Colliders: %d", colliderCount_); // 登録されたコライダーの数
+    ImGui::Text("Static Colliders: %zu", staticColliders_.size()); // 静的コライダーの数
+    ImGui::Text("Potential Collisions: %zu", potentialCollisions_.size()); // 衝突の可能性があるペアの数
+    ImGui::Text("Active Collisions: %d", collisionPairCount_); // 現在の衝突ペアの数
+
+    ImGui::Checkbox("Enable Broad Phase", &enableBroadPhase_);
 
     ImGui::PopID();
 

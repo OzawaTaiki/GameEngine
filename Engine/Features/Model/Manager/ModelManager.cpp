@@ -2,8 +2,8 @@
 
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Debug/Debug.h>
 #include <cassert>
-#include <LevelEditorLoader.cpp>
 
 ModelManager* ModelManager::GetInstance()
 {

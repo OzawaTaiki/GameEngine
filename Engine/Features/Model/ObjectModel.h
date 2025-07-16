@@ -30,9 +30,10 @@ public:
     void SetAnimation(const std::string& _name, bool _isLoop = false);
     void ChangeAnimation(const std::string& _name, float _blendTime, bool _isLoop = false);
 
-    bool IsEndAnimation() const { return !animationController_ || !animationController_->IsAnimationPlaying(); }
+    bool IsEndAnimation() const { return !uniqueAnimationController_ || !uniqueAnimationController_->IsAnimationPlaying(); }
 
     void SetModel(const std::string& _filePath);
+    void SetSharedAnimationController(AnimationController* _controller);
     void SetParent(const WorldTransform* _parent) { worldTransform_.SetParent(_parent); }
     void SetParent(const Matrix4x4* _parentMatrix) { worldTransform_.SetParent(_parentMatrix); }
 
@@ -45,7 +46,7 @@ public:
 
     std::string GetName() const{ return name_; }
 
-    const AnimationController* GetAnimationController();
+    std::unique_ptr<AnimationController> GetAnimationController();
 
 
     const Matrix4x4* GetSkeletonSpaceMatrix(const std::string& _jointName)  const;
@@ -68,7 +69,8 @@ private:
     WorldTransform worldTransform_;
 
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;
-    std::unique_ptr<AnimationController> animationController_ = nullptr;
+    std::unique_ptr<AnimationController> uniqueAnimationController_ = nullptr;
+    AnimationController* sharedAnimationController_ = nullptr;
 
     Model* model_ = nullptr;
     std::string name_ = "";

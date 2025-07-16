@@ -29,6 +29,9 @@ public:
     void RegisterStaticCollider(Collider* _collider);
 
     // 衝突判定を実行する
+    void CheckCollisionsWithBroadPhase();
+
+    // 衝突判定を実行する（ブロードフェーズを使用しない）
     void CheckCollisions();
 
     // 衝突応答を実行する
@@ -84,6 +87,13 @@ private:
 
     // スパイラルハッシュグリッド
     std::unique_ptr<SpiralHashGrid> spiralHashGrid_;
+
+#ifdef _DEBUG
+    // デバッグ用の衝突検出器
+    int32_t colliderCount_ = 0; // 登録されたコライダーの数
+    int32_t collisionPairCount_ = 0; // 衝突ペアの数
+#endif // _DEBUG
+    bool enableBroadPhase_ = true; // ブロードフェーズを使用するかどうか
 
 private:
     // コンストラクタ

@@ -40,14 +40,6 @@ void AnimationController::Initialize(ID3D12PipelineState* _computePipeline, ID3D
 
     currentAnimation_ = std::make_unique<ModelAnimation>();
     currentAnimation_->Initialize();
-
-    currentAnimation_->Update(skeleton_.GetJoints(), 0.0f);
-
-    skeleton_.Update();
-    skinCluster_.Update(skeleton_.GetJoints());
-
-    if (skinningCS_)
-        skinningCS_->Execute();
 }
 
 void AnimationController::Update(float _deltaTime)
@@ -85,6 +77,7 @@ void AnimationController::SetAnimation(const std::string& _name, bool _loop)
     currentAnimation_->Reset();
     currentAnimation_->SetAnimation(animation->GetAnimation());
     currentAnimation_->SetLoop(_loop);
+    currentAnimation_->Update(skeleton_.GetJoints(), 0.0f);
 }
 
 void AnimationController::ChangeAnimation(const std::string& _name, float _blendTime, bool _loop)
