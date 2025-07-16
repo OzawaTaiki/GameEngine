@@ -82,13 +82,22 @@ void ObjectModel::Draw(const Camera* _camera)
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
 
-    if (animationController_)
-        model_->QueueCommandAndDraw(commandList, animationController_->GetMargedMesh());
+    if (uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, sharedAnimationController_->GetMargedMesh());
     else
         model_->QueueCommandAndDraw(commandList);
 
     if (drawSkeleton_)
-        animationController_->DrawSkeleton(worldTransform_.matWorld_);
+    {
+        if (uniqueAnimationController_)
+            uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+        else if (sharedAnimationController_)
+            sharedAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+
+    }
+
 }
 
 void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)

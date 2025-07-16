@@ -1,10 +1,10 @@
-#include "SpiralHashGrid.h"
+#include "SpatialHashGrid.h"
 
 #include <set>
 #include <array>
 #include <Features/LineDrawer/LineDrawer.h>
 
-void SpiralHashGrid::AddCollider(Collider* _collider)
+void SpatialHashGrid::AddCollider(Collider* _collider)
 {
     std::array<int32_t, 4> cellIndices = GetCellIndices(_collider);
 
@@ -18,7 +18,7 @@ void SpiralHashGrid::AddCollider(Collider* _collider)
     }
 }
 
-void SpiralHashGrid::RemoveCollider(Collider* _collider)
+void SpatialHashGrid::RemoveCollider(Collider* _collider)
 {
     std::array<int32_t, 4> cellIndices = GetCellIndices(_collider);
 
@@ -43,7 +43,7 @@ void SpiralHashGrid::RemoveCollider(Collider* _collider)
     }
 }
 
-std::vector<Collider*> SpiralHashGrid::CheckCollision(Collider* _col) const
+std::vector<Collider*> SpatialHashGrid::CheckCollision(Collider* _col) const
 {
     std::set<Collider*> result;
 
@@ -96,7 +96,7 @@ std::vector<Collider*> SpiralHashGrid::CheckCollision(Collider* _col) const
     return std::vector<Collider*>(result.begin(), result.end());
 }
 
-uint64_t SpiralHashGrid::GetHashKey(const Vector2& _position) const
+uint64_t SpatialHashGrid::GetHashKey(const Vector2& _position) const
 {
     int32_t x = static_cast<int32_t>(_position.x / cellSize_);
     int32_t y = static_cast<int32_t>(_position.y / cellSize_);
@@ -105,7 +105,7 @@ uint64_t SpiralHashGrid::GetHashKey(const Vector2& _position) const
 
 }
 
-uint64_t SpiralHashGrid::GetHashKey(int32_t _x, int32_t _y) const
+uint64_t SpatialHashGrid::GetHashKey(int32_t _x, int32_t _y) const
 {
     // 負の値も正しく処理するためのオフセット
     uint32_t ux = static_cast<uint32_t>(_x);
@@ -114,7 +114,7 @@ uint64_t SpiralHashGrid::GetHashKey(int32_t _x, int32_t _y) const
     return (static_cast<uint64_t>(ux) << 32) | static_cast<uint64_t>(uy);
 }
 
-std::array<int32_t, 4> SpiralHashGrid::GetCellIndices(Collider* _col) const
+std::array<int32_t, 4> SpatialHashGrid::GetCellIndices(Collider* _col) const
 {
     Vector3 position3 = _col->GetWorldTransform()->GetWorldPosition();
     Vector2 center = Vector2(position3.x, position3.z);
@@ -132,7 +132,7 @@ std::array<int32_t, 4> SpiralHashGrid::GetCellIndices(Collider* _col) const
 
 }
 
-std::array<int32_t, 4> SpiralHashGrid::GetCellIndices(const AABB& _aabb) const
+std::array<int32_t, 4> SpatialHashGrid::GetCellIndices(const AABB& _aabb) const
 {
     Vector2 min = Vector2(_aabb.min.x, _aabb.min.z);
     Vector2 max = Vector2(_aabb.max.x, _aabb.max.z);

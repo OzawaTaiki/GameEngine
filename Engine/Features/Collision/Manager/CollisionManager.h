@@ -2,7 +2,7 @@
 #include <Features/Collision/Collider/Collider.h>
 #include <Features/Collision/Detector/CollisionDetector.h>
 #include <Features/Collision/Tree/QuadTree.h>
-#include <Features/Collision/SpiralHashGird/SpiralHashGrid.h>
+#include <Features/Collision/SpiralHashGird/SpatialHashGrid.h>
 #include <vector>
 #include <unordered_map>
 #include <functional>
@@ -86,7 +86,7 @@ private:
     std::unique_ptr<QuadTree> quadTree_;
 
     // スパイラルハッシュグリッド
-    std::unique_ptr<SpiralHashGrid> spiralHashGrid_;
+    std::unique_ptr<SpatialHashGrid> spiralHashGrid_;
 
 #ifdef _DEBUG
     // デバッグ用の衝突検出器

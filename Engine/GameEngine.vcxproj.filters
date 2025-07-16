@@ -223,9 +223,6 @@
     <Filter Include="Features\Collision\Tree">
       <UniqueIdentifier>{a01a5b5e-fd33-4c0b-9cf1-f26c55606ed6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\Collision\SpiralHashGrid">
-      <UniqueIdentifier>{8ccabc1c-898d-4356-9e85-abbf31094bee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\LevelEditor">
       <UniqueIdentifier>{e3c280d0-a343-413f-93ac-a4ce660ca9cf}</UniqueIdentifier>
     </Filter>
@@ -249,6 +246,9 @@
     </Filter>
     <Filter Include="Shaders\PostEffects">
       <UniqueIdentifier>{7e57f265-25f1-4991-8573-e6274ac52084}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Collision\SpatialHashGrid">
+      <UniqueIdentifier>{8ccabc1c-898d-4356-9e85-abbf31094bee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -540,8 +540,8 @@
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp">
       <Filter>Features\Collision\Tree</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Collision\SpiralHashGird\SpiralHashGrid.cpp">
-      <Filter>Features\Collision\SpiralHashGrid</Filter>
+    <ClCompile Include="Features\Collision\SpiralHashGird\SpatialHashGrid.cpp">
+      <Filter>Features\Collision\SpatialHashGrid</Filter>
     </ClCompile>
     <ClCompile Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
@@ -933,8 +933,8 @@
     <ClInclude Include="Features\Collision\Tree\QuadTree.h">
       <Filter>Features\Collision\Tree</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Collision\SpiralHashGird\SpiralHashGrid.h">
-      <Filter>Features\Collision\SpiralHashGrid</Filter>
+    <ClInclude Include="Features\Collision\SpiralHashGird\SpatialHashGrid.h">
+      <Filter>Features\Collision\SpatialHashGrid</Filter>
     </ClInclude>
     <ClInclude Include="Features\Scene\SceneData.h">
       <Filter>Features\Scene</Filter>
