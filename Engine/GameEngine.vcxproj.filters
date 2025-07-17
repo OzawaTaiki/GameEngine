@@ -571,6 +571,12 @@
     <ClCompile Include="Features\Model\Animation\Controller\AnimationController.cpp">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\ButtonNavigator.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIGroup.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -959,6 +965,12 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h">
       <Filter>Features\Model\Animation\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\ButtonNavigator.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIGroup.h">
+      <Filter>Features\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
