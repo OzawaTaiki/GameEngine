@@ -217,8 +217,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Sprite\SpriteManager.cpp" />
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
+    <ClCompile Include="Features\UI\ButtonNavigator.cpp" />
     <ClCompile Include="Features\UI\UIBase.cpp" />
     <ClCompile Include="Features\UI\UIButton.cpp" />
+    <ClCompile Include="Features\UI\UIGroup.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
@@ -338,8 +340,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Sprite\Sprite.h" />
     <ClInclude Include="Features\Sprite\SpriteManager.h" />
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="Features\UI\ButtonNavigator.h" />
     <ClInclude Include="Features\UI\UIBase.h" />
     <ClInclude Include="Features\UI\UIButton.h" />
+    <ClInclude Include="Features\UI\UIGroup.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
     <ClInclude Include="Features\UVTransform\IUVAnimation.h" />
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />

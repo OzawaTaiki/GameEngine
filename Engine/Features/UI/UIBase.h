@@ -28,7 +28,7 @@ public:
     void SetVisible(bool _isVisible) { isVisible_ = _isVisible; }
 
     Vector4 GetColor() const { return color_; }
-    void SetColor(const Vector4& _color) { color_ = _color; }
+    virtual void SetColor(const Vector4& _color) { color_ = _color; }
 
     const Vector2& GetPos() const { return position_; }
     void SetPos(const Vector2& _pos) { position_ = _pos; };
@@ -38,6 +38,7 @@ public:
 
     void SetRotate(float _rotate) { rotate_ = _rotate; }
     float GetRotate() const { return rotate_; }
+
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
     const Vector2& GetAnchor() const { return anchor_; }
 
