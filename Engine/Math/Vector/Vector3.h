@@ -5,8 +5,6 @@
 #include <string>
 #endif // _DEBUG
 
-#include <json.hpp>
-
 struct Vector3
 {
 	float x, y, z;
@@ -73,7 +71,6 @@ struct Vector3
 
     void Vec3ToFloat3(float _f[3]) const;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Vector3, x, y, z)
 
 #ifdef _DEBUG
 	void ShowData(const std::string& _label, bool _newWindow = true) const;

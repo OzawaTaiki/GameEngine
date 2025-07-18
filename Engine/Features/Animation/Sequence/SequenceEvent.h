@@ -7,9 +7,6 @@
 #include <Math/Quaternion/Quaternion.h>
 #include <Math/Easing.h>
 
-#include <Features/Json/JsonBinder.h>
-
-#include <json.hpp>
 
 #include <list>
 #include <variant>
@@ -18,44 +15,7 @@
 
 using ParameterValue = std::variant<int32_t, float, Vector2, Vector3, Vector4, Quaternion>;
 
-using json = nlohmann::json;
-
-inline void to_json(json& _j, const ParameterValue& _v) {
-    std::visit([&_j](const auto& value) {
-        _j = json{
-            {"type", std::type_index(typeid(value)).name()},
-            {"value", value}
-        };
-    }, _v);
-}
-
-inline void from_json(const json& _j, ParameterValue& _v) {
-
-    std::string type = _j.at("type").get<std::string>();
-    if (type == typeid(int32_t).name()) {
-        _v = _j.at("value").get<int32_t>();
-    }
-    else if (type == typeid(float).name()) {
-        _v = _j.at("value").get<float>();
-    }
-    else if (type == typeid(Vector2).name()) {
-        _v = _j.at("value").get<Vector2>();
-    }
-    else if (type == typeid(Vector3).name()) {
-        _v = _j.at("value").get<Vector3>();
-    }
-    else if (type == typeid(Vector4).name()) {
-        _v = _j.at("value").get<Vector4>();
-    }
-    else if (type == typeid(Quaternion).name()) {
-        _v = _j.at("value").get<Quaternion>();
-    }
-    else {
-        throw std::runtime_error("Invalid type");
-    }
-}
-
-
+class JsonBinder;
 class SequenceEvent
 {
 public:
@@ -67,8 +27,6 @@ public:
         uint32_t easingType;
         bool isSelect;
         bool isDelete;
-
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(KeyFrame, time, value, easingType, isSelect, isDelete)
     };
 
 public:
@@ -96,6 +54,7 @@ public:
     void ClearSelectKeyFrames();
 
     std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
+    const std::list<KeyFrame>& GetKeyFrames() const { return keyFrames_; }
     void AddKeyFrame(float _time, ParameterValue _value, uint32_t _easingType);
     void AddKeyFrame(float _time);
 
@@ -109,8 +68,15 @@ public:
     void MarkForDelete();
     bool IsDelete() const { return isDelete_; }
 
+    void SetLabel(const std::string& _label) { label_ = _label; }
+    void SetKeyFrames(const std::list<KeyFrame>& _keyFrames) { keyFrames_ = _keyFrames; }
+
     static void EditKeyFrameValue(KeyFrame& _keyFrame);
 
+
+private:
+
+    void InitializeValueFromKeyFrames();
 
 private:
     enum class UseType {
@@ -141,6 +107,4 @@ private:
     JsonBinder* jsonBinder_ = nullptr;
 
 public:
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(SequenceEvent, label_, keyFrames_)
-
 };

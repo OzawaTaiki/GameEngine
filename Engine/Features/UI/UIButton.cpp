@@ -1,6 +1,7 @@
 #include "UIButton.h"
 
 #include <System/Input/Input.h>
+#include <Debug/Debug.h>
 
 UIButton::UIButton() :
     UIBase(),

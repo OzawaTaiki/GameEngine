@@ -180,8 +180,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Event\EventManager.cpp" />
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp" />
     <ClCompile Include="Features\Json\JsonBinder.cpp" />
-    <ClCompile Include="Features\Json\JsonHub.cpp" />
-    <ClCompile Include="Features\Json\Loader\JsonLoader.cpp" />
+    <ClCompile Include="Features\Json\JsonSerializers.cpp" />
+    <ClCompile Include="Features\Json\Loader\JsonFileIO.cpp" />
     <ClCompile Include="Features\Light\Directional\DirectionalLight.cpp" />
     <ClCompile Include="Features\Light\Group\LightGroup.cpp" />
     <ClCompile Include="Features\Light\Point\PointLight.cpp" />
@@ -298,8 +298,9 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Event\EventTypeRegistry.h" />
     <ClInclude Include="Features\Event\GameEvent.h" />
     <ClInclude Include="Features\Json\JsonBinder.h" />
-    <ClInclude Include="Features\Json\JsonHub.h" />
-    <ClInclude Include="Features\Json\Loader\JsonLoader.h" />
+    <ClInclude Include="Features\Json\JsonSerializers.h" />
+    <ClInclude Include="Features\Json\Loader\JsonFileIO.h" />
+    <ClInclude Include="Features\Json\VariableHolder.h" />
     <ClInclude Include="Features\Light\Directional\DirectionalLight.h" />
     <ClInclude Include="Features\Light\Group\LightGroup.h" />
     <ClInclude Include="Features\Light\Light.h" />

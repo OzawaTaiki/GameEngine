@@ -5,7 +5,7 @@
 void LevelEditorLoader::Load(const std::string& _filePath)
 {
     // jsonファイルを読み込み jsonオブジェクトを取得
-    json j = JsonLoader::LoadFile(_filePath);
+    json j = JsonFileIO::Load(_filePath, "");
 
     // "name:scene"をふくんでいなければこれは不正なデータ
     if (j.contains("name"))

@@ -1,6 +1,7 @@
 #include "SequenceEvent.h"
 #include <Math/Easing.h>
 
+#include <Features/Json/JsonBinder.h>
 #include <stdexcept>
 
 SequenceEvent::SequenceEvent(const std::string& _label, JsonBinder* _jsonBinder) :
@@ -10,6 +11,7 @@ SequenceEvent::SequenceEvent(const std::string& _label, JsonBinder* _jsonBinder)
     jsonBinder_(_jsonBinder)
 {
     RegisterVariables();
+    InitializeValueFromKeyFrames();
 }
 
 SequenceEvent::SequenceEvent(const std::string& _label, ParameterValue _value, JsonBinder* _jsonBinder) :
@@ -20,6 +22,7 @@ SequenceEvent::SequenceEvent(const std::string& _label, ParameterValue _value, J
 {
     useType_ = CheckType(_value);
     RegisterVariables();
+    InitializeValueFromKeyFrames();
 }
 
 void SequenceEvent::Initialize(const std::string& _label)
@@ -301,6 +304,47 @@ void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
         }
         }, _keyFrame.value);
 #endif // _DEBUG
+}
+
+void SequenceEvent::InitializeValueFromKeyFrames()
+{
+    if (!keyFrames_.empty())
+    {
+        value_ = keyFrames_.front().value;
+        useType_ = CheckType(value_);
+    }
+    else
+    {
+        switch (useType_)
+        {
+        case UseType::Int:
+            value_ = 0;
+            break;
+        case UseType::Float:
+            value_ = 0.0f;
+            break;
+        case UseType::Vector2:
+            value_ = Vector2(0.0f, 0.0f);
+            break;
+        case UseType::Vector3:
+            value_ = Vector3(0.0f, 0.0f, 0.0f);
+            break;
+        case UseType::Vector4:
+            value_ = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+            break;
+        case UseType::Quaternion:
+            value_ = Quaternion(0.0f, 0.0f, 0.0f, 1.0f); // 単位クォータニオン
+            break;
+        default:
+            value_ = int32_t(0);
+            useType_ = UseType::Int; // デフォルトは整数型
+            break;
+        }
+
+    }
+
+
+
 }
 
 SequenceEvent::UseType SequenceEvent::CheckType(ParameterValue _value)
