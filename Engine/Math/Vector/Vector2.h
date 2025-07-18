@@ -1,8 +1,6 @@
 #pragma once
 #include <functional>
 
-#include <json.hpp>
-
 struct Vector2
 {
 	float x, y;
@@ -31,8 +29,6 @@ struct Vector2
     float Dot(const Vector2& _v) const;
     float Cross(const Vector2& _v) const;
 
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Vector2, x, y)
 };
 
 template <>

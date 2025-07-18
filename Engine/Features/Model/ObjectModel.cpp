@@ -5,7 +5,7 @@
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImGuiDebugManager.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
-
+#include <Debug/Debug.h>
 
 
 ObjectModel::ObjectModel(const std::string& _name)

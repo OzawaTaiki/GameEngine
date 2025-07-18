@@ -297,10 +297,7 @@
     <ClCompile Include="Features\Json\JsonBinder.cpp">
       <Filter>Features\Json</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Json\JsonHub.cpp">
-      <Filter>Features\Json</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\Json\Loader\JsonLoader.cpp">
+    <ClCompile Include="Features\Json\Loader\JsonFileIO.cpp">
       <Filter>Features\Json\Loader</Filter>
     </ClCompile>
     <ClCompile Include="Features\Light\Directional\DirectionalLight.cpp">
@@ -577,6 +574,9 @@
     <ClCompile Include="Features\UI\UIGroup.cpp">
       <Filter>Features\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Json\JsonSerializers.cpp">
+      <Filter>Features\Json</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -648,10 +648,7 @@
     <ClInclude Include="Features\Json\JsonBinder.h">
       <Filter>Features\Json</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Json\JsonHub.h">
-      <Filter>Features\Json</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\Json\Loader\JsonLoader.h">
+    <ClInclude Include="Features\Json\Loader\JsonFileIO.h">
       <Filter>Features\Json\Loader</Filter>
     </ClInclude>
     <ClInclude Include="Features\Light\Directional\DirectionalLight.h">
@@ -971,6 +968,12 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UIGroup.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Json\VariableHolder.h">
+      <Filter>Features\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Json\JsonSerializers.h">
+      <Filter>Features\Json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -60,16 +60,3 @@ public:
 #endif // _DEBUG
 
 };
-
-inline void to_json(nlohmann::json& j, const Quaternion& q) {
-    j = nlohmann::json{
-        {"qx", q.x}, {"qy", q.y}, {"qz", q.z}, {"qw", q.w}
-    };
-}
-
-inline void from_json(const nlohmann::json& j, Quaternion& q) {
-    j.at("qx").get_to(q.x);
-    j.at("qy").get_to(q.y);
-    j.at("qz").get_to(q.z);
-    j.at("qw").get_to(q.w);
-}

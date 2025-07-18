@@ -1,5 +1,6 @@
 #include "QuadTree.h"
 
+#include <Debug/Debug.h>
 #include <Math/Vector/VectorFunction.h>
 
 #include <iostream>

@@ -4,7 +4,6 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImGuiManager.h>
 #include <Debug/ImGuiDebugManager.h>
-#include <Features/Json/JsonHub.h>
 
 UIBase::~UIBase()
 {
@@ -16,7 +15,6 @@ void UIBase::Initialize(const std::string& _label)
     label_ = _label;
 
     jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
-    JsonHub::GetInstance()->SetDirectoryPathFromRoot("Resources/Data/UI/");
 
     jsonBinder_->RegisterVariable(label_+"_pos", &position_);
     jsonBinder_->RegisterVariable(label_+"_size", &size_);
