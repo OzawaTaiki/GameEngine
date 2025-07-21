@@ -78,7 +78,13 @@ void Framework::Initialize(const std::wstring& _winTitle)
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
 
+    fontCache_ = FontCache::GetInstance();
+    fontCache_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
+        Vector2(static_cast<float>(WinApp::kWindowWidth_), static_cast<float>(WinApp::kWindowHeight_)));
+
     textRenderer_ = TextRenderer::GetInstance();
+    textRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
+        Vector2(static_cast<float>(WinApp::kWindowWidth_), static_cast<float>(WinApp::kWindowHeight_)));
 
     collisionManager_ = CollisionManager::GetInstance();
 

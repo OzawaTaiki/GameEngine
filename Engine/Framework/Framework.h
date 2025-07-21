@@ -13,6 +13,8 @@
 #include <System/Audio/Audio.h>
 #include <System/Time/Time_MT.h>
 #include <Features/TextRenderer/TextRenderer.h>
+#include <Features/TextRenderer/FontCache.h>
+
 
 class Framework
 {
@@ -51,6 +53,7 @@ protected:
     GameTime*               gameTime_               = nullptr;//
     Audio* audio_ = nullptr;//
     TextRenderer* textRenderer_ = nullptr;//
+    FontCache* fontCache_ = nullptr;//
 
 
 
