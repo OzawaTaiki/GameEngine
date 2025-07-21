@@ -23,7 +23,7 @@
 
 #include <Features/Model/SkyBox.h>
 
-#include <Features/TextRenderer/TextRenderer.h>
+#include <Features/TextRenderer/TextGenerator.h>
 
 
 class DeveScene : public BaseScene
@@ -57,7 +57,7 @@ private:
     // ライト
     std::shared_ptr<LightGroup> lights_;
 
-    TextRenderer* textRenderer_;
+    TextGenerator text_;
 
     //------------------------------
     // シーン固有

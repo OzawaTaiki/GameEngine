@@ -30,12 +30,6 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
 
     sceneManager_->SetSceneFactory(new SceneFactory());
     particleManager_->SetModifierFactory(new ParticleModifierFactory());
-    textRenderer_->Initialize(
-        dxCommon_->GetDevice(),
-        dxCommon_->GetCommandList(),
-        TextRenderer::Config(),
-         WinApp::kWindowSize_ );
-
 
     Vector2 fieldSize = { 100.0f, 100.0f };
     Vector2 leftBottom = { -50.0f, -50.0f };
@@ -84,6 +78,8 @@ void SampleFramework::Draw()
 
     lineDrawer_->Draw();
     //=============================
+
+    textRenderer_->EndFrame();
 
     currentTex_ = "default";
 

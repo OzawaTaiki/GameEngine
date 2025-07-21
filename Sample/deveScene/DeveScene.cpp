@@ -152,12 +152,11 @@ void DeveScene::Initialize(SceneData* _sceneData)
     SceneCamera_.rotate_ = objectParams["Camera"].rotation;
 
 
-    textRenderer_ = TextRenderer::GetInstance();
+    text_.Initialize(FontConfig());
 }
 
 void DeveScene::Update()
 {
-    textRenderer_->BeginFrame();
     // シーン関連更新
     static std::string str = "Hello, World!";
 #ifdef _DEBUG
@@ -222,7 +221,7 @@ void DeveScene::Update()
 
     std::wstring wstr = std::wstring(str.begin(), str.end());
     wstr += L"\nこんにちは 世界";
-    textRenderer_->DrawText(wstr, Vector2{ 100, 100 }, Vector4{ 1, 1, 1, 1 });
+    text_.Draw(wstr, Vector2{ 100, 100 }, Vector4{ 1, 1, 1, 1 });
 
     // --------------------------------
     // シーン共通更新処理
@@ -269,7 +268,6 @@ void DeveScene::Draw()
 
 
     ParticleSystem::GetInstance()->DrawParticles();
-    textRenderer_->EndFrame();
 }
 
 void DeveScene::DrawShadow()
