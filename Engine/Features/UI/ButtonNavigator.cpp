@@ -34,7 +34,7 @@ void ButtonNavigator::Update()
         // マウスが動いた場合,マウスによるフォーカスをチェック
         CheckButtonFocus();
     }
-    else if (Direction dir = GetDirectionFromInput(); dir != Direction::None)
+    if (Direction dir = GetDirectionFromInput(); dir != Direction::None)
     {
         if (currentFocusedButton_)
         {
