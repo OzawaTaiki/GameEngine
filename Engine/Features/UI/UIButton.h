@@ -75,7 +75,8 @@ private:
     // デフォルトコールバック
     void OnFocusGained();
     void OnFocusLost();
-
+    void OnClickStart();
+    void OnClickEnd();
 private:
 
     // ナビゲーションのターゲット

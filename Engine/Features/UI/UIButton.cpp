@@ -16,8 +16,8 @@ UIButton::UIButton() :
     onFocusGained_([this]() {OnFocusGained(); }),
     onFocusLost_([this]() {OnFocusLost(); }),
     onFocusUpdate_(nullptr),
-    onClickStart_(nullptr),
-    onClickEnd_(nullptr)
+    onClickStart_([this]() {OnClickStart(); }),
+    onClickEnd_([this]() {OnClickEnd(); })
 {
 }
 
@@ -181,4 +181,17 @@ void UIButton::OnFocusGained()
 void UIButton::OnFocusLost()
 {
     color_ = defaultColor;
+}
+
+void UIButton::OnClickStart()
+{
+    // クリック開始時の処理
+    isClickEnd_ = true; // クリック終了フラグをリセット
+    isTrigered_ = false;
+}
+
+void UIButton::OnClickEnd()
+{
+    // クリック終了時の処理
+    isClickEnd_ = false; // クリック終了フラグをリセット
 }
