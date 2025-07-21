@@ -229,9 +229,6 @@
     <Filter Include="Features\LevelEditor\Loader">
       <UniqueIdentifier>{63f432ce-bc89-48fa-8545-82e8f5b69960}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\TextRenderring">
-      <UniqueIdentifier>{836eac1b-0b99-447c-bace-230d0eed60ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility\FileDialog">
       <UniqueIdentifier>{2837f622-517e-4658-8264-59f3d93a05fa}</UniqueIdentifier>
     </Filter>
@@ -249,6 +246,9 @@
     </Filter>
     <Filter Include="Features\Collision\SpatialHashGrid">
       <UniqueIdentifier>{8ccabc1c-898d-4356-9e85-abbf31094bee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Text">
+      <UniqueIdentifier>{836eac1b-0b99-447c-bace-230d0eed60ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -545,10 +545,10 @@
     </ClCompile>
     <ClCompile Include="LevelEditorLoader.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp">
-      <Filter>Features\TextRenderring</Filter>
+      <Filter>Features\Text</Filter>
     </ClCompile>
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp">
-      <Filter>Features\TextRenderring</Filter>
+      <Filter>Features\Text</Filter>
     </ClCompile>
     <ClCompile Include="Utility\FileDialog\FileDialog.cpp">
       <Filter>Utility\FileDialog</Filter>
@@ -576,6 +576,15 @@
     </ClCompile>
     <ClCompile Include="Features\Json\JsonSerializers.cpp">
       <Filter>Features\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\TextRenderer\FontCache.cpp">
+      <Filter>Features\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\TextRenderer\AtlasData.cpp">
+      <Filter>Features\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\TextRenderer\TextGenerator.cpp">
+      <Filter>Features\Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -949,7 +958,7 @@
       <Filter>Features\LevelEditor\Loader</Filter>
     </ClInclude>
     <ClInclude Include="Features\TextRenderer\TextRenderer.h">
-      <Filter>Features\TextRenderring</Filter>
+      <Filter>Features\Text</Filter>
     </ClInclude>
     <ClInclude Include="Utility\FileDialog\FileDialog.h">
       <Filter>Utility\FileDialog</Filter>
@@ -974,6 +983,18 @@
     </ClInclude>
     <ClInclude Include="Features\Json\JsonSerializers.h">
       <Filter>Features\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\AtlasData.h">
+      <Filter>Features\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\FontCache.h">
+      <Filter>Features\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\TextGenerator.h">
+      <Filter>Features\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\TextParan.h">
+      <Filter>Features\Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
