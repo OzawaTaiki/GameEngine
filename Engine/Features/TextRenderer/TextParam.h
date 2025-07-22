@@ -43,6 +43,7 @@ struct TextParam
 
         ImGui::DragFloat2("Scale", &scale.x, 0.01f);
         ImGui::DragFloat("Rotate", &rotate, 0.01f);
+        ImGui::DragFloat2("Position", &position.x);
         ImGui::DragFloat2("Pivot", &pivot.x, 0.01f);
         ImGui::Checkbox("Use Gradient", &useGradient);
         ImGui::Checkbox("Use Outline", &useOutline);

@@ -5,6 +5,7 @@
 #include <Math/Vector/Vector4.h>
 #include <Math/Quaternion/Quaternion.h>
 #include <Features/Animation/Sequence/SequenceEvent.h>
+#include <Features/TextRenderer/TextParam.h>
 
 #include <json.hpp>
 
@@ -41,3 +42,8 @@ void from_json(const json& _j, SequenceEvent::KeyFrame& _v);
 // SequenceEvent
 void to_json(json& _j, const SequenceEvent& _v);
 void from_json(const json& _j, SequenceEvent& _v);
+
+
+// TextParam
+void to_json(json& _j, const TextParam& _v);
+void from_json(const json& _j, TextParam& _v);

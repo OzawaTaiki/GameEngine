@@ -230,3 +230,43 @@ void from_json(const json& _j, SequenceEvent& _v)
         throw std::runtime_error("Invalid SequenceEvent JSON format");
     }
 }
+
+void to_json(json& _j, const TextParam& _v)
+{
+    _j = json{
+        {"scale", _v.scale},
+        {"rotate", _v.rotate},
+        {"position", _v.position},
+        {"useGradient", _v.useGradient},
+        {"topColor", _v.topColor},
+        {"bottomColor", _v.bottomColor},
+        {"pivot", _v.pivot},
+        {"useOutline", _v.useOutline},
+        {"outlineColor", _v.outlineColor},
+        {"outlineScale", _v.outlineScale}
+    };
+}
+
+void from_json(const json& _j, TextParam& _v)
+{
+    if (_j.contains("scale") && _j.contains("rotate") && _j.contains("position") &&
+        _j.contains("useGradient") && _j.contains("topColor") && _j.contains("bottomColor") &&
+        _j.contains("pivot") && _j.contains("useOutline") && _j.contains("outlineColor") &&
+        _j.contains("outlineScale"))
+    {
+        _v.scale = _j["scale"].get<Vector2>();
+        _v.rotate = _j["rotate"].get<float>();
+        _v.position = _j["position"].get<Vector2>();
+        _v.useGradient = _j["useGradient"].get<bool>();
+        _v.topColor = _j["topColor"].get<Vector4>();
+        _v.bottomColor = _j["bottomColor"].get<Vector4>();
+        _v.pivot = _j["pivot"].get<Vector2>();
+        _v.useOutline = _j["useOutline"].get<bool>();
+        _v.outlineColor = _j["outlineColor"].get<Vector4>();
+        _v.outlineScale = _j["outlineScale"].get<float>();
+    }
+    else
+    {
+        throw std::runtime_error("Invalid TextParam JSON format");
+    }
+}
