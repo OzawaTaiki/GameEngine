@@ -74,12 +74,12 @@ void LayerSystem::SetLayer(const std::string& layerName)
 
 }
 
-void LayerSystem::ApplyPostEffect(const std::string& _sourceLayerName, const std::string& _targetLayerName, PostEffectBase* _effect, PostEffectBaseData* _effectData)
+void LayerSystem::ApplyPostEffect(const std::string& _sourceLayerName, const std::string& _targetLayerName, PostEffectBase* _effect)
 {
     if (!instance_)
         Initialize();
 
-    _effect->Apply(_sourceLayerName, _targetLayerName, _effectData);
+    _effect->Apply(_sourceLayerName, _targetLayerName);
 
     auto it = instance_->nameToID_.find(_sourceLayerName);
     if (it != instance_->nameToID_.end())
@@ -127,7 +127,7 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
         {
             std::string textureToUse = info->hasEffect ? info->effectOutputTexture : info->name;
 
-            RTVManager::GetInstance()->SetRenderTexture(textureToUse);
+            RTVManager::GetInstance()->DrawRenderTexture(textureToUse);
         }
     }
 }

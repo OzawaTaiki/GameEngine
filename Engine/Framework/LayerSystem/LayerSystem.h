@@ -16,6 +16,8 @@ class PostEffectBase;
 class LayerSystem
 {
 public:
+    LayerSystem() = default;
+    ~LayerSystem() = default;
 
     // 初期化
     static void Initialize();
@@ -31,8 +33,7 @@ public:
 
     static void ApplyPostEffect(const std::string& _sourceLayerName,
         const std::string& _targetLayerName,
-        PostEffectBase* _effect,
-        PostEffectBaseData* _effectData = nullptr);
+        PostEffectBase* _effect);
 
     static void CompositeAllLayers(const std::string& _finalRendertextureName = "final");
 
@@ -65,8 +66,6 @@ private:
 
 private:
 
-    LayerSystem() = default;
-    ~LayerSystem() = default;
     LayerSystem(const LayerSystem&) = delete;
     LayerSystem& operator=(const LayerSystem&) = delete;
 

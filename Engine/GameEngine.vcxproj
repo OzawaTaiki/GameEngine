@@ -208,6 +208,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp" />
     <ClCompile Include="Features\Model\SkyBox.cpp" />
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
+    <ClCompile Include="Features\PostEffects\BoxFilter.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
     <ClCompile Include="Features\PostEffects\PostEffectBase.cpp" />
@@ -334,6 +335,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\Primitive\Triangle.h" />
     <ClInclude Include="Features\Model\SkyBox.h" />
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
+    <ClInclude Include="Features\PostEffects\BoxFilter.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
     <ClInclude Include="Features\PostEffects\PostEffectBase.h" />
@@ -422,6 +424,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shader\BoxFilter.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

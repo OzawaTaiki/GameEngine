@@ -8,6 +8,7 @@
 struct PostEffectBaseData
 {
     // 継承して拡張するためのデータ構造
+    // コンスタントバッファ用の構造体やテクスチャインデックスとか
 
     virtual ~PostEffectBaseData() = default;
 };
@@ -20,7 +21,9 @@ public:
 
     virtual void Initialize() = 0;
 
-    virtual void Apply(const std::string& _input, const std::string& _output, PostEffectBaseData* _data) = 0;
+    virtual void Apply(const std::string& _input, const std::string& _output) = 0;
+
+    virtual void SetData(const PostEffectBaseData* data) {};
 
 protected:
 
@@ -36,5 +39,6 @@ protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_; // 定数バッファ
     void* constantBufferData_ = nullptr; // 定数バッファのデータポインタ
 
+    PostEffectBaseData* postEffectData_ = nullptr; // ポストエフェクトのデータ
 
 };

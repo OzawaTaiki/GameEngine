@@ -592,7 +592,12 @@
     <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp">
       <Filter>Framework\LayerSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Features\PostEffects\PostEffectBase.cpp" />
+    <ClCompile Include="Features\PostEffects\BoxFilter.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\PostEffectBase.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1009,6 +1014,9 @@
     <ClInclude Include="Features\PostEffects\PostEffectBase.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
+    <ClInclude Include="Features\PostEffects\BoxFilter.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1081,6 +1089,9 @@
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\RadialBlur.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
   </ItemGroup>

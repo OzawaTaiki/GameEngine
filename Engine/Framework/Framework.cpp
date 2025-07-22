@@ -7,6 +7,7 @@
 #include <Features/Model/Manager/ModelManager.h>
 #include <Features/Event/EventManager.h>
 #include <System/Audio/AudioSystem.h>
+#include <Framework/LayerSystem/LayerSystem.h>
 
 #include <Debug/ImGuiDebugManager.h>
 
@@ -92,7 +93,7 @@ void Framework::Initialize(const std::wstring& _winTitle)
 
     Time_MT::GetInstance()->Initialize();
 
-
+    //LayerSystem::Initialize();
 
 }
 
@@ -134,6 +135,7 @@ void Framework::PostDraw()
 void Framework::Finalize()
 {
     sceneManager_->Finalize();
+    LayerSystem::Finalize();
 
     Time_MT::GetInstance()->Finalize();
     collisionManager_->Finalize();
