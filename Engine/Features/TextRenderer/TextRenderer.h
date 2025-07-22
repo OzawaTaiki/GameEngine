@@ -3,7 +3,7 @@
 #include <Externals/stb/stb_truetype.h>
 
 #include <Features/TextRenderer/AtlasData.h>
-#include <Features/TextRenderer/TextParan.h>
+#include <Features/TextRenderer/TextParam.h>
 
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector4.h>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Features/TextRenderer/AtlasData.h>
-#include <Features/TextRenderer/TextParan.h>
+#include <Features/TextRenderer/TextParam.h>
 
 
 #ifdef DrawText
