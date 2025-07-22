@@ -210,6 +210,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
+    <ClCompile Include="Features\PostEffects\PostEffectBase.cpp" />
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp" />
     <ClCompile Include="Features\Scene\ParticleTestScene.cpp" />
     <ClCompile Include="Features\SilhouetteDetection.cpp" />
@@ -229,6 +230,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
+    <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp" />
     <ClCompile Include="LevelEditorLoader.cpp" />
     <ClCompile Include="Math\BezierCurve3D.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
@@ -334,6 +336,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
+    <ClInclude Include="Features\PostEffects\PostEffectBase.h" />
     <ClInclude Include="Features\Scene\Interface\BaseScene.h" />
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h" />
     <ClInclude Include="Features\Scene\ISceneFactory.h" />
@@ -358,6 +361,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="Framework\Framework.h" />
+    <ClInclude Include="Framework\LayerSystem\LayerSystem.h" />
     <ClInclude Include="LevelEditorLoader.h" />
     <ClInclude Include="Math\BezierCurve3D.h" />
     <ClInclude Include="Math\Easing.h" />
