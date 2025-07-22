@@ -35,6 +35,7 @@ struct TextParam
         return *this;
     }
 
+#ifdef _DEBUG
     void ImGui()
     {
         ImGui::Checkbox("Outline", &useOutline);
@@ -50,4 +51,5 @@ struct TextParam
         ImGui::ColorEdit4("Outline Color", &outlineColor.x);
         ImGui::DragFloat("Outline Scale", &outlineScale, 0.01f);
     }
+#endif // _DEBUG
 };
