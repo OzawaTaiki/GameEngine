@@ -10,6 +10,7 @@ public:
     ~UISprite() = default;
 
     void Initialize(const std::string& _label);
+    void Initialize(const std::string& _label, const std::wstring& _text) override;
     void Update() override;
     void Draw() override;
 

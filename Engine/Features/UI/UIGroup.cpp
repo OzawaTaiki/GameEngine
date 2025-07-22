@@ -37,11 +37,13 @@ void UIGroup::Draw()
     }
 }
 
-UIButton* UIGroup::CreateButton(const std::string& _label)
+UIButton* UIGroup::CreateButton(const std::string& _label, const std::wstring& _text)
 {
     auto button = std::make_unique<UIButton>();
-
-    button->Initialize(_label);
+    if (_text.empty())
+        button->Initialize(_label);
+    else
+        button->Initialize(_label, _text);
     buttonNavigator_.RegisterButton(button.get()); // ボタンをナビゲーターに登録
 
     uiElements_.push_back(std::move(button));
@@ -49,10 +51,13 @@ UIButton* UIGroup::CreateButton(const std::string& _label)
     return static_cast<UIButton*>(uiElements_.back().get());
 }
 
-UISprite* UIGroup::CreateSprite(const std::string& _label)
+UISprite* UIGroup::CreateSprite(const std::string& _label, const std::wstring& _text)
 {
     auto sprite = std::make_unique<UISprite>();
-    sprite->Initialize(_label);
+    if (_text.empty())
+        sprite->Initialize(_label);
+    else
+        sprite->Initialize(_label, _text);
 
     uiElements_.push_back(std::move(sprite));
 

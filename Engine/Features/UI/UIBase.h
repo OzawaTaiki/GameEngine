@@ -4,6 +4,7 @@
 #include <Math/Vector/Vector4.h>
 
 #include <Features/Sprite/Sprite.h>
+#include <Features/TextRenderer/TextGenerator.h>
 
 #include <Features/Json/JsonBinder.h>
 
@@ -15,6 +16,8 @@ public:
     virtual ~UIBase();
 
     virtual void Initialize(const std::string& _label);
+    virtual void Initialize(const std::string& _label, const std::wstring& _text);
+    virtual void Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config);
     virtual void Update() {};
     virtual void Draw();
 
@@ -26,6 +29,8 @@ public:
 
     bool IsVisible() const { return isVisible_; }
     void SetVisible(bool _isVisible) { isVisible_ = _isVisible; }
+
+    void SetTextParam(const TextParam& _textParam) { textParam_ = _textParam; }
 
     Vector4 GetColor() const { return color_; }
     virtual void SetColor(const Vector4& _color) { color_ = _color; }
@@ -74,11 +79,21 @@ protected:
 
     Vector4 color_ = { 1,1,1,1 };
 
+
     std::string label_ = "";
     std::string textureName_ = "";
     std::string directoryPath_ = "Resources/images/";
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
+
+    // text
+    TextGenerator textGenerator_ = {};
+    std::wstring text_ = L""; // テキストの内容
+    // テキストがあるかどうか
+    bool hasText_ = false;
+    TextParam textParam_ = {}; // テキストのパラメータ
+
+    Vector2 textOffset_ = { 0,0 }; // テキストのオフセット
 
 
 };

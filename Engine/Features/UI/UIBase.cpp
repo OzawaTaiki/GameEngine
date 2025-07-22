@@ -16,16 +16,16 @@ void UIBase::Initialize(const std::string& _label)
 
     jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
 
-    jsonBinder_->RegisterVariable(label_+"_pos", &position_);
-    jsonBinder_->RegisterVariable(label_+"_size", &size_);
+    jsonBinder_->RegisterVariable(label_ + "_pos", &position_);
+    jsonBinder_->RegisterVariable(label_ + "_size", &size_);
     jsonBinder_->RegisterVariable(label_ + "_rotate", &rotate_);
-    jsonBinder_->RegisterVariable(label_+"_anchor", &anchor_);
-    jsonBinder_->RegisterVariable(label_+"_isActive", reinterpret_cast<uint32_t*>(&isActive_));
-    jsonBinder_->RegisterVariable(label_+"_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
+    jsonBinder_->RegisterVariable(label_ + "_anchor", &anchor_);
+    jsonBinder_->RegisterVariable(label_ + "_isActive", reinterpret_cast<uint32_t*>(&isActive_));
+    jsonBinder_->RegisterVariable(label_ + "_isVisible", reinterpret_cast<uint32_t*>(&isVisible_));
     jsonBinder_->RegisterVariable(label_ + "_color", &color_);
-    jsonBinder_->RegisterVariable(label_+"_textureName", &textureName_);
+    jsonBinder_->RegisterVariable(label_ + "_textureName", &textureName_);
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
-    jsonBinder_->RegisterVariable(label_+"_label", &label_);
+    jsonBinder_->RegisterVariable(label_ + "_label", &label_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
@@ -42,7 +42,23 @@ void UIBase::Initialize(const std::string& _label)
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
 
-    //ImGuiDebugManager::GetInstance()->AddDebugWindow(_label, [&]() {ImGui(); });
+}
+
+void UIBase::Initialize(const std::string& _label, const std::wstring& _text)
+{
+    Initialize(_label, _text, FontConfig());
+}
+
+void UIBase::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
+{
+    Initialize(_label);
+
+    textGenerator_.Initialize(_config);
+
+    hasText_ = true;
+
+    text_ = _text;
+
 }
 
 void UIBase::Draw()
@@ -57,6 +73,14 @@ void UIBase::Draw()
     sprite_->SetAnchor(anchor_);
     sprite_->SetTextureHandle(textureHandle_);
     sprite_->Draw(color_);
+
+    if (hasText_)
+    {
+        textParam_.position = position_ + textOffset_;
+        textParam_.pivot = anchor_;
+
+        textGenerator_.Draw(text_, textParam_);
+    }
 }
 
 bool UIBase::IsMousePointerInside() const
@@ -145,6 +169,13 @@ void UIBase::ImGui()
         {
             jsonBinder_->Save();
         }
+
+        ImGui::SeparatorText("Text param");
+
+        ImGui::DragFloat2("offset", &textOffset_.x, 0.01f);
+        textParam_.ImGui();
+
+
     }
     ImGui::EndTabBar();
 
