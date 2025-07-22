@@ -3,6 +3,8 @@
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector4.h>
 
+#include <Debug/ImGuiManager.h>
+
 struct TextParam
 {
     Vector2 scale = { 1.0f, 1.0f }; // スケール
@@ -31,5 +33,21 @@ struct TextParam
         outlineColor = _outlineColor;
         outlineScale = _outlineScale;
         return *this;
+    }
+
+    void ImGui()
+    {
+        ImGui::Checkbox("Outline", &useOutline);
+        ImGui::Checkbox("Gradient", &useGradient);
+
+        ImGui::DragFloat2("Scale", &scale.x, 0.01f);
+        ImGui::DragFloat("Rotate", &rotate, 0.01f);
+        ImGui::DragFloat2("Pivot", &pivot.x, 0.01f);
+        ImGui::Checkbox("Use Gradient", &useGradient);
+        ImGui::Checkbox("Use Outline", &useOutline);
+        ImGui::ColorEdit4("Bottom Color", &bottomColor.x);
+        ImGui::ColorEdit4("Top Color", &topColor.x);
+        ImGui::ColorEdit4("Outline Color", &outlineColor.x);
+        ImGui::DragFloat("Outline Scale", &outlineScale, 0.01f);
     }
 };

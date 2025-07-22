@@ -26,6 +26,11 @@ void UIButton::Initialize(const std::string& _label)
     UIBase::Initialize(_label);
 }
 
+void UIButton::Initialize(const std::string& _label, const std::wstring& _text)
+{
+    UIBase::Initialize(_label, _text);
+}
+
 void UIButton::Update()
 {
 #ifdef _DEBUG

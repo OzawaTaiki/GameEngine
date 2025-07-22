@@ -24,6 +24,8 @@ public:
 
     // 初期化
     void Initialize(const std::string& _label);
+    // 初期化
+    void Initialize(const std::string& _label, const std::wstring& _text) override;
     // 更新
     void Update() override;
     // 描画

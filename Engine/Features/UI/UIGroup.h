@@ -31,9 +31,9 @@ public:
 
 
     // ボタンの生成
-    UIButton* CreateButton(const std::string& _label);
+    UIButton* CreateButton(const std::string& _label, const std::wstring& _text = L"");
     // スプライトの生成
-    UISprite* CreateSprite(const std::string& _label);
+    UISprite* CreateSprite(const std::string& _label, const std::wstring& _text = L"");
 
 public: // 静的メンバ関数
 

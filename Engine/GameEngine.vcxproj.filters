@@ -993,7 +993,7 @@
     <ClInclude Include="Features\TextRenderer\TextGenerator.h">
       <Filter>Features\Text</Filter>
     </ClInclude>
-    <ClInclude Include="Features\TextRenderer\TextParan.h">
+    <ClInclude Include="Features\TextRenderer\TextParam.h">
       <Filter>Features\Text</Filter>
     </ClInclude>
   </ItemGroup>

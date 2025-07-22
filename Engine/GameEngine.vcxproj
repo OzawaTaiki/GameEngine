@@ -346,7 +346,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\TextRenderer\AtlasData.h" />
     <ClInclude Include="Features\TextRenderer\FontCache.h" />
     <ClInclude Include="Features\TextRenderer\TextGenerator.h" />
-    <ClInclude Include="Features\TextRenderer\TextParan.h" />
+    <ClInclude Include="Features\TextRenderer\TextParam.h" />
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Features\UI\ButtonNavigator.h" />
     <ClInclude Include="Features\UI\UIBase.h" />
