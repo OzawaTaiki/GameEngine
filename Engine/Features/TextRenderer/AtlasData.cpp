@@ -107,7 +107,7 @@ void AtlasData::CreateFontTexture()
     }
 
     textureIndex_= srvManager_->Allocate();
-    srvManager_->CreateSRVForTextrue2D(textureIndex_, fontTexture_.Get(), DXGI_FORMAT_R8_UNORM, 1);
+    srvManager_->CreateSRVForTexture2D(textureIndex_, fontTexture_.Get(), DXGI_FORMAT_R8_UNORM, 1);
 
     size_t uploadBufferSize = static_cast<size_t>(atlasSize_.x * atlasSize_.y);
 

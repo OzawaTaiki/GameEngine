@@ -250,6 +250,9 @@
     <Filter Include="Features\Text">
       <UniqueIdentifier>{836eac1b-0b99-447c-bace-230d0eed60ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\LayerSystem">
+      <UniqueIdentifier>{39850079-823b-4b04-a198-3481f45914bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -585,6 +588,15 @@
     </ClCompile>
     <ClCompile Include="Features\TextRenderer\TextGenerator.cpp">
       <Filter>Features\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp">
+      <Filter>Framework\LayerSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\BoxFilter.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\PostEffectBase.cpp">
+      <Filter>Features\PosttEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -996,6 +1008,15 @@
     <ClInclude Include="Features\TextRenderer\TextParam.h">
       <Filter>Features\Text</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\LayerSystem\LayerSystem.h">
+      <Filter>Framework\LayerSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\PostEffectBase.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\BoxFilter.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1069,6 +1090,12 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\RadialBlur.hlsl">
       <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Composite.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

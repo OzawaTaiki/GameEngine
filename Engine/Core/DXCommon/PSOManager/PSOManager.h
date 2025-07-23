@@ -27,6 +27,7 @@ struct PSOFlags
         PLShadowMap = 1 << 6,
         SkyBox = 1 << 7,
         Text = 1 << 8, // テキスト描画用
+        Composite = 1 << 9, // レイヤー合成用
 
     };
     enum class BlendMode
@@ -211,6 +212,7 @@ private:
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);
     void CreatePSOForOffScreen();
+    void CreatePSOForComposite();
     void CreatePSOForText();
 
     void CreatePSOForDLShadowMap();

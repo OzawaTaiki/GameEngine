@@ -286,7 +286,7 @@ void SilhouetteDetection::CreateResources()
     edgeInfoResource_ = dxCommon_->CreateUAVBufferResource(sizeof(EdgeInfoData) * edgeInfoCount);
 
     edgeInfoSrvIndex_ = srvManager->Allocate();
-    srvManager->CreateSRVForUAV(edgeInfoSrvIndex_, edgeInfoResource_.Get(), edgeInfoCount, sizeof(EdgeInfoData));
+    srvManager->CreateUAVForBuffer(edgeInfoSrvIndex_, edgeInfoResource_.Get(), edgeInfoCount, sizeof(EdgeInfoData));
 
 
     const uint32_t counterCount = 4;
@@ -295,21 +295,21 @@ void SilhouetteDetection::CreateResources()
     counterResource_ = dxCommon_->CreateUAVBufferResource(sizeof(uint32_t) * counterCount);
 
     counterSrvIndex_ = srvManager->Allocate();
-    srvManager->CreateSRVForUAV(counterSrvIndex_, counterResource_.Get(), counterCount, sizeof(uint32_t));
+    srvManager->CreateUAVForBuffer(counterSrvIndex_, counterResource_.Get(), counterCount, sizeof(uint32_t));
 
 
     // silhouetteEdgeの生成
     silhouetteEdgeResource_ = dxCommon_->CreateUAVBufferResource(sizeof(SilhouetteEdgeData) * kDefaultSilhouetteEdgeCount_);
 
     silhouetteEdgeUavIndex_ = srvManager->Allocate();
-    srvManager->CreateSRVForUAV(silhouetteEdgeUavIndex_, silhouetteEdgeResource_.Get(), kDefaultSilhouetteEdgeCount_, sizeof(SilhouetteEdgeData));
+    srvManager->CreateUAVForBuffer(silhouetteEdgeUavIndex_, silhouetteEdgeResource_.Get(), kDefaultSilhouetteEdgeCount_, sizeof(SilhouetteEdgeData));
 
 
     // pairEdgeの生成
     pairEdgeResource_ = dxCommon_->CreateUAVBufferResource(sizeof(PairEdgeData) * kDefaultSilhouetteEdgeCount_ );
 
     pairEdgeSrvIndex_ = srvManager->Allocate();
-    srvManager->CreateSRVForUAV(pairEdgeSrvIndex_, pairEdgeResource_.Get(), kDefaultSilhouetteEdgeCount_, sizeof(PairEdgeData));
+    srvManager->CreateUAVForBuffer(pairEdgeSrvIndex_, pairEdgeResource_.Get(), kDefaultSilhouetteEdgeCount_, sizeof(PairEdgeData));
 
 
     std::vector<EdgeInfoData> initialEdgeInfo(edgeInfoCount);

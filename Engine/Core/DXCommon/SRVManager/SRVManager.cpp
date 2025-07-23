@@ -32,9 +32,8 @@ void SRVManager::PreDraw(ID3D12GraphicsCommandList* _commandList)
 
 uint32_t SRVManager::Allocate()
 {
+    assert(useIndex_ < kMaxIndex_ && "SRV index overflow");
     uint32_t index = useIndex_++;
-    if (useIndex_ >= kMaxIndex_)
-        throw std::runtime_error("over MaxSRVindex");
     return index;
 }
 
@@ -52,7 +51,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SRVManager::GetGPUSRVDescriptorHandle(uint32_t _inde
     return handleGPU;
 }
 
-void SRVManager::CreateSRVForTextrue2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format, UINT _mipLevel)
+void SRVManager::CreateSRVForTexture2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format, UINT _mipLevel)
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = _format;
@@ -102,7 +101,7 @@ void SRVManager::CreateSRVForCubemap(uint32_t _index, ID3D12Resource* _resource,
     dxcommon_->GetDevice()->CreateShaderResourceView(_resource, &srvDesc, GetCPUSRVDescriptorHandle(_index));
 }
 
-void SRVManager::CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize)
+void SRVManager::CreateUAVForBuffer(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize)
 {
     D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
     uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -126,18 +125,25 @@ void SRVManager::CreateUAV(uint32_t _index, ID3D12Resource* _resource, const D3D
         GetCPUSRVDescriptorHandle(_index) // ディスクリプタハンドル
     );
 }
-
-void SRVManager::CreateSRVForCubeMap(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format)
+void SRVManager::CreateUAVForTexture2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format)
 {
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = _format;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.Format = _format;
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
+    uavDesc.Texture2D.PlaneSlice = 0;
 
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;//キューブマップ
-    srvDesc.Texture2D.MipLevels = UINT_MAX;
-    srvDesc.TextureCube.MostDetailedMip = 0;
-    srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+    dxcommon_->GetDevice()->CreateUnorderedAccessView(_resource, nullptr, &uavDesc, GetCPUSRVDescriptorHandle(_index));
+}
 
+void SRVManager::SetComputeUAV(uint32_t _index, uint32_t _slot)
+{
+    auto handle = GetGPUSRVDescriptorHandle(_index);
+    dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(_slot, handle);
+}
 
-    dxcommon_->GetDevice()->CreateShaderResourceView(_resource, &srvDesc, GetCPUSRVDescriptorHandle(_index));
+void SRVManager::SetComputeSRV(uint32_t _index, uint32_t _slot)
+{
+    auto handle = GetGPUSRVDescriptorHandle(_index);
+    dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(_slot, handle);
 }

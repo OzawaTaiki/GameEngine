@@ -20,14 +20,16 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
 
-    void CreateSRVForTextrue2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format, UINT _mipLevel);
+    void CreateSRVForTexture2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format, UINT _mipLevel);
     void CreateSRVForStructureBuffer(uint32_t _index, ID3D12Resource* _resource, UINT _numElement,UINT _structureBufferStride);
     void CreateSRVForRenderTexture(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format);
     void CreateSRVForCubemap(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format);
-    void CreateSRVForUAV(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize);
+    void CreateUAVForBuffer(uint32_t _index, ID3D12Resource* _resource, uint32_t _elementNum, size_t _elementSize);
     void CreateUAV(uint32_t _index, ID3D12Resource* _resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC* _desc);
-    void CreateSRVForCubeMap(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format);
 
+    void CreateUAVForTexture2D(uint32_t _index, ID3D12Resource* _resource, DXGI_FORMAT _format);
+    void SetComputeUAV(uint32_t _index, uint32_t _slot);
+    void SetComputeSRV(uint32_t _index, uint32_t _slot);
 
     ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap_.Get(); }
 

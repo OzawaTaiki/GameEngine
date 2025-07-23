@@ -54,7 +54,7 @@ uint32_t SkinningCS::CreateSRVForInputVertexResource(ID3D12Resource* _resource, 
 uint32_t SkinningCS::CreateSRVForOutputVertexResource(ID3D12Resource* _resource, uint32_t _vertexNum)
 {
     outputVertexUavIndex_ = srvManager_->Allocate();
-    srvManager_->CreateSRVForUAV(outputVertexUavIndex_, _resource, _vertexNum, sizeof(VertexData));
+    srvManager_->CreateUAVForBuffer(outputVertexUavIndex_, _resource, _vertexNum, sizeof(VertexData));
     return outputVertexUavIndex_;
 
 }

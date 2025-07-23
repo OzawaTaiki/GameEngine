@@ -42,6 +42,9 @@ public:
     void QueuePointLightShadowMapToSRV(const std::string& _name, uint32_t _index);
     void QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index);
 
+    uint32_t CreateComputeOutputTexture(const std::string& _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _format, const Vector4& _clearColor = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    void TransitionForCompute(uint32_t _rtvIndex);
+    void TransitionForRender(uint32_t _rtvIndex);
 
     void SetCubemapRenderTexture(uint32_t _handle);
     ID3D12Resource* GetCubemapResource(uint32_t _handle) const;
@@ -51,6 +54,10 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource(uint32_t _width, uint32_t _height,uint32_t _rtvindex, DXGI_FORMAT _format, const Vector4& _clearColor);
     void CreateDepthStencilTextureResource(uint32_t _width, uint32_t _height, uint32_t _dsvindex);
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResourceWithUAV(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format,
+        const Vector4& _clearColor = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+
 
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateCubemapResource(
         uint32_t _width,

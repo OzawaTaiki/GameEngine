@@ -135,7 +135,7 @@ void RTVManager::SetSwapChainRenderTexture(IDXGISwapChain4* _swapChain)
 
     commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 
-    commandList->ClearRenderTargetView(rtvHandle, clearColor_, 0, nullptr);
+    //commandList->ClearRenderTargetView(rtvHandle, clearColor_, 0, nullptr);
 
     commandList->RSSetViewports(1, &viewport_);
     commandList->RSSetScissorRects(1, &scissorRect_);
@@ -348,6 +348,62 @@ void RTVManager::QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index
     commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
 }
 
+uint32_t RTVManager::CreateComputeOutputTexture(const std::string& _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _format, const Vector4& _clearColor)
+{
+    uint32_t rtvIndex = AllocateRTVIndex();
+
+    // 既に存在するかチェック
+    auto it = textureMap_.find(_name);
+    if (it != textureMap_.end())
+        return it->second;
+
+    // UAVフラグも追加したリソース作成
+    auto rtvResource = CreateRenderTextureResourceWithUAV(_width, _height, rtvIndex, _format,_clearColor);
+
+    textureMap_[_name] = rtvIndex;
+
+    renderTargets_[rtvIndex] = std::make_unique<RenderTarget>();
+    renderTargets_[rtvIndex]->Initialize(rtvResource, GetCPURTVDescriptorHandle(rtvIndex), _format, _width, _height);
+    renderTargets_[rtvIndex]->SetViewport(viewport_);
+    renderTargets_[rtvIndex]->SetScissorRect(scissorRect_);
+    renderTargets_[rtvIndex]->SetClearColor(_clearColor);
+
+    uint32_t dsvIndex = AllocateDSVIndex();
+    CreateDepthStencilTextureResource(_width, _height, dsvIndex);
+    renderTargets_[rtvIndex]->SetDepthStencilResource(dsvResources_[dsvIndex].Get());
+
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDSVDescriptorHandle(dsvIndex);
+    renderTargets_[rtvIndex]->SetDepthStencilResource(dsvHandle);
+
+    return rtvIndex;
+}
+
+void RTVManager::TransitionForCompute(uint32_t _rtvIndex)
+{
+    auto it = renderTargets_.find(_rtvIndex);
+    if (it == renderTargets_.end())
+    {
+        assert(false && "RenderTarget not found");
+        return;
+    }
+
+    it->second->ChangeRTVState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+}
+
+void RTVManager::TransitionForRender(uint32_t _rtvIndex)
+{
+    auto it = renderTargets_.find(_rtvIndex);
+    if (it == renderTargets_.end())
+    {
+        assert(false && "RenderTarget not found");
+        return;
+    }
+
+    it->second->ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+
+
+
 void RTVManager::SetCubemapRenderTexture(uint32_t _handle)
 {
     auto it = cubemaps_.find(_handle);
@@ -478,6 +534,59 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
 
 }
 
+Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResourceWithUAV(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
+{
+    Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource = nullptr;
+
+    // テクスチャの設定（既存とほぼ同じだが、UAVフラグを追加）
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    resourceDesc.Width = _width;
+    resourceDesc.Height = _height;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.Format = _format;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    // RTV + UAV の両方のフラグを設定
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+    // ヒープの設定
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    // クリア値（デフォルト）
+    D3D12_CLEAR_VALUE clearValue{};
+    clearValue.Format = _format;
+    clearValue.Color[0] = _clearColor.x;
+    clearValue.Color[1] = _clearColor.y;
+    clearValue.Color[2] = _clearColor.z;
+    clearValue.Color[3] = _clearColor.w;
+
+    auto device = dxcommon_->GetDevice();
+
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
+        &clearValue,
+        IID_PPV_ARGS(renderTextureResource.GetAddressOf()));
+
+    assert(SUCCEEDED(hr) && "Failed to create compute output texture");
+
+    // RTV作成
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = _format;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPURTVDescriptorHandle(_rtvIndex);
+    dxcommon_->GetDevice()->CreateRenderTargetView(renderTextureResource.Get(), &rtvDesc, rtvHandle);
+
+    return renderTextureResource;
+
+}
+
 Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> cubemapResource = nullptr;
@@ -525,17 +634,15 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_
 
 uint32_t RTVManager::AllocateRTVIndex()
 {
+    assert(useIndexForRTV_ < kMaxRTVIndex_ && "RTV index overflow");
     uint32_t index = useIndexForRTV_++;
-    if (useIndexForRTV_ >= kMaxRTVIndex_)
-        throw std::runtime_error("over MaxRTVindex");
     return index;
 }
 
 uint32_t RTVManager::AllocateDSVIndex()
 {
+    assert(useIndexForDSV_ < kMaxDSVIndex_ && "DSV index overflow");
     uint32_t index = useIndexForDSV_++;
-    if (useIndexForDSV_ >= kMaxDSVIndex_)
-        throw std::runtime_error("over MaxDSVindex");
     return index;
 }
 
