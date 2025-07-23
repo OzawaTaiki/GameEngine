@@ -81,11 +81,11 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
     std::string ext = _filepath.substr(_filepath.find_last_of(".") + 1);
 	if (ext == "dds")
     {
-        srvManager_->CreateSRVForCubeMap(srvIndex, textures_[index].resource.Get(), metadata.format);
+        srvManager_->CreateSRVForCubemap(srvIndex, textures_[index].resource.Get(), metadata.format);
     }
     else
     {
-        srvManager_->CreateSRVForTextrue2D(srvIndex, textures_[index].resource.Get(), metadata.format, UINT(metadata.mipLevels));
+        srvManager_->CreateSRVForTexture2D(srvIndex, textures_[index].resource.Get(), metadata.format, UINT(metadata.mipLevels));
     }
 
 	//dxCommon_->GetDevice()->CreateShaderResourceView(, &srvDesc, srvManager_->GetCPUSRVDescriptorHandle(index));

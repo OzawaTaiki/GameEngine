@@ -1094,5 +1094,8 @@
     <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\Shader\Composite.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

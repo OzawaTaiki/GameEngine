@@ -2,7 +2,7 @@
 
 #include <Features/PostEffects/PostEffectBase.h>
 
-struct BoxFilterData : public PostEffectBaseData
+struct BoxFilterData
 {
     int kernelSize = 5; // カーネルサイズ
 
@@ -19,7 +19,7 @@ public:
 
     void Apply(const std::string& input, const std::string& output) override;
 
-    void SetData(const PostEffectBaseData* data) override;
+    void SetData(const BoxFilterData* data);
 
 private:
 

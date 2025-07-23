@@ -70,10 +70,6 @@ private:
     ID3D12Resource* dsvResource_ = nullptr;
     float clearValue_[4] = { 1.0f,0.0f,0.0f,1.0f };
 
-    // DSVの状態がSRVか
-    bool isDSVinSRVState = false;
-    bool isRTVinSRVState = false;
-
     uint32_t srvIndexofRTV_ = 0;
     uint32_t srvIndexofDSV_ = 0;
 

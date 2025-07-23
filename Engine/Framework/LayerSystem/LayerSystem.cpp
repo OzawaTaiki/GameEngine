@@ -34,14 +34,65 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
         // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
         CreateRenderTarget(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
-    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr });
+    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,false,"",0,false });
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
 
     return layerID;
+}
+
+LayerID LayerSystem::CreateOutputLayer(const std::string& layerName)
+{
+
+    if (!instance_)
+        Initialize();
+
+    for (const auto& [id, info] : instance_->layerInfos_)
+    {
+        if (info.name == layerName)
+        {
+            return id;
+        }
+    }
+
+    // レイヤーのRenderTargetを作成
+    LayerID layerID = RTVManager::GetInstance()->
+        CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, 999, true, nullptr,false,"",0,true });
+    instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
+
+    instance_->nameToID_[layerName] = layerID;
+
+    auto srvManager = SRVManager::GetInstance();
+    uint32_t UAVIndex = srvManager->Allocate();
+    auto boxFilterResource = RTVManager::GetInstance()->GetRenderTexture(layerName)->GetRTVResource();
+    srvManager->CreateUAVForTexture2D(UAVIndex, boxFilterResource, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+    instance_->layerInfos_[layerID].uavIndex = UAVIndex;
+
+    return layerID;
+}
+
+uint32_t LayerSystem::GetUAVIndex(const std::string& layerName)
+{
+    if (!instance_)
+        return 0;
+
+    auto it = instance_->nameToID_.find(layerName);
+    if (it == instance_->nameToID_.end())
+        return 0;
+
+    LayerID layerID = it->second;
+    auto infoIt = instance_->layerInfos_.find(layerID);
+    if (infoIt == instance_->layerInfos_.end())
+        return 0;
+
+    return infoIt->second.uavIndex;
 }
 
 void LayerSystem::SetLayer(LayerID _layerID)
@@ -108,7 +159,7 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     std::vector<std::pair<LayerID, LayerInfo*>> sortedLayers;
     for (auto& [id, info] : instance_->layerInfos_)
     {
-        if (info.enabled)
+        if (info.enabled && !info.isOutputLayer)
         {
             sortedLayers.push_back({ id, &info });
         }
@@ -120,6 +171,7 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
         });
 
     RTVManager::GetInstance()->SetRenderTexture(_finalRendertextureName);
+
     // 全てのレイヤーを合成
     for (auto& [id, info] : sortedLayers)
     {
@@ -130,6 +182,25 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
             RTVManager::GetInstance()->DrawRenderTexture(textureToUse);
         }
     }
+}
+
+LayerSystem::LayerInfo& LayerSystem::GetLayerInfo(const std::string& _layerName)
+{
+    auto it = instance_->nameToID_.find(_layerName);
+    if (it == instance_->nameToID_.end())
+    {
+        static LayerInfo defaultInfo = {};
+        return defaultInfo;
+    }
+
+    LayerID layerID = it->second;
+    auto infoIt = instance_->layerInfos_.find(layerID);
+    if (infoIt == instance_->layerInfos_.end())
+    {
+        static LayerInfo defaultInfo = {};
+        return defaultInfo;
+    }
+    return infoIt->second;
 }
 
 void LayerSystem::Finalize()

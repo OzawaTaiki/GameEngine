@@ -5,6 +5,9 @@
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+
+#include <Framework/LayerSystem/LayerSystem.h>
+
 #include <Debug/Debug.h>
 
 #include <cassert>
@@ -23,10 +26,6 @@ void BoxFilter::Apply(const std::string& input, const std::string& output)
 {
     auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
-    // 定数バッファを更新
-    if(postEffectData_)
-        UpdateConstantBuffer(postEffectData_, sizeof(BoxFilterData));
-
     // パイプラインステート設定
     cmdList->SetPipelineState(pipelineState_.Get());
     cmdList->SetComputeRootSignature(rootSignature_.Get());
@@ -37,7 +36,7 @@ void BoxFilter::Apply(const std::string& input, const std::string& output)
 
     auto rtvManager = RTVManager::GetInstance();
     UINT inputSRVIndex = rtvManager->GetRenderTexture(input)->GetSRVindexofRTV();
-    UINT outputUAVIndex = rtvManager->GetRenderTexture(output)->GetSRVindexofRTV();
+    uint32_t outputUAVIndex = LayerSystem::GetUAVIndex(output);
 
     rtvManager->GetRenderTexture(input)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     rtvManager->GetRenderTexture(output)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -59,20 +58,11 @@ void BoxFilter::Apply(const std::string& input, const std::string& output)
     rtvManager->GetRenderTexture(output)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void BoxFilter::SetData(const PostEffectBaseData* data)
+void BoxFilter::SetData(const BoxFilterData* data)
 {
     if (data)
     {
-        const BoxFilterData* boxFilterData = dynamic_cast<const BoxFilterData*>(data);
-        if (boxFilterData)
-        {
-            UpdateConstantBuffer(boxFilterData, sizeof(BoxFilterData));
-        }
-        else
-        {
-            // エラーハンドリング: データの型が不正な場合
-            assert(false && "Invalid BoxFilterData type");
-        }
+        UpdateConstantBuffer(data, sizeof(BoxFilterData));
     }
     else
     {

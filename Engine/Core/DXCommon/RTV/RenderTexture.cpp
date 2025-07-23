@@ -198,7 +198,7 @@ void RenderTarget::QueueCommandDSVtoSRV(uint32_t _index)
 
         DSVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     }
-    
+
     auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofDSV_);
 
     commandList->SetGraphicsRootDescriptorTable(_index, srvHandle);
@@ -232,18 +232,8 @@ void RenderTarget::Draw()
     auto commandList = DXCommon->GetCommandList();
     auto srvManager = SRVManager::GetInstance();
 
-    D3D12_RESOURCE_BARRIER barrier_{};
-    if (RTVCurrentState_ != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
-    {
-        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier_.Transition.pResource = renderTextureResource_.Get();
-        barrier_.Transition.StateBefore = RTVCurrentState_;
-        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-        commandList->ResourceBarrier(1, &barrier_);
-        RTVCurrentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    }
 
+    ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
     auto srvHandle = srvManager->GetGPUSRVDescriptorHandle(srvIndexofRTV_);
 
@@ -252,12 +242,7 @@ void RenderTarget::Draw()
 
     commandList->DrawInstanced(3, 1, 0, 0);
 
-    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-    commandList->ResourceBarrier(1, &barrier_);
-
-    RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 }
 
 void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
@@ -275,19 +260,6 @@ void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
 
         _cmdList->ResourceBarrier(1, &barrier);
         DSVCurrentState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-    }
-    
-    if (RTVCurrentState_ != D3D12_RESOURCE_STATE_RENDER_TARGET)
-    {
-        D3D12_RESOURCE_BARRIER barrier = {};
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = renderTextureResource_.Get();
-        barrier.Transition.StateBefore = RTVCurrentState_;
-        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        _cmdList->ResourceBarrier(1, &barrier);
-        RTVCurrentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
     }
 
     if (RTVCurrentState_ != D3D12_RESOURCE_STATE_RENDER_TARGET)

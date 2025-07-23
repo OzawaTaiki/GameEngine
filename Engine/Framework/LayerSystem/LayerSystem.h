@@ -15,6 +15,23 @@ using LayerID = int32_t;
 class PostEffectBase;
 class LayerSystem
 {
+private:
+    struct LayerInfo
+    {
+        std::string name;
+        int32_t priority; // レイヤーの優先度
+        bool enabled; // レイヤーが有効かどうか
+
+        RenderTarget* renderTarget;
+
+        bool hasEffect = false; // エフェクトがあるかどうか
+        std::string effectOutputTexture;
+
+        uint32_t uavIndex;
+        bool isOutputLayer = false; // 出力レイヤーかどうか
+
+    };
+
 public:
     LayerSystem() = default;
     ~LayerSystem() = default;
@@ -24,6 +41,10 @@ public:
 
     // レイヤーを作成する
     static LayerID CreateLayer(const std::string& layerName, int32_t _priority);
+
+    static LayerID CreateOutputLayer(const std::string& layerName);
+
+    static uint32_t GetUAVIndex(const std::string& layerName);
 
     // レイヤーを設定する
     static void SetLayer(LayerID layerID);
@@ -37,21 +58,10 @@ public:
 
     static void CompositeAllLayers(const std::string& _finalRendertextureName = "final");
 
+    static LayerInfo& GetLayerInfo(const std::string& _layerName);
+
     static void Finalize();
 
-private:
-    struct LayerInfo
-    {
-        std::string name;
-        int32_t priority; // レイヤーの優先度
-        bool enabled; // レイヤーが有効かどうか
-
-        RenderTarget* renderTarget;
-
-        bool hasEffect = false; // エフェクトがあるかどうか
-        std::string effectOutputTexture;
-
-    };
 
 private:
 
