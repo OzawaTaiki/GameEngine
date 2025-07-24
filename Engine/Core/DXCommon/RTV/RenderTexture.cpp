@@ -42,6 +42,8 @@ void RenderTarget::SetRenderTexture()
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
 
+    ChangeRTVState(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
     commandList->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
 
     D3D12_VIEWPORT viewport{};

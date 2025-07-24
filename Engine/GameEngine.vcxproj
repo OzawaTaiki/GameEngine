@@ -182,6 +182,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Json\JsonBinder.cpp" />
     <ClCompile Include="Features\Json\JsonSerializers.cpp" />
     <ClCompile Include="Features\Json\Loader\JsonFileIO.cpp" />
+    <ClCompile Include="Features\LevelEditor\LevelEditorLoader.cpp" />
     <ClCompile Include="Features\Light\Directional\DirectionalLight.cpp" />
     <ClCompile Include="Features\Light\Group\LightGroup.cpp" />
     <ClCompile Include="Features\Light\Point\PointLight.cpp" />
@@ -232,7 +233,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp" />
-    <ClCompile Include="LevelEditorLoader.cpp" />
     <ClCompile Include="Math\BezierCurve3D.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Math\Matrix\Matrix4x4.cpp" />
@@ -307,6 +307,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Json\JsonSerializers.h" />
     <ClInclude Include="Features\Json\Loader\JsonFileIO.h" />
     <ClInclude Include="Features\Json\VariableHolder.h" />
+    <ClInclude Include="Features\LevelEditor\LevelEditorLoader.h" />
     <ClInclude Include="Features\Light\Directional\DirectionalLight.h" />
     <ClInclude Include="Features\Light\Group\LightGroup.h" />
     <ClInclude Include="Features\Light\Light.h" />
@@ -364,7 +365,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\LayerSystem\LayerSystem.h" />
-    <ClInclude Include="LevelEditorLoader.h" />
     <ClInclude Include="Math\BezierCurve3D.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Math\Matrix\Matrix3x3.h" />
