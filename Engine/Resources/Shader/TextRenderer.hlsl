@@ -44,8 +44,8 @@ float4 PSmain(PSInput input) : SV_TARGET
 {
     float alpha = fontTexture.Sample(fontSampler, input.texCoord);
 
-    if (input.color.a * alpha == 0)
-        return float4(1, 0, 0, 1); // 赤で確認
+    if (input.color.a * alpha <= 0.1f)
+        discard;
 
 
     return float4(input.color.rgb, input.color.a * alpha);
