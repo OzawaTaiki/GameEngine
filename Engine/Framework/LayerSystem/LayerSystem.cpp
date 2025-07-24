@@ -34,7 +34,7 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
         // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
         CreateRenderTarget(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f), true);
 
     instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,false,"",0,false });
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);

@@ -1,43 +1,46 @@
 #pragma once
 
-#include <Features/Camera/Camera/Camera.h>
+#include <Features/PostEffects/PostEffectBase.h>
 
-class DepthBasedOutLine
+#include <Math/Vector/Vector3.h>
+#include <Math/Matrix/Matrix4x4.h>
+
+struct DepthBasedOutLineData
+{
+    Matrix4x4 inverseViewProjectionMatrix; // カメラの逆射影行列
+
+    float edgeThreshold = 0.5f; // エッジの閾値 (0.0~10.0くらい)
+    float edgeIntensity = 0.5f; // エッジの強度 (0.0~1.0)
+    float edgeWidth = 1.0f; // エッジの幅 (1.0~3.0くらい)
+    int enableColorBlending = 1; // カラーブレンディング有効（0:無効, 1:有効）
+
+    Vector3 edgeColor = { 1.0f, 1.0f, 1.0f }; // エッジの色（RGB）
+    float edgeColorIntensity = 1.0f; // エッジ色の強度（0.0~1.0）
+
+    void ImGui();
+};
+
+class Camera;
+class DepthBasedOutLine : public PostEffectBase
 {
 public:
-    static DepthBasedOutLine* GetInstance()
-    {
-        static DepthBasedOutLine instance;
-        return &instance;
-    }
+    void Initialize() override;
 
+    void Apply(const std::string& _input, const std::string& _output) override;
 
-    void Initialize();
+    void SetData(DepthBasedOutLineData* _data);
 
-    void Set(const std::string& _depthTextureName);
-
-    void SetCamera(Camera* _camera) { camera_ = _camera; }
-    void SetDepthTexture(ID3D12Resource* _depthTexture) { depthTexture_ = _depthTexture; }
+    void SetCamera(Camera* camera);
 
 private:
-    void SetPSO();
-    void SetRootSignature();
+    void CreatePipelineState();
 
+    void CreateRootSignature();
 
-    void CreatePSOForDepthBasedOutLine();
-
-
-    Camera* camera_ = nullptr;
-    ID3D12Resource* depthTexture_ = nullptr;
-
-    std::string name_ = "DepthBasedOutline";
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> inverseMatrixBuffer_ = nullptr;
-    Matrix4x4* inverseMatrixData_ = nullptr;
-
+    void UpdateData();
 private:
-    DepthBasedOutLine() = default;
-    ~DepthBasedOutLine() = default;
-    DepthBasedOutLine(const DepthBasedOutLine&) = delete;
-    DepthBasedOutLine& operator=(const DepthBasedOutLine&) = delete;
+
+    Camera* camera_ = nullptr; // カメラへのポインタ
+
+    DepthBasedOutLineData* data_ = nullptr; // データへのポインタ
 };
