@@ -76,4 +76,13 @@ namespace StringUtils
     /// <returns>拡張子</returns>
     std::string GetExtension(const std::string& _str);
 
+
+    /// <summary>
+    /// 文字列が指定の文字列を含んでいるかどうかを確認
+    /// </summary>
+    /// <param name="_str">操作を行う文字列</param>
+    /// <param name="_subStr">検索する文字列</param>
+    /// <returns>true: 含んでいる, false: 含んでいない</returns>
+    bool Contains(const std::string& _str, const std::string& _subStr);
+
 } // namespace StringUtils

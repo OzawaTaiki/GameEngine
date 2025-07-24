@@ -90,3 +90,8 @@ std::string StringUtils::GetExtension(const std::string& _str)
     return ""; // 拡張子が見つからない場合は空文字列を返す
 }
 
+bool StringUtils::Contains(const std::string& _str, const std::string& _subStr)
+{
+    return _str.find(_subStr) != std::string::npos; // _subStrが_strに含まれているかどうかを確認
+}
+

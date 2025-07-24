@@ -33,14 +33,20 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
 
         // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
-        CreateRenderTarget(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f), true);
+        CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
     instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,false,"",0,false });
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
 
+    auto srvManager = SRVManager::GetInstance();
+    uint32_t UAVIndex = srvManager->Allocate();
+    auto boxFilterResource = RTVManager::GetInstance()->GetRenderTexture(layerName)->GetRTVResource();
+    srvManager->CreateUAVForTexture2D(UAVIndex, boxFilterResource, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+    instance_->layerInfos_[layerID].uavIndex = UAVIndex;
     return layerID;
 }
 

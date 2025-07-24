@@ -543,7 +543,6 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
-    <ClCompile Include="LevelEditorLoader.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp">
       <Filter>Features\Text</Filter>
     </ClCompile>
@@ -597,6 +596,9 @@
     </ClCompile>
     <ClCompile Include="Features\PostEffects\DepthBasedOutline.cpp">
       <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\LevelEditor\LevelEditorLoader.cpp">
+      <Filter>Features\LevelEditor\Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -963,9 +965,6 @@
     <ClInclude Include="Features\Effect\Modifier\Preset\RotationBasedMovementModifier.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
-    <ClInclude Include="LevelEditorLoader.h">
-      <Filter>Features\LevelEditor\Loader</Filter>
-    </ClInclude>
     <ClInclude Include="Features\TextRenderer\TextRenderer.h">
       <Filter>Features\Text</Filter>
     </ClInclude>
@@ -1016,6 +1015,9 @@
     </ClInclude>
     <ClInclude Include="Features\PostEffects\DepthBasedOutline.h">
       <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\LevelEditor\LevelEditorLoader.h">
+      <Filter>Features\LevelEditor\Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
