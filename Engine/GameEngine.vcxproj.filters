@@ -513,9 +513,6 @@
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClCompile>
-    <ClCompile Include="Features\PostEffects\DepthBasedOutLine.cpp">
-      <Filter>Features\PosttEffects</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
@@ -596,6 +593,9 @@
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
     <ClCompile Include="Features\PostEffects\PostEffectBase.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\DepthBasedOutline.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -924,9 +924,6 @@
     <ClInclude Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.h">
       <Filter>Features\Effect\Modifier\Preset</Filter>
     </ClInclude>
-    <ClInclude Include="Features\PostEffects\DepthBasedOutLine.h">
-      <Filter>Features\PosttEffects</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Triangle.h">
       <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
@@ -1017,6 +1014,9 @@
     <ClInclude Include="Features\PostEffects\BoxFilter.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
+    <ClInclude Include="Features\PostEffects\DepthBasedOutline.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1096,6 +1096,9 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\Composite.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\DepthBasedOutline.CS.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
