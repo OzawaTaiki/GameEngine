@@ -23,7 +23,7 @@ struct GlyphInfo
 
 struct FontConfig
 {
-    Vector2 atlasSize = { 4096,4096 }; // アトラスの幅
+    Vector2 atlasSize = { 1024,1024 }; // アトラスの幅
     float fontSize = 32.0f; // フォントサイズ
     std::string fontFilePath = "Resources/Fonts/NotoSansJP-Regular.ttf"; // フォントファイルのパス
 };

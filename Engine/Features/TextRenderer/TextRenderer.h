@@ -35,6 +35,7 @@ public:
     void Finalize();
 
     void BeginFrame();
+
     void EndFrame();
 
     void DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, const Vector4& _color = { 1,1,1,1 });
