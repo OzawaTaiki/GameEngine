@@ -79,7 +79,6 @@ private:
 
     std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
-    std::vector<std::unique_ptr<ObjectModel>> models_;
 
 
 #ifdef _DEBUG

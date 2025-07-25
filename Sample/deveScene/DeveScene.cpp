@@ -15,8 +15,6 @@
 #include  <Core/DXCommon/DXCommon.h>
 
 
-#include "LevelEditorLoader.h"
-
 DeveScene::~DeveScene()
 {
 }
@@ -108,50 +106,6 @@ void DeveScene::Initialize(SceneData* _sceneData)
     skyBox_->Initialize(30.0f);
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
-    LevelEditorLoader loader;
-
-    loader.Load("Resources/testData/test.json");
-
-    auto objectParams = loader.GetAllObjectParameters();
-
-    for (const auto& [name, params] : objectParams)
-    {
-        if (params.name == "Camera")
-            continue;
-
-        auto model = std::make_unique<ObjectModel>(params.name);
-        // モデルのを読み込む
-        model->Initialize(params.modelPath);
-
-        model->translate_ = params.position;
-        model->euler_ = params.rotation;
-        model->scale_ = params.scale;
-
-
-        if (params.hasChild)
-        {
-            for (const auto& child : params.childParameters)
-            {
-                auto childModel = std::make_unique<ObjectModel>(child.name);
-                childModel->Initialize(child.modelPath);
-                childModel->translate_ = child.position;
-                childModel->euler_ = child.rotation;
-                childModel->scale_ = child.scale;
-
-                childModel->SetParent(model->GetWorldTransform());
-
-                models_.push_back(std::move(childModel));
-
-            }
-        }
-
-        models_.push_back(std::move(model));
-    }
-
-    SceneCamera_.translate_ = objectParams["Camera"].position;
-    SceneCamera_.rotate_ = objectParams["Camera"].rotation;
-
-
     text_.Initialize(FontConfig());
 }
 
@@ -214,10 +168,6 @@ void DeveScene::Update()
     // モデルの更新
     ground_->Update();
 
-    for (const auto& model : models_)
-    {
-        model->Update();
-    }
 
     std::wstring wstr = std::wstring(str.begin(), str.end());
     wstr += L"\nこんにちは 世界";
@@ -255,11 +205,6 @@ void DeveScene::Draw()
 
     // groundの描画
     ground_->Draw(&SceneCamera_, groundTextureHandle_, drawColor_);
-
-    for (const auto& model : models_)
-    {
-        model->Draw(&SceneCamera_, 0, drawColor_);
-    }
 
     // Sprite用のPSO等をセット
     Sprite::PreDraw();
