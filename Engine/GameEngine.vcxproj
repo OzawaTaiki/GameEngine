@@ -213,6 +213,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\PostEffects\BoxFilter.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutline.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
+    <ClCompile Include="Features\PostEffects\GrayScale.cpp" />
     <ClCompile Include="Features\PostEffects\PostEffectBase.cpp" />
     <ClCompile Include="Features\PostEffects\Vignette.cpp" />
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp" />
@@ -342,6 +343,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\PostEffects\BoxFilter.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutline.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
+    <ClInclude Include="Features\PostEffects\GrayScale.h" />
     <ClInclude Include="Features\PostEffects\PostEffectBase.h" />
     <ClInclude Include="Features\PostEffects\Vignette.h" />
     <ClInclude Include="Features\Scene\Interface\BaseScene.h" />

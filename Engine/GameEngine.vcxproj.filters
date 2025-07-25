@@ -609,6 +609,9 @@
     <ClCompile Include="Features\PostEffects\Vignette.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\GrayScale.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1032,6 +1035,9 @@
       <Filter>Features\ColorMask</Filter>
     </ClInclude>
     <ClInclude Include="Features\PostEffects\Vignette.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\GrayScale.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
   </ItemGroup>
