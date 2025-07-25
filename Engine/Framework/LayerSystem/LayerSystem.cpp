@@ -183,7 +183,7 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     {
         if (info->enabled && info->renderTarget)
         {
-            std::string textureToUse = info->hasEffect ? info->effectOutputTexture : info->name;
+            std::string textureToUse = /*info->hasEffect ? info->effectOutputTexture : */info->name;
 
             RTVManager::GetInstance()->DrawRenderTexture(textureToUse);
         }

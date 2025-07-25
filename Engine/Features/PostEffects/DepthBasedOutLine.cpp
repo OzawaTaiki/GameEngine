@@ -13,6 +13,11 @@
 
 #include <Debug/ImGuiDebugManager.h>
 
+DepthBasedOutLine::~DepthBasedOutLine()
+{
+    camera_ = nullptr;
+}
+
 void DepthBasedOutLine::Initialize()
 {
     CreateConstantBuffer(sizeof(DepthBasedOutLineData));
@@ -24,46 +29,69 @@ void DepthBasedOutLine::Initialize()
 
 void DepthBasedOutLine::Apply(const std::string& _input, const std::string& _output)
 {
-    auto cmdList = DXCommon::GetInstance()->GetCommandList();
+    //auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
+    //UpdateData();
+
+    //// パイプラインステート設定
+    //cmdList->SetPipelineState(pipelineState_.Get());
+    //cmdList->SetComputeRootSignature(rootSignature_.Get());
+
+    //// ルートパラメータ設定
+    //// CBV (b0) - 定数バッファ
+    //cmdList->SetComputeRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
+
+    //auto rtvManager = RTVManager::GetInstance();
+    //UINT inputSRVIndex = rtvManager->GetRenderTexture(_input)->GetSRVindexofRTV();
+    //uint32_t depthSRVIndex = rtvManager->GetRenderTexture(_input)->GetSRVindexofDSV();
+
+    //rtvManager->GetRenderTexture(_input)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    //rtvManager->GetRenderTexture(_input)->ChangeDSVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+    //// SRV (t0) - 入力テクスチャ
+    //cmdList->SetComputeRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(inputSRVIndex));
+    //// SRV (t1) 深度テクスチャ
+    //cmdList->SetComputeRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(depthSRVIndex));
+    //// UAV (u0) - 出力テクスチャ
+
+    //// スレッドグループ数計算 (8x8のスレッドグループ)
+    //uint32_t dispatchX = (WinApp::kWindowWidth_ + 7) / 8;
+    //uint32_t dispatchY = (WinApp::kWindowHeight_ + 7) / 8;
+
+    //// Dispatch実行
+    //cmdList->Dispatch(dispatchX, dispatchY, 1);
+
+
+    //rtvManager->GetRenderTexture(_input)->ChangeDSVState(cmdList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    //rtvManager->GetRenderTexture(_output)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     UpdateData();
 
-    // パイプラインステート設定
-    cmdList->SetPipelineState(pipelineState_.Get());
-    cmdList->SetComputeRootSignature(rootSignature_.Get());
-
-    // ルートパラメータ設定
-    // CBV (b0) - 定数バッファ
-    cmdList->SetComputeRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
+    auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
     auto rtvManager = RTVManager::GetInstance();
-    UINT inputSRVIndex = rtvManager->GetRenderTexture(_input)->GetSRVindexofRTV();
-    uint32_t outputUAVIndex = LayerSystem::GetUAVIndex(_output);
+    // パイプラインステート設定
+    cmdList->SetPipelineState(pipelineState_.Get());
+    cmdList->SetGraphicsRootSignature(rootSignature_.Get());
+
     uint32_t depthSRVIndex = rtvManager->GetRenderTexture(_input)->GetSRVindexofDSV();
 
+    rtvManager->GetRenderTexture(_output)->SetRenderTexture();
     rtvManager->GetRenderTexture(_input)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     rtvManager->GetRenderTexture(_input)->ChangeDSVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-    rtvManager->GetRenderTexture(_output)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    uint32_t srvIndex = rtvManager->GetRenderTexture(_input)->GetSRVindexofRTV();
+    // ルートパラメータ設定
+    // CBV (b0) - 定数バッファ
+    cmdList->SetGraphicsRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
 
-    // SRV (t0) - 入力テクスチャ
-    cmdList->SetComputeRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(inputSRVIndex));
-    // SRV (t1) 深度テクスチャ
-    cmdList->SetComputeRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(depthSRVIndex));
-    // UAV (u0) - 出力テクスチャ
-    cmdList->SetComputeRootDescriptorTable(3, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(outputUAVIndex));
+    cmdList->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndex));
 
-    // スレッドグループ数計算 (8x8のスレッドグループ)
-    uint32_t dispatchX = (WinApp::kWindowWidth_ + 7) / 8;
-    uint32_t dispatchY = (WinApp::kWindowHeight_ + 7) / 8;
-
+    cmdList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(depthSRVIndex));
     // Dispatch実行
-    cmdList->Dispatch(dispatchX, dispatchY, 1);
-
+    cmdList->DrawInstanced(3, 1, 0, 0);
 
     rtvManager->GetRenderTexture(_input)->ChangeDSVState(cmdList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    rtvManager->GetRenderTexture(_output)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-}
 
+}
 void DepthBasedOutLine::SetData(DepthBasedOutLineData* _data)
 {
     if (_data)
@@ -82,112 +110,138 @@ void DepthBasedOutLine::SetCamera(Camera* camera)
 
 void DepthBasedOutLine::CreatePipelineState()
 {
-
     HRESULT hr = S_FALSE;
 
 #pragma region Shader
-    // Compute Shaderをコンパイルする
-    Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob =
-        PSOManager::GetInstance()->ComplieShader(L"DepthBasedOutline.CS.hlsl", L"cs_6_0");
-    assert(computeShaderBlob != nullptr);
-#pragma endregion
 
-    // Compute PSOを生成する
-    D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc{};
-    computePipelineStateDesc.pRootSignature = rootSignature_.Get();
-    computePipelineStateDesc.CS = { computeShaderBlob->GetBufferPointer(), computeShaderBlob->GetBufferSize() };
-    computePipelineStateDesc.NodeMask = 0;
-    computePipelineStateDesc.CachedPSO.pCachedBlob = nullptr;
-    computePipelineStateDesc.CachedPSO.CachedBlobSizeInBytes = 0;
-    computePipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"FullScreen.VS.hlsl", L"vs_6_0");
+    assert(vertexShaderBlob != nullptr);
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"DepthBasedOutline.hlsl", L"ps_6_0");
+    assert(pixelShaderBlob != nullptr);
+#pragma endregion
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    depthStencilDesc.DepthEnable = false;
+
+    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+    inputLayoutDesc.pInputElementDescs = nullptr;
+    inputLayoutDesc.NumElements = 0;
+
+    D3D12_BLEND_DESC blendDesc{};
+    blendDesc = PSOManager::GetInstance()->GetBlendDesc(PSOFlags::BlendMode::Normal);
+
+    D3D12_RASTERIZER_DESC rasterizerDesc{};
+    rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+    graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();                                                // RootSignature
+    graphicsPipelineStateDesc.BlendState = blendDesc;                                                               // BlendState
+    graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                        // InputLayout
+    graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
+    graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
+    graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                                     // RasterizerState
+    // 追加の DRTV の情報
+    graphicsPipelineStateDesc.NumRenderTargets = 1;
+    graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+    graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
+    graphicsPipelineStateDesc.SampleDesc.Count = 1;
+    graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+    graphicsPipelineStateDesc.BlendState = blendDesc;
 
     // PSOを生成
-    hr = DXCommon::GetInstance()->GetDevice()->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
-    assert(SUCCEEDED(hr));
+    hr = DXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
 }
 
 void DepthBasedOutLine::CreateRootSignature()
 {
-    HRESULT hr = S_OK;
+    HRESULT hr = S_FALSE;
+
+    //Samplerの設定
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    staticSamplers[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
+    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
+    staticSamplers[0].ShaderRegister = 0;
+    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+    // 深度テクスチャ用サンプラー
+    staticSamplers[1].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;
+    staticSamplers[1].ShaderRegister = 1; // s1
+    staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+#pragma region RootSignature
+    // RootSignatureを生成する
+    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE; // Compute用
 
 
-    // descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
-
-    // SRV (t0) - 入力テクスチャ
-    descriptorRange[0].BaseShaderRegister = 0;
-    descriptorRange[0].NumDescriptors = 1;
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    //descriptorRange
+    D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].NumDescriptors = 1;//数は１つ
+    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    // SRV (t1) - depthテクスチャ
-    descriptorRange[1].BaseShaderRegister = 1;
-    descriptorRange[1].NumDescriptors = 1;
-    descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+    descriptorRange[1].BaseShaderRegister = 1;//０から始まる
+    descriptorRange[1].NumDescriptors = 1;//数は１つ
+    descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    // UAV (u0) - 出力テクスチャ
-    descriptorRange[2].BaseShaderRegister = 0;
-    descriptorRange[2].NumDescriptors = 1;
-    descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-    descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    // ディスクリプタテーブルの作成
-    D3D12_ROOT_PARAMETER rootParameters[4] = {};
+    // RootParameter作成
+    D3D12_ROOT_PARAMETER rootParameters[3] = {};
 
-    // コンスタントバッファ (b0) DepthBasedOutlineData
+    // CBV (b0) - 定数バッファ
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[0].Descriptor.ShaderRegister = 0;
 
-    // テクスチャ用ディスクリプタテーブル
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
-    rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRange[0];
+    // テクスチャ
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRange[0];		//tableの中身の配列を指定
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;//tableで利用する数
 
-    // 深度テクスチャ用ディスクリプタテーブル
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[1];		//tableの中身の配列を指定
     rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
-    rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
 
-    // 出力テクスチャ用ディスクリプタテーブル
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
-    rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
+    descriptionRootSignature.pParameters = rootParameters;
+    descriptionRootSignature.NumParameters = _countof(rootParameters);
 
+    descriptionRootSignature.pStaticSamplers = staticSamplers;
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-    // ルートシグネチャ記述の設定
-    D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-    rootSignatureDesc.NumParameters = _countof(rootParameters);
-    rootSignatureDesc.pParameters = rootParameters;
-    rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE; // Compute用
-
-    // ルートシグネチャのシリアライズと作成
+    // シリアライズしてバイナリする
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    hr = D3D12SerializeRootSignature(
-        &rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-        &signatureBlob, &errorBlob);
-
-    if (FAILED(hr)) {
-        if (errorBlob) {
-            Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        }
-        assert(false && "Failed to serialize root signature");
-        return;
+    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    if (FAILED(hr))
+    {
+        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        assert(false);
     }
-
-    hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(
-        0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-        IID_PPV_ARGS(&rootSignature_));
-
-    if (FAILED(hr)) {
-        assert(false && "Failed to create root signature");
-        return;
-    }
+    hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
+    assert(SUCCEEDED(hr));
+#pragma endregion
 }
 
 void DepthBasedOutLine::UpdateData()

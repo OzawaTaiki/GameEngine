@@ -214,6 +214,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\PostEffects\DepthBasedOutline.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
     <ClCompile Include="Features\PostEffects\PostEffectBase.cpp" />
+    <ClCompile Include="Features\PostEffects\Vignette.cpp" />
     <ClCompile Include="Features\Scene\Manager\SceneManager.cpp" />
     <ClCompile Include="Features\Scene\ParticleTestScene.cpp" />
     <ClCompile Include="Features\SilhouetteDetection.cpp" />
@@ -342,6 +343,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\PostEffects\DepthBasedOutline.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
     <ClInclude Include="Features\PostEffects\PostEffectBase.h" />
+    <ClInclude Include="Features\PostEffects\Vignette.h" />
     <ClInclude Include="Features\Scene\Interface\BaseScene.h" />
     <ClInclude Include="Features\Scene\Interface\ISceneTransition.h" />
     <ClInclude Include="Features\Scene\ISceneFactory.h" />
@@ -531,6 +533,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\TextRenderer.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Vignette.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

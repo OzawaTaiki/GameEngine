@@ -204,6 +204,10 @@ public:
 
     void CreatePSOForSkyBox();
 
+    D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
+    D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);
+    D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(PSOFlags _flag);
+
 private:
     void CreateDefaultPSOs();
 
@@ -218,9 +222,6 @@ private:
     void CreatePSOForDLShadowMap();
     void CreatePSOForPLShadowMap();
 
-    D3D12_BLEND_DESC GetBlendDesc(PSOFlags _flag);
-    D3D12_RASTERIZER_DESC GetRasterizerDesc(PSOFlags _flag);
-    D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(PSOFlags _flag);
 
     DXCommon* dxCommon_ = nullptr;
 

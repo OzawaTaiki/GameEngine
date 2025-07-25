@@ -16,7 +16,6 @@ PixelShaderOutput main(VertexOutput _input)
 
     if (output.color.a == 0)
         discard;
-
-    output.color.a = 1.0f; // Set alpha to 1.0 for full opacity
+    
     return output;
 }

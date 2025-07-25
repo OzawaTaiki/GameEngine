@@ -606,6 +606,9 @@
     <ClCompile Include="Features\ColorMask\ColorMask.cpp">
       <Filter>Features\ColorMask</Filter>
     </ClCompile>
+    <ClCompile Include="Features\PostEffects\Vignette.cpp">
+      <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1028,6 +1031,9 @@
     <ClInclude Include="Features\ColorMask\ColorMask.h">
       <Filter>Features\ColorMask</Filter>
     </ClInclude>
+    <ClInclude Include="Features\PostEffects\Vignette.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1113,6 +1119,9 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\ColorMask.CS.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Vignette.CS.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
