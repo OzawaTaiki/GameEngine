@@ -170,6 +170,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Collision\SpiralHashGird\SpatialHashGrid.cpp" />
     <ClCompile Include="Features\Collision\Tree\Cell.cpp" />
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp" />
+    <ClCompile Include="Features\ColorMask\ColorMask.cpp" />
     <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp" />
     <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp" />
     <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp" />
@@ -288,6 +289,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Collision\SpiralHashGird\SpatialHashGrid.h" />
     <ClInclude Include="Features\Collision\Tree\Cell.h" />
     <ClInclude Include="Features\Collision\Tree\QuadTree.h" />
+    <ClInclude Include="Features\ColorMask\ColorMask.h" />
     <ClInclude Include="Features\Effect\Editor\ParticleEditor.h" />
     <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h" />
     <ClInclude Include="Features\Effect\Manager\ParticleSystem.h" />
@@ -429,6 +431,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\BoxFilter.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\ColorMask.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
