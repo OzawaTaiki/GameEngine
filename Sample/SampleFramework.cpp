@@ -24,8 +24,6 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
     PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
     PSOManager::GetInstance()->CreatePSOForPostEffect("RadialBlur", L"RadialBlur.hlsl");
 
-
-    DepthBasedOutLine::GetInstance()->Initialize();
     Dissolve::GetInstance()->Initialize();
 
     sceneManager_->SetSceneFactory(new SceneFactory());
@@ -106,10 +104,6 @@ void SampleFramework::Draw()
             // luminanceBasedOutlineの処理
              PSOManager::GetInstance()->SetPSOForPostEffect("LuminanceBasedOutline");
         }
-        else if (eff == "DepthBasedOutline") {
-            // depthBasedOutlineの処理
-             DepthBasedOutLine::GetInstance()->Set("default");
-        }
         else if (eff == "RadialBlur") {
             // radialBlurの処理
             PSOManager::GetInstance()->SetPSOForPostEffect("RadialBlur");
@@ -157,7 +151,7 @@ void SampleFramework::RenderUI()
     static const char* availableEffects[] = {
         "BoxFilter", "GrayScale", "Vignette",
         "Gauss", "LuminanceBasedOutline",
-        "DepthBasedOutline","RadialBlur","Dissolve"
+        "RadialBlur","Dissolve"
     };
     static const int numAvailableEffects = IM_ARRAYSIZE(availableEffects);
 

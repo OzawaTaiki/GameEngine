@@ -126,8 +126,6 @@ void SampleScene::Initialize(SceneData* _sceneData)
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
 
-    DepthBasedOutLine::GetInstance()->SetCamera(&SceneCamera_);
-
 }
 
 void SampleScene::Update()
