@@ -39,12 +39,6 @@ static const float kPrewittVertical[3][3] =
     { 1.0f / 6.0f, 1.0f / 6.0f, 1.0f / 6.0f }
 };
 
-
-float Luminance(float3 _v)
-{
-    return dot(_v, float3(0.2125f, 0.7154f, 0.0721f));
-}
-
 PixelShaderOutput main(VertexOutput _input)
 {
     PixelShaderOutput output;
@@ -63,7 +57,7 @@ PixelShaderOutput main(VertexOutput _input)
 
             float ndcDepth = gDepthTexture.Sample(gDepthSampler, texcoord);
             float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), gInverseProjectionMatrix);// TODO
-            float viewZ = viewSpace.z * rcp(viewSpace.w); 
+            float viewZ = viewSpace.z * rcp(viewSpace.w);
 
             difference.x += viewZ * kPrewittHorizontal[x][y];
             difference.y += viewZ * kPrewittVertical[x][y];
