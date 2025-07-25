@@ -253,6 +253,9 @@
     <Filter Include="Framework\LayerSystem">
       <UniqueIdentifier>{39850079-823b-4b04-a198-3481f45914bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\ColorMask">
+      <UniqueIdentifier>{db0f8b03-c861-4de0-92ca-985b6003783b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -599,6 +602,12 @@
     </ClCompile>
     <ClCompile Include="Features\LevelEditor\LevelEditorLoader.cpp">
       <Filter>Features\LevelEditor\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\ColorMask\ColorMask.cpp">
+      <Filter>Features\ColorMask</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\Vignette.cpp">
+      <Filter>Features\PosttEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1019,6 +1028,12 @@
     <ClInclude Include="Features\LevelEditor\LevelEditorLoader.h">
       <Filter>Features\LevelEditor\Loader</Filter>
     </ClInclude>
+    <ClInclude Include="Features\ColorMask\ColorMask.h">
+      <Filter>Features\ColorMask</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\Vignette.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1100,6 +1115,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\DepthBasedOutline.CS.hlsl">
+      <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\ColorMask.CS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Vignette.CS.hlsl">
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
   </ItemGroup>

@@ -1,29 +1,24 @@
-#include "BoxFilter.h"
-
+#include "Vignette.h"
 #include <Core/WinApp/WinApp.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
-#include <Core/DXCommon/TextureManager/TextureManager.h>
 
 #include <Framework/LayerSystem/LayerSystem.h>
-
 #include <Debug/Debug.h>
 
-#include <cassert>
-#include <dxcapi.h>
-
-void BoxFilter::Initialize()
+void Vignette::Initialize()
 {
-    CreateConstantBuffer(sizeof(BoxFilterData));
+    CreateConstantBuffer(sizeof(VignetteData));
 
     // PSOとルートシグネチャを生成
     CreateRootSignature();
     CreatePipelineState();
 }
 
-void BoxFilter::Apply(const std::string& input, const std::string& output)
+void Vignette::Apply(const std::string& input, const std::string& _output)
 {
+    DataUpdate();
     auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
     auto rtvManager = RTVManager::GetInstance();
@@ -31,7 +26,7 @@ void BoxFilter::Apply(const std::string& input, const std::string& output)
     cmdList->SetPipelineState(pipelineState_.Get());
     cmdList->SetGraphicsRootSignature(rootSignature_.Get());
 
-    rtvManager->GetRenderTexture(output)->SetRenderTexture();
+    rtvManager->GetRenderTexture(_output)->SetRenderTexture();
     rtvManager->GetRenderTexture(input)->ChangeRTVState(cmdList, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
     uint32_t srvIndex = rtvManager->GetRenderTexture(input)->GetSRVindexofRTV();
@@ -46,84 +41,16 @@ void BoxFilter::Apply(const std::string& input, const std::string& output)
 
 }
 
-void BoxFilter::SetData(const BoxFilterData* data)
+void Vignette::SetData(VignetteData* _data)
 {
-    if (data)
+    if (_data)
     {
-        UpdateConstantBuffer(data, sizeof(BoxFilterData));
-    }
-    else
-    {
-        // エラーハンドリング: データがnullptrの場合
-        assert(false && "BoxFilterData is nullptr");
+        data_ = _data;
+        DataUpdate();
     }
 }
 
-void BoxFilter::CreateRootSignature()
-{
-    HRESULT hr = S_FALSE;
-
-    //Samplerの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
-    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
-    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 比較しない
-    staticSamplers[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
-    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
-    staticSamplers[0].ShaderRegister = 0;
-    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // PixelShaderで使う
-
-#pragma region RootSignature
-    // RootSignatureを生成する
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE; // Compute用
-
-
-    //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
-    descriptorRange[0].NumDescriptors = 1;//数は１つ
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-    // RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[2] = {};
-
-    // CBV (b0) - 定数バッファ
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[0].Descriptor.ShaderRegister = 0;
-
-    // テクスチャ
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
-
-    descriptionRootSignature.pParameters = rootParameters;
-    descriptionRootSignature.NumParameters = _countof(rootParameters);
-
-    descriptionRootSignature.pStaticSamplers = staticSamplers;
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-    // シリアライズしてバイナリする
-    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-    if (FAILED(hr))
-    {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        assert(false);
-    }
-    hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-    assert(SUCCEEDED(hr));
-#pragma endregion
-}
-
-void BoxFilter::CreatePipelineState()
+void Vignette::CreatePipelineState()
 {
     HRESULT hr = S_FALSE;
 
@@ -131,7 +58,7 @@ void BoxFilter::CreatePipelineState()
 
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"FullScreen.VS.hlsl", L"vs_6_0");
     assert(vertexShaderBlob != nullptr);
-    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"BoxFilter.hlsl", L"ps_6_0");
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"Vignetting.hlsl", L"ps_6_0");
     assert(pixelShaderBlob != nullptr);
 #pragma endregion
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -171,4 +98,81 @@ void BoxFilter::CreatePipelineState()
 
     // PSOを生成
     hr = DXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
+}
+
+void Vignette::CreateRootSignature()
+{
+
+    HRESULT hr = S_FALSE;
+
+    //Samplerの設定
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
+    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
+    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 比較しない
+    staticSamplers[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
+    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
+    staticSamplers[0].ShaderRegister = 0;
+    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // PixelShaderで使う
+
+#pragma region RootSignature
+    // RootSignatureを生成する
+    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE; // Compute用
+
+
+    //descriptorRange
+    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+    descriptorRange[0].BaseShaderRegister = 0;//０から始まる
+    descriptorRange[0].NumDescriptors = 1;//数は１つ
+    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    // RootParameter作成
+    D3D12_ROOT_PARAMETER rootParameters[2] = {};
+
+    // CBV (b0) - 定数バッファ
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    rootParameters[0].Descriptor.ShaderRegister = 0;
+    // テクスチャ
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
+    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
+
+    descriptionRootSignature.pParameters = rootParameters;
+    descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+    descriptionRootSignature.pStaticSamplers = staticSamplers;
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+
+    // シリアライズしてバイナリする
+    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    if (FAILED(hr))
+    {
+        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        assert(false);
+    }
+    hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
+    assert(SUCCEEDED(hr));
+#pragma endregion
+}
+
+void Vignette::DataUpdate()
+{
+    if (!data_)
+        return;
+
+    // 定数バッファのデータを更新
+    if (constantBufferData_)
+    {
+        UpdateConstantBuffer(data_, sizeof(VignetteData));
+    }
+
 }

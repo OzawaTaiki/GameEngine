@@ -24,6 +24,10 @@ class Camera;
 class DepthBasedOutLine : public PostEffectBase
 {
 public:
+
+    DepthBasedOutLine() = default;
+    ~DepthBasedOutLine() override;
+
     void Initialize() override;
 
     void Apply(const std::string& _input, const std::string& _output) override;

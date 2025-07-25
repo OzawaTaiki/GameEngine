@@ -99,6 +99,7 @@ void Framework::Initialize(const std::wstring& _winTitle)
 
 void Framework::Update()
 {
+    srvManager_->PreDraw();
     gameTime_->BeginFrame();
     if (winApp_->ProcessMessage())
     {
@@ -117,7 +118,6 @@ void Framework::Update()
 
 void Framework::PreDraw()
 {
-    srvManager_->PreDraw();
 }
 
 void Framework::PostDraw()

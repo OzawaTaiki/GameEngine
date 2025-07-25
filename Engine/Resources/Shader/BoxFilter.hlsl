@@ -5,7 +5,12 @@ Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
 //
-static const int kKernelSize = 5;
+cbuffer KernelSizeBuffer : register(b0)
+{
+    int gKernelSize; // カーネルサイズ
+
+    float3 pad;
+}
 
 struct PixelShaderOutput
 {
@@ -19,9 +24,9 @@ PixelShaderOutput main(VertexOutput _input)
     float2 uvStepSize = float2(rcp(width), rcp(height));
 
     PixelShaderOutput output;
-    output.color.rgb = float3(0.0f, 0.0f, 0.0f);
+    output.color = float4(0, 0, 0, gTexture.Sample(gSampler, _input.uv).a);
 
-    int kernelSize = kKernelSize;
+    int kernelSize = gKernelSize;
     // 偶数のとき
     if (kernelSize % 2 == 0)
         kernelSize++;
@@ -41,6 +46,5 @@ PixelShaderOutput main(VertexOutput _input)
         }
     }
 
-    output.color.a = 1.0f;
     return output;
 }
