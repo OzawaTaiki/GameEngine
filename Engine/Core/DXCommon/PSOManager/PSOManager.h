@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Core/BlendMode.h>
 
 #include <d3d12.h>
 #include <dxcapi.h>
@@ -199,6 +198,8 @@ public:
         const std::wstring& _entryFuncName = L"main",
         const std::wstring& _dirPath = L"Resources/Shader/");
 
+    void CreatePSOForComposite(PSOFlags::BlendMode _blendMode);
+
     void RegisterPSO(const std::string& _name, ID3D12PipelineState* _pso);
     void RegisterRootSignature(const std::string& _name, ID3D12RootSignature* _rs);
 
@@ -216,7 +217,6 @@ private:
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);
     void CreatePSOForOffScreen();
-    void CreatePSOForComposite();
     void CreatePSOForText();
 
     void CreatePSOForDLShadowMap();

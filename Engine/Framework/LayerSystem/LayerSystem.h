@@ -3,6 +3,7 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/RTV/RenderTexture.h>
 
+#include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Features/PostEffects/PostEffectBase.h>
 
 #include <memory>
@@ -24,6 +25,8 @@ private:
 
         RenderTarget* renderTarget;
 
+        PSOFlags::BlendMode blendMode = PSOFlags::BlendMode::Normal; // ブレンドモード
+
         bool hasEffect = false; // エフェクトがあるかどうか
         std::string effectOutputTexture;
 
@@ -40,7 +43,7 @@ public:
     static void Initialize();
 
     // レイヤーを作成する
-    static LayerID CreateLayer(const std::string& layerName, int32_t _priority);
+    static LayerID CreateLayer(const std::string& layerName, int32_t _priority, PSOFlags::BlendMode _blendmode = PSOFlags::BlendMode::Normal);
 
     static LayerID CreateOutputLayer(const std::string& layerName);
 

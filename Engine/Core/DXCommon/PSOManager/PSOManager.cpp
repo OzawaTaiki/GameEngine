@@ -513,7 +513,7 @@ void PSOManager::CreateDefaultPSOs()
     CreatePSOForText();
 
     CreatePSOForOffScreen();
-    CreatePSOForComposite();
+    CreatePSOForComposite(PSOFlags::BlendMode::Normal);
     CreatePSOForDLShadowMap();
     CreatePSOForPLShadowMap();
 }
@@ -1315,17 +1315,24 @@ void PSOManager::CreatePSOForOffScreen()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[type] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(flag)] = pipelineState;
 
 }
 
-void PSOManager::CreatePSOForComposite()
+void PSOManager::CreatePSOForComposite(PSOFlags::BlendMode _blendMode)
 {
+
     HRESULT hr = S_FALSE;
 
-    PSOFlags flag = PSOFlags::Type::Composite | PSOFlags::CullMode::None | PSOFlags::BlendMode::Normal;
+    PSOFlags flag = PSOFlags::Type::Composite | _blendMode;
 
     uint64_t type = flag.GetTypeValue();
+
+    if (graphicsPipelineStates_.contains(flag))
+    {
+        // すでに存在する場合は何もしない
+        return;
+    }
 
 #pragma region Sampler
     //Samplerの設定
@@ -1443,7 +1450,7 @@ void PSOManager::CreatePSOForComposite()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[type] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(flag)] = pipelineState;
 }
 
 void PSOManager::CreatePSOForText()
@@ -1608,7 +1615,7 @@ void PSOManager::CreatePSOForText()
     hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
     assert(SUCCEEDED(hr));
 
-    graphicsPipelineStates_[type] = pipelineState;
+    graphicsPipelineStates_[static_cast<uint64_t>(flag)] = pipelineState;
 }
 
 void PSOManager::CreatePSOForDLShadowMap()
@@ -1922,55 +1929,84 @@ void PSOManager::CreatePSOForPLShadowMap()
 
 D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
 {
-    if(!_flag.IsSingleValueSet(PSOFlags::BlendModeMask))
+    if (!_flag.IsSingleValueSet(PSOFlags::BlendModeMask))
     {
         assert("BlendModeが複数設定されています" && false);
         return {};
     }
 
-
     D3D12_BLEND_DESC blendDesc{};
-
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.RenderTarget[0].BlendEnable = TRUE;
 
     PSOFlags::BlendMode mode = _flag.GetBlendMode();
-
     switch (mode)
     {
     case PSOFlags::BlendMode::Normal:
+        // 標準的なアルファブレンド: Src * SrcAlpha + Dest * (1 - SrcAlpha)
+        // RGB
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+        // Alpha: SrcAlpha + DestAlpha * (1 - SrcAlpha)
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
+
     case PSOFlags::BlendMode::Add:
+        // 加算ブレンド: Src * SrcAlpha + Dest * 1
+        // RGB
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+        // Alpha: SrcAlpha + DestAlpha（通常は飽和）
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
+
     case PSOFlags::BlendMode::Sub:
+        // 減算ブレンド: Dest - Src * SrcAlpha
+        // RGB
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
-        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+        // Alpha: DestAlpha - SrcAlpha（ただし0以下にはならない）
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_REV_SUBTRACT;
         break;
+
     case PSOFlags::BlendMode::Multiply:
+        // 乗算ブレンド: Src * Dest
+        // RGB
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-        break;
-    case PSOFlags::BlendMode::Screen:
-        blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+        // Alpha: SrcAlpha * DestAlpha
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
+
+    case PSOFlags::BlendMode::Screen:
+        // スクリーンブレンド: 1 - (1 - Src) * (1 - Dest) = Src + Dest - Src * Dest
+        // RGB
+        blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+        // Alpha: 同様にスクリーン合成
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        break;
+
     default:
+        // デフォルトは無効化
+        blendDesc.RenderTarget[0].BlendEnable = FALSE;
         break;
     }
-
-
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
     return blendDesc;
 }

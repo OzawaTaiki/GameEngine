@@ -1,8 +1,8 @@
 #pragma once
 #include <Math/Random/RandomGenerator.h>
 #include <Features/Effect/ParticleInitParam.h>
-#include <Core/BlendMode.h>
 #include <Features/Model/Transform/WorldTransform.h>
+#include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Features/Json/JsonBinder.h>
 
 #include <string>
@@ -137,7 +137,7 @@ private:
     // 親があるときのオフセット
     Vector3 offset_ = { 0, 0, 0 }; // 親からのオフセット
 
-    BlendMode blendMode_ = BlendMode::Add; // ブレンドモード
+    PSOFlags::BlendMode blendMode_ = PSOFlags::BlendMode::Add; // ブレンドモード
     bool cullBack_ = false; // バックカリングするか
 
     // エミッターの設定

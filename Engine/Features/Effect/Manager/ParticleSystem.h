@@ -3,7 +3,6 @@
 #include <Features/Effect/Particle/Particle.h>
 #include <Features/Effect/Modifier/ParticleModifier.h>
 #include <Features/Effect/Modifier/IPaticleMoifierFactory.h>
-#include <Core/BlendMode.h>
 #include <System/Time/GameTime.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Features/Camera/Camera/Camera.h>
@@ -18,7 +17,7 @@
 
 struct ParticleRenderSettings
 {
-    BlendMode blendMode = BlendMode::Add;
+    PSOFlags::BlendMode blendMode = PSOFlags::BlendMode::Add;
     bool cullBack = false;
 
     PSOFlags GetPSOFlags() const
@@ -27,19 +26,19 @@ struct ParticleRenderSettings
 
         switch (blendMode)
         {
-        case BlendMode::Normal:
+        case PSOFlags::BlendMode::Normal:
             flags = flags | PSOFlags::BlendMode::Normal;
             break;
-        case BlendMode::Add:
+        case PSOFlags::BlendMode::Add:
             flags = flags | PSOFlags::BlendMode::Add;
             break;
-        case BlendMode::Sub:
+        case PSOFlags::BlendMode::Sub:
             flags = flags | PSOFlags::BlendMode::Sub;
             break;
-        case BlendMode::Multiply:
+        case PSOFlags::BlendMode::Multiply:
             flags = flags | PSOFlags::BlendMode::Multiply;
             break;
-        case BlendMode::Screen:
+        case PSOFlags::BlendMode::Screen:
             flags = flags | PSOFlags::BlendMode::Screen;
             break;
         default:

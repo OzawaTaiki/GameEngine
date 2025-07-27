@@ -261,7 +261,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Utility\StringUtils\StringUitls.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\BlendMode.h" />
     <ClInclude Include="Core\DXCommon\CmdList\CommandList.h" />
     <ClInclude Include="Core\DXCommon\DXCommon.h" />
     <ClInclude Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.h" />
