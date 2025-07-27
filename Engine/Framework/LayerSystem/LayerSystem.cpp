@@ -18,7 +18,7 @@ void LayerSystem::Initialize()
             DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
 }
 
-LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority)
+LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority, PSOFlags::BlendMode _blendmode)
 {
     if (!instance_)
         Initialize();
@@ -36,10 +36,12 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
         CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
             DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
-    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,false,"",0,false });
+    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,_blendmode,false,"",0,false });
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
+
+    PSOManager::GetInstance()->CreatePSOForComposite(_blendmode);
 
     auto srvManager = SRVManager::GetInstance();
     uint32_t UAVIndex = srvManager->Allocate();
@@ -69,7 +71,7 @@ LayerID LayerSystem::CreateOutputLayer(const std::string& layerName)
         CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
             DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
-    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, 999, true, nullptr,false,"",0,true });
+    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, 999, true, nullptr, PSOFlags::BlendMode::Normal,false,"",0,true });
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
@@ -176,6 +178,9 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
             return a.second->priority < b.second->priority;
         });
 
+
+    PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::Composite);
+
     RTVManager::GetInstance()->SetRenderTexture(_finalRendertextureName);
 
     // 全てのレイヤーを合成
@@ -183,9 +188,13 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     {
         if (info->enabled && info->renderTarget)
         {
-            std::string textureToUse = /*info->hasEffect ? info->effectOutputTexture : */info->name;
+            PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::Composite | info->blendMode);
+            std::string textureToUse = info->hasEffect ? info->effectOutputTexture : info->name;
 
             RTVManager::GetInstance()->DrawRenderTexture(textureToUse);
+
+            // 毎フレームリセット
+            info->hasEffect = false;
         }
     }
 }

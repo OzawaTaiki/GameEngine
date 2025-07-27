@@ -194,11 +194,11 @@ void ParticleEmitter::ShowDebugWindow()
             if (ImGui::TreeNode("Render Setting"))
             {
                 ImGui::Text("Blend Mode");
-                ImGui::RadioButton("Normal", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Normal));
-                ImGui::RadioButton("Add", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Add));
-                ImGui::RadioButton("Sub", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Sub));
-                ImGui::RadioButton("Mul", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Multiply));
-                ImGui::RadioButton("Screen", reinterpret_cast<int*>(&blendMode_), static_cast<int>(BlendMode::Screen));
+                ImGui::RadioButton("Normal", reinterpret_cast<int*>(&blendMode_), static_cast<int>(PSOFlags::BlendMode::Normal));
+                ImGui::RadioButton("Add", reinterpret_cast<int*>(&blendMode_), static_cast<int>(PSOFlags::BlendMode::Add));
+                ImGui::RadioButton("Sub", reinterpret_cast<int*>(&blendMode_), static_cast<int>(PSOFlags::BlendMode::Sub));
+                ImGui::RadioButton("Mul", reinterpret_cast<int*>(&blendMode_), static_cast<int>(PSOFlags::BlendMode::Multiply));
+                ImGui::RadioButton("Screen", reinterpret_cast<int*>(&blendMode_), static_cast<int>(PSOFlags::BlendMode::Screen));
 
                 ImGui::Separator();
 

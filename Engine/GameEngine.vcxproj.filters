@@ -632,9 +632,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\BlendMode.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\DXCommon\DXCommon.h">
       <Filter>Core\DXCommon</Filter>
     </ClInclude>

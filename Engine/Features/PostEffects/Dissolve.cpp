@@ -18,7 +18,7 @@ void Dissolve::Initialize()
 
 void Dissolve::Set()
 {
-    PSOManager::GetInstance()->SetRegisterPSO("Dissolve");
+    PSOManager::GetInstance()->SetRegisterPSO("Dissolve"); 
     PSOManager::GetInstance()->SetRegisterRootSignature("Dissolve");
 
     auto cmdList = DXCommon::GetInstance()->GetCommandList();
