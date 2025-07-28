@@ -111,7 +111,10 @@ void LayerSystem::SetLayer(LayerID _layerID)
     auto it = instance_->layerInfos_.find(_layerID);
     if (it != instance_->layerInfos_.end())
     {
-        RTVManager::GetInstance()->SetRenderTexture(_layerID);
+        LayerInfo info = it->second;
+        std::string textureToUse = info.hasEffect ? info.effectOutputTexture : info.name;
+
+        RTVManager::GetInstance()->SetRenderTexture(textureToUse);
     }
     else
     {
@@ -129,6 +132,10 @@ void LayerSystem::SetLayer(const std::string& layerName)
     if (it != instance_->nameToID_.end())
     {
         SetLayer(it->second);  // LayerID版のSetLayerを呼び出し
+    }
+    else
+    {
+        RTVManager::GetInstance()->DrawRenderTexture(layerName);
     }
 
 }
