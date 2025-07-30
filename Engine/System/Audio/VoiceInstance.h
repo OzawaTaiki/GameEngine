@@ -6,7 +6,7 @@ class VoiceInstance
 {
 public:
     VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume = 1.0f, float _sampleRate = 44100.0f, float _startTime = 0.0f);
-    ~VoiceInstance() = default;
+    ~VoiceInstance();
 
     /// <summary>
     /// 始めから再生
