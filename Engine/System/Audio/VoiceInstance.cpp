@@ -28,6 +28,15 @@ VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume, f
 
 }
 
+VoiceInstance::~VoiceInstance()
+{
+    if (sourceVoice_)
+    {
+        sourceVoice_->DestroyVoice();
+        sourceVoice_ = nullptr;
+    }
+}
+
 void VoiceInstance::Play()
 {
     if (sourceVoice_)

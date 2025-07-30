@@ -40,6 +40,7 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     {
         Debug::Log("Error: File not found - " + _filename + "\n");
         throw std::runtime_error("Error: File not found - " + _filename);
+        return nullptr;
     }
 
     // RIFFヘッダーの読み込み
@@ -49,11 +50,13 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     {
         Debug::Log("Error: Not a RIFF - " + _filename + "\n");
         throw std::runtime_error("Error: Not a RIFF");
+        return nullptr;
     }
     if (strncmp(riff.type, "WAVE", 4) != 0)
     {
         Debug::Log("Error: Not a WAVE - " + _filename + "\n");
         throw std::runtime_error("Error: Not a WAVE");
+        return nullptr;
     }
 
     // フォーマットチャンクとデータチャンクを見つけるまで繰り返し
@@ -110,12 +113,14 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     {
         Debug::Log("Error: No format chunk found - " + _filename + "\n");
         throw std::runtime_error("Error: No format chunk found - " + _filename);
+        return nullptr;
     }
 
     if (!foundData)
     {
         Debug::Log("Error: No data chunk found - " + _filename + "\n");
         throw std::runtime_error("Error: No data chunk found - " + _filename);
+        return nullptr;
     }
 
     // データの読み込み
