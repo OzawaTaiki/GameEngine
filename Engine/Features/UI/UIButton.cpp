@@ -41,14 +41,22 @@ void UIButton::Update()
     if (isTrigered_)
     {
         if (onClickStart_)
+        {
             onClickStart_(); // クリック開始時のコールバック
+
+            isClickEnd_ = true; // クリック終了フラグをリセット
+            isTrigered_ = false;
+        }
         else
             isTrigered_ = false;
     }
     else if (isClickEnd_)
     {
         if (onClickEnd_)
+        {
             onClickEnd_(); // クリック終了時のコールバック
+            isClickEnd_ = false;
+        }
         else
             isTrigered_ = false;
     }
