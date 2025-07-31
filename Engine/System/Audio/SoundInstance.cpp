@@ -17,7 +17,7 @@ SoundInstance::~SoundInstance()
 {
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap)
+std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap,  VoiceCallBack* _callback)
 {
     //保留
     if (!_enableOverlap) {}
@@ -27,7 +27,15 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
     IXAudio2* xAudio2 = audioSystem_->GetXAudio2().Get();
 
     IXAudio2SourceVoice* pSourceVoice = nullptr;
-    hresult = xAudio2->CreateSourceVoice(&pSourceVoice, &audioSystem_->GetSoundFormat(soundID_));
+    hresult = xAudio2->CreateSourceVoice(
+        &pSourceVoice, // Source voice
+        &audioSystem_->GetSoundFormat(soundID_), // Wave format
+        0, // Flags
+        XAUDIO2_DEFAULT_FREQ_RATIO, // Frequency ratio
+        _callback,// コールバック関数
+        nullptr, // Send list
+        nullptr // Effect chain
+    );
 
     if (!SUCCEEDED(hresult))
     {
@@ -59,12 +67,12 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
     return voiceInstance;
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap)
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
 {
     return Play(_volume, 0.0f, _loop, _enableOverlap);
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap)
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
 {
     auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap);
     if (voiceInstance)

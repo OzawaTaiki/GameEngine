@@ -386,6 +386,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Audio\Audio.h" />
     <ClInclude Include="System\Audio\AudioSystem.h" />
     <ClInclude Include="System\Audio\SoundInstance.h" />
+    <ClInclude Include="System\Audio\VoiceCallback.h" />
     <ClInclude Include="System\Audio\VoiceInstance.h" />
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Time\GameTime.h" />
