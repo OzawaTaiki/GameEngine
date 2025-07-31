@@ -397,6 +397,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Utility\FileDialog\FileDialog.h" />
     <ClInclude Include="Utility\StringUtils\StringUitls.h" />
+    <ClInclude Include="VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

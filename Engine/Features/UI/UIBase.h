@@ -21,6 +21,7 @@ public:
     virtual void Update() {};
     virtual void Draw();
 
+
     bool IsMousePointerInside() const;
     bool IsPointInside(const Vector2& _point) const;
 
@@ -37,6 +38,9 @@ public:
 
     const Vector2& GetPos() const { return position_; }
     void SetPos(const Vector2& _pos) { position_ = _pos; };
+
+    const Vector2& GetWorldPos() const;
+    void SetParent(UIBase* _parent);
 
     const Vector2& GetSize() const { return size_; }
     void SetSize(const Vector2& _size) { size_ = _size; };
@@ -95,5 +99,5 @@ protected:
 
     Vector2 textOffset_ = { 0,0 }; // テキストのオフセット
 
-
+    UIBase* parent_ = nullptr; // 親UI要素
 };

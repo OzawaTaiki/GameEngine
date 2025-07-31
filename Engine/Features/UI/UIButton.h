@@ -61,15 +61,15 @@ public:
         std::function<void(void)> _onClickStart,
         std::function<void(void)> _onClickEnd);
 
-    // コールバックを設定する
+    // フォーカスを得たときのコールバックを設定する
     void SetCallBackOnFocusGained(std::function<void(void)> _onFocusGained) { onFocusGained_ = _onFocusGained; }
-    // コールバックを設定する
+    // フォーカスを失ったときのコールバックを設定する
     void SetCallBackOnFocusLost(std::function<void(void)> _onFocusLost) { onFocusLost_ = _onFocusLost; }
-    // コールバックを設定する
+    // フォーカス時の更新時のコールバックを設定する
     void SetCallBackOnFocusUpdate(std::function<void(void)> _onFocusUpdate) { onFocusUpdate_ = _onFocusUpdate; }
-    // コールバックを設定する
+    // クリック開始時のコールバックを設定する (SEや視覚効果など
     void SetCallBackOnClickStart(std::function<void(void)> _onClickStart) { onClickStart_ = _onClickStart; }
-    // コールバックを設定する
+    // クリック終了時のコールバックを設定する
     void SetCallBackOnClickEnd(std::function<void(void)> _onClickEnd) { onClickEnd_ = _onClickEnd; }
 
 private:

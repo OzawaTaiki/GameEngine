@@ -26,6 +26,8 @@ void UIBase::Initialize(const std::string& _label)
     jsonBinder_->RegisterVariable(label_ + "_textureName", &textureName_);
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_ + "_label", &label_);
+    jsonBinder_->RegisterVariable(label_ + "_Text", &textParam_);
+    jsonBinder_->RegisterVariable(label_ + "_TextOffset", &textOffset_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
@@ -67,7 +69,7 @@ void UIBase::Draw()
     {
         return;
     }
-    sprite_->translate_ = position_;
+    sprite_->translate_ = GetWorldPos();
     sprite_->SetSize(size_);
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
@@ -76,7 +78,7 @@ void UIBase::Draw()
 
     if (hasText_)
     {
-        textParam_.position = position_ + textOffset_;
+        textParam_.position = GetWorldPos() + textOffset_;
         textParam_.pivot = anchor_;
 
         textGenerator_.Draw(text_, textParam_);
@@ -93,8 +95,8 @@ bool UIBase::IsMousePointerInside() const
 bool UIBase::IsPointInside(const Vector2& _point) const
 {
     // アンカーを考慮した四頂点の計算
-    Vector2 leftTop = position_ - size_ * anchor_;
-    Vector2 rightBottom = position_ + size_ * (Vector2{ 1,1 } - anchor_);
+    Vector2 leftTop = GetWorldPos() - size_ * anchor_;
+    Vector2 rightBottom = GetWorldPos() + size_ * (Vector2{ 1,1 } - anchor_);
     Vector2 rightTop = { rightBottom.x, leftTop.y };
     Vector2 leftBottom = { leftTop.x, rightBottom.y };
 
@@ -106,6 +108,21 @@ bool UIBase::IsPointInside(const Vector2& _point) const
     }
 
     return false;
+}
+
+const Vector2& UIBase::GetWorldPos() const
+{
+    Vector2 pos = position_;
+    if (parent_)
+        pos +=parent_->GetWorldPos();
+
+    return pos;
+}
+
+void UIBase::SetParent(UIBase* _parent)
+{
+    if (_parent)
+        parent_ = _parent;
 }
 
 void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
