@@ -69,12 +69,12 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
 std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
 {
-    return Play(_volume, 0.0f, _loop, _enableOverlap);
+    return Play(_volume, 0.0f, _loop, _enableOverlap, _callback);
 }
 
 std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
 {
-    auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap);
+    auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap, _callback);
     if (voiceInstance)
     {
         voiceInstance->Play();
