@@ -74,6 +74,7 @@ void Sprite::Draw()
 
 void Sprite::Draw(const Vector4& _color)
 {
+    PreDraw();
     auto commandList = DXCommon::GetInstance()->GetCommandList();
     TransferData(commandList);
     colorObj_->SetColor(_color);
