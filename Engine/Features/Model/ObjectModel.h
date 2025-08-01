@@ -22,7 +22,7 @@ public:
     void Draw(const Camera* _camera);
     void Draw(const Camera* _camera ,const Vector4& _color);
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
-    void DrawShadow(const Camera* _camera);
+    void DrawShadow();
 
 
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
@@ -43,7 +43,10 @@ public:
     UVTransform& GetUVTransform(uint32_t _index = 0) { return model_->GetUVTransform(_index); }
     Vector3 GetMin()const { return model_->GetMin(); }
     Vector3 GetMax()const { return model_->GetMax(); }
-    Material* GetMaterial() { return model_->GetMaterialPtr(); }
+
+    Material* GetMaterial() { return materials_[0].get(); }
+    Material* GetMaterial(size_t _index) { return materials_[_index].get(); }
+    std::vector<std::unique_ptr<Material>>& GetMaterials() { return materials_; }
 
     void SetTimeChannel(const std::string& _channelName) { timeChannel = _channelName; }
 
@@ -70,7 +73,7 @@ private:
     void InitializeCommon(); // 共通初期化
 
     WorldTransform worldTransform_;
-
+    std::vector<std::unique_ptr<Material>> materials_ = {};
     std::unique_ptr<ObjectColor> objectColor_ = nullptr;
     std::unique_ptr<AnimationController> uniqueAnimationController_ = nullptr;
     AnimationController* sharedAnimationController_ = nullptr;

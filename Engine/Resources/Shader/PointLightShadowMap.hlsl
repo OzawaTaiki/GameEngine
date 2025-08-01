@@ -94,8 +94,12 @@ PSOutput PSmain(GSOutput input)
 {
     PSOutput output;
 
-    float z = input.Position.z / input.Position.w; // NDC座標のZ値を取得
-    output.data = float4(z, z, z, 1.0f);
+    float3 lightToPixel = input.WorldPos.xyz - PL.position; // ライト位置からピクセル位置へのベクトル
+    float distance = length(lightToPixel); // 距離を計算
+
+    float normalizedDistance = distance / PL.radius; // 距離を正規化 0~1
+
+    output.data = float4(normalizedDistance, normalizedDistance, normalizedDistance, 1.0f);
 
     return output;
 }

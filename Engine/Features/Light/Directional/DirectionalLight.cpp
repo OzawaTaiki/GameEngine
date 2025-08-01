@@ -23,7 +23,8 @@ void DirectionalLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
     if (!data_.castShadow) return;
 
     // シャドウマップサイズから計算値を設定
-    float halfSize = static_cast<float>(shadowMapSize) / 2.0f;
+    float sceneSize = 30.0f;
+    float halfSize = sceneSize / 2.0f;
 
     // 上方向ベクトルの設定
     Vector3 up = { 0.0f, 1.0f, 0.0f };
@@ -39,7 +40,7 @@ void DirectionalLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
 
     // 射影行列を計算（平行投影）
     float nearClip = 0.1f;
-    float farClip = 1000.0f;
+    float farClip = 200.0f;
     Matrix4x4 projMat = MakeOrthographicMatrix(-halfSize, -halfSize, halfSize, halfSize, nearClip, farClip);
 
     // ビュー射影行列を設定

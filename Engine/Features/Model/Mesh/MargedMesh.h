@@ -26,7 +26,11 @@ public:
     void Initialize(const std::vector<std::unique_ptr<Mesh>>& _meshes);
 
 
-    void QueueCommand(ID3D12GraphicsCommandList* _commandList) const;
+    void QueueCommandLocalIndex(ID3D12GraphicsCommandList* _commandList);
+
+    void QueueCommandAbsIndex(ID3D12GraphicsCommandList* _commandList);
+
+
 
     size_t GetMeshCount() const { return meshCount_; }
     size_t GetVertexCount() const { return vertexCount_; }
@@ -52,7 +56,7 @@ public:
     ID3D12Resource* GetVertexResource() { return vertexResource_.Get(); }
     ID3D12Resource* GetSkinnedVertexResource() { return skinnedVertexResource_.Get(); }
 
-    ID3D12Resource* GetIndexResource() { return indexResource_.Get(); }
+    ID3D12Resource* GetIndexResource() { return localIndexResource_.Get(); }
 
     D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
     D3D12_VERTEX_BUFFER_VIEW* GetSkinnedVertexBufferView() { return &skinnedVertexBufferView_; }
@@ -83,9 +87,13 @@ private:
 
     // メッシュのインデックスデータ
     D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
-    Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr; // インデックスデータのリソース
-    uint32_t* iConstMap_ = nullptr; // インデックスデータの定数バッファマップ
+    // ローカルインデックス
+    Microsoft::WRL::ComPtr<ID3D12Resource> localIndexResource_ = nullptr; // インデックスデータのリソース
+    uint32_t* localIConstMap_ = nullptr; // インデックスデータの定数バッファマップ
 
+    // 絶対インデックス
+    Microsoft::WRL::ComPtr<ID3D12Resource> absIndexResource_ = nullptr; // アブソリュートインデックスのリソース
+    uint32_t* absIConstMap_ = nullptr; // アブソリュートインデックスの定数バッファマップ
 
     D3D12_VERTEX_BUFFER_VIEW skinnedVertexBufferView_ = {}; // スキンニング後の頂点データのバッファビュー
     Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexResource_ = nullptr; // スキンニング後の頂点データのリソース

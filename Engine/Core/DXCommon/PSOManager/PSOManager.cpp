@@ -1626,32 +1626,6 @@ void PSOManager::CreatePSOForDLShadowMap()
 
     uint64_t type = flag.GetTypeValue();
 
-#pragma region Sampler
-    //Samplerの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
-    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0-1の範囲外をリピート
-    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
-    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // あらかじめのMipmapを使う
-    staticSamplers[0].ShaderRegister = 0;
-    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
-
-    // シャドウマップ用のサンプラ
-    staticSamplers[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT; // 比較用フィルタ
-    staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER; // 境界外を無効化
-    staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-    staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-    staticSamplers[1].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE; // 影の外は光が当たる
-    staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS; // 深度比較
-    staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;
-    staticSamplers[1].ShaderRegister = 1; // s1
-    staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-
-#pragma endregion
-
 #pragma region RootSignature
 
     /// RootSignatrueを生成する
@@ -1659,30 +1633,24 @@ void PSOManager::CreatePSOForDLShadowMap()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[3] = {};
-
-    //カメラ
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[0].Descriptor.ShaderRegister = 0;
+    D3D12_ROOT_PARAMETER rootParameters[2] = {};
 
     // transform
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[1].Descriptor.ShaderRegister = 1;
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[0].Descriptor.ShaderRegister = 0;
 
     // LightGroup
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParameters[2].Descriptor.ShaderRegister = 3;
-
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+    rootParameters[1].Descriptor.ShaderRegister = 1;
 
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
 
-    descriptionRootSignature.pStaticSamplers = staticSamplers;
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+    descriptionRootSignature.pStaticSamplers = nullptr;
+    descriptionRootSignature.NumStaticSamplers = 0;
 
     //シリアライズしてバイナリする
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
@@ -1807,7 +1775,7 @@ void PSOManager::CreatePSOForPLShadowMap()
 
     // PointLight
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_GEOMETRY;
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     rootParameters[1].Descriptor.ShaderRegister = 1;
 
 
@@ -2020,7 +1988,7 @@ D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
     }
 
     D3D12_RASTERIZER_DESC rasterizerDesc{};
-
+    rasterizerDesc.DepthClipEnable = true;
     PSOFlags::CullMode cullMode = _flag.GetCullMode();
 
     switch (cullMode)
@@ -2040,7 +2008,6 @@ D3D12_RASTERIZER_DESC PSOManager::GetRasterizerDesc(PSOFlags _flag)
     default:
         break;
     }
-
     return rasterizerDesc;
 }
 

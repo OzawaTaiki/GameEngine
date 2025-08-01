@@ -39,12 +39,12 @@ public:
     void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
     void Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color);
 
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh = nullptr) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, MargedMesh* _margedMesh = nullptr) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const Vector4& _color, MargedMesh* _margedMesh = nullptr) const;
-    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList,uint32_t _textureHandle, const std::vector<std::unique_ptr<Material>>& _materials,MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const Vector4& _color, const std::vector<std::unique_ptr<Material>>& _materials,MargedMesh* _margedMesh = nullptr) const;
+    void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh = nullptr) const;
 
-    void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const;
+    void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh = nullptr) const;
 
     void QueueLightCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index) const;
 
@@ -62,6 +62,8 @@ public:
 
     Mesh* GetMeshPtr() { return mesh_[0].get(); }
     Material* GetMaterialPtr() { return material_[0].get(); }
+
+    const std::vector<std::unique_ptr<Material>>& GetMaterials() { return material_; }
 
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;

@@ -134,14 +134,14 @@ Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<
 }
 
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const std::vector<std::unique_ptr<Material>>& _materials,MargedMesh* _margedMesh) const
 {
     QueueLightCommand(_commandList, 5);
 
     if (_margedMesh)
     {
         _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        _margedMesh->QueueCommand(_commandList);
+        _margedMesh->QueueCommandLocalIndex(_commandList);
         for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
         {
             UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
@@ -150,9 +150,9 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedM
 
             size_t materialIndex = mesh_[meshIndex]->GetUseMaterialIndex();
 
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TransferData();
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4);
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TransferData();
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4);
             _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
         }
     }
@@ -162,22 +162,22 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, MargedM
         for (auto& mesh : mesh_)
         {
             mesh->QueueCommand(_commandList);
-            material_[mesh->GetUseMaterialIndex()]->TransferData();
-            material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
-            material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
+            _materials[mesh->GetUseMaterialIndex()]->TransferData();
+            _materials[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+            _materials[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4);
             _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
         }
     }
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, MargedMesh* _margedMesh) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh) const
 {
     QueueLightCommand(_commandList, 5);
 
     if (_margedMesh)
     {
         _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        _margedMesh->QueueCommand(_commandList);
+        _margedMesh->QueueCommandLocalIndex(_commandList);
         for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
         {
             UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
@@ -186,9 +186,9 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
 
             size_t materialIndex = mesh_[meshIndex]->GetUseMaterialIndex();
 
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TransferData();
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TransferData();
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
             _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
         }
     }
@@ -197,22 +197,22 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
         for (auto& mesh : mesh_)
         {
             mesh->QueueCommand(_commandList);
-            material_[mesh->GetUseMaterialIndex()]->TransferData();
-            material_[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
-            material_[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
+            _materials[mesh->GetUseMaterialIndex()]->TransferData();
+            _materials[mesh->GetUseMaterialIndex()]->MaterialQueueCommand(_commandList, 2);
+            _materials[mesh->GetUseMaterialIndex()]->TextureQueueCommand(_commandList, 4, _textureHandle);
             _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
         }
     }
 }
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const Vector4& _color, MargedMesh* _margedMesh) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const Vector4& _color, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh) const
 {
     QueueLightCommand(_commandList, 5);
 
     if (_margedMesh)
     {
         _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        _margedMesh->QueueCommand(_commandList);
+        _margedMesh->QueueCommandLocalIndex(_commandList);
         for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
         {
             UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
@@ -220,47 +220,10 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const V
             UINT indexCount = _margedMesh->GetIndexCount(meshIndex);
 
             size_t materialIndex = mesh_[meshIndex]->GetUseMaterialIndex();
-            material_[materialIndex]->SetColor(_color);
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TransferData();
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4);
-            _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
-        }
-    }
-    else
-    {
-        for (auto& mesh : mesh_)
-        {
-            mesh->QueueCommand(_commandList);
-            size_t materialIndex = mesh->GetUseMaterialIndex();
-
-            material_[materialIndex]->SetColor(_color);
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4);
-            _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
-        }
-    }
-}
-
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, MargedMesh* _margedMesh) const
-{
-    QueueLightCommand(_commandList, 5);
-
-    if (_margedMesh)
-    {
-        _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        _margedMesh->QueueCommand(_commandList);
-        for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
-        {
-            UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
-            UINT indexOffset = _margedMesh->GetIndexOffset(meshIndex);
-            UINT indexCount = _margedMesh->GetIndexCount(meshIndex);
-
-            size_t materialIndex = mesh_[meshIndex]->GetUseMaterialIndex();
-            material_[materialIndex]->SetColor(_color);
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TransferData();
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
+            _materials[materialIndex]->SetColor(_color);
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TransferData();
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4);
             _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
         }
     }
@@ -271,23 +234,71 @@ void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_
             mesh->QueueCommand(_commandList);
             size_t materialIndex = mesh->GetUseMaterialIndex();
 
-            material_[materialIndex]->SetColor(_color);
-            material_[materialIndex]->TransferData();
-            material_[materialIndex]->MaterialQueueCommand(_commandList, 2);
-            material_[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
+            _materials[materialIndex]->SetColor(_color);
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4);
+            _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+        }
+    }
+}
+
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh) const
+{
+    QueueLightCommand(_commandList, 5);
+
+    if (_margedMesh)
+    {
+        _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        _margedMesh->QueueCommandLocalIndex(_commandList);
+        for (size_t meshIndex = 0; meshIndex < _margedMesh->GetMeshCount(); ++meshIndex)
+        {
+            UINT vertexOffset = _margedMesh->GetVertexOffset(meshIndex);
+            UINT indexOffset = _margedMesh->GetIndexOffset(meshIndex);
+            UINT indexCount = _margedMesh->GetIndexCount(meshIndex);
+
+            size_t materialIndex = mesh_[meshIndex]->GetUseMaterialIndex();
+            _materials[materialIndex]->SetColor(_color);
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TransferData();
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
+            _commandList->DrawIndexedInstanced(indexCount, 1, indexOffset, vertexOffset, 0);
+        }
+    }
+    else
+    {
+        for (auto& mesh : mesh_)
+        {
+            mesh->QueueCommand(_commandList);
+            size_t materialIndex = mesh->GetUseMaterialIndex();
+
+            _materials[materialIndex]->SetColor(_color);
+            _materials[materialIndex]->TransferData();
+            _materials[materialIndex]->MaterialQueueCommand(_commandList, 2);
+            _materials[materialIndex]->TextureQueueCommand(_commandList, 4, _textureHandle);
             _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
         }
     }
 }
 
 
-void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList) const
+void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh) const
 {
-    QueueLightCommand(_commandList, 2);
-    for (auto& mesh : mesh_)
+    QueueLightCommand(_commandList, 1);
+    if (_margedMesh)
     {
-        mesh->QueueCommand(_commandList);
-        _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+        _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        _margedMesh->QueueCommandAbsIndex(_commandList);
+
+        UINT indexCount = static_cast<UINT>(_margedMesh->GetIndexCount());
+        _commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+    }
+    else
+    {
+        for (auto& mesh : mesh_)
+        {
+            mesh->QueueCommand(_commandList);
+            _commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+        }
     }
 }
 

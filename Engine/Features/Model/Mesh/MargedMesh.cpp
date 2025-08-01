@@ -14,6 +14,8 @@ void MargedMesh::Initialize(const std::vector<std::unique_ptr<Mesh>>& _meshes)
     vertexCount_ = 0;
     std::vector<VertexData> vertices;
     std::vector<uint32_t> indices;
+    std::vector<uint32_t> absIndices;
+
 
     uint32_t currentVertexOffset = 0;
     uint32_t currentIndexOffset = 0;
@@ -40,6 +42,7 @@ void MargedMesh::Initialize(const std::vector<std::unique_ptr<Mesh>>& _meshes)
         for (uint32_t index : mesh->GetIndices())
         {
             indices.push_back(index);
+            absIndices.push_back(index + currentVertexOffset);
         }
 
         currentVertexOffset += mesh->GetVertexNum();
@@ -57,20 +60,33 @@ void MargedMesh::Initialize(const std::vector<std::unique_ptr<Mesh>>& _meshes)
     Map();
 
     std::memcpy(vConstMap_, vertices.data(), sizeof(VertexData) * vertexCount_);
-    std::memcpy(iConstMap_, indices.data(), sizeof(uint32_t) * indexCount_);
+    std::memcpy(localIConstMap_, indices.data(), sizeof(uint32_t) * indexCount_);
+    std::memcpy(absIConstMap_, absIndices.data(), sizeof(uint32_t) * indexCount_);
 
     skinnedVertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
     skinnedVertexBufferView_.SizeInBytes = static_cast<uint32_t>(sizeof(VertexData) * vertexCount_);
     skinnedVertexBufferView_.StrideInBytes = sizeof(VertexData);
 
-    indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+    indexBufferView_.BufferLocation = localIndexResource_->GetGPUVirtualAddress();
     indexBufferView_.SizeInBytes = static_cast<uint32_t>(sizeof(uint32_t) * indexCount_);
     indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 }
 
-void MargedMesh::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
+void MargedMesh::QueueCommandLocalIndex(ID3D12GraphicsCommandList* _commandList)
 {
+    indexBufferView_.BufferLocation = localIndexResource_->GetGPUVirtualAddress();
+
+    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    _commandList->IASetVertexBuffers(0, 1, &skinnedVertexBufferView_);
+    _commandList->IASetIndexBuffer(&indexBufferView_);
+}
+
+void MargedMesh::QueueCommandAbsIndex(ID3D12GraphicsCommandList* _commandList)
+{
+    indexBufferView_.BufferLocation = absIndexResource_->GetGPUVirtualAddress();
+
+    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->IASetVertexBuffers(0, 1, &skinnedVertexBufferView_);
     _commandList->IASetIndexBuffer(&indexBufferView_);
 }
@@ -142,13 +158,13 @@ void MargedMesh::SetSkinnedVertexBufferView(Microsoft::WRL::ComPtr<ID3D12Resourc
 void MargedMesh::CreateResources()
 {
     vertexResource_ = dxCommon_->CreateBufferResource(static_cast<uint32_t>(sizeof(VertexData) * vertexCount_));
-    indexResource_ = dxCommon_->CreateBufferResource(static_cast<uint32_t>(sizeof(uint32_t) * indexCount_));
-
+    localIndexResource_ = dxCommon_->CreateBufferResource(static_cast<uint32_t>(sizeof(uint32_t) * indexCount_));
+    absIndexResource_ = dxCommon_->CreateBufferResource(static_cast<uint32_t>(sizeof(uint32_t) * indexCount_));
 }
 
 void MargedMesh::Map()
 {
     vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
-    indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iConstMap_));
-
+    localIndexResource_->Map(0, nullptr, reinterpret_cast<void**>(&localIConstMap_));
+    absIndexResource_->Map(0, nullptr, reinterpret_cast<void**>(&absIConstMap_));
 }
