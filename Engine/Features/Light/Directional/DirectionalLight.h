@@ -32,7 +32,7 @@ public:
 
 
     void SetColor(const Vector4& color) { data_.color = color; }
-    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); }
+    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); UpdateViewProjection(0); }
     void SetIntensity(float intensity) { data_.intensity = intensity; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }

@@ -83,11 +83,11 @@ void ObjectModel::Draw(const Camera* _camera)
     objectColor_->QueueCommand(commandList, 3);
 
     if (uniqueAnimationController_)
-        model_->QueueCommandAndDraw(commandList, uniqueAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, materials_,uniqueAnimationController_->GetMargedMesh());
     else if (sharedAnimationController_)
-        model_->QueueCommandAndDraw(commandList, sharedAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, materials_, sharedAnimationController_->GetMargedMesh());
     else
-        model_->QueueCommandAndDraw(commandList);
+        model_->QueueCommandAndDraw(commandList, materials_);
 
     if (drawSkeleton_)
     {
@@ -122,11 +122,11 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
     worldTransform_.QueueCommand(commandList, 1);
     objectColor_->QueueCommand(commandList, 3);
     if(uniqueAnimationController_)
-        model_->QueueCommandAndDraw(commandList, uniqueAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, materials_, uniqueAnimationController_->GetMargedMesh());
     else if (sharedAnimationController_)
-        model_->QueueCommandAndDraw(commandList, sharedAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, materials_, sharedAnimationController_->GetMargedMesh());
     else
-        model_->QueueCommandAndDraw(commandList);
+        model_->QueueCommandAndDraw(commandList, materials_);
 
     if (drawSkeleton_)
     {
@@ -159,11 +159,11 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     objectColor_->QueueCommand(commandList, 3);
 
     if (uniqueAnimationController_)
-        model_->QueueCommandAndDraw(commandList, _textureHandle, uniqueAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_, uniqueAnimationController_->GetMargedMesh());
     else if (sharedAnimationController_)
-        model_->QueueCommandAndDraw(commandList, _textureHandle, sharedAnimationController_->GetMargedMesh());
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_, sharedAnimationController_->GetMargedMesh());
     else
-        model_->QueueCommandAndDraw(commandList, _textureHandle);
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_);
 
     if(drawSkeleton_)
         uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
@@ -202,7 +202,7 @@ void ObjectModel::ChangeAnimation(const std::string& _name, float _blendTime, bo
     }
 }
 
-void ObjectModel::DrawShadow(const Camera* _camera)
+void ObjectModel::DrawShadow()
 {
     auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
     if (lightGroup.get() == nullptr) return;
@@ -216,9 +216,14 @@ void ObjectModel::DrawShadow(const Camera* _camera)
         PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::DLShadowMap);
         PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::DLShadowMap);
 
-        _camera->QueueCommand(commandList, 0);
-        worldTransform_.QueueCommand(commandList, 1);
-        model_->QueueCommandForShadow(commandList);// BVB IBV LIGHT3
+        worldTransform_.QueueCommand(commandList, 0);
+
+        if (uniqueAnimationController_)
+            model_->QueueCommandForShadow(commandList, uniqueAnimationController_->GetMargedMesh());
+        else if (sharedAnimationController_)
+            model_->QueueCommandForShadow(commandList, sharedAnimationController_->GetMargedMesh());
+        else
+            model_->QueueCommandForShadow(commandList);
     }
 
     auto pointLights = lightGroup->GetAllPointLights();
@@ -239,9 +244,26 @@ void ObjectModel::DrawShadow(const Camera* _camera)
 
         worldTransform_.QueueCommand(commandList, 0);
         LightingSystem::GetInstance()->QueuePointLightShadowCommand(commandList, 1, pointLight.get());
-        model_->GetMeshPtr()->QueueCommand(commandList);//
 
-        commandList->DrawIndexedInstanced(model_->GetMeshPtr()->GetIndexNum(), 1, 0, 0, 0);
+        if (uniqueAnimationController_)
+        {
+            uniqueAnimationController_->GetMargedMesh()->QueueCommandAbsIndex(commandList);
+            commandList->DrawIndexedInstanced(static_cast<UINT>(uniqueAnimationController_->GetMargedMesh()->GetIndexCount()), 1, 0, 0, 0);
+        }
+        else if (sharedAnimationController_)
+        {
+            sharedAnimationController_->GetMargedMesh()->QueueCommandAbsIndex(commandList);
+            commandList->DrawIndexedInstanced(static_cast<UINT>(sharedAnimationController_->GetMargedMesh()->GetIndexCount()), 1, 0, 0, 0);
+        }
+        else
+        {
+            for (auto& mesh : model_->GetMeshes())
+            {
+                mesh->QueueCommand(commandList);
+                commandList->DrawIndexedInstanced(mesh->GetIndexNum(), 1, 0, 0, 0);
+            }
+        }
+
 
     }
 }
@@ -328,6 +350,22 @@ void ObjectModel::ImGui()
             sharedAnimationController_->ImGui();
     }
 
+    if (!materials_.empty())
+    {
+        if (ImGui::CollapsingHeader("Materials"))
+        {
+            for (size_t i = 0; i < materials_.size(); ++i)
+            {
+                auto& material = materials_[i];
+                if(ImGui::TreeNode(std::format("Material {}", i).c_str()))
+                {
+                    material->Imgui();
+                    ImGui::TreePop();
+                }
+            }
+        }
+    }
+
     ImGui::PopID();
 
 #endif // _DEBUG
@@ -341,4 +379,11 @@ void ObjectModel::InitializeCommon()
     objectColor_->Initialize();
 
     gameTime_ = GameTime::GetInstance();
+
+    for (auto& material : model_->GetMaterials())
+    {
+        auto copyMaterial = std::make_unique<Material>(*(material.get()));
+
+        materials_.push_back(std::move(copyMaterial));
+    }
 }

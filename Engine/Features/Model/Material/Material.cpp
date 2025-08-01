@@ -27,7 +27,7 @@ void Material::Initialize(const std::string& _texturepath)
     LoadTexture();
 
 }
-
+ 
 void Material::LoadTexture()
 {
 	if (texturePath_ == "")
@@ -45,9 +45,11 @@ void Material::TransferData()
 	constMap_->shininess = shiness_;
 	constMap_->enabledLighthig = enableLighting_;
     constMap_->hasTexture = hasTexture_ ? 1 : 0;
+    constMap_->envScale = envScale_;
+    constMap_->enableEnvironment = enableEnvironment_ ? 1 : 0;
 }
 
-void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index) 
+void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index)
 {
 	TransferData();
     _commandList->SetGraphicsRootConstantBufferView(_index, resorces_->GetGPUVirtualAddress());
@@ -97,4 +99,34 @@ void Material::AnalyzeMaterial(const aiMaterial* _material)
 		hasTexture_ = true;
 	else
 		hasTexture_ = false;
+}
+
+void Material::Imgui()
+{
+#ifdef _DEBUG
+    ImGui::PushID(this);
+
+    ImGui::ColorEdit4("Diffuse Color", &deffuseColor_.x);
+    ImGui::DragFloat("Shininess", &shiness_, 0.1f, 0.0f, 100.0f);
+    ImGui::Checkbox("Enable Lighting", &enableLighting_);
+    ImGui::Checkbox("Enable Environment", &enableEnvironment_);
+    ImGui::DragFloat("Environment Scale", &envScale_, 0.01f, 0.0f, 10.0f);
+
+    ImGui::Text("Texture Path: %s", texturePath_.c_str());
+    ImGui::SeparatorText("UV Transform");
+
+    Vector2 offset = uvTransform_.GetOffset();
+    Vector2 scale = uvTransform_.GetScale();
+    float rotation = uvTransform_.GetRotation();
+
+    ImGui::DragFloat2("UV Offset", &offset.x, 0.01f);
+    ImGui::DragFloat2("UV Scale", &scale.x, 0.01f);
+    ImGui::DragFloat("UV Rotation", &rotation, 0.01f);
+
+    uvTransform_.SetOffset(offset);
+    uvTransform_.SetScale(scale);
+    uvTransform_.SetRotation(rotation);
+
+    ImGui::PopID();
+#endif // _DEBUG
 }
