@@ -570,7 +570,7 @@
     <ClCompile Include="Features\Model\Animation\Controller\AnimationController.cpp">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\ButtonNavigator.cpp">
+    <ClCompile Include="Features\UI\UINavigator.cpp">
       <Filter>Features\UI</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UIGroup.cpp">
@@ -611,6 +611,12 @@
     </ClCompile>
     <ClCompile Include="Features\PostEffects\GrayScale.cpp">
       <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISlider.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISelectable.cpp">
+      <Filter>Features\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -989,7 +995,7 @@
     <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\ButtonNavigator.h">
+    <ClInclude Include="Features\UI\UINavigator.h">
       <Filter>Features\UI</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIGroup.h">
@@ -1039,6 +1045,13 @@
     </ClInclude>
     <ClInclude Include="System\Audio\VoiceCallback.h">
       <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCallback.h" />
+    <ClInclude Include="Features\UI\UISlider.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISelectable.h">
+      <Filter>Features\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -40,6 +40,18 @@ enum class PadButton
 	iPad_Max       // ボタン数
 };
 
+enum class MouseButton
+{
+    Left = 0,		// 左クリック
+    Right,		    // 右クリック
+    Middle,		    // 中央クリック
+
+    X1,	            // サイドボタン１
+    X2,	            // サイドボタン２
+
+    MaxButtons	    // ボタン数
+};
+
 class Input
 {
 public:
