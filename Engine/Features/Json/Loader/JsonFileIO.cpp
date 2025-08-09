@@ -52,7 +52,11 @@ void JsonFileIO::Save(const std::string& _filepath, const std::string& _director
 
     Debug::Log("JsonFileIO::Save filepath: " + filepath + "\n");
 
-    std::filesystem::create_directory(_directory);
+    std::string dir = _directory;
+    if(dir.empty())
+        dir = StringUtils::GetBeforeLast(filepath, "/");
+
+    std::filesystem::create_directory(dir);
 
     std::ofstream outputFile(filepath);
     if (!outputFile.is_open())

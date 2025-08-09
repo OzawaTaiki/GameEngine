@@ -2,11 +2,13 @@
 
 #include <Features/UI/UISprite.h>
 #include <Features/UI/UIButton.h>
+#include <Features/UI/UISlider.h>
+#include <algorithm>
 
 void UIGroup::Initialize()
 {
-    // ボタンナビゲーターの初期化
-    buttonNavigator_.Initialize(nullptr); // 初期状態ではフォーカスを持つボタンはなし
+    // ナビゲーターの初期化
+    navigator_.Initialize(nullptr); // 初期状態ではフォーカスを持つ要素はなし
 
     // UI要素の初期化
     uiElements_.clear();
@@ -16,21 +18,20 @@ void UIGroup::Update()
 {
     for (const auto& element : uiElements_)
     {
-        if (element)
+        if (element && element->IsActive())
         {
             element->Update();
         }
     }
 
-    buttonNavigator_.Update();
-
+    navigator_.Update();
 }
 
 void UIGroup::Draw()
 {
     for (const auto& element : uiElements_)
     {
-        if (element)
+        if (element && element->IsVisible())
         {
             element->Draw();
         }
@@ -39,146 +40,170 @@ void UIGroup::Draw()
 
 UIButton* UIGroup::CreateButton(const std::string& _label, const std::wstring& _text)
 {
-    auto button = std::make_unique<UIButton>();
-    if (_text.empty())
-        button->Initialize(_label);
-    else
-        button->Initialize(_label, _text);
-    buttonNavigator_.RegisterButton(button.get()); // ボタンをナビゲーターに登録
-
-    uiElements_.push_back(std::move(button));
-
-    return static_cast<UIButton*>(uiElements_.back().get());
+    return CreateElement<UIButton>(_label, _text);
 }
 
 UISprite* UIGroup::CreateSprite(const std::string& _label, const std::wstring& _text)
 {
-    auto sprite = std::make_unique<UISprite>();
-    if (_text.empty())
-        sprite->Initialize(_label);
-    else
-        sprite->Initialize(_label, _text);
-
-    uiElements_.push_back(std::move(sprite));
-
-    return static_cast<UISprite*>(uiElements_.back().get());
+    return CreateElement<UISprite>(_label, _text);
 }
 
-void UIGroup::LinkVertical(std::initializer_list<UIButton*> _buttons)
+UISlider* UIGroup::CreateSlider(const std::string& _label, const std::wstring& _text)
 {
-    std::vector<UIButton*> buttonList;
-    for (auto button : _buttons)
+    return CreateElement<UISlider>(_label, _text);
+}
+
+void UIGroup::AddElement(std::unique_ptr<UIBase> _element)
+{
+    if (!_element)
+        return;
+
+    // UISelectableを継承している場合はNavigatorに登録
+    if (UISelectable* selectable = dynamic_cast<UISelectable*>(_element.get()))
     {
-        if (button)
+        navigator_.RegisterSelectable(selectable);
+    }
+
+    uiElements_.push_back(std::move(_element));
+}
+
+void UIGroup::RemoveElement(UIBase* _element)
+{
+    if (!_element)
+        return;
+
+    auto it = std::find_if(uiElements_.begin(), uiElements_.end(),
+        [_element](const std::unique_ptr<UIBase>& element) {
+            return element.get() == _element;
+        });
+
+    if (it != uiElements_.end())
+    {
+        // UISelectableを継承している場合はNavigatorから削除
+        if (UISelectable* selectable = dynamic_cast<UISelectable*>(_element))
         {
-            buttonList.push_back(button);
+            navigator_.UnregisterSelectable(selectable);
+        }
+
+        uiElements_.erase(it);
+    }
+}
+
+void UIGroup::LinkVertical(std::initializer_list<UISelectable*> _elements)
+{
+    std::vector<UISelectable*> elementList;
+    for (auto element : _elements)
+    {
+        if (element)
+        {
+            elementList.push_back(element);
         }
     }
-    SetupVerticalNavigation(buttonList);
+    SetupVerticalNavigation(elementList);
 }
 
-void UIGroup::LinkHorizontal(std::initializer_list<UIButton*> _buttons)
+void UIGroup::LinkHorizontal(std::initializer_list<UISelectable*> _elements)
 {
-    std::vector<UIButton*> buttonList;
-    for (auto button : _buttons)
+    std::vector<UISelectable*> elementList;
+    for (auto element : _elements)
     {
-        if (button)
+        if (element)
         {
-            buttonList.push_back(button);
+            elementList.push_back(element);
         }
     }
-    SetupHorizontalNavigation(buttonList);
+    SetupHorizontalNavigation(elementList);
 }
 
-void UIGroup::LinkGrid(std::initializer_list<std::initializer_list<UIButton*>> _buttons)
+void UIGroup::LinkGrid(std::initializer_list<std::initializer_list<UISelectable*>> _elements)
 {
-    std::vector<std::vector<UIButton*>> buttonGrid;
-    for (const auto& row : _buttons)
+    std::vector<std::vector<UISelectable*>> elementGrid;
+    for (const auto& row : _elements)
     {
-        std::vector<UIButton*> buttonRow;
-        for (auto button : row)
+        std::vector<UISelectable*> elementRow;
+        for (auto element : row)
         {
-            if (button)
+            if (element)
             {
-                buttonRow.push_back(button);
+                elementRow.push_back(element);
             }
         }
-        buttonGrid.push_back(buttonRow);
+        elementGrid.push_back(elementRow);
     }
-    SetupGridNavigation(buttonGrid);
+    SetupGridNavigation(elementGrid);
 }
 
-void UIGroup::SetupVerticalNavigation(const std::vector<UIButton*>& _buttons)
+void UIGroup::SetupVerticalNavigation(const std::vector<UISelectable*>& _elements)
 {
-    for (size_t i = 0; i < _buttons.size(); ++i)
+    for (size_t i = 0; i < _elements.size(); ++i)
     {
-        UIButton* currentButton = _buttons[i];
-        if (!currentButton)
+        UISelectable* currentElement = _elements[i];
+        if (!currentElement)
             continue;
 
-        // 上のボタン
+        // 上の要素
         if (i > 0)
         {
-            currentButton->SetNavigationTarget(_buttons[i - 1], Direction::Up);
+            currentElement->SetNavigationTarget(_elements[i - 1], Direction::Up);
         }
-        // 下のボタン
-        if (i < _buttons.size() - 1)
+        // 下の要素
+        if (i < _elements.size() - 1)
         {
-            currentButton->SetNavigationTarget(_buttons[i + 1], Direction::Down);
+            currentElement->SetNavigationTarget(_elements[i + 1], Direction::Down);
         }
     }
 }
 
-void UIGroup::SetupHorizontalNavigation(const std::vector<UIButton*>& _buttons)
+void UIGroup::SetupHorizontalNavigation(const std::vector<UISelectable*>& _elements)
 {
-    for (size_t i = 0; i < _buttons.size(); ++i)
+    for (size_t i = 0; i < _elements.size(); ++i)
     {
-        UIButton* currentButton = _buttons[i];
-        if (!currentButton)
+        UISelectable* currentElement = _elements[i];
+        if (!currentElement)
             continue;
 
-        // 左のボタン
+        // 左の要素
         if (i > 0)
         {
-            currentButton->SetNavigationTarget(_buttons[i - 1], Direction::Left);
+            currentElement->SetNavigationTarget(_elements[i - 1], Direction::Left);
         }
-        // 右のボタン
-        if (i < _buttons.size() - 1)
+        // 右の要素
+        if (i < _elements.size() - 1)
         {
-            currentButton->SetNavigationTarget(_buttons[i + 1], Direction::Right);
+            currentElement->SetNavigationTarget(_elements[i + 1], Direction::Right);
         }
     }
 }
 
-void UIGroup::SetupGridNavigation(const std::vector<std::vector<UIButton*>>& _buttons)
+void UIGroup::SetupGridNavigation(const std::vector<std::vector<UISelectable*>>& _elements)
 {
-    for (size_t i = 0; i < _buttons.size(); ++i)
+    for (size_t i = 0; i < _elements.size(); ++i)
     {
-        for (size_t j = 0; j < _buttons[i].size(); ++j)
+        for (size_t j = 0; j < _elements[i].size(); ++j)
         {
-            UIButton* currentButton = _buttons[i][j];
-            if (!currentButton)
+            UISelectable* currentElement = _elements[i][j];
+            if (!currentElement)
                 continue;
 
-            // 上のボタン
-            if (i > 0 && j < _buttons[i - 1].size())
+            // 上の要素
+            if (i > 0 && j < _elements[i - 1].size())
             {
-                currentButton->SetNavigationTarget(_buttons[i - 1][j], Direction::Up);
+                currentElement->SetNavigationTarget(_elements[i - 1][j], Direction::Up);
             }
-            // 下のボタン
-            if (i < _buttons.size() - 1 && j < _buttons[i + 1].size())
+            // 下の要素
+            if (i < _elements.size() - 1 && j < _elements[i + 1].size())
             {
-                currentButton->SetNavigationTarget(_buttons[i + 1][j], Direction::Down);
+                currentElement->SetNavigationTarget(_elements[i + 1][j], Direction::Down);
             }
-            // 左のボタン
+            // 左の要素
             if (j > 0)
             {
-                currentButton->SetNavigationTarget(_buttons[i][j - 1], Direction::Left);
+                currentElement->SetNavigationTarget(_elements[i][j - 1], Direction::Left);
             }
-            // 右のボタン
-            if (j < _buttons[i].size() - 1)
+            // 右の要素
+            if (j < _elements[i].size() - 1)
             {
-                currentButton->SetNavigationTarget(_buttons[i][j + 1], Direction::Right);
+                currentElement->SetNavigationTarget(_elements[i][j + 1], Direction::Right);
             }
         }
     }

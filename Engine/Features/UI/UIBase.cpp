@@ -48,12 +48,12 @@ void UIBase::Initialize(const std::string& _label)
 
 void UIBase::Initialize(const std::string& _label, const std::wstring& _text)
 {
-    Initialize(_label, _text, FontConfig());
+    UIBase::Initialize(_label, _text, FontConfig());
 }
 
 void UIBase::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
 {
-    Initialize(_label);
+    UIBase::Initialize(_label);
 
     textGenerator_.Initialize(_config);
 
