@@ -193,9 +193,6 @@
     <Filter Include="System">
       <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\Effect\Editor">
-      <UniqueIdentifier>{222a3361-f0f8-4ba4-a39b-308b9e3b1b75}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\Effect\Emitter">
       <UniqueIdentifier>{8618e4ff-0a47-4acf-b58d-74b1fd32aa3d}</UniqueIdentifier>
     </Filter>
@@ -255,6 +252,15 @@
     </Filter>
     <Filter Include="Features\ColorMask">
       <UniqueIdentifier>{db0f8b03-c861-4de0-92ca-985b6003783b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Effect\EditorScene">
+      <UniqueIdentifier>{222a3361-f0f8-4ba4-a39b-308b9e3b1b75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Model\Primitive\Builder">
+      <UniqueIdentifier>{bc6b1728-ff01-4aa2-8f2e-bf728169f9d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Model\Primitive\Creater">
+      <UniqueIdentifier>{7197a996-07b6-4bdb-89c3-0188caf73e2e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -492,8 +498,8 @@
     <ClCompile Include="Features\Event\EventTypeRegistry.cpp">
       <Filter>Features\Event</Filter>
     </ClCompile>
-    <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp">
-      <Filter>Features\Effect\Editor</Filter>
+    <ClCompile Include="Features\Effect\Editor\EffectEditorScene.cpp">
+      <Filter>Features\Effect\EditorScene</Filter>
     </ClCompile>
     <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp">
       <Filter>Features\Effect\Emitter</Filter>
@@ -617,6 +623,15 @@
     </ClCompile>
     <ClCompile Include="Features\UI\UISelectable.cpp">
       <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Effect\Effect\Effect.cpp">
+      <Filter>Features\Effect\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Builder\PrimitiveBuilder.cpp">
+      <Filter>Features\Model\Primitive\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp">
+      <Filter>Features\Model\Primitive\Creater</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -911,8 +926,8 @@
     <ClInclude Include="Features\Event\EventData.h">
       <Filter>Features\Event</Filter>
     </ClInclude>
-    <ClInclude Include="Features\Effect\Editor\ParticleEditor.h">
-      <Filter>Features\Effect\Editor</Filter>
+    <ClInclude Include="Features\Effect\Editor\EffectEditorScene.h">
+      <Filter>Features\Effect\EditorScene</Filter>
     </ClInclude>
     <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h">
       <Filter>Features\Effect\Emitter</Filter>
@@ -1052,6 +1067,15 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UISelectable.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Effect\Effect\Effect.h">
+      <Filter>Features\Effect\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Builder\PrimitiveBuilder.h">
+      <Filter>Features\Model\Primitive\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h">
+      <Filter>Features\Model\Primitive\Creater</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

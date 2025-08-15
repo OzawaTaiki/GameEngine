@@ -1,4 +1,6 @@
 #pragma once
+#define NOMINMAX
+
 #include <Math/Random/RandomGenerator.h>
 #include <Features/Effect/ParticleInitParam.h>
 #include <Features/Model/Transform/WorldTransform.h>
@@ -6,189 +8,230 @@
 #include <Features/Json/JsonBinder.h>
 
 #include <string>
+#include <string_view>
 #include <array>
 #include <memory>
 #include <cstdint>
+#include <functional>
+#include <vector>
 
-
+// Range構造体 - テンプレート化
 template<typename T>
 struct Range {
-    bool isRandom = false;  // ランダム値かどうか
-    T value;                // 固定値（isRandom = falseの場合）
-    T min;                  // 最小値（isRandom = trueの場合）
-    T max;                  // 最大値（isRandom = trueの場合）
+    bool isRandom = false;
+    T value;
+    T minV;
+    T maxV;
 
-    // コンストラクタ
-    Range(T defaultValue, T minValue, T maxValue)
-        : value(defaultValue){
-        min = minValue;
-        max = maxValue;
+    Range(T _defaultValue, T _minValue, T _maxValue)
+        : value(_defaultValue), minV(_minValue), maxV(_maxValue) {
     }
 
-
-    // 現在の値を取得（固定かランダムに応じて）
     T GetValue() const {
         if (isRandom) {
-            // ランダム値を生成
-            return RandomGenerator::GetInstance()->GetRandValue(min, max);
+            return RandomGenerator::GetInstance()->GetRandValue(minV, maxV);
         }
-        return value;  // 固定値を返す
+        return value;
+    }
+
+    void SetValue(T _newValue) { value = _newValue; }
+    void SetRange(T _minValue, T _maxValue) {
+        minV = _minValue;
+        maxV = _maxValue;
+        isRandom = true;
+    }
+    void SetFixed(T _fixedValue) {
+        value = _fixedValue;
+        isRandom = false;
     }
 };
 
-enum class EmitterShape
-{
-    Box,    // 立方体
-    Sphere, // 球形
-    //Cone,   // 円錐
-    //Cylinder, // 円柱
-    //Plane,  // 平面
+// Enum定義
+enum class EmitterShape : uint32_t {
+    Box = 0,
+    Sphere = 1,
+    Count
 };
 
-enum class ParticleDirectionType
-{
-    Outward,   // 外側に向かう
-    Inward,    // 内側に向かう
-    Random,    // ランダム
-    Fixed      // 固定
-
+enum class ParticleDirectionType : uint32_t {
+    Outward = 0,
+    Inward = 1,
+    Random = 2,
+    Fixed = 3,
+    Count
 };
 
-enum class ParticleLifeTimeType
-{
-    Infinite,  // 無限
-    Random,    // ランダム
-    Fixed      // 固定
+enum class ParticleLifeTimeType : uint32_t {
+    Infinite = 0,
+    Random = 1,
+    Fixed = 2,
+    Count
 };
 
-
+// パーティクル初期化パラメータ
 struct ParticleInitParamsForGenerator
 {
-    // パーティクルの初期位置
-    // Boxの場合は、Boxの中心からのオフセット
-    Range<Vector3> boxOffset = { 0.0f, 0.0f, 0.0f };
-    // Sphereの場合は、Sphereの中心からのオフセット
+    // 位置関連
+    Range<Vector3> boxOffset = { Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0) };
     Range<float> sphereOffset = { 0.0f, 0.0f, 0.0f };
 
-
-    // パーティクルの初期速度
-    Range<Vector3> direction = { Vector3(0, 0, 0), Vector3(-1, -1, -1), Vector3(1, 1, 1) };
-    ParticleDirectionType directionType = ParticleDirectionType::Outward; // 方向のタイプ
-    // パーティクルの速さ
+    // 動作関連
+    Range<Vector3> direction = { Vector3(0,0,0), Vector3(-1,-1,-1), Vector3(1,1,1) };
+    ParticleDirectionType directionType = ParticleDirectionType::Outward;
     Range<float> speed = { 1.0f, 0.5f, 2.0f };
-    // パーティクルの寿命
-    Range<float> lifeTime = { 1.0f, 0.5f, 2.0f };
-    ParticleLifeTimeType lifeTimeType = ParticleLifeTimeType::Fixed; // 寿命のタイプ
-
-    // パーティクルの減速率
     Range<float> deceleration = { 0.0f, 0.0f, 1.0f };
 
+    // 寿命関連
+    Range<float> lifeTime = { 1.0f, 0.5f, 2.0f };
+    ParticleLifeTimeType lifeTimeType = ParticleLifeTimeType::Fixed;
 
-    // 回転パラメータを追加
-    Range<Vector3> rotation = { Vector3(0, 0, 0), Vector3(0,0,0), Vector3(6.28318f ,6.28318f ,6.28318f)}; // 0〜2π（360度)
-    Range<Vector3> rotationSpeed = { Vector3(0, 0, 0), Vector3(-3.14159f,-3.14159f,-3.14159f), Vector3(3.14159f,3.14159f,3.14159f) }; // -π〜π（-180度〜180度/秒）
+    // 見た目関連
+    Range<Vector3> size = { Vector3(1,1,1), Vector3(0.5f,0.5f,0.5f), Vector3(2,2,2) };
+    Range<Vector3> rotation = { Vector3(0,0,0), Vector3(0,0,0), Vector3(6.28318f,6.28318f,6.28318f) };
+    Range<Vector3> rotationSpeed = { Vector3(0,0,0), Vector3(-3.14159f,-3.14159f,-3.14159f), Vector3(3.14159f,3.14159f,3.14159f) };
+    Range<Vector3> colorRGB = { Vector3(1,1,1), Vector3(0,0,0), Vector3(1,1,1) };
+    Range<float> colorA = { 1.0f, 0.0f, 1.0f };
 
-
-    // パーティクルの初期色
-    Range<Vector3> colorRGB = { Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(1, 1, 1) };
-    Range<float> colorA = { 1.0f, 0.0f, 1.0f }; // アルファ値の範囲
-    // パーティクルの初期サイズ
-    Range<Vector3> size = { Vector3(1.0f,1.0f,1.0f), Vector3(0.5f,0.5f,0.5f), Vector3(2.0f,2.0f,2.0f) };
-
-    std::array<bool, 3> billboard = { false, false, false }; // ビルボードのタイプ
-
-    std::string textureName = "uvChecker.png"; // テクスチャの名前（デフォルト
-
-    std::vector<std::string> modifiers; // モディファイアのリスト
-
+    std::array<bool, 3> billboard = { false, false, false };
+    std::string textureName = "uvChecker.png";
+    std::vector<std::string> modifiers;
 };
 
 class ParticleEmitter
 {
 public:
-    ParticleEmitter() {};
-    ~ParticleEmitter() {};
+    ParticleEmitter() = default;
+    ~ParticleEmitter() = default;
 
-    void Initialize(const std::string& _name);
+    // === 初期化・基本操作 ===
+    bool Initialize(const std::string& _name);  // 保存するため const std::string&
     void Update(float _deltaTime);
+    void Reset();
 
-    void ShowDebugWindow();
-
-
+    // === パーティクル生成 ===
     void GenerateParticles();
+    void EmitSingle();
+    void EmitBurst(uint32_t _count);
 
+    // === 状態管理 ===
+    void SetActive(bool _active) { isActive_ = _active; }
+    bool IsActive() const { return isActive_; }
+    void SetAlive(bool _alive) { isAlive_ = _alive; }
+    bool IsAlive() const { return isAlive_; }
+
+    // === 設定系 (保存するため const std::string&) ===
+    void SetName(const std::string& _name);
+    void SetModelName(const std::string& _modelName);
+    void SetTextureName(const std::string& _textureName);
+    void SetTimeChannel(const std::string& _channel);
+
+    // === 検索・比較系 (一時的なため std::string_view) ===
+    bool HasModifier(std::string_view _modifierName) const;
+    ParticleEmitter* FindChild(std::string_view _name) const;
+
+    // === ファイル操作系 (一時的なため std::string_view) ===
+    bool LoadFromFile(std::string_view _filePath);
+    bool SaveToFile(std::string_view _filePath) const;
+    void LoadTexture(std::string_view _texturePath);
+    void LoadModel(std::string_view _modelPath);
+
+    // === 取得系 ===
+    const std::string& GetName() const { return name_; }
+    const std::string& GetModelName() const { return useModelName_; }
+    const std::string& GetTextureName() const { return initParams_.textureName; }
+    float GetDelayTime() const { return delayTime_; }
+    float GetDuration() const { return lifeTime; }
+    float GetElapsedTime() const { return elapsedTime_; }
+
+    // === 変形・位置系 ===
     void SetParentTransform(WorldTransform* _parentTransform) { parentTransform_ = _parentTransform; }
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
     void SetPosition(const Vector3& _position) { position_ = _position; }
+    void SetRotation(const Quaternion& _rotation) { rotation_ = _rotation; }
+    void SetScale(const Vector3& _scale) { scale_ = _scale; }
 
+    const Vector3& GetPosition() const { return position_; }
+    const Quaternion& GetRotation() const { return rotation_; }
+    const Vector3& GetScale() const { return scale_; }
+
+    // === モディファイア管理 ===
+    void AddModifier(const std::string& _modifierName);  // 保存
+    bool RemoveModifier(std::string_view _modifierName); // 検索
+    void ClearModifiers() { initParams_.modifiers.clear(); }
+    const std::vector<std::string>& GetModifiers() const { return initParams_.modifiers; }
+
+    // === デバッグ・エラー ===
+    std::string GetLastError() const { return lastError_; }
+
+#ifdef _DEBUG
+    void ShowDebugWindow();
+#endif
 
 private:
+    // === コア設定 ===
+    std::string name_ = "Emitter";
+    bool isActive_ = false;
+    bool isAlive_ = true;
 
+    // === 親子関係 ===
+    WorldTransform* parentTransform_ = nullptr;
+    Vector3 offset_ = { 0, 0, 0 };
+
+    // === 変形 ===
+    Vector3 position_ = { 0, 0, 0 };
+    Quaternion rotation_ = { 0, 0, 0, 1 };
+    Vector3 scale_ = { 1, 1, 1 };
+
+    // === レンダリング設定 ===
+    PSOFlags::BlendMode blendMode_ = PSOFlags::BlendMode::Add;
+    bool cullBack_ = false;
+
+    // === エミッター形状 ===
+    EmitterShape shape_ = EmitterShape::Box;
+    Vector3 boxSize_ = { 1, 1, 1 };
+    float sphereRadius_ = 1.0f;
+
+    // === 発生設定 ===
+    uint32_t emitPerSecond_ = 10;
+    uint32_t emitCount_ = 1;
+    std::string useModelName_ = "cube/cube.obj";
+
+    // === タイミング ===
+    bool isLoop_ = false;
+    float elapsedTime_ = 0.0f;
+    float delayTime_ = 0.0f;
+    float lifeTime = 0.0f;
+    std::string timeChannel_ = "default";
+
+    // === パーティクル初期値 ===
+    ParticleInitParamsForGenerator initParams_;
+
+    // === データ管理 ===
+    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
+
+    // === 統計・デバッグ ===
+    mutable std::string lastError_;
+
+#ifdef _DEBUG
+    // === ImGui用バッファ ===
+    static int s_nextID_;
+    int instanceID_ = 0;
+    char nameBuf_[256] = {};
+    char modelPath_[256] = {};
+    char modelName_[256] = {};
+    char texturePath_[256] = {};
+    char textureRoot_[256] = "Resources/images/";
+    char modifierName_[256] = {};
+#endif
+
+    // === 内部ヘルパー ===
     void InitJsonBinder();
-
-    // エミッターの名前
-    std::string name_ = "Emitter"; // エミッターの名前
-
-    // 有効フラグ
-    bool isActive_ = false; // アクティブか
-
-    // 親のWorldTransform
-    WorldTransform* parentTransform_ = nullptr; // 親のワールドトランスフォーム
-    // 親があるときのオフセット
-    Vector3 offset_ = { 0, 0, 0 }; // 親からのオフセット
-
-    PSOFlags::BlendMode blendMode_ = PSOFlags::BlendMode::Add; // ブレンドモード
-    bool cullBack_ = false; // バックカリングするか
-
-    // エミッターの設定
-    EmitterShape shape_ = EmitterShape::Box; // エミッターの形状
-
-    uint32_t emitPerSecond_ = 10; // 秒間の発生数
-    // 一度に発生するパーティクルの数
-    uint32_t emitCount_ = 1; // 一度に発生するパーティクルの数
-
-    std::string useModelName_ = "plane/plane.gltf"; // 使用するモデルの名前
+    void SetError(std::string_view _error) const { lastError_ = _error; }
+    void ClearError() const { lastError_.clear(); }
+    bool ValidateSettings() const;
 
 #ifdef _DEBUG
-    char modelPath_[256];
-    char modelName_[256];
-    char nameBuf_[256];
-    char texturePath_[256];
-    char textureRoot_[256] = "Resources/images/"; // テクスチャのルートパス
-    char modifierName[256]; // モディファイアの名前
-#endif _DEBUG
-
-
-
-    bool isLoop_ = false; // ループするか
-    float elapsedTime_ = 0.0f; // 経過時間
-    float delayTime_ = 0.0f; // 遅延時間
-    float lifeTime = 0.0f; // 寿命
-
-    Vector3 position_ = { 0, 0, 0 }; // エミッターの位置
-    Quaternion rotation_ = { 0, 0, 0, 1 }; // エミッターの回転
-
-
-    //---------------
-    // shapeごとのパラメータ
-
-    // Box
-    Vector3 boxSize_ = { 1, 1, 1 }; // ボックスのサイズ
-
-    // Sphere
-    float sphereRadius_ = 1.0f; // 球の半径
-
-
-    // パーティクルの初期値用
-    ParticleInitParamsForGenerator initParams_; // パーティクルの初期値設定用
-
-    std::unique_ptr<JsonBinder> jsonBinder_ = nullptr; // JsonBinder
-
-
-
-    //各パラメータごとの設定用imgui関数
-#ifdef _DEBUG
-
+    // === ImGuiヘルパー ===
     void DebugWindowForSize();
     void DebugWindowForPosition();
     void DebugWindowForDirection();
@@ -197,11 +240,6 @@ private:
     void DebugWindowForDeceleration();
     void DebugWindowForLifeTime();
     void DebugWindowForColor();
-
     void DebugWindowForModifier();
-
-#endif // _DEBUG
-
-
-
+#endif
 };

@@ -270,3 +270,181 @@ void from_json(const json& _j, TextParam& _v)
         throw std::runtime_error("Invalid TextParam JSON format");
     }
 }
+
+void to_json(json& _j, const PrimitiveType& _type)
+{
+    switch (_type)
+    {
+    case PrimitiveType::Plane:
+        _j = "Plane";
+        break;
+    case PrimitiveType::Triangle:
+        _j = "Triangle";
+        break;
+    case PrimitiveType::Cylinder:
+        _j = "Cylinder";
+        break;
+    case PrimitiveType::Ring:
+        _j = "Ring";
+        break;
+    default:
+        _j = "Unknown";
+        break;
+    }
+}
+
+void from_json(const json& _j, PrimitiveType& _type)
+{
+    std::string typeStr = _j.get<std::string>();
+    if (typeStr == "Plane")
+        _type = PrimitiveType::Plane;
+    else if (typeStr == "Triangle")
+        _type = PrimitiveType::Triangle;
+    else if (typeStr == "Cylinder")
+        _type = PrimitiveType::Cylinder;
+    else if (typeStr == "Ring")
+        _type = PrimitiveType::Ring;
+    else
+        throw std::runtime_error("Invalid PrimitiveType: " + typeStr);
+}
+
+void to_json(json& _j, const PrimitiveSettings::PlaneData& _plane)
+{
+    _j = json{
+        {"normal", _plane.normal},
+        {"size", _plane.size},
+        {"pivot", _plane.pivot}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings::PlaneData& _plane)
+{
+    if (_j.contains("normal"))
+        _plane.normal = _j["normal"].get<Vector3>();
+    if (_j.contains("size"))
+        _plane.size = _j["size"].get<Vector2>();
+    if (_j.contains("pivot"))
+        _plane.pivot = _j["pivot"].get<Vector3>();
+}
+
+void to_json(json& _j, const PrimitiveSettings::TriangleData& _triangle)
+{
+    _j = json{
+        {"vertex0", _triangle.vertex0},
+        {"vertex1", _triangle.vertex1},
+        {"vertex2", _triangle.vertex2},
+        {"normal", _triangle.normal}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings::TriangleData& _triangle)
+{
+    if (_j.contains("vertex0"))
+        _triangle.vertex0 = _j["vertex0"].get<Vector3>();
+    if (_j.contains("vertex1"))
+        _triangle.vertex1 = _j["vertex1"].get<Vector3>();
+    if (_j.contains("vertex2"))
+        _triangle.vertex2 = _j["vertex2"].get<Vector3>();
+    if (_j.contains("normal"))
+        _triangle.normal = _j["normal"].get<Vector3>();
+}
+
+void to_json(json& _j, const PrimitiveSettings::CylinderData& _cylinder)
+{
+    _j = json{
+        {"topRadius", _cylinder.topRadius},
+        {"bottomRadius", _cylinder.bottomRadius},
+        {"height", _cylinder.height},
+        {"hasTop", _cylinder.hasTop},
+        {"hasBottom", _cylinder.hasBottom},
+        {"startAngle", _cylinder.startAngle},
+        {"endAngle", _cylinder.endAngle},
+        {"loop", _cylinder.loop}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings::CylinderData& _cylinder)
+{
+    _cylinder.topRadius = _j.value("topRadius", 1.0f);
+    _cylinder.bottomRadius = _j.value("bottomRadius", 1.0f);
+    _cylinder.height = _j.value("height", 2.0f);
+    _cylinder.hasTop = _j.value("hasTop", false);
+    _cylinder.hasBottom = _j.value("hasBottom", false);
+    _cylinder.startAngle = _j.value("startAngle", 0.0f);
+    _cylinder.endAngle = _j.value("endAngle", 6.28318f);
+    _cylinder.loop = _j.value("loop", true);
+}
+
+void to_json(json& _j, const PrimitiveSettings::RingData& _ring)
+{
+    _j = json{
+        {"innerRadius", _ring.innerRadius},
+        {"outerRadius", _ring.outerRadius},
+        {"startAngle", _ring.startAngle},
+        {"endAngle", _ring.endAngle},
+        {"startOuterRadiusRatio", _ring.startOuterRadiusRatio},
+        {"endOuterRadiusRatio", _ring.endOuterRadiusRatio}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings::RingData& _ring)
+{
+    _ring.innerRadius = _j.value("innerRadius", 0.5f);
+    _ring.outerRadius = _j.value("outerRadius", 1.0f);
+    _ring.startAngle = _j.value("startAngle", 0.0f);
+    _ring.endAngle = _j.value("endAngle", 6.28318f);
+    _ring.startOuterRadiusRatio = _j.value("startOuterRadiusRatio", 1.0f);
+    _ring.endOuterRadiusRatio = _j.value("endOuterRadiusRatio", 1.0f);
+}
+
+void to_json(json& _j, const PrimitiveSettings& _settings)
+{
+    _j = json{
+        {"name", _settings.name},
+        {"divide", _settings.divide},
+        {"flipU", _settings.flipU},
+        {"flipV", _settings.flipV},
+        {"plane", _settings.plane},
+        {"triangle", _settings.triangle},
+        {"cylinder", _settings.cylinder},
+        {"ring", _settings.ring}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings& _settings)
+{
+    _settings.name = _j.value("name", "NewPrimitive");
+    _settings.divide = _j.value("divide", 16u);
+    _settings.flipU = _j.value("flipU", false);
+    _settings.flipV = _j.value("flipV", false);
+
+    if (_j.contains("plane"))
+        _settings.plane = _j["plane"].get<PrimitiveSettings::PlaneData>();
+    if (_j.contains("triangle"))
+        _settings.triangle = _j["triangle"].get<PrimitiveSettings::TriangleData>();
+    if (_j.contains("cylinder"))
+        _settings.cylinder = _j["cylinder"].get<PrimitiveSettings::CylinderData>();
+    if (_j.contains("ring"))
+        _settings.ring = _j["ring"].get<PrimitiveSettings::RingData>();
+}
+
+void to_json(json& _j, const CreatedPrimitive& _primitive)
+{
+    _j = json{
+        {"type", _primitive.type},
+        {"settings", _primitive.settings},
+        {"isSaved", _primitive.isSaved}
+        // modelは保存しない（ポインタなので）
+    };
+}
+
+void from_json(const json& _j, CreatedPrimitive& _primitive)
+{
+    if (_j.contains("type"))
+        _primitive.type = _j["type"].get<PrimitiveType>();
+    if (_j.contains("settings"))
+        _primitive.settings = _j["settings"].get<PrimitiveSettings>();
+
+    _primitive.isSaved = _j.value("isSaved", false);
+    _primitive.model = nullptr; // モデルは別途生成する必要がある
+}
