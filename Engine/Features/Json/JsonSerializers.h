@@ -6,6 +6,7 @@
 #include <Math/Quaternion/Quaternion.h>
 #include <Features/Animation/Sequence/SequenceEvent.h>
 #include <Features/TextRenderer/TextParam.h>
+#include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
 
 #include <json.hpp>
 
@@ -43,7 +44,34 @@ void from_json(const json& _j, SequenceEvent::KeyFrame& _v);
 void to_json(json& _j, const SequenceEvent& _v);
 void from_json(const json& _j, SequenceEvent& _v);
 
-
 // TextParam
 void to_json(json& _j, const TextParam& _v);
 void from_json(const json& _j, TextParam& _v);
+
+
+/// PrimitiveCreater.h
+
+// PrimitiveType
+void to_json(json& _j, const PrimitiveType& _type);
+void from_json(const json& _j, PrimitiveType& _type);
+
+// PrimitiveSettings
+void to_json(json& _j, const PrimitiveSettings& _settings);
+void from_json(const json& _j, PrimitiveSettings& _settings);
+
+// PrimitiveSettings
+void to_json(json& _j, const PrimitiveSettings::PlaneData& _plane);
+void from_json(const json& _j, PrimitiveSettings::PlaneData& _plane);
+
+void to_json(json& _j, const PrimitiveSettings::TriangleData& _triangle);
+void from_json(const json& _j, PrimitiveSettings::TriangleData& _triangle);
+
+void to_json(json& _j, const PrimitiveSettings::CylinderData& _cylinder);
+void from_json(const json& _j, PrimitiveSettings::CylinderData& _cylinder);
+
+void to_json(json& _j, const PrimitiveSettings::RingData& _ring);
+void from_json(const json& _j, PrimitiveSettings::RingData& _ring);
+
+// CreatedPrimitive
+void to_json(json& _j, const CreatedPrimitive& _data);
+void from_json(const json& _j, CreatedPrimitive& _data);

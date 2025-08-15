@@ -171,7 +171,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Collision\Tree\Cell.cpp" />
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp" />
     <ClCompile Include="Features\ColorMask\ColorMask.cpp" />
-    <ClCompile Include="Features\Effect\Editor\ParticleEditor.cpp" />
+    <ClCompile Include="Features\Effect\Editor\EffectEditorScene.cpp" />
+    <ClCompile Include="Features\Effect\Effect\Effect.cpp" />
     <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp" />
     <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp" />
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp" />
@@ -204,6 +205,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\Mesh\Mesh.cpp" />
     <ClCompile Include="Features\Model\Model.cpp" />
     <ClCompile Include="Features\Model\ObjectModel.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Builder\PrimitiveBuilder.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp" />
     <ClCompile Include="Features\Model\Primitive\Cylinder.cpp" />
     <ClCompile Include="Features\Model\Primitive\Plane.cpp" />
     <ClCompile Include="Features\Model\Primitive\Ring.cpp" />
@@ -293,7 +296,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Collision\Tree\Cell.h" />
     <ClInclude Include="Features\Collision\Tree\QuadTree.h" />
     <ClInclude Include="Features\ColorMask\ColorMask.h" />
-    <ClInclude Include="Features\Effect\Editor\ParticleEditor.h" />
+    <ClInclude Include="Features\Effect\Editor\EffectEditorScene.h" />
+    <ClInclude Include="Features\Effect\Effect\Effect.h" />
     <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h" />
     <ClInclude Include="Features\Effect\Manager\ParticleSystem.h" />
     <ClInclude Include="Features\Effect\Modifier\IPaticleMoifierFactory.h" />
@@ -334,6 +338,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\Mesh\Mesh.h" />
     <ClInclude Include="Features\Model\Model.h" />
     <ClInclude Include="Features\Model\ObjectModel.h" />
+    <ClInclude Include="Features\Model\Primitive\Builder\PrimitiveBuilder.h" />
+    <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h" />
     <ClInclude Include="Features\Model\Primitive\Cylinder.h" />
     <ClInclude Include="Features\Model\Primitive\Plane.h" />
     <ClInclude Include="Features\Model\Primitive\Primitive.h" />
