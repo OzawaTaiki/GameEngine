@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "CollisionDetector.h"
 #include <Math/Matrix/MatrixFunction.h>
 #include <Math/Vector/VectorFunction.h>

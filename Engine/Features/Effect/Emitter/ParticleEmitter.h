@@ -1,5 +1,4 @@
 #pragma once
-#define NOMINMAX
 
 #include <Math/Random/RandomGenerator.h>
 #include <Features/Effect/ParticleInitParam.h>
@@ -179,6 +178,7 @@ private:
 
     // === 変形 ===
     Vector3 position_ = { 0, 0, 0 };
+    Vector3 rotationEuler_ = { 0, 0, 0 }; // Euler角
     Quaternion rotation_ = { 0, 0, 0, 1 };
     Vector3 scale_ = { 1, 1, 1 };
 

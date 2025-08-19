@@ -5,6 +5,8 @@
 #include <string>
 #endif // _DEBUG
 
+class Quaternion;
+
 struct Vector3
 {
 	float x, y, z;
@@ -43,6 +45,7 @@ struct Vector3
 
    static Vector3 Lerp(const Vector3& _v1, const Vector3& _v2, float _t);
 
+   static Vector3 QuaternionToEuler(const Quaternion& _q);
 
 	inline bool operator==(const Vector3& _v)const {
 		return x == _v.x && y == _v.y && z == _v.z;

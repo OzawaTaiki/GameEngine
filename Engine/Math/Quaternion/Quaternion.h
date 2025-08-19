@@ -45,6 +45,8 @@ public:
     // 球面線形補間
     static Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
 
+    // Euler角からクォータニオンを作成
+    static Quaternion  EulerToQuaternion(const Vector3& _euler);
 
     ///****演算子オーバロード****///
     Quaternion operator-() const;

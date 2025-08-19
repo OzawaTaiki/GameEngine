@@ -146,6 +146,30 @@ Quaternion Quaternion::Slerp(const Quaternion& _q1, const Quaternion& _q2, float
     return (q0 * scale0 + _q2 * scale1) / std::sinf(theta);
 }
 
+Quaternion Quaternion::EulerToQuaternion(const Vector3& _euler)
+{
+    float halfX = _euler.x * 0.5f;
+    float halfY = _euler.y * 0.5f;
+    float halfZ = _euler.z * 0.5f;
+
+    float cX = std::cosf(halfX);
+    float sX = std::sinf(halfX);
+
+    float cY = std::cosf(halfY);
+    float sY = std::sinf(halfY);
+
+    float cZ = std::cosf(halfZ);
+    float sZ = std::sinf(halfZ);
+
+    Quaternion q;
+    q.x = sX * cY * cZ + cX * sY * sZ;
+    q.y = cX * sY * cZ - sX * cY * sZ;
+    q.z = cX * cY * sZ + sX * sY * cZ;
+    q.w = cX * cY * cZ - sX * sY * sZ;
+
+    return q.Normalize();
+}
+
 Quaternion Quaternion::operator-() const
 {
     return Quaternion(-x, -y, -z, -w);

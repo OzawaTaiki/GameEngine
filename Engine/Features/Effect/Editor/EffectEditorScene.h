@@ -36,6 +36,8 @@ private:
     ParticleSystem* particleSystem_ = nullptr;
     std::shared_ptr<LightGroup> lights_;
 
+    std::vector<std::unique_ptr<ObjectModel>> objectModels_;
+
     // === エフェクト管理 ===
     std::vector<std::unique_ptr<Effect>> effects_;
     int selectedEffectIndex_ = -1;
@@ -129,6 +131,7 @@ private:
     void ImGuiPerformanceMonitor();
     void ImGuiCameraControls();
     void ImGuiEnvironmentSettings();
+    void ImGuiModelControls();
     void ImGuiTemplateSelector();
     void ImGuiFileOperations();
     void ImGuiHelpWindow();

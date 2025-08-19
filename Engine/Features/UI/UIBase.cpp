@@ -110,7 +110,7 @@ bool UIBase::IsPointInside(const Vector2& _point) const
     return false;
 }
 
-const Vector2& UIBase::GetWorldPos() const
+Vector2 UIBase::GetWorldPos() const
 {
     Vector2 pos = position_;
     if (parent_)

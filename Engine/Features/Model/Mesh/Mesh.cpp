@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include <Features/Model/Mesh/Mesh.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Debug/Debug.h>

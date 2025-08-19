@@ -69,6 +69,9 @@ void EffectEditorScene::Update()
     // パフォーマンスデータ更新
     UpdatePerformanceData();
 
+    for (auto& model : objectModels_)
+        model->Update();
+
     // プレビュー時間更新
     if (isPlaying_ && !isPaused_)
     {
@@ -109,6 +112,9 @@ void EffectEditorScene::Draw()
         skyBox_->QueueCmdCubeTexture();
     }
 
+    for (auto& model : objectModels_)
+        model->Draw(&sceneCamera_);
+
     // グリッド・ガイド描画
     if (showGrid_) DrawGrid();
     if (showAxis_) DrawAxis();
@@ -135,6 +141,8 @@ void EffectEditorScene::Draw()
 
     if (showPerformanceMonitor_)
         ImGuiPerformanceMonitor();
+
+    ImGuiModelControls();
 
     primitiveCreator_.DrawImGui();
 #endif
@@ -798,6 +806,75 @@ void EffectEditorScene::ImGuiEnvironmentSettings()
 
     ImGui::Checkbox("Show Axis", &showAxis_);
     ImGui::Checkbox("Show Bounds", &showBounds_);
+}
+
+void EffectEditorScene::ImGuiModelControls()
+{
+    ImGui::Begin("Model Controls");
+
+    if (ImGui::Button("Create Model"))
+    {
+        ImGui::OpenPopup("CreateModelPopup");
+    }
+
+    if (ImGui::BeginPopupModal("CreateModelPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static char modelNameBuf[256] = "NewModel";
+        static char modelPathBuf[256] = "cube/cube.obj";
+        std::string modelName(modelNameBuf);
+        std::string modelPath(modelPathBuf);
+        if(ImGui::InputText("Model Name", modelNameBuf, sizeof(modelNameBuf)))
+            modelName = modelNameBuf;
+        if (ImGui::InputText("Model Path", modelPathBuf, sizeof(modelPathBuf)))
+            modelPath = modelPathBuf;
+
+        if (ImGui::Button("Create"))
+        {
+            if (!modelPath.empty())
+            {
+                auto newModel = std::make_unique<ObjectModel>(modelNameBuf);
+                newModel->Initialize(modelPathBuf);
+                if (newModel)
+                {
+                    objectModels_.emplace_back(std::move(newModel));
+                    // モデル作成成功
+                    ImGui::CloseCurrentPopup();
+                }
+                else
+                {
+                    ImGui::Text("Failed to create model: %s", modelNameBuf);
+                }
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    ImGui::Separator();
+
+    for (auto it = objectModels_.begin(); it != objectModels_.end();)
+    {
+        auto& model = *it;
+        ImGui::PushID(model.get());
+        bool isDelete = ImGui::Button("Delete");
+
+        ImGui::SameLine();
+        ImGui::Text("Model: %s", model->GetName().c_str());
+
+        if (isDelete)
+            it = objectModels_.erase(it);
+        else
+            ++it;
+
+        ImGui::PopID();
+    }
+
+
+    ImGui::End();
 }
 
 // ヘルパー関数の実装
