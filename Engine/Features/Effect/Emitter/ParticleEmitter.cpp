@@ -95,14 +95,25 @@ void ParticleEmitter::GenerateParticles()
 
     std::vector<Particle*> particles(emitCount_);
 
+    Quaternion q = Quaternion::EulerToQuaternion(rotationEuler_);
+    Matrix4x4 emitterTransform = MakeAffineMatrix(
+        Vector3(1.0f, 1.0f, 1.0f), // スケール
+        q, // 回転
+        position_ // 平行移動
+    );
+
+    Quaternion parentRotation = q;
+    if (parentTransform_)
+    {
+        // 親のワールドトランスフォームを考慮
+        emitterTransform *= parentTransform_->matWorld_;
+        parentRotation = parentRotation * parentTransform_->quaternion_;
+    }
+
     for (uint32_t i = 0; i < emitCount_; ++i)
     {
-
         ParticleInitParam initParam;
 
-        //particle.acceleration;
-
-        initParam.isBillboard;
         initParam.isBillboard = initParams_.billboard;
 
         initParam.color;
@@ -111,30 +122,21 @@ void ParticleEmitter::GenerateParticles()
 
         initParam.color = Vector4(rgb.x, rgb.y, rgb.z, alpha);
 
-
-
-        initParam.isInfiniteLife;
         initParam.isInfiniteLife = initParams_.lifeTimeType == ParticleLifeTimeType::Infinite;
 
-        initParam.lifeTime;
         if (!initParam.isInfiniteLife)
         {
             initParam.lifeTime = initParams_.lifeTime.GetValue();
         }
 
-        initParam.position;
         Vector3 emitterWorldPos = position_;
-        if (parentTransform_)
-        {
-            //emitterWorldPos = parentTransform_->GetWorldPosition();
-            emitterWorldPos = Transform(offset_, parentTransform_->matWorld_);
-        }
+
         switch (shape_)
         {
         case EmitterShape::Box:
         {
             Vector3 boxOffset = RandomGenerator::GetInstance()->GetRandValue(initParams_.boxOffset.GetValue(), boxSize_ / 2.0f);
-            initParam.position = emitterWorldPos + boxOffset;
+            initParam.position = boxOffset;
             break;
         }
         case EmitterShape::Sphere:
@@ -145,15 +147,13 @@ void ParticleEmitter::GenerateParticles()
             initParam.position.x = std::cosf(rad) * sphereOffset;
             initParam.position.y = RandomGenerator::GetInstance()->GetRandValue(-sphereOffset, sphereOffset);
             initParam.position.z = std::sinf(rad) * sphereOffset;
-            initParam.position += emitterWorldPos;
             break;
         }
         default:
             break;
         }
+        initParam.position = Transform(initParam.position, emitterTransform);
 
-
-        initParam.direction;
         if (initParams_.directionType == ParticleDirectionType::Random ||
             initParams_.directionType == ParticleDirectionType::Fixed)
         {
@@ -174,17 +174,12 @@ void ParticleEmitter::GenerateParticles()
 
             initParam.direction = dir;
         }
+        initParam.direction = TransformNormal(initParam.direction, emitterTransform);
 
-        // 回転設定を追加
-        initParam.rotate = initParams_.rotation.GetValue();
+        // 回転設定を追加 eulerはベクトルではないのでTransformNormalは不適切 quaternionなどに変換して親の回転を反映させる必要がある
+        initParam.rotate = Vector3::QuaternionToEuler(Quaternion::EulerToQuaternion(initParams_.rotation.GetValue()) * parentRotation);
         initParam.rotationSpeed = initParams_.rotationSpeed.GetValue();
-
-
-        initParam.size;
         initParam.size = initParams_.size.GetValue();
-
-
-        initParam.speed;
         initParam.speed = initParams_.speed.GetValue();
 
         particles[i] = new Particle();
@@ -196,7 +191,7 @@ void ParticleEmitter::GenerateParticles()
     settings.cullBack = cullBack_;
 
     if (useModelName_ == "")
-        useModelName_ = "plane/plane.gltf";
+        useModelName_ = "cube/cube.obj";
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load(initParams_.textureName);
 

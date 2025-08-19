@@ -9,6 +9,6 @@ class IParticleMoifierFactory
 public:
     virtual ~IParticleMoifierFactory() = default;
 
-    virtual std::unique_ptr<ParticleModifier> CreateModifier(const std::string _name) = 0;
+    virtual std::unique_ptr<ParticleModifier> CreateModifier(const std::string& _name) = 0;
 
 };

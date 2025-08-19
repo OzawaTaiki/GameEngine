@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include <Math/MyLib.h>
 #include <algorithm>
 #include <numbers>

@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "ImguITools.h"
 
 #include <Debug/ImGuiHelper.h>

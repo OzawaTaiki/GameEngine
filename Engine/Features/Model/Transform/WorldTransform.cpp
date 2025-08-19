@@ -17,15 +17,15 @@ void WorldTransform::Initialize()
 
 void WorldTransform::UpdateData(bool _useQuaternion)
 {
-    if (_useQuaternion)
-        matWorld_ = MakeAffineMatrix(scale_, quaternion_, transform_);
-    else
-        matWorld_ = MakeAffineMatrix(scale_, rotate_, transform_);
+    SyncRotataion(_useQuaternion);
+
+    matWorld_ = MakeAffineMatrix(scale_, quaternion_, transform_);
+
     if (parentMatrix_)
     {
         matWorld_ *= *parentMatrix_;
     }
-    if (parent_)
+    else if (parent_)
     {
         matWorld_ *= parent_->matWorld_;
     }
@@ -52,17 +52,37 @@ void WorldTransform::SetParent(const Matrix4x4* _parentMatrix)
     parentMatrix_ = _parentMatrix;
 }
 
-void WorldTransform::UpdateData(const std::initializer_list<Matrix4x4>& _mat)
+void WorldTransform::SyncRotataion(bool _useQuaternion)
 {
+    // クォータニオンの使用状態が変わった場合、回転を更新
+    if (_useQuaternion)
+    {
+        rotate_ = Vector3::QuaternionToEuler(quaternion_);
+    }
+    else
+    {
+        quaternion_ = Quaternion::EulerToQuaternion(rotate_);
+    }
+    wasUsingQuaternion_ = _useQuaternion;
+}
+
+void WorldTransform::UpdateData(const std::initializer_list<Matrix4x4>& _mat, bool _useQuaternion)
+{
+    SyncRotataion(_useQuaternion);
+
     Matrix4x4 matrix = MakeIdentity4x4();
     for (auto& mat : _mat)
     {
         matWorld_ = matrix * mat;
     }
-    matWorld_ *= MakeAffineMatrix(scale_, rotate_, transform_);
+    matWorld_ *= MakeAffineMatrix(scale_, quaternion_, transform_);
     if (parent_)
     {
         matWorld_ *= parent_->matWorld_;
+    }
+    else if (parentMatrix_)
+    {
+        matWorld_ *= *parentMatrix_;
     }
     TransferData();
 }

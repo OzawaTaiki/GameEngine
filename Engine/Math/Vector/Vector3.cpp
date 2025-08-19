@@ -1,5 +1,7 @@
 #include <Math/Vector/Vector3.h>
 
+#include <Math/Quaternion/Quaternion.h>
+#include <numbers>
 
 float Vector3::Length() const
 {
@@ -70,6 +72,31 @@ Vector3 Vector3::Lerp(const Vector3& _v1, const Vector3& _v2, float _t)
     Vector3 result;
     result = _v1 + (_v2 - _v1) * _t;
     return result;
+}
+
+Vector3 Vector3::QuaternionToEuler(const Quaternion& _q)
+{
+    Vector3 euler;
+
+    // ジンバルロックチェック
+    float sinY = 2.0f * (_q.w * _q.y - _q.z * _q.x);
+
+    if (abs(sinY) >= 0.99999f) {
+        // ジンバルロック状態
+        euler.x = atan2(2.0f * (_q.x * _q.y + _q.w * _q.z),
+            1.0f - 2.0f * (_q.y * _q.y + _q.z * _q.z));
+        euler.y = copysign(std::numbers::pi_v<float> / 2.0f, sinY);
+        euler.z = 0.0f;
+    }
+    else {
+        euler.x = atan2(2.0f * (_q.w * _q.x + _q.y * _q.z),
+            1.0f - 2.0f * (_q.x * _q.x + _q.y * _q.y));
+        euler.y = asin(sinY);
+        euler.z = atan2(2.0f * (_q.w * _q.z + _q.x * _q.y),
+            1.0f - 2.0f * (_q.y * _q.y + _q.z * _q.z));
+    }
+
+    return euler;
 }
 
 Vector3 Vector3::operator+(const Vector3& _v) const

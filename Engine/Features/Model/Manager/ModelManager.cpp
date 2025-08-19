@@ -3,6 +3,7 @@
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Debug/Debug.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <cassert>
 
 ModelManager* ModelManager::GetInstance()
@@ -78,6 +79,38 @@ Model* ModelManager::Create(const std::string& _name)
 
     models_[name] = std::make_unique<Model>();
     return models_[name].get();
+}
+
+void ModelManager::ImGui(bool* _open)
+{
+#ifdef _DEBUG
+
+    ImGui::Begin("ModelManager", _open);
+    ImGui::PushID(this);
+
+
+    for (const auto& [key, model] : models_)
+    {
+        ImGui::PushID(key.c_str()); // 一意なIDを使用してウィンドウを識別
+        ImGui::Text("%s", key.c_str());
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::Text("Model Name: %s", key.c_str());
+            ImGui::Text("Mesh Count: %zu", model->GetMeshes().size());
+            for (const auto& mesh : model->GetMeshes())
+            {
+                ImGui::Text("  Mesh Name: %s", mesh->GetName().c_str());
+                ImGui::Text("  Vertex Count: %zu", mesh->GetVertexNum());
+                ImGui::Text("  Index Count: %zu", mesh->GetIndexNum());
+            }
+        }
+        ImGui::PopID();
+    }
+
+    ImGui::PopID();
+    ImGui::End();
+
+#endif // _DEBUG
 }
 
 void ModelManager::CreateComputePipeline()
@@ -175,5 +208,20 @@ void ModelManager::CreateComputePipeline()
 
     hr = DXCommon::GetInstance()->GetDevice()->CreateComputePipelineState(&computePsoDesc, IID_PPV_ARGS(&computePipeline_));
     assert(SUCCEEDED(hr));
+
+}
+
+ModelManager::ModelManager()
+{
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("ModelManager", [this](bool* _open) {ImGui(_open); });
+#endif // _DEBUG
+}
+
+ModelManager::~ModelManager()
+{
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("ModelManager");
+#endif // _DEBUG
 
 }

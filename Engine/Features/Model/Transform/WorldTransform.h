@@ -18,7 +18,7 @@ public:
     void Initialize();
 
     void UpdateData(bool _useQuaternion = false);
-    void UpdateData(const std::initializer_list<Matrix4x4>& _mat);
+    void UpdateData(const std::initializer_list<Matrix4x4>& _mat, bool _useQuaternion = false);
     void TransferData();
 
     void QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) const;
@@ -40,9 +40,12 @@ public:
 
 
 private:
+    void SyncRotataion(bool _useQuaternion);
+
     const Matrix4x4* parentMatrix_ = nullptr;
     const WorldTransform* parent_ = nullptr;
 
+    bool wasUsingQuaternion_ = false; // 前回クォータニオンを使用していたかどうか
 
     struct DataForGPU
     {

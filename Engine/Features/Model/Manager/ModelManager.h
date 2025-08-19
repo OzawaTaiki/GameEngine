@@ -14,6 +14,7 @@ class ModelManager
 {
 public:
 
+
     static ModelManager* GetInstance();
 
     void Initialize();
@@ -25,6 +26,10 @@ public:
 
     Model* FindSameModel(const std::string& _name);
     Model* Create(const std::string& _name);
+public:
+
+    void ImGui(bool* _open);
+
 private:
 
     void CreateComputePipeline();
@@ -43,8 +48,10 @@ private:
     PSOFlags psoFlagsForAlpha_{};
 
 
-    ModelManager() = default;
-    ~ModelManager() = default;
+
+private:
+    ModelManager();
+    ~ModelManager();
     ModelManager(const ModelManager&) = delete;
     ModelManager& operator=(const ModelManager&) = delete;
 

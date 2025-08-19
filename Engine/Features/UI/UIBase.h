@@ -39,7 +39,7 @@ public:
     const Vector2& GetPos() const { return position_; }
     void SetPos(const Vector2& _pos) { position_ = _pos; };
 
-    const Vector2& GetWorldPos() const;
+    Vector2 GetWorldPos() const;
     void SetParent(UIBase* _parent);
 
     const Vector2& GetSize() const { return size_; }
