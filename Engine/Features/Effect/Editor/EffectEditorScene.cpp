@@ -951,20 +951,16 @@ void EffectEditorScene::UpdateCamera()
         cameraRotationY_ += Time::GetDeltaTime<float>() * 0.5f; // 0.5 rad/sec
     }
 
-    // カメラ位置計算
     Vector3 cameraPos;
-    cameraPos.x = cameraTargetPosition_.x + cameraDistance_ * std::cosf(cameraRotationY_);
+    cameraPos.x = cameraTargetPosition_.x + cameraDistance_ * std::sinf(cameraRotationY_);
     cameraPos.y = cameraTargetPosition_.y + cameraHeight_;
-    cameraPos.z = cameraTargetPosition_.z + cameraDistance_ * std::sinf(cameraRotationY_);
-
+    cameraPos.z = cameraTargetPosition_.z + cameraDistance_ * std::cosf(cameraRotationY_);
     sceneCamera_.translate_ = cameraPos;
 
-    // カメラの向きを計算
+    // カメラの向き計算
     Vector3 direction = cameraTargetPosition_ - cameraPos;
     direction = direction.Normalize();
 
-    // Look-at行列を使用してカメラの回転を設定
-    // 簡略化のため、Y軸回転のみ設定
     sceneCamera_.rotate_.y = std::atan2f(direction.x, direction.z);
     sceneCamera_.rotate_.x = std::asinf(-direction.y);
 
