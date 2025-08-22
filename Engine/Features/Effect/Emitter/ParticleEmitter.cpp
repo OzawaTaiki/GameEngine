@@ -411,7 +411,7 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("BoxOffset_Random", &initParams_.boxOffset.isRandom);
     jsonBinder_->RegisterVariable("BoxOffset_Min", &initParams_.boxOffset.minV);
     jsonBinder_->RegisterVariable("BoxOffset_Max", &initParams_.boxOffset.maxV);
-    jsonBinder_->RegisterVariable("BoxOffset_Max", &initParams_.boxOffset.value);
+    jsonBinder_->RegisterVariable("BoxOffset_Value", &initParams_.boxOffset.value);
 
     jsonBinder_->RegisterVariable("SphereOffset_Random", &initParams_.sphereOffset.isRandom);
     jsonBinder_->RegisterVariable("SphereOffset_Min", &initParams_.sphereOffset.minV);

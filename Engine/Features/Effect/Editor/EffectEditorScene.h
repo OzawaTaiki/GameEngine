@@ -66,7 +66,7 @@ private:
     // === カメラ制御 ===
     Vector3 cameraTargetPosition_ = { 0, 0, 0 };
     float cameraDistance_ = 10.0f;
-    float cameraHeight_ = 5.0f;
+    float cameraHeight_ = 2.0f;
     float cameraRotationY_ = 0.0f;
     bool autoRotateCamera_ = false;
 
@@ -74,7 +74,7 @@ private:
     bool showGrid_ = true;
     bool showAxis_ = true;
     bool showBounds_ = false;
-    float gridSize_ = 1.0f;
+    float gridSize_ = 20.0f;
     int gridCount_ = 20;
 
     // === テンプレート・プリセット ===
