@@ -148,6 +148,50 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     auto soundindtance = std::make_shared<SoundInstance>(soundId, this, sampleRate);
     soundInstances_[soundId] = soundindtance;
 
+    Debug::Log("=== Detailed Audio Analysis ===");
+
+    // 変換処理
+    std::vector<float> samples;
+    int bytesPerSample = soundData.wfex.wBitsPerSample / 8;
+    int totalSamples = soundData.bufferSize / bytesPerSample;
+    int channels = soundData.wfex.nChannels;
+
+    if (soundData.wfex.wBitsPerSample == 16)
+    {
+        const short* shortData = reinterpret_cast<const short*>(soundData.pBuffer);
+
+        // ステレオの場合はモノラル化
+        for (int i = 0; i < totalSamples; i += channels)
+        {
+            float mixedSample = 0.0f;
+            for (int ch = 0; ch < channels; ch++)
+            {
+                mixedSample += shortData[i + ch] / 32768.0f;
+            }
+            samples.push_back(mixedSample / channels);
+        }
+    }
+
+    // 統計計算
+    if (!samples.empty())
+    {
+        float minVal = *std::min_element(samples.begin(), samples.end());
+        float maxVal = *std::max_element(samples.begin(), samples.end());
+        float rms = 0.0f;
+
+        for (float sample : samples)
+        {
+            rms += sample * sample;
+        }
+        rms = sqrt(rms / samples.size());
+
+        Debug::Log("Converted Float Stats:");
+        Debug::Log("  Min: " + std::to_string(minVal));
+        Debug::Log("  Max: " + std::to_string(maxVal));
+        Debug::Log("  RMS: " + std::to_string(rms));
+        Debug::Log("  Peak: " + std::to_string(std::max(abs(minVal), abs(maxVal))));
+    }
+
     return soundindtance;
 }
 

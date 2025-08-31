@@ -87,6 +87,28 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTi
     }
 }
 
+std::vector<float> SoundInstance::GetWaveform() const
+{
+    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
+
+    return ConvertToFloatSamples(buffer, bufferSize, format);
+}
+
+std::vector<float> SoundInstance::GetWaveform(float _startTime, float _endTime) const
+{
+    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
+
+    // 秒をサンプル数に変換
+    unsigned int startSample = static_cast<unsigned int>(_startTime * format.nSamplesPerSec);
+    unsigned int endSample = static_cast<unsigned int>(_endTime * format.nSamplesPerSec);
+
+    return ConvertToFloatSamples(buffer, bufferSize, format, _startTime, _endTime - _startTime);
+}
+
 float SoundInstance::GetDuration() const
 {
     if (audioSystem_)
@@ -99,5 +121,86 @@ float SoundInstance::GetDuration() const
             return static_cast<float>(bufSize) / wfex.nAvgBytesPerSec;
         }
     }
-    return 0.0f; // Duration cannot be determined
+    return 0.0f;
 }
+
+std::vector<float> SoundInstance::ConvertToFloatSamples(
+    const BYTE* _pBuffer,
+    unsigned int _bufferSize,
+    const WAVEFORMATEX& _wfex,
+    float _startSeconds,
+    float _durationSeconds ) const
+{
+    std::vector<float> samples;
+    int bytesPerSample = _wfex.wBitsPerSample / 8;
+    unsigned int totalSamples = _bufferSize / bytesPerSample;
+    unsigned int sampleRate = _wfex.nSamplesPerSec;
+
+    // 秒をサンプル数に変換
+    unsigned int startSample = static_cast<unsigned int>(_startSeconds * sampleRate);
+    unsigned int endSample = totalSamples;
+
+    // 範囲チェック
+    if (startSample >= totalSamples) {
+        return samples; // 空のベクターを返す
+    }
+
+    // durationSecondsが指定されている場合
+    if (_durationSeconds > 0.0) {
+        unsigned int numSamples = static_cast<unsigned int>(_durationSeconds * sampleRate);
+        endSample = std::min(startSample + numSamples, (unsigned int)totalSamples);
+    }
+
+    unsigned int actualSamples = endSample - startSample;
+    samples.reserve(actualSamples);
+
+    // ビット深度に応じて変換
+    if (_wfex.wBitsPerSample == 16)
+    {
+        // 16bit PCM
+        const short* shortData = reinterpret_cast<const short*>(_pBuffer);
+        for (unsigned int i = startSample; i < endSample; i++)
+        {
+            samples.push_back(shortData[i] / 32768.0f); // 2^15
+        }
+    }
+    else if (_wfex.wBitsPerSample == 8)
+    {
+        // 8bit PCM
+        for (unsigned int i = startSample; i < endSample; i++)
+        {
+            samples.push_back((_pBuffer[i] - 128) / 128.0f); // 0-255 -> -1.0 to 1.0
+        }
+    }
+    else if (_wfex.wBitsPerSample == 24)
+    {
+        // 24bit PCM
+        unsigned int startByte = startSample * 3;
+        unsigned int endByte = endSample * 3;
+
+        for (unsigned int i = startByte; i < endByte; i += 3)
+        {
+            // 24bit -> 32bit変換
+            int sample = (_pBuffer[i]) |
+                (_pBuffer[i + 1] << 8) |
+                (_pBuffer[i + 2] << 16);
+            // 符号拡張
+            if (sample & 0x800000) {
+                sample |= 0xFF000000;
+            }
+            samples.push_back(sample / 8388608.0f); // 2^23
+        }
+    }
+    else if (_wfex.wBitsPerSample == 32)
+    {
+        // 32bit PCM
+        const int* intData = reinterpret_cast<const int*>(_pBuffer);
+        for (unsigned int i = startSample; i < endSample; i++)
+        {
+            samples.push_back(intData[i] / 2147483648.0f); // 2^31
+        }
+    }
+
+    return samples;
+}
+

@@ -239,6 +239,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
+    <ClCompile Include="Features\WaveformDisplay\WaveformDisplay.cpp" />
+    <ClCompile Include="Features\WaveformDisplay\WaveformTextureGenerator.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp" />
     <ClCompile Include="Math\BezierCurve3D.cpp" />
@@ -378,6 +380,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
+    <ClInclude Include="Features\WaveformDisplay\WaveformDisplay.h" />
+    <ClInclude Include="Features\WaveformDisplay\WaveformTextureGenerator.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\LayerSystem\LayerSystem.h" />
     <ClInclude Include="Math\BezierCurve3D.h" />
@@ -554,6 +558,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Vignetting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\WaveformGenerator.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
