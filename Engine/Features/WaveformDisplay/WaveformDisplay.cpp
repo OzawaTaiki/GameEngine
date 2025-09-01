@@ -10,10 +10,14 @@
 
 float WaveformDisplay::waveformTimeWindow_ = 5.0f;
 
-void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds)
+void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds, const Matrix4x4& _matVP)
 {
-    soundInstance_ = _soundInstance;
+    SetSoundInstance(_soundInstance);
     bounds_ = _bounds;
+
+    CreatePipeline();
+    CreateConstantBuffer(_matVP);
+    CreateVertexBuffer();
 
     SetSampleRate(_soundInstance->GetSampleRate());
 
@@ -25,7 +29,7 @@ void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const Wave
 
 void WaveformDisplay::Draw()
 {
-    if (!soundInstance_ || !lineDrawer_ || soundInstance_->GetWaveform().empty())
+    if (!soundInstance_ || !lineDrawer_)
     {
         return; // 初期化されていない場合は何もしない
     }
@@ -93,7 +97,7 @@ void WaveformDisplay::CalculateDisplayRange()
         mappedVertexBuffer_[i] = { static_cast<float>(i),resampled[i] };
     }
 
-
+    instanceCount_ = static_cast<UINT>(resampled.size());
     isValidCache_ = true;
 
 }
@@ -169,58 +173,22 @@ void WaveformDisplay::DrawCenterLine()
 
 void WaveformDisplay::DrawWaveform()
 {
-    if (waveformCache_.empty() || !isValidCache_)
-    {
-        waveformCache_ = soundInstance_->GetWaveform(startTime_, endTime_);
-        waveformCache_ = LanczosResample(waveformCache_, static_cast<int>(bounds_.size.x));
-        isValidCache_ = true;
-    }
+    // データの更新済みなので描画だけ行う
 
-    float duration = soundInstance_->GetDuration();
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
 
-    if (duration <= 0.0f)
-    {
-        return; // 無効な再生時間の場合は何もしない
-    }
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);// 頂点を順番につなげて折れ線を描画
 
-    int totalSamples = static_cast<int>(waveformCache_.size());
-    int displayWidth = static_cast<int>(bounds_.size.x);
+    commandList->SetPipelineState(pipelineState_.Get());
+    commandList->SetGraphicsRootSignature(rootSignature_.Get());
 
-    if (totalSamples == 0 || displayWidth == 0) return;
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
-    // 上下の余白
-    const float verticalMargin = 0.1f; // 10%の余白
+    commandList->SetGraphicsRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
 
-    float top = bounds_.leftTop.y + verticalMargin;
-    float bottom = bounds_.Bottom() - verticalMargin;
-
-    float sampleRate = soundInstance_->GetSampleRate();
-
-    size_t startIndex = static_cast<size_t>(std::floor(startTime_ * sampleRate));
-    size_t endIndex = static_cast<size_t>(std::ceil(endTime_ * sampleRate));
-
-    float currentTime = static_cast<float>(startIndex) / sampleRate;
-    currentTime = std::clamp(currentTime, startTime_, endTime_); // 時間を表示範囲に制限
-
-    float currentX = bounds_.leftTop.x + (currentTime - startTime_) / displayTimeWindow_ * bounds_.size.x;
-    float currentY = Lerp(bottom, top, (waveformCache_[startIndex] + 1.0f) / 2.0f); // 波形の値をY座標に変換
-    float timeStep = static_cast<float>(soundInstance_->GetDuration() / waveformCache_.size());
-    for (size_t i = 0;  i < waveformCache_.size(); ++i)
-    {
-        float nextTime = static_cast<float>((i + 1) * timeStep) / sampleRate; // サンプルの時間
-
-        nextTime = std::clamp(nextTime, startTime_, endTime_); // 時間を表示範囲に制限
-
-        float x = bounds_.leftTop.x + static_cast<float>(i);
-        float y = Lerp(bottom, top, (waveformCache_[i] + 1.0f) / 2.0f); // 波形の値をY座標に変換
-
-        lineDrawer_->RegisterPoint(Vector2(currentX, currentY), Vector2(x, y), Vector4(0.3f, 0.5f, 1.0f, 1.0f));
-
-        currentX = x;
-        currentY = y;
-
-    }
+    commandList->DrawInstanced(instanceCount_, 1, 0, 0);
 }
+
 
 void WaveformDisplay::CreatePipeline()
 {
@@ -309,7 +277,7 @@ void WaveformDisplay::CreatePipeline()
     // 追加の DRTV の情報
     graphicsPipelineStateDesc.NumRenderTargets = 1;
     graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
     graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -326,7 +294,7 @@ void WaveformDisplay::CreatePipeline()
 
 }
 
-void WaveformDisplay::CreateConstantBuffer()
+void WaveformDisplay::CreateConstantBuffer(const Matrix4x4& _matVP)
 {
     constantBuffer_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
     constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mapData_));
@@ -338,6 +306,8 @@ void WaveformDisplay::CreateConstantBuffer()
     mapData_->displayHeight = bounds_.size.y;
     mapData_->displayWidth = bounds_.size.x;
     mapData_->startTime = startTime_;
+    mapData_->screenSize = Vector2(1280,720);
+    mapData_->matViewProj = _matVP;
 
 }
 

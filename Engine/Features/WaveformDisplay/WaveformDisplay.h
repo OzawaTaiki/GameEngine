@@ -1,6 +1,7 @@
 #pragma once
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector4.h>
+#include <Math/Matrix/Matrix4x4.h>
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -33,7 +34,7 @@ public:
     WaveformDisplay() = default;
     ~WaveformDisplay() = default;
 
-    void Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds);
+    void Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds, const Matrix4x4& _matVP);
     void Draw();
 
     void SetDisplayTimeWindow(float _displayTimeWindow);
@@ -66,7 +67,7 @@ private:
     void DrawWaveform();
 
     void CreatePipeline();
-    void CreateConstantBuffer();
+    void CreateConstantBuffer(const Matrix4x4& _matVP);
     void CreateVertexBuffer();
 
 
@@ -83,7 +84,9 @@ private:
         float displayHeight; // 描画範囲 の高さ
         float displayWidth; // 描画範囲 の幅
 
-        Vector2 pad;
+        Vector2 screenSize;
+
+        Matrix4x4 matViewProj = Matrix4x4::Identity(); // ビュー射影行列
     };
 
 private:
@@ -102,6 +105,7 @@ private:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
     Vector2* mappedVertexBuffer_ = nullptr;
     static const int kMaxVertices_ = 44100 * 150; // sampleRate * 3分
+    UINT instanceCount_ = 0;
 
     WaveformBounds bounds_;
     std::vector<float> waveformCache_; // 波形データのキャッシュ

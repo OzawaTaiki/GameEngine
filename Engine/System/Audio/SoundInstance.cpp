@@ -193,11 +193,19 @@ std::vector<float> SoundInstance::ConvertToFloatSamples(
     }
     else if (_wfex.wBitsPerSample == 32)
     {
-        // 32bit PCM
-        const int* intData = reinterpret_cast<const int*>(_pBuffer);
-        for (unsigned int i = startSample; i < endSample; i++)
-        {
-            samples.push_back(intData[i] / 2147483648.0f); // 2^31
+        if (_wfex.wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+            // 32bit Float PCM - すでに正規化済み
+            const float* floatData = reinterpret_cast<const float*>(_pBuffer);
+            for (unsigned int i = startSample; i < endSample; i++) {
+                samples.push_back(floatData[i]);
+            }
+        }
+        else {
+            // 32bit Integer PCM
+            const int* intData = reinterpret_cast<const int*>(_pBuffer);
+            for (unsigned int i = startSample; i < endSample; i++) {
+                samples.push_back(intData[i] / 2147483648.0f);
+            }
         }
     }
 
