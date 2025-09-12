@@ -60,6 +60,9 @@ private:
     std::vector<float> LanczosResample(const std::vector<float>& _input, int _outputSize = 1280) const;
     std::vector<float> LanczosResample(const std::vector<float>& _input, size_t _startSample, size_t _enbSample, int _outputSize = 1280) const;
 
+    std::vector<float> SimpleResample(const std::vector<float>& _input, int _outputSize = 1280) const;
+    std::vector<float> SimpleResample(const std::vector<float>& _input, size_t _startSample, size_t _enbSample, int _outputSize = 1280) const;
+
     float LanczosKernel(float x, int kernelSize) const;
 
     void DrawCenterLine();
@@ -114,7 +117,7 @@ private:
     float startTime_ = 0.0f; // 開始時間
     float endTime_ = 0.0f;   // 終了時間
 
-    float displayTimeWindow_ = 5.0f; // 表示する時間（秒）
+    float displayTimeWindow_ = 2.0f; // 表示する時間（秒）
 
     float sampleRate_ = 44100.0f; // サンプルレート
 

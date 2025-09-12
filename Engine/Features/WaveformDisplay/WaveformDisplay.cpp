@@ -12,8 +12,8 @@ float WaveformDisplay::waveformTimeWindow_ = 5.0f;
 
 void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds, const Matrix4x4& _matVP)
 {
-    SetSoundInstance(_soundInstance);
     bounds_ = _bounds;
+    SetSoundInstance(_soundInstance);
 
     CreatePipeline();
     CreateConstantBuffer(_matVP);
@@ -50,6 +50,9 @@ void WaveformDisplay::SetDisplayTimeWindow(float _displayTimeWindow)
 
 void WaveformDisplay::SetStartTime(float _startTime)
 {
+    if (startTime_ == _startTime)
+        return;
+
     startTime_ = _startTime;
 
     isValidCache_ = false; // キャッシュを無効化
@@ -69,6 +72,17 @@ void WaveformDisplay::SetSoundInstance(const SoundInstance* _soundInstance)
 
     waveformCache_ = soundInstance_->GetWaveform();
 
+
+    float musicDuration = soundInstance_->GetDuration();
+    float sizePerSec = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
+    float size = std::ceil(sizePerSec * musicDuration);
+    waveformCache_ = SimpleResample(
+        waveformCache_,
+        static_cast<size_t>(0),
+        static_cast<size_t>(musicDuration * sampleRate_),
+        static_cast<int>(size)
+    );
+
     isValidCache_ = false; // キャッシュを無効化
 }
 
@@ -80,24 +94,30 @@ void WaveformDisplay::CalculateDisplayRange()
     }
 
 
-    endTime_ = std::min(soundInstance_->GetDuration(), startTime_ + displayTimeWindow_);
+    float musicDuration= soundInstance_->GetDuration();
+    endTime_ = std::min(musicDuration, startTime_ + displayTimeWindow_);
 
-    auto resampled = LanczosResample(
-        waveformCache_,
-        static_cast<size_t>(startTime_ * sampleRate_),
-        static_cast<size_t>(endTime_ * sampleRate_),
-        static_cast<int>(bounds_.size.x)
-    );
+
+
+    size_t startSample = static_cast<size_t>(startTime_ * sampleRate_);
+    size_t endSample = static_cast<size_t>(endTime_ * sampleRate_);
+
+    float sizePerSec = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
+    float size = std::ceil(sizePerSec * musicDuration);
+
+    size_t startIndex = static_cast<size_t>(size / musicDuration * startTime_);
+    size_t endIndex = static_cast<size_t>(size / musicDuration * endTime_);
 
     // 波形データを計算しなおす VBVにね
     ZeroMemory(mappedVertexBuffer_, sizeof(Vector2) * kMaxVertices_);
 
-    for (size_t i = 0; i < resampled.size(); ++i)
+    instanceCount_ = 0;
+    for (size_t i = startIndex; i < endIndex && i - startIndex < waveformCache_.size(); ++i)
     {
-        mappedVertexBuffer_[i] = { static_cast<float>(i),resampled[i] };
+        mappedVertexBuffer_[instanceCount_] = { static_cast<float>(instanceCount_),waveformCache_[i] };
+        ++instanceCount_;
     }
 
-    instanceCount_ = static_cast<UINT>(resampled.size());
     isValidCache_ = true;
 
 }
@@ -149,6 +169,46 @@ std::vector<float> WaveformDisplay::LanczosResample(const std::vector<float>& _i
 
 }
 
+std::vector<float> WaveformDisplay::SimpleResample(const std::vector<float>& _input, int _outputSize) const
+{
+    std::vector<float> output;
+    output.reserve(_outputSize);
+
+    // 1indexあたりにいくつのサンプルがあるか
+    size_t sampleSize = _input.size() / _outputSize;
+
+    for (size_t i = 0; i < _outputSize; ++i)
+    {
+        float min = FLT_MAX;
+        float max = -FLT_MAX;
+
+        for (size_t j = 0; j < sampleSize; ++j)
+        {
+            size_t index = i * sampleSize + j;
+            if (index < _input.size())
+            {
+                min = std::min(min, _input[index]);
+                max = std::max(max, _input[index]);
+            }
+        }
+        output.push_back(min);
+        output.push_back(max);
+    }
+
+
+    return output;
+}
+
+std::vector<float> WaveformDisplay::SimpleResample(const std::vector<float>& _input, size_t _startSample, size_t _enbSample, int _outputSize) const
+{
+    std::vector<float> clampedInput(
+        _input.begin() + static_cast<size_t>(_startSample),
+        _input.begin() + static_cast<size_t>(std::min(_enbSample, static_cast<size_t>(_input.size())))
+    );
+
+    return SimpleResample(clampedInput, _outputSize);
+}
+
 float WaveformDisplay::LanczosKernel(float _x, int _kernelSize) const
 {
     if (_x == 0.0f)
@@ -177,7 +237,7 @@ void WaveformDisplay::DrawWaveform()
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);// 頂点を順番につなげて折れ線を描画
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
     commandList->SetPipelineState(pipelineState_.Get());
     commandList->SetGraphicsRootSignature(rootSignature_.Get());
@@ -186,7 +246,7 @@ void WaveformDisplay::DrawWaveform()
 
     commandList->SetGraphicsRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
 
-    commandList->DrawInstanced(instanceCount_, 1, 0, 0);
+    commandList->DrawInstanced(instanceCount_, instanceCount_ / 2, 0, 0);
 }
 
 
