@@ -39,6 +39,23 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
     if (!SUCCEEDED(hresult))
     {
+        if (FAILED(hresult)) {
+            //Debug::Log("CreateSourceVoice failed: 0x" + std::to_string(std::hex, hresult));
+
+            switch (hresult) {
+            
+            case E_INVALIDARG:
+                Debug::Log("INVALIDARG - 引数が無効");
+                break;
+            case E_OUTOFMEMORY:
+                Debug::Log("OUT_OF_MEMORY");
+                break;
+            case XAUDIO2_E_INVALID_CALL:
+                Debug::Log("INVALID_CALL - XAudio2が初期化されていない");
+                break;
+            }
+        }
+
         Debug::Log("Error: Failed to create source voice\n");
         return nullptr;
     }
@@ -129,86 +146,104 @@ std::vector<float> SoundInstance::ConvertToFloatSamples(
     unsigned int _bufferSize,
     const WAVEFORMATEX& _wfex,
     float _startSeconds,
-    float _durationSeconds ) const
+    float _durationSeconds) const
 {
     std::vector<float> samples;
     int bytesPerSample = _wfex.wBitsPerSample / 8;
+    int channels = _wfex.nChannels;
     unsigned int totalSamples = _bufferSize / bytesPerSample;
+    unsigned int totalFrames = totalSamples / channels;
     unsigned int sampleRate = _wfex.nSamplesPerSec;
 
-    // 秒をサンプル数に変換
-    unsigned int startSample = static_cast<unsigned int>(_startSeconds * sampleRate);
-    unsigned int endSample = totalSamples;
+    // 秒をフレーム数に変換
+    unsigned int startFrame = static_cast<unsigned int>(_startSeconds * sampleRate);
+    unsigned int endFrame = totalFrames;
 
     // 範囲チェック
-    if (startSample >= totalSamples) {
-        return samples; // 空のベクターを返す
+    if (startFrame >= totalFrames) {
+        return samples;
     }
 
-    // durationSecondsが指定されている場合
     if (_durationSeconds > 0.0) {
-        unsigned int numSamples = static_cast<unsigned int>(_durationSeconds * sampleRate);
-        endSample = std::min(startSample + numSamples, (unsigned int)totalSamples);
+        unsigned int numFrames = static_cast<unsigned int>(_durationSeconds * sampleRate);
+        endFrame = std::min(startFrame + numFrames, totalFrames);
     }
 
-    unsigned int actualSamples = endSample - startSample;
-    samples.reserve(actualSamples);
+    unsigned int actualFrames = endFrame - startFrame;
+    samples.reserve(actualFrames);
 
     // ビット深度に応じて変換
     if (_wfex.wBitsPerSample == 16)
     {
-        // 16bit PCM
         const short* shortData = reinterpret_cast<const short*>(_pBuffer);
-        for (unsigned int i = startSample; i < endSample; i++)
+        for (unsigned int frame = startFrame; frame < endFrame; frame++)
         {
-            samples.push_back(shortData[i] / 32768.0f); // 2^15
+            float mixedSample = 0.0f;
+            for (int ch = 0; ch < channels; ch++)
+            {
+                int sampleIndex = frame * channels + ch;
+                mixedSample += shortData[sampleIndex] / 32768.0f;
+            }
+            samples.push_back(mixedSample / channels);
         }
     }
     else if (_wfex.wBitsPerSample == 8)
     {
-        // 8bit PCM
-        for (unsigned int i = startSample; i < endSample; i++)
+        for (unsigned int frame = startFrame; frame < endFrame; frame++)
         {
-            samples.push_back((_pBuffer[i] - 128) / 128.0f); // 0-255 -> -1.0 to 1.0
+            float mixedSample = 0.0f;
+            for (int ch = 0; ch < channels; ch++)
+            {
+                int sampleIndex = frame * channels + ch;
+                mixedSample += (_pBuffer[sampleIndex] - 128) / 128.0f;
+            }
+            samples.push_back(mixedSample / channels);
         }
     }
     else if (_wfex.wBitsPerSample == 24)
     {
-        // 24bit PCM
-        unsigned int startByte = startSample * 3;
-        unsigned int endByte = endSample * 3;
-
-        for (unsigned int i = startByte; i < endByte; i += 3)
+        for (unsigned int frame = startFrame; frame < endFrame; frame++)
         {
-            // 24bit -> 32bit変換
-            int sample = (_pBuffer[i]) |
-                (_pBuffer[i + 1] << 8) |
-                (_pBuffer[i + 2] << 16);
-            // 符号拡張
-            if (sample & 0x800000) {
-                sample |= 0xFF000000;
+            float mixedSample = 0.0f;
+            for (int ch = 0; ch < channels; ch++)
+            {
+                int byteIndex = (frame * channels + ch) * 3;
+                int sample = (_pBuffer[byteIndex]) |
+                    (_pBuffer[byteIndex + 1] << 8) |
+                    (_pBuffer[byteIndex + 2] << 16);
+                if (sample & 0x800000) {
+                    sample |= 0xFF000000;
+                }
+                mixedSample += sample / 8388608.0f;
             }
-            samples.push_back(sample / 8388608.0f); // 2^23
+            samples.push_back(mixedSample / channels);
         }
     }
     else if (_wfex.wBitsPerSample == 32)
     {
         if (_wfex.wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-            // 32bit Float PCM - すでに正規化済み
             const float* floatData = reinterpret_cast<const float*>(_pBuffer);
-            for (unsigned int i = startSample; i < endSample; i++) {
-                samples.push_back(floatData[i]);
+            for (unsigned int frame = startFrame; frame < endFrame; frame++) {
+                float mixedSample = 0.0f;
+                for (int ch = 0; ch < channels; ch++) {
+                    int sampleIndex = frame * channels + ch;
+                    mixedSample += floatData[sampleIndex];
+                }
+                samples.push_back(mixedSample / channels);
             }
         }
         else {
-            // 32bit Integer PCM
             const int* intData = reinterpret_cast<const int*>(_pBuffer);
-            for (unsigned int i = startSample; i < endSample; i++) {
-                samples.push_back(intData[i] / 2147483648.0f);
+            for (unsigned int frame = startFrame; frame < endFrame; frame++) {
+                float mixedSample = 0.0f;
+                for (int ch = 0; ch < channels; ch++) {
+                    int sampleIndex = frame * channels + ch;
+                    mixedSample += intData[sampleIndex] / 2147483648.0f;
+                }
+                samples.push_back(mixedSample / channels);
             }
         }
     }
 
     return samples;
 }
-
