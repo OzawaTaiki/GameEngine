@@ -47,7 +47,7 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
     XAUDIO2_BUFFER buf{};
     buf.pAudioData = audioSystem_->GetBuffer(soundID_);
-    buf.AudioBytes = audioSystem_->GetBufferSize(soundID_);
+    buf.AudioBytes = static_cast<UINT32>(audioSystem_->GetBufferSize(soundID_));
     buf.PlayBegin = startSample;
     buf.PlayLength = 0; // 最後まで再生
     buf.Flags = XAUDIO2_END_OF_STREAM;
@@ -91,7 +91,7 @@ float SoundInstance::GetDuration() const
 {
     if (audioSystem_)
     {
-        unsigned int bufSize = audioSystem_->GetBufferSize(soundID_);
+        size_t bufSize = audioSystem_->GetBufferSize(soundID_);
         auto& wfex = audioSystem_->GetSoundFormat(soundID_);
 
         if (wfex.nAvgBytesPerSec > 0)

@@ -13,6 +13,16 @@
 
 #pragma comment (lib,"xaudio2.lib")
 
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
+
+#pragma comment(lib, "Mf.lib")
+#pragma comment(lib, "mfplat.lib")
+#pragma comment(lib, "Mfreadwrite.lib")
+#pragma comment(lib, "mfuuid.lib")
+
+
 class SoundInstance;
 
 class AudioSystem
@@ -32,8 +42,8 @@ public:
     float GetMasterVolume() const { return masterVolume_; }
 
     const WAVEFORMATEX& GetSoundFormat(uint32_t _soundID) const { return sounds_[_soundID].wfex; }
-    BYTE* GetBuffer(uint32_t _soundID) const { return sounds_[_soundID].pBuffer; }
-    unsigned int GetBufferSize(uint32_t _soundID) const { return sounds_[_soundID].bufferSize; }
+    const BYTE* GetBuffer(uint32_t _soundID) const { return sounds_[_soundID].mediaData.data(); }
+    size_t GetBufferSize(uint32_t _soundID) const { return sounds_[_soundID].mediaData.size(); }
 
 
 private:
@@ -41,8 +51,7 @@ private:
     struct SoundData
     {
         WAVEFORMATEX wfex;
-        BYTE* pBuffer;
-        unsigned int bufferSize;
+        std::vector<BYTE> mediaData;
         std::string path;
     };
 
@@ -62,7 +71,8 @@ private:
 
     float masterVolume_ = 1.0f;
 
-    void SoundUnLoad(SoundData* _soundData);
+
+    std::shared_ptr<SoundInstance> CreateSoundInstance(const WAVEFORMATEX& _wfex, std::vector<BYTE> _mediaData, const std::string& _path);
 
 
 private:

@@ -15,9 +15,14 @@ void AudioSystem::Initialize()
 
     // エンジンのインスタンスを生成
     hresult = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
+    CHECK_HR_VOID(hresult, "Failed to create XAudio2 instance");
 
     // マスターボイスを生成
     hresult = xAudio2_->CreateMasteringVoice(&masterVoice_);
+    CHECK_HR_VOID(hresult, "Failed to create mastering voice");
+
+    hresult = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+    CHECK_HR_VOID(hresult, "Failed to startup Media Foundation");
 }
 
 void AudioSystem::Finalize()
@@ -26,129 +31,96 @@ void AudioSystem::Finalize()
     masterVoice_ = nullptr;
     xAudio2_.Reset();
 
-    for (auto sound : sounds_)
-        SoundUnLoad(&sound);
+    sounds_.clear();        // ← 自動的にすべてのvectorが解放される
+    pathToid_.clear();
+    soundInstances_.clear();
+
+    HRESULT hr = MFShutdown();
+    CHECK_HR_VOID(hr, "Failed to shutdown Media Foundation");
 }
 
 std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
 {
+    HRESULT hr = S_OK;
+
     Debug::Log("Loading sound file: " + _filename);
 
-    std::ifstream file;
-    file.open(_filename, std::ios_base::binary);
-    if (!file.is_open())
-    {
-        Debug::Log("Error: File not found - " + _filename + "\n");
-        throw std::runtime_error("Error: File not found - " + _filename);
-        return nullptr;
-    }
+    // ワイド文字列に変換
+    std::wstring wFilename(_filename.begin(), _filename.end());
 
-    // RIFFヘッダーの読み込み
-    RiffHeader riff;
-    file.read((char*)&riff, sizeof(riff));
-    if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
-    {
-        Debug::Log("Error: Not a RIFF - " + _filename + "\n");
-        throw std::runtime_error("Error: Not a RIFF");
-        return nullptr;
-    }
-    if (strncmp(riff.type, "WAVE", 4) != 0)
-    {
-        Debug::Log("Error: Not a WAVE - " + _filename + "\n");
-        throw std::runtime_error("Error: Not a WAVE");
-        return nullptr;
-    }
+    // ソースリーダーの生成
+    Microsoft::WRL::ComPtr<IMFSourceReader> pMFSourceReader{ nullptr };
+    hr = MFCreateSourceReaderFromURL(wFilename.c_str(), NULL, &pMFSourceReader);
+    CHECK_HR(hr, "Failed to create source reader from URL");
 
-    // フォーマットチャンクとデータチャンクを見つけるまで繰り返し
-    FormatChunk format = {};
-    ChunkHeader data = {};
-    bool foundFormat = false;
-    bool foundData = false;
+    // 出力メディアタイプの設定
+    Microsoft::WRL::ComPtr<IMFMediaType> pMFMediaType{ nullptr };
+    hr = MFCreateMediaType(&pMFMediaType);
+    CHECK_HR(hr, "Failed to create media type");
+    hr = pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio); // オーディオストリーム
+    CHECK_HR(hr, "Failed to set major type");
+    hr = pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);    // PCM形式
+    CHECK_HR(hr, "Failed to set subtype");
+    hr = pMFSourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType.Get()); // 出力メディアタイプの設定
+    CHECK_HR(hr, "Failed to set current media type");
 
-    while (!foundFormat || !foundData)
+    //pMFMediaType->Release();
+
+    // 現在のメディアタイプを取得
+    hr = pMFSourceReader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pMFMediaType);
+    CHECK_HR(hr, "Failed to get current media type");
+
+    // WAVEFORMATEXの取得
+    WAVEFORMATEX* waveFormat{ nullptr };
+    hr = MFCreateWaveFormatExFromMFMediaType(pMFMediaType.Get(), &waveFormat, nullptr);
+    CHECK_HR(hr, "Failed to create WAVEFORMATEX from media type");
+
+    // メディアデータの読み込み
+    std::vector<BYTE> mediaData;
+    while (true)
     {
-        ChunkHeader header;
-        file.read((char*)&header, sizeof(ChunkHeader));
+        Microsoft::WRL::ComPtr<IMFSample> pMFSample;    // サンプル
+        DWORD dwStreamFlags{ 0 };           // ストリームの状態を格納するフラグ
 
-        // ファイル終端チェック
-        if (file.eof())
+        // サンプルの読み込み
+        hr = pMFSourceReader->ReadSample(
+            MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+            0,
+            nullptr,
+            &dwStreamFlags,
+            nullptr,
+            &pMFSample);
+        CHECK_HR(hr, "Failed to read sample");
+
+        if (dwStreamFlags & MF_SOURCE_READERF_ENDOFSTREAM)
         {
-            Debug::Log("Error: Unexpected end of file - " + _filename + "\n");
-            throw std::runtime_error("Error: Unexpected end of file - " + _filename);
+            break; // 最後まで読み込んだら終了
         }
 
-        // フォーマットチャンク
-        if (strncmp(header.id, "fmt ", 4) == 0)
-        {
-            format.chunk = header;
-            // フォーマットデータのサイズチェック
-            if (header.size > sizeof(format.fmt))
-            {
-                // 追加データがある場合は一時バッファへ読み込む
-                std::vector<char> tempBuffer(header.size);
-                file.read(tempBuffer.data(), header.size);
-                memcpy(&format.fmt, tempBuffer.data(), sizeof(format.fmt));
-            }
-            else
-            {
-                file.read((char*)&format.fmt, header.size);
-            }
-            foundFormat = true;
-        }
-        // データチャンク
-        else if (strncmp(header.id, "data", 4) == 0)
-        {
-            data = header;
-            foundData = true;
-            break; // データチャンクが見つかったら終了
-        }
-        // その他のチャンク（スキップ）
-        else
-        {
-            file.seekg(header.size, std::ios_base::cur);
-        }
+        // サンプルからメディアバッファを取得
+        Microsoft::WRL::ComPtr<IMFMediaBuffer> pMFMediaBuffer;
+        hr = pMFSample->ConvertToContiguousBuffer(&pMFMediaBuffer); // 連続したバッファに変換
+        CHECK_HR(hr, "Failed to convert sample to contiguous buffer");
+
+        // メディアバッファからデータを取得
+        BYTE* pBuffer{ nullptr };
+        DWORD cbCurrentLength{ 0 };
+        hr = pMFMediaBuffer->Lock(&pBuffer, nullptr, &cbCurrentLength); // バッファのロック (ポインタを取得)
+        CHECK_HR(hr, "Failed to lock media buffer");
+
+        mediaData.resize(mediaData.size() + cbCurrentLength);
+        memcpy(mediaData.data() + mediaData.size() - cbCurrentLength, pBuffer, cbCurrentLength);// データのコピー
+
+        pMFMediaBuffer->Unlock(); // バッファのアンロック
+
     }
 
-    if (!foundFormat)
-    {
-        Debug::Log("Error: No format chunk found - " + _filename + "\n");
-        throw std::runtime_error("Error: No format chunk found - " + _filename);
-        return nullptr;
-    }
+    auto soundInstance = CreateSoundInstance(*waveFormat, std::move(mediaData), _filename);
 
-    if (!foundData)
-    {
-        Debug::Log("Error: No data chunk found - " + _filename + "\n");
-        throw std::runtime_error("Error: No data chunk found - " + _filename);
-        return nullptr;
-    }
+    CoTaskMemFree(waveFormat);
 
-    // データの読み込み
-    char* pbuffer = new char[data.size];
-    file.read(pbuffer, data.size);
-    file.close();
+    return soundInstance;
 
-    SoundData soundData = {};
-    soundData.bufferSize = data.size;
-    soundData.pBuffer = reinterpret_cast<BYTE*>(pbuffer);
-    soundData.wfex = format.fmt;
-    soundData.path = _filename;
-
-    Debug::Log("Sound file loaded successfully: " + _filename);
-
-    sounds_.push_back(soundData);
-
-    // 音声データのIDを取得
-    uint32_t soundId = static_cast<uint32_t>(sounds_.size() - 1);
-    pathToid_[_filename] = soundId;
-
-    Debug::Log("\tID : " + std::to_string(soundId) + "\n");
-    float sampleRate = static_cast<float>(soundData.wfex.nSamplesPerSec);
-
-    auto soundindtance = std::make_shared<SoundInstance>(soundId, this, sampleRate);
-    soundInstances_[soundId] = soundindtance;
-
-    return soundindtance;
 }
 
 void AudioSystem::SetMasterVolume(float _volume)
@@ -160,14 +132,27 @@ void AudioSystem::SetMasterVolume(float _volume)
     }
 }
 
-void AudioSystem::SoundUnLoad(SoundData* _soundData)
+std::shared_ptr<SoundInstance> AudioSystem::CreateSoundInstance(const WAVEFORMATEX& _wfex, std::vector<BYTE> _mediaData, const std::string& _path)
 {
-    delete[] _soundData->pBuffer;
+    SoundData soundData{};
+    soundData.wfex = _wfex;
+    soundData.mediaData = std::move(_mediaData);
+    soundData.path = _path;
 
-    _soundData->pBuffer = 0;
-    _soundData->bufferSize = 0;
-    _soundData->wfex = {};
-    _soundData->path = "";
+    sounds_.push_back(std::move(soundData));
+
+    uint32_t soundID = static_cast<uint32_t>(sounds_.size() - 1);
+    pathToid_.emplace(_path, soundID);
+
+    // サウンドインスタンスの生成
+    auto soundInstance = std::make_shared<SoundInstance>(soundID, this, static_cast<float>(_wfex.nSamplesPerSec));
+    // サウンドインスタンスの登録
+    soundInstances_.emplace(soundID, soundInstance);
+
+    Debug::Log("Sound Loaded : " + _path + " (ID " + std::to_string(soundID) + ")\n");
+
+    // サウンドインスタンスを返す
+    return soundInstance;
 }
 
 AudioSystem::~AudioSystem()
