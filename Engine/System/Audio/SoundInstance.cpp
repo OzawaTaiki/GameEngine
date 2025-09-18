@@ -103,28 +103,28 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTi
         return nullptr;
     }
 }
-
-std::vector<float> SoundInstance::GetWaveform() const
-{
-    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
-    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
-    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
-
-    return ConvertToFloatSamples(buffer, bufferSize, format);
-}
-
-std::vector<float> SoundInstance::GetWaveform(float _startTime, float _endTime) const
-{
-    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
-    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
-    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
-
-    // 秒をサンプル数に変換
-    unsigned int startSample = static_cast<unsigned int>(_startTime * format.nSamplesPerSec);
-    unsigned int endSample = static_cast<unsigned int>(_endTime * format.nSamplesPerSec);
-
-    return ConvertToFloatSamples(buffer, bufferSize, format, _startTime, _endTime - _startTime);
-}
+//
+//std::vector<float> SoundInstance::GetWaveform() const
+//{
+//    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+//    const BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+//    size_t bufferSize = audioSystem_->GetBufferSize(soundID_);
+//
+//    return ConvertToFloatSamples(buffer, bufferSize, format);
+//}
+//
+//std::vector<float> SoundInstance::GetWaveform(float _startTime, float _endTime) const
+//{
+//    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+//    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+//    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
+//
+//    // 秒をサンプル数に変換
+//    unsigned int startSample = static_cast<unsigned int>(_startTime * format.nSamplesPerSec);
+//    unsigned int endSample = static_cast<unsigned int>(_endTime * format.nSamplesPerSec);
+//
+//    return ConvertToFloatSamples(buffer, bufferSize, format, _startTime, _endTime - _startTime);
+//}
 
 float SoundInstance::GetDuration() const
 {
@@ -139,111 +139,4 @@ float SoundInstance::GetDuration() const
         }
     }
     return 0.0f;
-}
-
-std::vector<float> SoundInstance::ConvertToFloatSamples(
-    const BYTE* _pBuffer,
-    unsigned int _bufferSize,
-    const WAVEFORMATEX& _wfex,
-    float _startSeconds,
-    float _durationSeconds) const
-{
-    std::vector<float> samples;
-    int bytesPerSample = _wfex.wBitsPerSample / 8;
-    int channels = _wfex.nChannels;
-    unsigned int totalSamples = _bufferSize / bytesPerSample;
-    unsigned int totalFrames = totalSamples / channels;
-    unsigned int sampleRate = _wfex.nSamplesPerSec;
-
-    // 秒をフレーム数に変換
-    unsigned int startFrame = static_cast<unsigned int>(_startSeconds * sampleRate);
-    unsigned int endFrame = totalFrames;
-
-    // 範囲チェック
-    if (startFrame >= totalFrames) {
-        return samples;
-    }
-
-    if (_durationSeconds > 0.0) {
-        unsigned int numFrames = static_cast<unsigned int>(_durationSeconds * sampleRate);
-        endFrame = std::min(startFrame + numFrames, totalFrames);
-    }
-
-    unsigned int actualFrames = endFrame - startFrame;
-    samples.reserve(actualFrames);
-
-    // ビット深度に応じて変換
-    if (_wfex.wBitsPerSample == 16)
-    {
-        const short* shortData = reinterpret_cast<const short*>(_pBuffer);
-        for (unsigned int frame = startFrame; frame < endFrame; frame++)
-        {
-            float mixedSample = 0.0f;
-            for (int ch = 0; ch < channels; ch++)
-            {
-                int sampleIndex = frame * channels + ch;
-                mixedSample += shortData[sampleIndex] / 32768.0f;
-            }
-            samples.push_back(mixedSample / channels);
-        }
-    }
-    else if (_wfex.wBitsPerSample == 8)
-    {
-        for (unsigned int frame = startFrame; frame < endFrame; frame++)
-        {
-            float mixedSample = 0.0f;
-            for (int ch = 0; ch < channels; ch++)
-            {
-                int sampleIndex = frame * channels + ch;
-                mixedSample += (_pBuffer[sampleIndex] - 128) / 128.0f;
-            }
-            samples.push_back(mixedSample / channels);
-        }
-    }
-    else if (_wfex.wBitsPerSample == 24)
-    {
-        for (unsigned int frame = startFrame; frame < endFrame; frame++)
-        {
-            float mixedSample = 0.0f;
-            for (int ch = 0; ch < channels; ch++)
-            {
-                int byteIndex = (frame * channels + ch) * 3;
-                int sample = (_pBuffer[byteIndex]) |
-                    (_pBuffer[byteIndex + 1] << 8) |
-                    (_pBuffer[byteIndex + 2] << 16);
-                if (sample & 0x800000) {
-                    sample |= 0xFF000000;
-                }
-                mixedSample += sample / 8388608.0f;
-            }
-            samples.push_back(mixedSample / channels);
-        }
-    }
-    else if (_wfex.wBitsPerSample == 32)
-    {
-        if (_wfex.wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-            const float* floatData = reinterpret_cast<const float*>(_pBuffer);
-            for (unsigned int frame = startFrame; frame < endFrame; frame++) {
-                float mixedSample = 0.0f;
-                for (int ch = 0; ch < channels; ch++) {
-                    int sampleIndex = frame * channels + ch;
-                    mixedSample += floatData[sampleIndex];
-                }
-                samples.push_back(mixedSample / channels);
-            }
-        }
-        else {
-            const int* intData = reinterpret_cast<const int*>(_pBuffer);
-            for (unsigned int frame = startFrame; frame < endFrame; frame++) {
-                float mixedSample = 0.0f;
-                for (int ch = 0; ch < channels; ch++) {
-                    int sampleIndex = frame * channels + ch;
-                    mixedSample += intData[sampleIndex] / 2147483648.0f;
-                }
-                samples.push_back(mixedSample / channels);
-            }
-        }
-    }
-
-    return samples;
 }

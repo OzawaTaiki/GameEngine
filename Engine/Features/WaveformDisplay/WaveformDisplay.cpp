@@ -70,7 +70,7 @@ void WaveformDisplay::SetSoundInstance(const SoundInstance* _soundInstance)
     soundInstance_ = _soundInstance;
     SetSampleRate(_soundInstance->GetSampleRate());
 
-    waveformCache_ = soundInstance_->GetWaveform();
+    //waveformCache_ = soundInstance_->GetWaveform();
 
 
     float musicDuration = soundInstance_->GetDuration();

@@ -23,9 +23,8 @@ public:
     std::shared_ptr<VoiceInstance> Play(float _volume, float _startTime, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr);
 
 
-    std::vector<float> GetWaveform() const;
-
-    std::vector<float> GetWaveform(float _startTime, float _endTime) const;
+    //std::vector<float> GetWaveform() const;
+    //std::vector<float> GetWaveform(float _startTime, float _endTime) const;
 
     /// <summary>
     /// 音声ファイルの再生時間を取得
@@ -41,7 +40,7 @@ public:
 
 private:
 
-    std::vector<float> ConvertToFloatSamples(const BYTE* _pBuffer, unsigned int _bufferSize, const WAVEFORMATEX& _wfex, float _startSeconds = 0.0f, float _durationSeconds = 0.0f) const;
+    //std::vector<float> ConvertToFloatSamples(const BYTE* _pBuffer, unsigned int _bufferSize, const WAVEFORMATEX& _wfex, float _startSeconds = 0.0f, float _durationSeconds = 0.0f) const;
 
 private:
 
