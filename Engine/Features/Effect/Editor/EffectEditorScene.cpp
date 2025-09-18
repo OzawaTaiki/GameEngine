@@ -9,11 +9,14 @@
 
 EffectEditorScene::~EffectEditorScene()
 {
+#ifdef _DEBUG
     effects_.clear();
+#endif
 }
 
 void EffectEditorScene::Initialize(SceneData* _sceneData)
 {
+#ifdef _DEBUG
     // カメラ初期化
     sceneCamera_.Initialize();
     sceneCamera_.translate_ = { 0, 5, -10 };
@@ -56,10 +59,13 @@ void EffectEditorScene::Initialize(SceneData* _sceneData)
 
     // フレーム履歴初期化
     frameTimeHistory_.resize(kFrameHistorySize, 0.0f);
+#endif
 }
 
 void EffectEditorScene::Update()
 {
+#ifdef _DEBUG
+
     // ホットキー処理
     ProcessHotKeys();
 
@@ -95,10 +101,12 @@ void EffectEditorScene::Update()
 
     // パーティクルシステム更新
     particleSystem_->Update();
+#endif
 }
 
 void EffectEditorScene::Draw()
 {
+#ifdef _DEBUG
     // 背景描画
     if (usesSkyBox_ && skyBox_)
     {
@@ -123,7 +131,6 @@ void EffectEditorScene::Draw()
     // パーティクル描画
     particleSystem_->DrawParticles();
 
-#ifdef _DEBUG
     // ImGui描画
     ImGuiMainMenuBar();
 

@@ -282,7 +282,7 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
         RegisterPoint(spos, epos, _frontDraw);
     }
 }
- 
+
 
 void LineDrawer::TransferData()
 {
