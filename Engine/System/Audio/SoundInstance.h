@@ -27,6 +27,12 @@ public:
     //std::vector<float> GetWaveform(float _startTime, float _endTime) const;
 
     /// <summary>
+    /// 音声IDを取得
+    /// </summary>
+    /// <returns>音声ID</returns>
+    uint32_t GetSoundID() const { return soundID_; }
+
+    /// <summary>
     /// 音声ファイルの再生時間を取得
     /// </summary>
     /// <returns>再生時間(秒)</returns>

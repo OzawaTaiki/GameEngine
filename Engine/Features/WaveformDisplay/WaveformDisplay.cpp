@@ -2,10 +2,12 @@
 
 #include <System/Audio/SoundInstance.h>
 #include <Features/LineDrawer/LineDrawer.h>
+#include <Features/WaveformDisplay/WaveformAnalyzer.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Debug/Debug.h>
 #include <Math/MyLib.h>
+
 #include <numbers>
 
 float WaveformDisplay::waveformTimeWindow_ = 5.0f;
@@ -25,6 +27,7 @@ void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const Wave
 
     startTime_ = 0.0f; // デフォルトの開始時間
     endTime_ = 0.0f;   // デフォルトの終了時間
+
 }
 
 void WaveformDisplay::Draw()
@@ -70,18 +73,18 @@ void WaveformDisplay::SetSoundInstance(const SoundInstance* _soundInstance)
     soundInstance_ = _soundInstance;
     SetSampleRate(_soundInstance->GetSampleRate());
 
-    //waveformCache_ = soundInstance_->GetWaveform();
+    waveformCache_ = WaveformAnalyzer::ExtractRawWaveformMaxMin(soundInstance_, bounds_.size.x, displayTimeWindow_);
 
 
-    float musicDuration = soundInstance_->GetDuration();
-    float sizePerSec = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
-    float size = std::ceil(sizePerSec * musicDuration);
-    waveformCache_ = SimpleResample(
-        waveformCache_,
-        static_cast<size_t>(0),
-        static_cast<size_t>(musicDuration * sampleRate_),
-        static_cast<int>(size)
-    );
+    //float musicDuration = soundInstance_->GetDuration();
+    //float sizePerSec = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
+    //float size = std::ceil(sizePerSec * musicDuration);
+    //waveformCache_ = LanczosResample(
+    //    waveformCache_,
+    //    static_cast<size_t>(0),
+    //    static_cast<size_t>(musicDuration * sampleRate_),
+    //    static_cast<int>(size)
+    //);
 
     isValidCache_ = false; // キャッシュを無効化
 }
@@ -94,10 +97,8 @@ void WaveformDisplay::CalculateDisplayRange()
     }
 
 
-    float musicDuration= soundInstance_->GetDuration();
+    float musicDuration = soundInstance_->GetDuration();
     endTime_ = std::min(musicDuration, startTime_ + displayTimeWindow_);
-
-
 
     size_t startSample = static_cast<size_t>(startTime_ * sampleRate_);
     size_t endSample = static_cast<size_t>(endTime_ * sampleRate_);
@@ -112,17 +113,19 @@ void WaveformDisplay::CalculateDisplayRange()
     ZeroMemory(mappedVertexBuffer_, sizeof(Vector2) * kMaxVertices_);
 
     instanceCount_ = 0;
-    for (size_t i = startIndex; i < endIndex && i - startIndex < waveformCache_.size(); ++i)
+    float time = 0.0f;
+    for (size_t i = startIndex * 2; i < endIndex * 2 && i < waveformCache_.size(); i +=2)
     {
-        mappedVertexBuffer_[instanceCount_] = { static_cast<float>(instanceCount_),waveformCache_[i] };
-        ++instanceCount_;
+        mappedVertexBuffer_[instanceCount_] = { static_cast<float>(time),waveformCache_[i] };
+        mappedVertexBuffer_[instanceCount_ + 1] = { static_cast<float>(time++),waveformCache_[i + 1] };
+        instanceCount_ += 2;
     }
 
     isValidCache_ = true;
 
 }
 
-std::vector<float> WaveformDisplay::LanczosResample(const std::vector<float>& _input, int _outputSize ) const
+std::vector<float> WaveformDisplay::LanczosResample(const std::vector<float>& _input, int _outputSize) const
 {
     std::vector<float> output;
     output.reserve(_outputSize);
@@ -216,7 +219,7 @@ float WaveformDisplay::LanczosKernel(float _x, int _kernelSize) const
     if (std::abs(_x) >= _kernelSize)
         return 0.0f; // カーネル外の値は0
 
-    float piX = std::numbers::pi_v<float> * _x;
+    float piX = std::numbers::pi_v<float> *_x;
     float piXKernel = piX / _kernelSize;
 
     return std::sin(piX) / piX * std::sin(piXKernel) / piXKernel; // ランツォスカーネルの計算
@@ -293,15 +296,15 @@ void WaveformDisplay::CreatePipeline()
         assert(false);
     }
     hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(0,
-        signatureBlob->GetBufferPointer(),
-        signatureBlob->GetBufferSize(),
-        IID_PPV_ARGS(&rootSignature_));
+                                                                   signatureBlob->GetBufferPointer(),
+                                                                   signatureBlob->GetBufferSize(),
+                                                                   IID_PPV_ARGS(&rootSignature_));
     assert(SUCCEEDED(hr));
 
 
 #pragma region DepthStencilState
-        //DepthStencilStateの設定
-        D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    //DepthStencilStateの設定
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     depthStencilDesc.DepthEnable = false;
 #pragma endregion
 
@@ -366,7 +369,7 @@ void WaveformDisplay::CreateConstantBuffer(const Matrix4x4& _matVP)
     mapData_->displayHeight = bounds_.size.y;
     mapData_->displayWidth = bounds_.size.x;
     mapData_->startTime = startTime_;
-    mapData_->screenSize = Vector2(1280,720);
+    mapData_->screenSize = Vector2(1280, 720);
     mapData_->matViewProj = _matVP;
 
 }

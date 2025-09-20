@@ -639,7 +639,9 @@
     <ClCompile Include="Features\WaveformDisplay\WaveformDisplay.cpp">
       <Filter>Features\Waveform</Filter>
     </ClCompile>
-    <ClCompile Include="Features\WaveformDisplay\WaveformTextureGenerator.cpp" />
+    <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp">
+      <Filter>Features\Waveform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1087,7 +1089,7 @@
     <ClInclude Include="Features\WaveformDisplay\WaveformDisplay.h">
       <Filter>Features\Waveform</Filter>
     </ClInclude>
-    <ClInclude Include="Features\WaveformDisplay\WaveformTextureGenerator.h">
+    <ClInclude Include="Features\WaveformDisplay\WaveformAnalyzer.h">
       <Filter>Features\Waveform</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1179,7 +1181,7 @@
     <FxCompile Include="Resources\Shader\Vignette.CS.hlsl">
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\WaveformGenerator.hlsl">
+    <FxCompile Include="Resources\Shader\Waveform.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

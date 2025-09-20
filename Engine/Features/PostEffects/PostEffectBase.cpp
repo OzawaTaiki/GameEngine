@@ -5,7 +5,7 @@
 void PostEffectBase::CreateConstantBuffer(size_t dataSize)
 {
     // 定数バッファのリソースを作成
-    constantBuffer_ = DXCommon::GetInstance()->CreateBufferResource(dataSize);
+    constantBuffer_ = DXCommon::GetInstance()->CreateBufferResource(static_cast<uint32_t>(dataSize));
 
     // マッピングしてデータポインタを取得
     constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&constantBufferData_));

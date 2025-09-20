@@ -35,6 +35,7 @@ VertexOutput VSmain(VertexInput _input)
     float x = _input.waveformData.x + leftTop.x;
 
     ratio = (_input.waveformData.y + 1.0) / 2.0; // -1.0 ~ 1.0 -> 0.0 ~ 1.0
+    //ratio = _input.waveformData.y;
     float y = lerp(leftTop.y + displayHeight, leftTop.y, ratio);
 
     output.position = mul(float4(x, y, 0.0f, 1.0f), vp);
