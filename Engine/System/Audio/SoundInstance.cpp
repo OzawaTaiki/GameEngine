@@ -39,6 +39,23 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
     if (!SUCCEEDED(hresult))
     {
+        if (FAILED(hresult)) {
+            //Debug::Log("CreateSourceVoice failed: 0x" + std::to_string(std::hex, hresult));
+
+            switch (hresult) {
+            
+            case E_INVALIDARG:
+                Debug::Log("INVALIDARG - 引数が無効");
+                break;
+            case E_OUTOFMEMORY:
+                Debug::Log("OUT_OF_MEMORY");
+                break;
+            case XAUDIO2_E_INVALID_CALL:
+                Debug::Log("INVALID_CALL - XAudio2が初期化されていない");
+                break;
+            }
+        }
+
         Debug::Log("Error: Failed to create source voice\n");
         return nullptr;
     }
@@ -86,6 +103,28 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTi
         return nullptr;
     }
 }
+//
+//std::vector<float> SoundInstance::GetWaveform() const
+//{
+//    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+//    const BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+//    size_t bufferSize = audioSystem_->GetBufferSize(soundID_);
+//
+//    return ConvertToFloatSamples(buffer, bufferSize, format);
+//}
+//
+//std::vector<float> SoundInstance::GetWaveform(float _startTime, float _endTime) const
+//{
+//    const WAVEFORMATEX& format = audioSystem_->GetSoundFormat(soundID_);
+//    BYTE* buffer = audioSystem_->GetBuffer(soundID_);
+//    unsigned int bufferSize = audioSystem_->GetBufferSize(soundID_);
+//
+//    // 秒をサンプル数に変換
+//    unsigned int startSample = static_cast<unsigned int>(_startTime * format.nSamplesPerSec);
+//    unsigned int endSample = static_cast<unsigned int>(_endTime * format.nSamplesPerSec);
+//
+//    return ConvertToFloatSamples(buffer, bufferSize, format, _startTime, _endTime - _startTime);
+//}
 
 float SoundInstance::GetDuration() const
 {
@@ -99,5 +138,5 @@ float SoundInstance::GetDuration() const
             return static_cast<float>(bufSize) / wfex.nAvgBytesPerSec;
         }
     }
-    return 0.0f; // Duration cannot be determined
+    return 0.0f;
 }

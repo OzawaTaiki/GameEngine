@@ -163,9 +163,6 @@
     <Filter Include="Utility\ConvertString">
       <UniqueIdentifier>{CA125FFB-B0E4-4016-892A-CCCC6AF6D3CA6BBF}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\DXCommon\RTV">
-      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\Animation">
       <UniqueIdentifier>{fc8c535f-f4d7-4570-9f9e-79de5a290788}</UniqueIdentifier>
     </Filter>
@@ -261,6 +258,12 @@
     </Filter>
     <Filter Include="Features\Model\Primitive\Creater">
       <UniqueIdentifier>{7197a996-07b6-4bdb-89c3-0188caf73e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Waveform">
+      <UniqueIdentifier>{2be77bff-94f8-48bc-94e7-301dd7c00d72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\DXCommon\TextureManager\RTV">
+      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -460,10 +463,10 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp">
-      <Filter>Core\DXCommon\RTV</Filter>
+      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
-      <Filter>Core\DXCommon\RTV</Filter>
+      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
     </ClCompile>
     <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
       <Filter>Features\Model\Animation</Filter>
@@ -632,6 +635,12 @@
     </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp">
       <Filter>Features\Model\Primitive\Creater</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\WaveformDisplay\WaveformDisplay.cpp">
+      <Filter>Features\Waveform</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp">
+      <Filter>Features\Waveform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -879,10 +888,10 @@
       <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RTVManager.h">
-      <Filter>Core\DXCommon\RTV</Filter>
+      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
-      <Filter>Core\DXCommon\RTV</Filter>
+      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\SkinningCS.h">
       <Filter>Features\Model\Animation</Filter>
@@ -1077,6 +1086,12 @@
     <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h">
       <Filter>Features\Model\Primitive\Creater</Filter>
     </ClInclude>
+    <ClInclude Include="Features\WaveformDisplay\WaveformDisplay.h">
+      <Filter>Features\Waveform</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\WaveformDisplay\WaveformAnalyzer.h">
+      <Filter>Features\Waveform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1165,6 +1180,9 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\Vignette.CS.hlsl">
       <Filter>Shaders\PostEffects</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Waveform.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

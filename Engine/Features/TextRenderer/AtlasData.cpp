@@ -167,11 +167,11 @@ void AtlasData::PreloadCommonCharacters()
     {
         GetGlyph(static_cast<wchar_t>(c));
     }
-    for (wchar_t c = L'あ'; c < L'ん'; c++)
+    for (wchar_t c = L'あ'; c <= L'ん'; c++)
     {
         GetGlyph(c);
     }
-    for (wchar_t c = L'ア'; c < L'ン'; c++)
+    for (wchar_t c = L'ア'; c <= L'ン'; c++)
     {
         GetGlyph(c);
     }

@@ -59,7 +59,7 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     CHECK_HR(hr, "Failed to create media type");
     hr = pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio); // オーディオストリーム
     CHECK_HR(hr, "Failed to set major type");
-    hr = pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);    // PCM形式
+    hr = pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_Float);    // PCM形式
     CHECK_HR(hr, "Failed to set subtype");
     hr = pMFSourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType.Get()); // 出力メディアタイプの設定
     CHECK_HR(hr, "Failed to set current media type");

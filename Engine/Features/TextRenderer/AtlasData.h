@@ -102,8 +102,8 @@ private:
     bool atlasNeedsUpdate_;
 
     // フォントメトリクス
-    float fontAscent_;
-    float fontDescent_;
-    float fontLineGap_;
+    float fontAscent_; // ベースラインから上への距離
+    float fontDescent_; // ベースラインから下への距離（負の値）
+    float fontLineGap_; // 行間
 
 };
