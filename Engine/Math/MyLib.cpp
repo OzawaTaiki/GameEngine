@@ -25,6 +25,13 @@ Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
     return (q0 * scale0 + _q2 * scale1) / std::sinf(theta);
 }
 
+float CalculateBias(float _val, float _min, float _max)
+{
+    float center    = (_min + _max) * 0.5f;
+    float range     = (_max - _min) * 0.5f;
+    return (_val - center) / range;
+}
+
 float Lerp(float _a, float _b, float _t)
 {
     return _a + (_b - _a) * _t;

@@ -40,7 +40,7 @@ void WaveformDisplay::Draw()
     CalculateDisplayRange();
 
     DrawCenterLine();
-
+    DrawPlayheadLine();
     DrawWaveform();
 }
 
@@ -98,26 +98,40 @@ void WaveformDisplay::CalculateDisplayRange()
 
 
     float musicDuration = soundInstance_->GetDuration();
+
+    // playheadを中心にするために、表示範囲を調整
+    float displayStartTime  = startTime_ - displayTimeWindow_ * 0.5f;
+    float displayEndTime    = startTime_ + displayTimeWindow_ * 0.5f;
+
+    float clampedDisplayStartTime = std::max(0.0f, displayStartTime);
+    float clampedDisplayEndTime   = std::min(musicDuration, displayEndTime);
+
     endTime_ = std::min(musicDuration, startTime_ + displayTimeWindow_);
 
-    size_t startSample = static_cast<size_t>(startTime_ * sampleRate_);
-    size_t endSample = static_cast<size_t>(endTime_ * sampleRate_);
+    size_t startSample  = static_cast<size_t>(clampedDisplayStartTime * sampleRate_);
+    size_t endSample    = static_cast<size_t>(clampedDisplayEndTime * sampleRate_);
 
-    float sizePerSec = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
-    float size = std::ceil(sizePerSec * musicDuration);
+    float sizePerSec    = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
+    float size          = std::ceil(sizePerSec * musicDuration);
 
-    size_t startIndex = static_cast<size_t>(size / musicDuration * startTime_);
-    size_t endIndex = static_cast<size_t>(size / musicDuration * endTime_);
+    size_t startIndex   = static_cast<size_t>(size / musicDuration * clampedDisplayStartTime);
+    size_t endIndex     = static_cast<size_t>(size / musicDuration * clampedDisplayEndTime);
 
     // 波形データを計算しなおす VBVにね
     ZeroMemory(mappedVertexBuffer_, sizeof(Vector2) * kMaxVertices_);
 
-    instanceCount_ = 0;
-    float time = 0.0f;
-    for (size_t i = startIndex * 2; i < endIndex * 2 && i < waveformCache_.size(); i +=2)
+    instanceCount_  = 0;
+    float renderDuration    = clampedDisplayEndTime - clampedDisplayStartTime;    // 表示要素数
+    float displayRatio      = renderDuration / displayTimeWindow_; // 表示比率
+    size_t localX           = static_cast<size_t>(Lerp(bounds_.size.x, 0.0f, displayRatio));
+
+    if (musicDuration - displayEndTime < 0)
+        localX = 0;
+
+    for (size_t i = startIndex * 2; i < endIndex * 2 && i < waveformCache_.size(); i += 2) // 配列要素はmax/minでニコイチなので*2する
     {
-        mappedVertexBuffer_[instanceCount_] = { static_cast<float>(time),waveformCache_[i] };
-        mappedVertexBuffer_[instanceCount_ + 1] = { static_cast<float>(time++),waveformCache_[i + 1] };
+        mappedVertexBuffer_[instanceCount_] = { static_cast<float>(localX),waveformCache_[i] };
+        mappedVertexBuffer_[instanceCount_ + 1] = { static_cast<float>(localX++),waveformCache_[i + 1] };
         instanceCount_ += 2;
     }
 
@@ -232,6 +246,12 @@ void WaveformDisplay::DrawCenterLine()
 
     lineDrawer_->RegisterPoint(Vector2(bounds_.leftTop.x, centerY), Vector2(bounds_.Right(), centerY), Vector4(1, 1, 1, 1));
 
+}
+
+void WaveformDisplay::DrawPlayheadLine()
+{
+    float playheadX = bounds_.CenterX();
+    lineDrawer_->RegisterPoint(Vector2(playheadX, bounds_.leftTop.y), Vector2(playheadX, bounds_.Bottom()), Vector4(1, 0, 0, 1));
 }
 
 void WaveformDisplay::DrawWaveform()

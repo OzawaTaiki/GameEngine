@@ -10,6 +10,15 @@
 #include <math.h>
 Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
 
+/// <summary>
+/// 値のバイアスを計算
+/// </summary>
+/// <param name="_val">対象の値</param>
+/// <param name="_min">最小値</param>
+/// <param name="_max">最大値</param>
+/// <returns> -ならmin寄り、+ならmax寄り</returns>
+float CalculateBias(float _val, float _min, float _max);
+
 float Lerp(float _a, float _b, float _t);
 Vector2 Lerp(const Vector2& _v1, const Vector2& _v2, float _t);
 Vector3 Lerp(const Vector3& _v1, const Vector3& _v2, float _t);
