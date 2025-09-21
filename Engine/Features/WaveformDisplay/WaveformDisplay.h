@@ -67,6 +67,8 @@ private:
 
     void DrawCenterLine();
 
+    void DrawPlayheadLine();
+
     void DrawWaveform();
 
     void CreatePipeline();
