@@ -15,7 +15,14 @@ public:
 
     ~AudioSpectrum()= default;
 
+    // 離散フーリエ変換
     std::vector<std::complex<float>> DFT(const std::vector<float>& _input);
+    // 逆離散フーリエ変換
+    std::vector<float> IDFT(const std::vector<std::complex<float>>& _input);
+
+
+    // 入出力のラウンドトリップテスト
+    void RoundTripTest(const std::vector<float>& _input);
 
 private:
 

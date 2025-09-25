@@ -1,6 +1,7 @@
 #include "AudioSpectrum.h"
 
 #include <numbers>
+#include <Debug/Debug.h>
 
 AudioSpectrum::AudioSpectrum(size_t windowSize, float _overlapRatio):
     windowSize_(windowSize),
@@ -38,4 +39,54 @@ std::vector<std::complex<float>> AudioSpectrum::DFT(const std::vector<float>& _i
     }
 
     return output;
+}
+
+// x(n) = (1/N) * Σ[k=0 to N-1] X(k) * e^(+i*2π*k*n/N)
+std::vector<float> AudioSpectrum::IDFT(const std::vector<std::complex<float>>& _input)
+{
+
+    size_t N = _input.size();
+    float fN = static_cast<float>(N);
+
+    if (N == 0)
+        return {};
+
+    // 出力配列の確保
+    std::vector<float> output(N);
+
+    for (size_t n = 0; n < N; ++n)// 時間のインデックス(出力)
+    {
+        std::complex<float> sum(0.0f, 0.0f);
+
+        for (size_t k = 0; k < N; ++k)// 周波数のインデックス(入力)
+        {
+            // e^(+i*2π*k*n/N) = cos(2π*k*n/N) + i*sin(2π*k*n/N)
+            float angle = 2 * std::numbers::pi_v<float> *static_cast<float>(k) * static_cast<float>(n) / fN; // 2π*k*n/N
+            std::complex<float> complexValue(std::cos(angle), std::sin(angle)); // e^(+i*2π*k*n/N)
+
+            sum += _input[k] * complexValue; // X(k) * e^(+i*2π*k*n/N)
+        }
+
+        output[n] = sum.real() / fN; // x(n) = 1/N * sum; // 実数部を取り出して正規化
+    }
+
+    return output;
+}
+
+void AudioSpectrum::RoundTripTest(const std::vector<float>& _input)
+{
+    Debug::Log("==========================\n");
+    auto dft = DFT(_input);
+    // 結果の表示
+    for (size_t i = 0; i < _input.size(); ++i)
+    {
+        Debug::Log(std::format("X[{}]: {} + {}i\n", i, dft[i].real(), dft[i].imag()));
+    }
+
+    auto idft = IDFT(dft);
+    for (size_t i = 0; i < idft.size(); ++i)
+    {
+        Debug::Log(std::format("x[{}]: {}\n", i, idft[i]));
+    }
+
 }
