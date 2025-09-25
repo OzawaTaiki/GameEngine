@@ -265,6 +265,9 @@
     <Filter Include="Core\DXCommon\TextureManager\RTV">
       <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\AudioSpectrum">
+      <UniqueIdentifier>{4ddccde8-0c2d-45f7-94bc-1a5b9c3467a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -642,6 +645,7 @@
     <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp">
       <Filter>Features\Waveform</Filter>
     </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1091,6 +1095,9 @@
     </ClInclude>
     <ClInclude Include="Features\WaveformDisplay\WaveformAnalyzer.h">
       <Filter>Features\Waveform</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\AudioSpectrum\AudioSpectrum.h">
+      <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
