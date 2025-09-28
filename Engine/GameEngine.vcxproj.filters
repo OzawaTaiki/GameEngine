@@ -645,7 +645,10 @@
     <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp">
       <Filter>Features\Waveform</Filter>
     </ClCompile>
-    <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp" />
+    <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp">
+      <Filter>Features\AudioSpectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1097,6 +1100,9 @@
       <Filter>Features\Waveform</Filter>
     </ClInclude>
     <ClInclude Include="Features\AudioSpectrum\AudioSpectrum.h">
+      <Filter>Features\AudioSpectrum</Filter>
+    </ClInclude>
+    <ClInclude Include="features\AudioSpectrum\SpectrumValidator.h">
       <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
   </ItemGroup>
