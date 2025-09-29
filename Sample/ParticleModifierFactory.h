@@ -9,5 +9,5 @@ public:
     ParticleModifierFactory() = default;
     ~ParticleModifierFactory() override = default;
 
-    std::unique_ptr<ParticleModifier> CreateModifier(const std::string _name) override;
+    std::unique_ptr<ParticleModifier> CreateModifier(const std::string& _name) override;
 };
