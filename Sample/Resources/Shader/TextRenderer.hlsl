@@ -43,5 +43,6 @@ struct PSInput
 float4 PSmain(PSInput input) : SV_TARGET
 {
     float alpha = fontTexture.Sample(fontSampler, input.texCoord);
+
     return float4(input.color.rgb, input.color.a * alpha);
 }
