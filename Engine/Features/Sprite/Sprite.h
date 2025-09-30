@@ -19,6 +19,7 @@ public:
     void Update();
     void Draw();
     void Draw(const Vector4& _color);
+    void Draw(D3D12_GPU_DESCRIPTOR_HANDLE _handle);
 
     // worldMat
     Vector2 translate_ = {0.0f,0.0f };
@@ -44,7 +45,8 @@ public:
     void SetUVSize(const Vector2& _size);
     void SetLeftTop(const Vector2& _leftTop);
 
-private:
+    void ImGui();
+private: 
 
     static uint32_t winWidth_;
     static uint32_t winHeight_;
@@ -89,7 +91,6 @@ private:
 
     Vector2 lefttop_ = { 0.0f,0.0f };
     Vector2 size_ = { 100.0f,100.0f };
-    void ImGui();
 
 
 };

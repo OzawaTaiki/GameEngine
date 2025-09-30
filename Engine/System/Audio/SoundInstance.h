@@ -22,6 +22,7 @@ public:
     std::shared_ptr<VoiceInstance> Play(float _volume, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr);
     std::shared_ptr<VoiceInstance> Play(float _volume, float _startTime, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr);
 
+    std::vector<float> GetAudioData() const;
 
     //std::vector<float> GetWaveform() const;
     //std::vector<float> GetWaveform(float _startTime, float _endTime) const;

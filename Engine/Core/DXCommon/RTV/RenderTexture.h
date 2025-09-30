@@ -54,6 +54,7 @@ public:
     ID3D12Resource* GetRTVResource() const { return renderTextureResource_.Get(); }
     ID3D12Resource* GetDSVResource() const { return dsvResource_; }
 
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandleofRTV() const { return SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndexofRTV_); }
 
 
     void Clear(ID3D12GraphicsCommandList* _cmdList);

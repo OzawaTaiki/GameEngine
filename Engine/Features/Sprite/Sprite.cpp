@@ -82,6 +82,23 @@ void Sprite::Draw(const Vector4& _color)
     commandList->DrawInstanced(6, 1, 0, 0);
 }
 
+void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE _handle)
+{
+    PreDraw();
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    CalculateMatrix();
+    colorObj_->SetColor(color_);
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+    commandList->SetGraphicsRootConstantBufferView(0, matResource_->GetGPUVirtualAddress());
+    colorObj_->QueueCommand(commandList, 1);
+    commandList->SetGraphicsRootDescriptorTable(2, _handle);
+
+    commandList->DrawInstanced(6, 1, 0, 0);
+}
+
 std::unique_ptr<Sprite> Sprite::Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor)
 {
     std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>(_name);

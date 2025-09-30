@@ -70,7 +70,7 @@ void WaveformDisplay::SetSampleRate(float _sampleRate)
 
 void WaveformDisplay::SetSoundInstance(const SoundInstance* _soundInstance)
 {
-    soundInstance_ = _soundInstance;
+    soundInstance_ = _soundInstance;    
     SetSampleRate(_soundInstance->GetSampleRate());
 
     waveformCache_ = WaveformAnalyzer::ExtractRawWaveformMaxMin(soundInstance_, bounds_.size.x, displayTimeWindow_);

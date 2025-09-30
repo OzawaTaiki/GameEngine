@@ -43,7 +43,7 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
             //Debug::Log("CreateSourceVoice failed: 0x" + std::to_string(std::hex, hresult));
 
             switch (hresult) {
-            
+
             case E_INVALIDARG:
                 Debug::Log("INVALIDARG - 引数が無効");
                 break;
@@ -102,6 +102,17 @@ std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTi
         Debug::Log("Error: Failed to play sound instance with start time\n");
         return nullptr;
     }
+}
+
+std::vector<float> SoundInstance::GetAudioData() const
+{
+    const BYTE* data= audioSystem_->GetBuffer(soundID_);
+    const float* floatData = reinterpret_cast<const float*>(data);
+
+    std::vector<float> audioData;
+    size_t dataSize = audioSystem_->GetBufferSize(soundID_);
+    audioData.assign(floatData, floatData + dataSize / sizeof(float));
+    return audioData;
 }
 //
 //std::vector<float> SoundInstance::GetWaveform() const
