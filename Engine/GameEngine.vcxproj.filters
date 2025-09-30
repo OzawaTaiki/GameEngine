@@ -262,11 +262,11 @@
     <Filter Include="Features\Waveform">
       <UniqueIdentifier>{2be77bff-94f8-48bc-94e7-301dd7c00d72}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\DXCommon\TextureManager\RTV">
-      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\AudioSpectrum">
       <UniqueIdentifier>{4ddccde8-0c2d-45f7-94bc-1a5b9c3467a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\DXCommon\RTV">
+      <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -466,10 +466,10 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp">
-      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
+      <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp">
-      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
+      <Filter>Core\DXCommon\RTV</Filter>
     </ClCompile>
     <ClCompile Include="Features\Model\Animation\SkinningCS.cpp">
       <Filter>Features\Model\Animation</Filter>
@@ -480,7 +480,7 @@
     <ClCompile Include="Features\SilhouetteDetection.cpp">
       <Filter>Features</Filter>
     </ClCompile>
-    <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp">
+    <ClCompile Include="Core\DXCommon\CmdList\CommandList.cpp">
       <Filter>Core\DXCommon\CommandList</Filter>
     </ClCompile>
     <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayer.cpp">
@@ -648,7 +648,10 @@
     <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp">
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
-    <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp" />
+    <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp">
+      <Filter>Features\AudioSpectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -895,10 +898,10 @@
       <Filter>Features\Animation\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RTVManager.h">
-      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
+      <Filter>Core\DXCommon\RTV</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h">
-      <Filter>Core\DXCommon\TextureManager\RTV</Filter>
+      <Filter>Core\DXCommon\RTV</Filter>
     </ClInclude>
     <ClInclude Include="Features\Model\Animation\SkinningCS.h">
       <Filter>Features\Model\Animation</Filter>
@@ -1105,6 +1108,9 @@
     <ClInclude Include="features\AudioSpectrum\SpectrumValidator.h">
       <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
+    <ClInclude Include="Features\AudioSpectrum\SpectrumTextureGenerator.h">
+      <Filter>Features\AudioSpectrum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1195,6 +1201,9 @@
       <Filter>Shaders\PostEffects</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\Waveform.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\SpectrumTextureGenerator.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

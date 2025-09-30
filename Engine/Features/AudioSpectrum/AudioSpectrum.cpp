@@ -209,7 +209,7 @@ void AudioSpectrum::RecursiveFFT(std::vector<std::complex<float>>& _x)
     std::vector<std::complex<float>> even(halfN);
     std::vector<std::complex<float>> odd(halfN);
 
-    // 偶数要素と基数要素に分割
+    // 偶数要素と基数要素に分割 
     for (size_t i = 0; i < halfN; ++i)
     {
         even[i] = _x[i * 2];

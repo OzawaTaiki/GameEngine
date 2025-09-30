@@ -143,7 +143,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\DXCommon\CmdList\CommnadList.cpp" />
+    <ClCompile Include="Core\DXCommon\CmdList\CommandList.cpp" />
     <ClCompile Include="Core\DXCommon\DXCommon.cpp" />
     <ClCompile Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Core\DXCommon\PSOManager\PSOManager.cpp" />
@@ -160,6 +160,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp" />
     <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp" />
     <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp" />
+    <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp" />
     <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp" />
     <ClCompile Include="Features\Camera\Camera\Camera.cpp" />
     <ClCompile Include="Features\Camera\DebugCamera\DebugCamera.cpp" />
@@ -289,6 +290,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Animation\Sequence\AnimationSequence.h" />
     <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h" />
     <ClInclude Include="Features\AudioSpectrum\AudioSpectrum.h" />
+    <ClInclude Include="Features\AudioSpectrum\SpectrumTextureGenerator.h" />
     <ClInclude Include="features\AudioSpectrum\SpectrumValidator.h" />
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
     <ClInclude Include="Features\Camera\DebugCamera\DebugCamera.h" />
@@ -544,6 +546,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\SkyBox.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\SpectrumTextureGenerator.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
