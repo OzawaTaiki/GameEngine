@@ -85,11 +85,11 @@ std::vector<float> SegmentedAudioGenerator::GenerateSegmentedTones(int _sampleRa
     };
 
     std::vector<TimeSegment> segments = {
-        {0.0f, 1.0f, 261.63f, "C4"},  // ド
-        {1.0f, 2.0f, 293.66f, "D4"},  // レ
-        {2.0f, 3.0f, 329.63f, "E4"},  // ミ
-        {3.0f, 4.0f, 349.23f, "F4"},  // ファ
-        {4.0f, 5.0f, 392.00f, "G4"}   // ソ
+        {0.0f, 10.0f, 261.63f, "C4"},  // ド
+        //{1.0f, 2.0f, 293.66f, "D4"},  // レ
+        //{2.0f, 3.0f, 329.63f, "E4"},  // ミ
+        //{3.0f, 4.0f, 349.23f, "F4"},  // ファ
+        //{4.0f, 5.0f, 392.00f, "G4"}   // ソ
     };
 
     for (const auto& segment : segments)

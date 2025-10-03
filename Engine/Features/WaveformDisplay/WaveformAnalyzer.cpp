@@ -55,6 +55,51 @@ std::vector<float> WaveformAnalyzer::ExtractRawWaveformMaxMin(const SoundInstanc
 
 }
 
+float WaveformAnalyzer::GetRMSAtTime(const SoundInstance* _soundInstance, float _time, float _windowSizeMs)
+{
+    AudioSystem* audioSystem = AudioSystem::GetInstance();
+    // サンプルレート
+    float sampleRate = _soundInstance->GetSampleRate();
+    size_t windowSizeSamples = static_cast<size_t>(_windowSizeMs * 0.001f * sampleRate);
+    uint32_t soundID = _soundInstance->GetSoundID();
+    const WAVEFORMATEX& format = audioSystem->GetSoundFormat(soundID);
+    const BYTE* buffer = audioSystem->GetBuffer(soundID);
+    size_t bufferSize = audioSystem->GetBufferSize(soundID);
+    const float* waveformF = reinterpret_cast<const float*>(buffer);
+    // フォーマット情報
+    size_t channels = static_cast<size_t>(format.nChannels);
+    size_t totalFloats = bufferSize / sizeof(float);     // float要素の総数
+    size_t totalFrames = totalFloats / channels;         // フレーム数
+    size_t centerFrame = static_cast<size_t>(_time * sampleRate);
+    size_t startFrame = (centerFrame >= windowSizeSamples / 2) ? (centerFrame - windowSizeSamples / 2) : 0;
+    size_t endFrame = std::min(centerFrame + windowSizeSamples / 2, totalFrames);
+    long double sumSquares = 0.0L;
+    size_t framesInWindow = endFrame - startFrame;
+
+    for (size_t frame = 0; frame < framesInWindow; ++frame)
+    {
+        // チャンネルごとの処理
+        for (size_t ch = 0; ch < channels; ++ch)
+        {
+            size_t sampleIndex = (startFrame + frame) * channels + ch;
+            if (sampleIndex >= totalFloats) // 範囲確認
+                continue;
+            float sample = waveformF[sampleIndex];
+            sample = std::clamp(sample, -1.0f, 1.0f);
+            sumSquares += static_cast<long double>(sample * sample);
+        }
+    }
+
+    // 全チャンネル・全フレームでの平均二乗
+    if (framesInWindow > 0 && channels > 0)
+    {
+        float meanSquare = static_cast<float>(sumSquares / (framesInWindow * channels));
+        return std::sqrt(meanSquare);
+    }
+
+    return 0.0f;
+}
+
 std::vector<float> WaveformAnalyzer::AnalyzeRMS(const SoundInstance* _soundInstance, Waveform::CompressionLevel _compressionLevel)
 {
     AudioSystem* audioSystem = AudioSystem::GetInstance();

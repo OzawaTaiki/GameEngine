@@ -2,6 +2,7 @@
 
 #include <numbers>
 #include <Debug/Debug.h>
+#include <numeric>
 
 AudioSpectrum::AudioSpectrum(size_t windowSize, float _overlapRatio)
 {
@@ -98,8 +99,8 @@ void AudioSpectrum::Butterfly4(std::complex<float>& _x0, std::complex<float>& _x
 
     /// 結合
     _x0 = E0 + w0 * O0; // X[0] = E[0] + w^0 * O[0]
-    _x1 = E1 + w1 * O1; // X[1] = E[1] + w^1 * O[1]
     _x2 = E0 - w0 * O0; // X[2] = E[0] - w^0 * O[0]
+    _x1 = E1 + w1 * O1; // X[1] = E[1] + w^1 * O[1]
     _x3 = E1 - w1 * O1; // X[3] = E[1] - w^1 * O[1]
 }
 
@@ -209,7 +210,7 @@ void AudioSpectrum::RecursiveFFT(std::vector<std::complex<float>>& _x)
     std::vector<std::complex<float>> even(halfN);
     std::vector<std::complex<float>> odd(halfN);
 
-    // 偶数要素と基数要素に分割 
+    // 偶数要素と基数要素に分割
     for (size_t i = 0; i < halfN; ++i)
     {
         even[i] = _x[i * 2];
@@ -263,9 +264,14 @@ std::vector<float> AudioSpectrum::ComputeSpectrum(float _time, size_t _startInde
 
     // マグニチュード計算
     std::vector<float> magnitude(fftResult.size() / 2);
+
+    // ハニング窓のゲイン補正係数 (窓関数の平均値の逆数)
+    const float windowGain = 2.0f;
+    // FFTの正規化係数
+    const float fftNorm = 1.0f / static_cast<float>(fftResult.size());
     for (size_t i = 0; i < magnitude.size(); ++i)
     {
-        magnitude[i] = std::abs(fftResult[i]);
+        magnitude[i] = std::abs(fftResult[i]) * windowGain * fftNorm;
     }
 
     return magnitude;

@@ -24,12 +24,12 @@ public:
     std::vector<float> IDFT(const std::vector<std::complex<float>>& _input);
 
 
-    void Butterfly2(std::complex<float>& _x0, std::complex<float>& _x1);
-    void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1, std::complex<float>& _x2, std::complex<float>& _x3);
-    void Butterfly8(std::array<std::complex<float>, 8>& _x);
+    static void Butterfly2(std::complex<float>& _x0, std::complex<float>& _x1);
+    static void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1, std::complex<float>& _x2, std::complex<float>& _x3);
+    static void Butterfly8(std::array<std::complex<float>, 8>& _x);
 
     // 高速フーリエ変換
-    void FFT(const std::vector<float>& _input, std::vector<std::complex<float>>& _output);
+    static void FFT(const std::vector<float>& _input, std::vector<std::complex<float>>& _output);
 
     std::vector<float> GetSpectrumAtTime(float _time);
 
@@ -43,7 +43,7 @@ public:
 private:
 
     // 再帰的FFT
-    void RecursiveFFT(std::vector<std::complex<float>>& _x);
+    static void RecursiveFFT(std::vector<std::complex<float>>& _x);
 
     std::vector<float> ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex);
 

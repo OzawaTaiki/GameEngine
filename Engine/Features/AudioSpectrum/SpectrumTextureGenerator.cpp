@@ -6,13 +6,13 @@
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <Debug/Debug.h>
 
-const size_t SpectrumTextureGenerator::kMaxSpectrumDataCount = 4096;
+const size_t SpectrumTextureGenerator::kMaxSpectrumDataCount = 1024;
 
 SpectrumTextureGenerator::SpectrumTextureGenerator(uint32_t _textureWidth, uint32_t _textureHeight):
     textureWidth_(_textureWidth),
     textureHeight_(_textureHeight),
-    width_(24.0f),// w1024 32本描画すると仮定
-    margin_(8.0f) // w1024 32本描画すると仮定
+    width_(24.0f/2.0f),// w1024 32本描画すると仮定
+    margin_(8.0f / 2.0f) // w1024 32本描画すると仮定
 {
 }
 
@@ -22,9 +22,11 @@ void SpectrumTextureGenerator::Initialize()
     CreatePipelineState();
 
     CreateBuffers();
+    MakeLogRanges(512, 64, 20.0f, 20000.0f, 44100.0f, 1024);
+
 }
 
-void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, uint32_t _drawCount)
+void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, uint32_t _drawCount)
 {
     DXCommon* dxCommon = DXCommon::GetInstance();
     ID3D12GraphicsCommandList* commandList = dxCommon->GetCommandList();
@@ -32,17 +34,18 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
     // 定数バッファ更新
     cbData_->textureWidth = textureWidth_;
     cbData_->textureHeight = textureHeight_;
-    cbData_->maxMagnitude = _maxMagnitude;
+    if (!_spectrumData.empty()) // 空なら更新しない
+        cbData_->maxMagnitude = *std::max_element(_spectrumData.begin(), _spectrumData.end());
     cbData_->dataCount = static_cast<uint32_t>(std::min(_spectrumData.size(), kMaxSpectrumDataCount));
     cbData_->drawCount = _drawCount;
     cbData_->width = width_;
     cbData_->margin = margin_;
+    cbData_->rms = _rms;
 
     // ストラクチャードバッファ更新
     size_t copySize = sizeof(float) * std::min(_spectrumData.size(), kMaxSpectrumDataCount);
     memcpy(spectrumData_, _spectrumData.data(), copySize);
-    spectrumDataBuffer_->Unmap(0, nullptr);
-    spectrumDataBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&spectrumData_));
+
 
     /// 描画コマンド
     // パイプラインステートとルートシグネチャの設定
@@ -56,6 +59,7 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
     // bufferの設定
     commandList->SetGraphicsRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
     commandList->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(dataSrvIndex_));
+    commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(rangesSrvIndex_));
 
     // 描画コマンド
     commandList->DrawInstanced(6, cbData_->drawCount, 0, 0);
@@ -67,8 +71,48 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
 
 D3D12_GPU_DESCRIPTOR_HANDLE SpectrumTextureGenerator::GetTextureHandle() const
 {
-    return renderTexture_->GetGPUHandleofRTV(); 
+    return renderTexture_->GetGPUHandleofRTV();
 }
+
+void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize)
+{
+    if (bars > 128)
+    {
+        Debug::Log("Max bars is 64\n");
+        bars = 128;
+    }
+
+
+    float logFmin = std::log(fmin);
+    float logFmax = std::log(fmax);
+
+    for (int32_t b = 0; b < bars; ++b)
+    {
+        float p0 = (float)b / bars;
+        float p1 = (float)(b + 1) / bars;
+        float f0 = std::exp(logFmin + (logFmax - logFmin) * p0);
+        float f1 = std::exp(logFmin + (logFmax - logFmin) * p1);
+
+        int32_t i0 = (int32_t)std::floor(f0 * fftSize / sampleRate);
+        int32_t i1 = (int32_t)std::ceil(f1 * fftSize / sampleRate);
+
+
+
+        if (i0 < 0) i0 = 0;
+        if (i1 >= fftBins) i1 = fftBins - 1;
+        if (i1 < i0) i1 = i0;
+
+        ranges_[b] = { i0, i1 };
+
+    }
+
+    cashedDrawData_.drawCount = bars;
+    cashedDrawData_.fftBins = fftBins;
+    cashedDrawData_.sampleRate = sampleRate;
+
+}
+
+
 
 void SpectrumTextureGenerator::CreateBuffers()
 {
@@ -79,11 +123,16 @@ void SpectrumTextureGenerator::CreateBuffers()
     constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&cbData_));
 
 
-
     dataSrvIndex_ = srvManager->Allocate();
     spectrumDataBuffer_ = dxCommon->CreateBufferResource(sizeof(float) * kMaxSpectrumDataCount);
     spectrumDataBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&spectrumData_));
     srvManager->CreateSRVForStructureBuffer(dataSrvIndex_, spectrumDataBuffer_.Get(), kMaxSpectrumDataCount, sizeof(float));
+
+    // Range用バッファ
+    rangesSrvIndex_ = srvManager->Allocate();
+    rangesBuffer_ = dxCommon->CreateBufferResource(sizeof(Range) * 128);
+    rangesBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&ranges_));
+    srvManager->CreateSRVForStructureBuffer(rangesSrvIndex_, rangesBuffer_.Get(), 128, sizeof(Range));
 
 
     uint32_t handle  = RTVManager::GetInstance()->CreateRenderTarget(
@@ -91,7 +140,7 @@ void SpectrumTextureGenerator::CreateBuffers()
         textureWidth_,
         textureHeight_,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-        Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+        Vector4(0.0f, 0.0f, 0.0f, 0.3f),
         false
     );
 
@@ -109,15 +158,20 @@ void SpectrumTextureGenerator::CreateRootSignature()
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+    D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
     descriptorRange[0].BaseShaderRegister = 0;
     descriptorRange[0].NumDescriptors = 1;//数は１つ
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
 
+    descriptorRange[1].BaseShaderRegister = 1;
+    descriptorRange[1].NumDescriptors = 1;//数は１つ
+    descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
+
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[2] = {};
+    D3D12_ROOT_PARAMETER rootParameters[3] = {};
 
     // transform
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -128,8 +182,15 @@ void SpectrumTextureGenerator::CreateRootSignature()
     // テクスチャ
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;
-    rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+    rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRange[0];
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+
+    // range
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+    rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+
 
     descriptionRootSignature.pParameters = rootParameters;
     descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
@@ -206,132 +267,3 @@ void SpectrumTextureGenerator::CreatePipelineState()
     hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
     assert(SUCCEEDED(hr));
 }
-
-/*
-
-#pragma region RootSignature
-
-    /// RootSignatrueを生成する
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-    //descriptorRange
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;
-    descriptorRange[0].NumDescriptors = 1;//数は１つ
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//ofsetを自動計算
-
-
-    //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[4] = {};
-
-    // transform
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[0].Descriptor.ShaderRegister = 0;
-
-    // camera
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[1].Descriptor.ShaderRegister = 1;
-
-    // color
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[2].Descriptor.ShaderRegister = 2;
-
-    // テクスチャ
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableで使う
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			//pixelShaderで使う
-    rootParameters[3].DescriptorTable.pDescriptorRanges = descriptorRange;		//tableの中身の配列を指定
-    rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//tableで利用する数
-
-
-
-    descriptionRootSignature.pParameters = rootParameters;
-    descriptionRootSignature.NumParameters = _countof(rootParameters);         // 配列の長さ
-
-    descriptionRootSignature.pStaticSamplers = staticSamplers;
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-    uint64_t type = flag.GetTypeValue();
-
-    //シリアライズしてバイナリする
-    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-    if (FAILED(hr))
-    {
-        Debug::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        assert(false);
-    }
-    hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[type]));
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region DepthStencilState
-    //DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    //Depthの機能を有効にする
-    depthStencilDesc.DepthEnable = true;
-    //書き込みします
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    //比較関数はLessEqeul つまり近ければ描画される
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-#pragma endregion
-
-
-#pragma region Shader
-    /// shaderをコンパイルする
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = PSOManager::GetInstance()->ComplieShader(L"SkyBox.hlsl", L"vs_6_0",L"VSmain");
-    assert(vertexShaderBlob != nullptr);
-    Microsoft::WRL::ComPtr<IDxcBlob>pixelShaderBlob = PSOManager::GetInstance()->ComplieShader(L"SkyBox.hlsl", L"ps_6_0", L"PSmain");
-    assert(pixelShaderBlob != nullptr);
-#pragma endregion
-
-#pragma region BlendState
-    /// BlendStateの設定
-    D3D12_BLEND_DESC blendDesc{};
-    blendDesc = GetBlendDesc(flag);
-#pragma endregion
-
-#pragma region RasterizerState
-
-    /// RasterizerStateの設定
-    D3D12_RASTERIZER_DESC rasterizerDesc{};
-    rasterizerDesc = GetRasterizerDesc(flag);
-
-    //三角形を塗りつぶす
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-#pragma endregion
-
-    // PSOを生成する
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-    graphicsPipelineStateDesc.pRootSignature = rootSignatures_[type].Get();                                         // RootSignature
-    graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() };	    // VertexShader
-    graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() };       // PixelShader
-    graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                                     // RasterizerState
-    // 追加の DRTV の情報
-    graphicsPipelineStateDesc.NumRenderTargets = 1;
-    graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-    graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    // どのように画面に色を打ち込むかの設定 (気にしなくて良い)
-    graphicsPipelineStateDesc.SampleDesc.Count = 1;
-    graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-    graphicsPipelineStateDesc.BlendState = blendDesc;
-
-
-    // PSOを生成
-    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-    hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
-    assert(SUCCEEDED(hr));
-
-
-    graphicsPipelineStates_[static_cast<uint64_t>(flag)] = pipelineState;
-*/
