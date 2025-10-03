@@ -8,6 +8,7 @@
 
 class RenderTarget;
 
+
 class SpectrumTextureGenerator
 {
 public:
@@ -17,12 +18,14 @@ public:
 
     void Initialize();
 
-    void Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, uint32_t drawCount = 32);
+    void Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, uint32_t drawCount = 64);
 
     D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandle() const;
 
     void SetWidth(float _width) { width_ = _width; }
     void SetMargin(float _margin) { margin_ = _margin; }
+
+    void MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize);
 private:
 
     struct ConstantBufferData
@@ -35,9 +38,18 @@ private:
         uint32_t drawCount; // 描画するバーの数
         float width; // バーの幅
         float margin;// バーの間隔
+        float rms; // RMS値  スケールとして使う
 
-        float pad;
+    };
 
+    struct Range
+    {
+        int32_t start;
+        int32_t end;
+
+        Range() = default;
+        Range(int32_t _s, int32_t _e) : start(_s), end(_e) {}
+        ~Range() = default;
     };
 
 private:
@@ -67,6 +79,11 @@ private:
     // テクスチャ
     RenderTarget* renderTexture_ = 0;
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> rangesBuffer_;
+    uint32_t rangesSrvIndex_ = 0;
+    Range* ranges_ = nullptr;
+
+
     // パイプライン
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
     // ルートシグネチャ
@@ -84,5 +101,25 @@ private:
 
     float width_    = 0.0f;
     float margin_   = 0.0f;
+
+    struct DrawData
+    {
+        size_t drawCount;
+        size_t fftBins;
+        float sampleRate;
+
+        bool operator==(const DrawData& other) const
+        {
+            return drawCount == other.drawCount &&
+                fftBins == other.fftBins &&
+                sampleRate == other.sampleRate;
+        }
+        bool CashEquals(size_t drawCount, size_t fftBins, float sampleRate) const
+        {
+            return *this == DrawData{ drawCount, fftBins, sampleRate };
+        }
+    };
+
+    DrawData cashedDrawData_{};
 
 };

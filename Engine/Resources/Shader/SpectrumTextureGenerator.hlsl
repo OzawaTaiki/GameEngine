@@ -9,6 +9,7 @@ struct ConstantBuff
     uint spectrumDrawCount; // 描画するデータの数
     float pieceWidth; // 幅
     float pieceMargin; // 余白
+    float rms; // RMS値
 };
 
 cbuffer cb : register(b0)
@@ -17,6 +18,7 @@ cbuffer cb : register(b0)
 }
 
 StructuredBuffer<float> spectrumData : register(t0);
+StructuredBuffer<int2> fftRanges : register(t1);
 
 // 1x1 の矩形 下中央が原点
 static const float2 quad[6] =
@@ -36,16 +38,29 @@ float4 VSmain(uint instanceID : SV_InstanceID, uint Vertexid : SV_VertexID) : SV
 
     float magnitude = 0;
 
-    uint margeDataCount = cb.spectrumDataCount / cb.spectrumDrawCount;
-    for (uint i = 0; i < margeDataCount; ++i)
-    {
-        magnitude = max(magnitude, spectrumData[instanceID * margeDataCount + i]);
-        //magnitude += spectrumData[instanceID * margeDataCount + i];
-    }
-    //magnitude /= margeDataCount; // 平均を取る
+    float sum = 0.0f;
+    int count = 0;
 
-    float t = saturate(magnitude / cb.maxMagnitude); // 0~1に正規化
-    float y = localpos.y * t; // 高さを変える
+    for (uint i = fftRanges[instanceID].x; i < fftRanges[instanceID].y; ++i)
+    {
+        sum += spectrumData[i];
+        ++count;
+    }
+
+    float avgMagnitude = 0.0f;
+    if (count > 0) // 0割り防止
+        avgMagnitude = sum / count;
+
+    // dbに変換
+    float db = 20.0f * log10(avgMagnitude + 1e-12f);
+    float normalized = (db + 60.0f) / 50.0f;
+    normalized = clamp(normalized, 0.0f, 1.0f);
+
+    // 形状 : 音量 = 7 : 3 で加算合成して音量による変化をつける
+    //float baseHeight = saturate(magnitude / cb.maxMagnitude) * 0.8f; // 0~1に正規化
+    //float volumeBoost = cb.rms * 0.2;
+    //float t = baseHeight + volumeBoost;
+    float y = localpos.y * normalized; // 高さを変える
 
 
     float offset = instanceID * (cb.pieceWidth + cb.pieceMargin) + (cb.pieceMargin); //端にmarginを入れる

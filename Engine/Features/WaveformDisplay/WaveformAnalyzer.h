@@ -37,12 +37,23 @@ public:
     /// <param name="_displayWidth">表示幅(ピクセル)</param>
     /// <param name="_displayDuration">表示時間(秒)</param>
     /// <returns>生波形データのPeakの配列</returns>
-    static std::vector<float> ExtractRawWaveformMaxMin(const SoundInstance* _soundInstance, float displayWidth, float displayDuration);
+    static std::vector<float> ExtractRawWaveformMaxMin(const SoundInstance* _soundInstance, float _displayWidth, float _displayDuration);
+
+
 
     //*=====================
     // RMS : Root Mean Square
     //      一定時間内の音声信号のエネルギーを計算し、その平均的な大きさを表す
     //*=====================
+
+    /// <summary>
+    /// 指定時間のRMS値を取得
+    /// </summary>
+    /// <param name="_soundInstance">解析する音声インスタンス</param>
+    /// <param name="_time">取得する時間(秒)</param>
+    /// <param name="_windowSizeMs">RMS計算に使用するウィンドウサイズ(ミリ秒)</param>
+    /// <returns>RMS値</returns>
+    static float GetRMSAtTime(const SoundInstance* _soundInstance, float _time, float _windowSizeMs = 50.0f);
 
     /// <summary>
     /// RMS解析
