@@ -48,9 +48,11 @@ UISprite* UIGroup::CreateSprite(const std::string& _label, const std::wstring& _
     return CreateElement<UISprite>(_label, _text);
 }
 
-UISlider* UIGroup::CreateSlider(const std::string& _label, const std::wstring& _text)
+UISlider* UIGroup::CreateSlider(const std::string& _label, float _minV, float _maxV)
 {
-    return CreateElement<UISlider>(_label, _text);
+    UISlider* newSlider = CreateSliderInternal(_label, _minV, _maxV);
+    newSlider->SetRange(_minV, _maxV);
+    return newSlider;
 }
 
 void UIGroup::AddElement(std::unique_ptr<UIBase> _element)
@@ -131,6 +133,23 @@ void UIGroup::LinkGrid(std::initializer_list<std::initializer_list<UISelectable*
         elementGrid.push_back(elementRow);
     }
     SetupGridNavigation(elementGrid);
+}
+
+UISlider* UIGroup::CreateSliderInternal(const std::string& _label, float _minV, float _maxV)
+{
+    auto element = std::make_unique<UISlider>();
+
+    uiElements_.push_back(std::move(element));
+    UISlider* newSlider = static_cast<UISlider*>(uiElements_.back().get());
+
+    navigator_.RegisterSelectable(newSlider);
+
+        newSlider->Initialize(_label, _minV, _maxV);
+    /*else
+        newSlider->Initialize(_label, _text);*/
+        // TODO : UITextを作成
+        // componentみたいにする
+    return newSlider;
 }
 
 void UIGroup::SetupVerticalNavigation(const std::vector<UISelectable*>& _elements)

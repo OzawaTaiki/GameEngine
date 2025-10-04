@@ -42,7 +42,7 @@ void UINavigator::Update()
     {
         if (currentFocused_)
         {
-            if (UISelectable* nextFocus = currentFocused_->GetNavigationTarget(dir); nextFocus && nextFocus->IsFocusable())
+            if (UISelectable* nextFocus = currentFocused_->GetNavigationTarget(dir); nextFocus && nextFocus->IsFocused())
             {
                 ChangeFocus(nextFocus);
             }
@@ -54,7 +54,7 @@ void UINavigator::Update()
             {
                 for (auto* element : registeredElements_)
                 {
-                    if (element && element->IsFocusable())
+                    if (element && element->IsFocused())
                     {
                         ChangeFocus(element);
                         break;
@@ -64,7 +64,8 @@ void UINavigator::Update()
         }
     }
 
-    CheckConfirm();
+
+    //CheckConfirm();
 
     previousMousePosition_ = mousePosition;
 }
@@ -74,7 +75,7 @@ void UINavigator::RegisterSelectable(UISelectable* _element)
     if (_element)
     {
         registeredElements_.push_back(_element);
-        _element->SetConfirmKeys(keyConfig_[UIAction::Confirm]);
+        //_element->SetConfirmKeys(keyConfig_[UIAction::Confirm]);
     }
 }
 
@@ -108,7 +109,7 @@ void UINavigator::CheckElementFocus()
     bool isFocused = false;
     for (auto* element : registeredElements_)
     {
-        if (element && element->IsFocusable() && element->IsMousePointerInside())
+        if (element && element->IsFocused() && element->IsMousePointerInside())
         {
             ChangeFocus(element);
             isFocused = true;
@@ -149,15 +150,15 @@ Direction UINavigator::GetDirectionFromInput() const
     }
     return Direction::None;
 }
-
-bool UINavigator::CheckConfirm() const
-{
-    if (!currentFocused_)
-        return false;
-
-    // フォーカスされた要素の入力処理を呼び出し
-    return currentFocused_->HandleInput();
-}
+//
+//bool UINavigator::CheckConfirm() const
+//{
+//    if (!currentFocused_)
+//        return false;
+//
+//    // フォーカスされた要素の入力処理を呼び出し
+//    return currentFocused_->HandleInput();
+//}
 
 void UINavigator::ChangeFocus(UISelectable* _element)
 {
@@ -169,7 +170,7 @@ void UINavigator::ChangeFocus(UISelectable* _element)
         currentFocused_ = _element;
 
         // nullの可能性があるからnullチェック
-        if (currentFocused_ && currentFocused_->IsFocusable())
+        if (currentFocused_ && currentFocused_->IsFocused())
             currentFocused_->SetFocused(true);
     }
 }

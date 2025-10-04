@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UISelectable.h"
+#include <Features/TextRenderer/TextGenerator.h>
 
 enum class PadButton;
 
@@ -12,53 +13,66 @@ public:
     ~UIButton() = default;
 
     // 初期化
-    void Initialize(const std::string& _label) override;
-    void Initialize(const std::string& _label, const std::wstring& _text) override;
-    void Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config) override;
+    void Initialize(const std::string& _label);
+    void Initialize(const std::string& _label, const std::wstring& _text);
+    void Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config);
 
     // 更新
-    void Update() override;
-
+    void UpdateSelf() override;
     // 描画
     void Draw() override;
 
-    // 入力処理
-    bool HandleInput() override;
+    // テキスト操作
+    void SetText(const std::wstring& _text);
+    const std::wstring& GetText() const;
+    void SetTextParam(const TextParam& _param);
+    void SetTextOffset(const Vector2& _offset);
 
-    // マウスクリックで押されたか
-    bool IsPressed();
-    // 指定のpadボタンで押されたか
-    bool IsPressed(PadButton _button);
-    // 押された コールバックを開始する
-    void Pressed();
+    void SetOnClickStart(std::function<void()> _callback);
+    void SetOnClickEnd(std::function<void()> _callback);
+    void SetOnFocusGained(std::function<void()> _callback) { onFocusGainedCallback_ = _callback; }
+    void SetOnFocusLost(std::function<void()> _callback) { onFocusLostCallback_ = _callback; }
 
-    // 色を設定する
-    void SetColor(const Vector4& _color) override;
+    void SetBackgroundColor(const Vector4& _color);
+    void SetTextColor(const Vector4& _color);
 
-    // クリック関連のコールバックを設定する
-    void SetCallBackOnClickStart(std::function<void()> _callback) { onClickStart_ = _callback; }
-    void SetCallBackOnClickEnd(std::function<void()> _callback) { onClickEnd_ = _callback; }
-
-    // 全てのコールバックを一括設定
-    void SetCallBacks(std::function<void()> _onFocusGained,
-        std::function<void()> _onFocusLost,
-        std::function<void()> _onFocusUpdate,
-        std::function<void()> _onClickStart,
-        std::function<void()> _onClickEnd);
+    void ImGui();
 
 protected:
+
+    // UIInteractiveの仮想関数のオーバーライド
+    void OnClick() override;
+    void OnMouseDown() override;
+    void OnMouseUp() override;
+
+    // UISelectableの仮想関数のオーバーライド
+    void OnFocusGained() override;
+    void OnFocusLost() override;
 
     // デフォルトコールバック
     virtual void OnClickStart();
     virtual void OnClickEnd();
 
-private:
 
+
+private:
     // クリック状態
-    bool isTriggered_ = false;
-    bool isClickEnd_ = false;
+    bool isClickProcessing_ = false;
 
     // クリック関連コールバック
     std::function<void()> onClickStart_ = nullptr;
     std::function<void()> onClickEnd_ = nullptr;
+
+    // フォーカス関連コールバック
+    std::function<void()> onFocusGainedCallback_ = nullptr;
+    std::function<void()> onFocusLostCallback_ = nullptr;
+
+    TextGenerator textGenerator_;
+    std::wstring text_ = L"";
+    TextParam textParam_;
+    Vector2 textOffset_ = { 0,0 };
+
+    // ビジュアル
+    Vector4 backgroundColor_ = { 0.8f, 0.8f, 0.8f, 1.0f };
+    Vector4 textColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 };

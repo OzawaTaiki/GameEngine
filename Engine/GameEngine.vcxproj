@@ -234,6 +234,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp" />
     <ClCompile Include="Features\TextRenderer\TextGenerator.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
+    <ClCompile Include="Features\UI\UIInteractive.cpp" />
     <ClCompile Include="Features\UI\UINavigator.cpp" />
     <ClCompile Include="Features\UI\UIBase.cpp" />
     <ClCompile Include="Features\UI\UIButton.cpp" />
@@ -377,6 +378,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\TextRenderer\TextGenerator.h" />
     <ClInclude Include="Features\TextRenderer\TextParam.h" />
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="Features\UI\UIInteractive.h" />
     <ClInclude Include="Features\UI\UINavigator.h" />
     <ClInclude Include="Features\UI\UIBase.h" />
     <ClInclude Include="Features\UI\UIButton.h" />

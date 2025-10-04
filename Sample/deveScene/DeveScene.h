@@ -24,6 +24,7 @@
 #include <Features/Model/SkyBox.h>
 
 #include <Features/TextRenderer/TextGenerator.h>
+#include <Features/UI/UIGroup.h>
 
 
 class DeveScene : public BaseScene
@@ -78,6 +79,8 @@ private:
     std::shared_ptr<VoiceInstance> voiceInstance_ = nullptr;
 
     std::unique_ptr<SkyBox> skyBox_ = nullptr;
+
+    std::unique_ptr<UIGroup> uiGroup_ = nullptr;
 
 
 

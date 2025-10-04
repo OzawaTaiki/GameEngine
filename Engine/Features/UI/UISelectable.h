@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Features/UI/UIBase.h>
-#include <functional>
+#include <Features/UI/UIInteractive.h>
+
+#include <vector>
 
 enum class Direction
 {
@@ -12,69 +13,88 @@ enum class Direction
     None
 };
 
-class UISelectable : public UIBase
+// 選択可能なUI基底クラス
+class UISelectable : public UIInteractive
 {
 public:
-
     UISelectable();
     virtual ~UISelectable() = default;
 
-    // 初期化
-    void Initialize(const std::string& _label) override;
-    void Initialize(const std::string& _label, const std::wstring& _text) override;
-    void Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config) override;
+    void UpdateSelf () override;
 
-    // 更新
-    void Update() override;
 
-    // フォーカス関連
-    virtual void SetFocused(bool _focused);
+    // 選択状態
+    void SetSelected(bool _selected) { isSelected_ = _selected; }
+    bool IsSelected() const { return isSelected_; }
+
+    // フォーカス状態
+    void SetFocused(bool _focused);
     bool IsFocused() const { return isFocused_; }
-    bool IsFocusable() const { return isFocusable_; }
-    void SetFocusable(bool _focusable) { isFocusable_ = _focusable; }
 
-    // ナビゲーション関連
+    // ナビゲーション
     void SetNavigationTarget(UISelectable* _target, Direction _dir);
     UISelectable* GetNavigationTarget(Direction _dir) const;
 
-    // コールバック設定
-    void SetCallBackOnFocusGained(std::function<void()> _callback) { onFocusGained_ = _callback; }
-    void SetCallBackOnFocusLost(std::function<void()> _callback) { onFocusLost_ = _callback; }
-    void SetCallBackOnFocusUpdate(std::function<void()> _callback) { onFocusUpdate_ = _callback; }
+    // ドラッグ関連
+    bool IsDragging() const { return isDragging_; }
+    // ドラッグのコールバック設定
+    void SetOnDragStart (std::function<void()> _callback) { onDragStartCallback_ = _callback; }
+    void SetOnDragging  (std::function<void()> _callback) { onDraggingCallback_ = _callback; }
+    void SetOnDragEnd   (std::function<void()> _callback) { onDragEndCallback_ = _callback; }
 
-    // 入力処理（派生クラスでオーバーライド）
-    virtual bool HandleInput() { return IsConfirmed(); }
-    void SetConfirmKeys(const std::vector<int32_t>& _keys) { confirmKeys_ = _keys; }
-    void SetConfirmKey(int32_t _key) { confirmKeys_.push_back(_key); }
+    // 色設定
+    void SetDefaultColor    (const Vector4& _color) { defaultColor_ = _color; }
+    void SetHoverColor      (const Vector4& _color) { hoverColor_ = _color; }
+    void SetPressedColor    (const Vector4& _color) { pressedColor_ = _color; }
+    void SetSelectedColor   (const Vector4& _color) { selectedColor_ = _color; }
+    void SetFocusedColor    (const Vector4& _color) { focusedColor_ = _color; }
+
 
 protected:
 
-    bool IsConfirmed() const;
+    // ドラッグイベント
+    virtual void OnDragStart();
+    virtual void OnDragging();
+    virtual void OnDragEnd();
 
-    // デフォルトコールバック（派生クラスでオーバーライド可能）
+    // フォーカスイベント
     virtual void OnFocusGained();
     virtual void OnFocusLost();
-    virtual void OnFocusUpdate();
+
+    // 現在の色を取得
+    Vector4 GetCurrentColor() const;
+
+    // ナビゲーション処理
+    void ProcessNavigation();
 
 protected:
 
-    // フォーカス状態
-    bool isFocusable_ = true;
-    bool isFocused_ = false;
+    // フォーカス関連
+    bool isSelected_ = false; // 選択状態か
+    bool isFocused_  = false; // フォーカス状態か
 
-    // ナビゲーションターゲット
-    UISelectable* upTarget_ = nullptr;
-    UISelectable* downTarget_ = nullptr;
-    UISelectable* leftTarget_ = nullptr;
-    UISelectable* rightTarget_ = nullptr;
+    // ドラッグ状態
+    bool    isDragging_     = false; // ドラッグ中か
+    Vector2 dragStartPos_   = { 0,0 }; // ドラッグ開始時のマウス位置
+    Vector2 dragOffset_     = { 0,0 }; // ドラッグ中のオフセット
 
-    // コールバック関数
-    std::function<void()> onFocusGained_ = nullptr;
-    std::function<void()> onFocusLost_ = nullptr;
-    std::function<void()> onFocusUpdate_ = nullptr;
 
-    std::vector<int32_t> confirmKeys_ = {};
+    // ナビゲーション関連
+    UISelectable* upTarget_     = nullptr;
+    UISelectable* downTarget_   = nullptr;
+    UISelectable* leftTarget_   = nullptr;
+    UISelectable* rightTarget_  = nullptr;
 
-    // デフォルト色（フォーカス時の色変更用）
-    Vector4 defaultColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // コールバック
+    std::function<void()> onDragStartCallback_  = nullptr;
+    std::function<void()> onDraggingCallback_   = nullptr;
+    std::function<void()> onDragEndCallback_    = nullptr;
+
+    // 状態別カラー
+    Vector4 defaultColor_   = { 1.0f,1.0f,1.0f,1.0f }; // デフォルトカラー
+    Vector4 hoverColor_     = { 0.9f,0.9f,0.9f,1.0f }; // ホバーカラー
+    Vector4 pressedColor_   = { 0.7f,0.7f,0.7f,1.0f }; // 押下カラー
+    Vector4 selectedColor_  = { 0.8f,0.8f,1.0f,1.0f }; // 選択カラー
+    Vector4 focusedColor_   = { 1.0f,1.0f,0.8f,1.0f }; // フォーカスカラー
+
 };

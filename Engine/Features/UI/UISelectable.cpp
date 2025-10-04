@@ -2,49 +2,48 @@
 #include <Debug/Debug.h>
 #include <System/Input/Input.h>
 
-UISelectable::UISelectable() :
-    UIBase(),
-    confirmKeys_({ DIK_RETURN,
-        DIK_SPACE,
-        static_cast<int32_t>(PadButton::iPad_A),
-        static_cast<int32_t>(MouseButton::Left) })
+UISelectable::UISelectable()
 {
-    defaultColor_ = color_;
 }
 
-void UISelectable::Initialize(const std::string& _label)
+void UISelectable::UpdateSelf()
 {
-    UIBase::Initialize(_label);
-    defaultColor_ = color_;
-}
+    UIInteractive::UpdateSelf();
 
-void UISelectable::Initialize(const std::string& _label, const std::wstring& _text)
-{
-    UIBase::Initialize(_label, _text);
-    defaultColor_ = color_;
-}
+    Input* input = Input::GetInstance();
+    Vector2 mousePos = input->GetMousePosition();
 
-void UISelectable::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
-{
-    UIBase::Initialize(_label, _text, _config);
-    defaultColor_ = color_;
-}
+    // ドラッグ処理
+    if (isHovered_ && input->IsMouseTriggered(0))
+    {
+        isDragging_ = true;
+        dragStartPos_ = mousePos;
+        dragOffset_ = mousePos - GetWorldPos();
+        OnDragStart();
+    }
 
-void UISelectable::Update()
-{
-    UIBase::Update();
+    if (isDragging_)
+    {
+        if (input->IsMousePressed(0) || input->IsMouseTriggered(0))
+        {
+            // ドラッグ中
+            OnDragging();
+        }
+        else
+        {
+            // ドラッグ終了
+            isDragging_ = false;
+            OnDragEnd();
+        }
+    }
 
-    if (!isActive_ || !isFocusable_)
-        return;
-
-    // フォーカス中の更新処理
     if (isFocused_)
     {
-        OnFocusUpdate();
-
-        // 派生クラスの入力処理
-        HandleInput();
+        // フォーカスがある場合、ナビゲーション処理
+        ProcessNavigation();
     }
+
+    color_ = GetCurrentColor();
 }
 
 void UISelectable::SetFocused(bool _focused)
@@ -68,29 +67,24 @@ void UISelectable::SetNavigationTarget(UISelectable* _target, Direction _dir)
 {
     switch (_dir)
     {
-    case Direction::Up:
-        upTarget_ = _target;
-        if (_target)
-            _target->downTarget_ = this; // 双方向リンク
-        break;
-    case Direction::Down:
-        downTarget_ = _target;
-        if (_target)
-            _target->upTarget_ = this; // 双方向リンク
-        break;
-    case Direction::Left:
-        leftTarget_ = _target;
-        if (_target)
-            _target->rightTarget_ = this; // 双方向リンク
-        break;
-    case Direction::Right:
-        rightTarget_ = _target;
-        if (_target)
-            _target->leftTarget_ = this; // 双方向リンク
-        break;
-    default:
-        Debug::Log("Invalid direction for UISelectable navigation target.");
-        return;
+        case Direction::Up:
+            upTarget_ = _target;
+            _target->downTarget_ = this; // 双方向に設定
+            break;
+        case Direction::Down:
+            downTarget_ = _target;
+            _target->upTarget_ = this; // 双方向に設定
+            break;
+        case Direction::Left:
+            leftTarget_ = _target;
+            _target->rightTarget_ = this; // 双方向に設定
+            break;
+        case Direction::Right:
+            rightTarget_ = _target;
+            _target->leftTarget_ = this; // 双方向に設定
+            break;
+        default:
+            break;
     }
 }
 
@@ -98,62 +92,106 @@ UISelectable* UISelectable::GetNavigationTarget(Direction _dir) const
 {
     switch (_dir)
     {
-    case Direction::Up:
-        return upTarget_;
-    case Direction::Down:
-        return downTarget_;
-    case Direction::Left:
-        return leftTarget_;
-    case Direction::Right:
-        return rightTarget_;
-    default:
-        Debug::Log("Invalid direction for UISelectable navigation target.");
-        return nullptr;
+        case Direction::Up:
+            return upTarget_;
+        case Direction::Down:
+            return downTarget_;
+        case Direction::Left:
+            return leftTarget_;
+        case Direction::Right:
+            return rightTarget_;
+        default:
+            return nullptr;
     }
 }
 
-bool UISelectable::IsConfirmed() const
+void UISelectable::OnDragStart()
 {
-    Input* input = Input::GetInstance();
-
-    if (!input)
-        return false;
-
-    for (const auto& key : confirmKeys_)
+    if (onDragStartCallback_)
     {
-        if (input->IsPadTriggered(static_cast<PadButton>(key))
-            || input->IsKeyTriggered(key)
-            || input->IsMouseTriggered(key))
-        {
-            return true;
-        }
+        onDragStartCallback_();
     }
-    return false;
+}
+
+void UISelectable::OnDragging()
+{
+    if (onDraggingCallback_)
+    {
+        onDraggingCallback_();
+    }
+}
+
+void UISelectable::OnDragEnd()
+{
+    if (onDragEndCallback_)
+    {
+        onDragEndCallback_();
+    }
 }
 
 void UISelectable::OnFocusGained()
 {
-    // デフォルト：少し暗くする
-    color_ = defaultColor_ * 0.8f;
-
-    // カスタムコールバックがあれば実行
-    if (onFocusGained_)
-        onFocusGained_();
+    // フォーカス時の処理
+    // 派生クラスでオーバーライド可能
 }
 
 void UISelectable::OnFocusLost()
 {
-    // デフォルト：元の色に戻す
-    color_ = defaultColor_;
-
-    // カスタムコールバックがあれば実行
-    if (onFocusLost_)
-        onFocusLost_();
+    // フォーカス喪失時の処理
+    // 派生クラスでオーバーライド可能
 }
 
-void UISelectable::OnFocusUpdate()
+Vector4 UISelectable::GetCurrentColor() const
 {
-    // カスタムコールバックがあれば実行
-    if (onFocusUpdate_)
-        onFocusUpdate_();
+    // 優先順位: Pressed/Dragging > Focused > Selected > Hovered > Default
+    if (isPressed_ || isDragging_)
+        return pressedColor_;
+
+    if (isFocused_)
+        return focusedColor_;
+
+    if (isSelected_)
+        return selectedColor_;
+
+    if (isHovered_)
+        return hoverColor_;
+
+    return defaultColor_;
+}
+
+void UISelectable::ProcessNavigation()
+{
+    Input* input = Input::GetInstance();
+    if (input->IsKeyTriggered(DIK_UP))
+    {
+        if (upTarget_)
+        {
+            SetFocused(false);
+            upTarget_->SetFocused(true);
+        }
+    }
+    if (input->IsKeyTriggered(DIK_DOWN))
+    {
+        if (downTarget_)
+        {
+            SetFocused(false);
+            downTarget_->SetFocused(true);
+        }
+    }
+    if (input->IsKeyTriggered(DIK_LEFT))
+    {
+        if (leftTarget_)
+        {
+            SetFocused(false);
+            leftTarget_->SetFocused(true);
+        }
+    }
+    if (input->IsKeyTriggered(DIK_RIGHT))
+    {
+        if (rightTarget_)
+        {
+            SetFocused(false);
+            rightTarget_->SetFocused(true);
+        }
+    }
 }
