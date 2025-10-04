@@ -8,6 +8,7 @@
 UIBase::~UIBase()
 {
     //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(label_);
+    RemoveAllChildren();
 }
 
 void UIBase::Initialize(const std::string& _label)
@@ -26,8 +27,6 @@ void UIBase::Initialize(const std::string& _label)
     jsonBinder_->RegisterVariable(label_ + "_textureName", &textureName_);
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_ + "_label", &label_);
-    jsonBinder_->RegisterVariable(label_ + "_Text", &textParam_);
-    jsonBinder_->RegisterVariable(label_ + "_TextOffset", &textOffset_);
 
     if (textureName_ == "")
         textureName_ = "white.png";
@@ -44,22 +43,26 @@ void UIBase::Initialize(const std::string& _label)
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
 
+    color_ = { 1.0f,1.0f ,1.0f ,1.0f };
 }
 
-void UIBase::Initialize(const std::string& _label, const std::wstring& _text)
+void UIBase::Update()
 {
-    UIBase::Initialize(_label, _text, FontConfig());
-}
+    if(!isActive_)
+    {
+        // 非アクティブなら更新しない
+        return;
+    }
 
-void UIBase::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
-{
-    UIBase::Initialize(_label);
+    // 自身の更新処理
+    UpdateSelf();
 
-    textGenerator_.Initialize(_config);
-
-    hasText_ = true;
-
-    text_ = _text;
+    // 子要素の更新
+    for (auto& child : children_)
+    {
+        if (child)
+            child->Update();
+    }
 
 }
 
@@ -69,28 +72,87 @@ void UIBase::Draw()
     {
         return;
     }
+
+    DrawSelf();
+
+    for (auto& child : children_)
+    {
+        if (child && child->IsVisible())
+        {
+            child->Draw();
+        }
+    }
+}
+
+void UIBase::DrawSelf()
+{
+    if (!sprite_)
+        return;
+
     sprite_->translate_ = GetWorldPos();
     sprite_->SetSize(size_);
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
     sprite_->SetTextureHandle(textureHandle_);
     sprite_->Draw(color_);
+}
 
-    if (hasText_)
+void UIBase::AddChild(std::shared_ptr<UIBase> _child)
+{
+    if (!_child)
+        return;
+
+    if (_child->parent_)
     {
-        textParam_.position = GetWorldPos() + textOffset_;
-        textParam_.pivot = anchor_;
+        // すでに親がいる場合は外す
+        _child->parent_->RemoveChild(_child);
+    }
 
-        textGenerator_.Draw(text_, textParam_);
+    // 親子関係を設定
+    _child->parent_ = this;
+    children_.push_back(_child);
+}
+
+void UIBase::RemoveChild(std::shared_ptr<UIBase> _child)
+{
+    if (!_child)
+        return;
+
+    auto it = std::find(children_.begin(), children_.end(), _child);
+    if (it != children_.end())
+    {
+        (*it)->parent_ = nullptr; // 親を解除
+        children_.erase(it);
     }
 }
 
-bool UIBase::IsMousePointerInside() const
+void UIBase::RemoveAllChildren()
 {
-    Vector2 mPos = Input::GetInstance()->GetMousePosition();
-
-    return IsPointInside(mPos);
+    for (auto& child : children_)
+    {
+        if (child)
+            child->parent_ = nullptr;
+    }
+    children_.clear();
 }
+
+
+Vector2 UIBase::GetWorldPos() const
+{
+    Vector2 pos = position_;
+    if (parent_)
+        pos +=parent_->GetWorldPos();
+
+    return pos;
+}
+
+//
+//bool UIBase::IsMousePointerInside() const
+//{
+//    Vector2 mPos = Input::GetInstance()->GetMousePosition();
+//
+//    return IsPointInside(mPos);
+//}
 
 bool UIBase::IsPointInside(const Vector2& _point) const
 {
@@ -110,20 +172,12 @@ bool UIBase::IsPointInside(const Vector2& _point) const
     return false;
 }
 
-Vector2 UIBase::GetWorldPos() const
-{
-    Vector2 pos = position_;
-    if (parent_)
-        pos +=parent_->GetWorldPos();
-
-    return pos;
-}
-
-void UIBase::SetParent(UIBase* _parent)
-{
-    if (_parent)
-        parent_ = _parent;
-}
+//
+//void UIBase::SetParent(UIBase* _parent)
+//{
+//    if (_parent)
+//        parent_ = _parent;
+//}
 
 void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
 {
@@ -187,11 +241,6 @@ void UIBase::ImGui()
             jsonBinder_->Save();
         }
 
-        ImGui::SeparatorText("Text param");
-
-        ImGui::DragFloat2("offset", &textOffset_.x, 0.01f);
-        textParam_.ImGui();
-
 
     }
     ImGui::EndTabBar();
@@ -199,4 +248,8 @@ void UIBase::ImGui()
 #endif // _DEBUG
 }
 
+void UIBase::UpdateSelf()
+{
+
+}
 

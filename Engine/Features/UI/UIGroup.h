@@ -36,7 +36,7 @@ public:
     // 要素の生成
     UIButton* CreateButton(const std::string& _label, const std::wstring& _text = L"");
     UISprite* CreateSprite(const std::string& _label, const std::wstring& _text = L"");
-    UISlider* CreateSlider(const std::string& _label, const std::wstring& _text = L"");
+    UISlider* CreateSlider(const std::string& _label,float _minV, float _maxV);
 
     // 任意のUI要素を追加（UISelectableを継承した要素）
     template<typename T>
@@ -60,25 +60,6 @@ public:
         return static_cast<T*>(uiElements_.back().get());
     }
 
-    template<>
-    UISlider* CreateElement<UISlider>(const std::string& _label, const std::wstring& _text )
-    {
-        auto element = std::make_unique<UISlider>(this);
-
-         uiElements_.push_back(std::move(element));
-         UISlider* newSlider = static_cast<UISlider*>(uiElements_.back().get());
-
-        navigator_.RegisterSelectable(newSlider);
-
-        if (_text.empty())
-            newSlider->Initialize(_label);
-        else
-            newSlider->Initialize(_label, _text);
-
-        return newSlider;
-
-    }
-
     // 要素を手動で追加
     void AddElement(std::unique_ptr<UIBase> _element);
 
@@ -92,6 +73,8 @@ public: // 静的メンバ関数
     static void LinkGrid(std::initializer_list<std::initializer_list<UISelectable*>> _elements);
 
 private:
+
+    UISlider* CreateSliderInternal(const std::string& _label, float _minV, float _maxV);
 
     static void SetupVerticalNavigation(const std::vector<UISelectable*>& _elements);
     static void SetupHorizontalNavigation(const std::vector<UISelectable*>& _elements);

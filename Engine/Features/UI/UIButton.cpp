@@ -1,144 +1,196 @@
 #include "UIButton.h"
 #include <System/Input/Input.h>
 #include <Debug/ImGuiManager.h>
+#include <Utility/ConvertString/ConvertString.h>
 
-UIButton::UIButton() :
-    UISelectable(),
-    onClickStart_([this]() { OnClickStart(); }),
-    onClickEnd_([this]() { OnClickEnd(); })
-
+UIButton::UIButton()
 {
 }
 
 void UIButton::Initialize(const std::string& _label)
 {
     UISelectable::Initialize(_label);
+
+    jsonBinder_->RegisterVariable(label_ + "backgroundColor", &backgroundColor_);
+    jsonBinder_->RegisterVariable(label_ + "textColor", &textColor_);
+
+    // ボタンのデフォルト色設定
+    SetDefaultColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+    SetHoverColor({ 0.9f, 0.9f, 0.9f, 1.0f });
+    SetPressedColor({ 0.6f, 0.6f, 0.6f, 1.0f });
+    SetSelectedColor({ 0.7f, 0.7f, 1.0f, 1.0f });
+    SetFocusedColor({ 1.0f, 1.0f, 0.8f, 1.0f });
+
+
 }
 
 void UIButton::Initialize(const std::string& _label, const std::wstring& _text)
 {
-    UISelectable::Initialize(_label, _text);
+    Initialize(_label, _text, FontConfig());
 }
 
 void UIButton::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
 {
-    UISelectable::Initialize(_label, _text, _config);
+    Initialize(_label);
+    textGenerator_.Initialize(_config);
+    text_ = _text;
 }
 
-void UIButton::Update()
+void UIButton::UpdateSelf()
 {
-#ifdef _DEBUG
-    ImGui();
-#endif // _DEBUG
+    UISelectable::UpdateSelf();
 
-    UISelectable::Update();
-
-    // クリック処理
-    if (isTriggered_)
+    // クリック処理が完了していたらクリック終了
+    if (isClickProcessing_ && !isPressed_)
     {
-        if (onClickStart_)
-        {
-            onClickStart_();
-            isClickEnd_ = true;
-        }
-        isTriggered_ = false;
-    }
-    else if (isClickEnd_)
-    {
-        if (onClickEnd_)
-        {
-            onClickEnd_();
-            isClickEnd_ = false;
-        }
-        else
-        {
-            isClickEnd_ = false;
-        }
+        OnClickEnd();
     }
 }
 
 void UIButton::Draw()
 {
-    UISelectable::Draw();
+    if (!isVisible_)
+        return;
+
+    textParam_.position = GetWorldPos() + textOffset_;
+
+    UIBase::Draw();
+    textGenerator_.Draw(text_, textParam_);
 }
 
-bool UIButton::HandleInput()
+void UIButton::SetText(const std::wstring& _text)
 {
-    if (!isFocused_)
-        return false;
+    text_ = _text;
+}
 
-    Input* input = Input::GetInstance();
+const std::wstring& UIButton::GetText() const
+{
+    return text_;
+}
 
-    // Enter、Space、パッドAボタンでクリック
-    if (IsConfirmed())
+void UIButton::SetTextParam(const TextParam& _param)
+{
+    textParam_ = _param;
+}
+
+void UIButton::SetTextOffset(const Vector2& _offset)
+{
+    textOffset_ = _offset;
+    // Drawで位置更新をしているためここでは必要ない
+}
+
+void UIButton::SetOnClickStart(std::function<void()> _callback)
+{
+    onClickCallback_ = _callback;
+}
+
+void UIButton::SetOnClickEnd(std::function<void()> _callback)
+{
+    onClickEnd_ = _callback;
+}
+
+void UIButton::SetBackgroundColor(const Vector4& _color)
+{
+    backgroundColor_ = _color;
+    SetDefaultColor(backgroundColor_);
+}
+
+void UIButton::SetTextColor(const Vector4& _color)
+{
+    textColor_ = _color;
+    textParam_.SetColor(textColor_);
+}
+
+void UIButton::ImGui()
+{
+#ifdef _DEBUG
+    UISelectable::ImGui();
+
+    ImGui::PushID("Button");
+
+    if (ImGui::TreeNode("Button Settings"))
     {
-        Pressed();
-        return true;
+        if (ImGui::ColorEdit4("backgroundColor", &backgroundColor_.x))
+        {
+            SetBackgroundColor(backgroundColor_);
+        }
+
+        if (ImGui::ColorEdit4("textColor", &textColor_.x))
+        {
+            SetTextColor(textColor_);
+        }
+
+        // テキスト編集
+        char buf[256];
+        std::string str = ConvertString(text_);
+        strcpy_s(buf, str.c_str());
+        if (ImGui::InputText("text", buf, 256))
+        {
+            str = buf;
+            SetText(std::wstring(str.begin(), str.end()));
+        }
+
+        ImGui::TreePop();
     }
 
-    return false;
+    ImGui::PopID();
+#endif
 }
 
-bool UIButton::IsPressed()
+void UIButton::OnClick()
 {
-    if (IsMousePointerInside() &&
-        Input::GetInstance()->IsMouseTriggered(0))
+    UISelectable::OnClick();
+
+    if (!isClickProcessing_)
     {
-        Pressed();
-        return true;
+        OnClickStart();
+        isClickProcessing_ = true;
     }
-
-    return false;
 }
 
-bool UIButton::IsPressed(PadButton _button)
+void UIButton::OnMouseDown()
 {
-    // 選択されていないときは押されていないとする
-    if (!isFocused_)
-        return false;
+    UISelectable::OnMouseDown();
+}
 
-    if (Input::GetInstance()->IsPadTriggered(_button))
+void UIButton::OnMouseUp()
+{
+    UISelectable::OnMouseUp();
+}
+
+void UIButton::OnFocusGained()
+{
+    UISelectable::OnFocusGained();
+
+    if (onFocusGainedCallback_)
     {
-        Pressed();
-        return true;
+        onFocusGainedCallback_();
     }
-
-    return false;
 }
 
-void UIButton::Pressed()
+void UIButton::OnFocusLost()
 {
-    isTriggered_ = true;
-}
+    UISelectable::OnFocusLost();
 
-void UIButton::SetColor(const Vector4& _color)
-{
-    UISelectable::SetColor(_color);
-    defaultColor_ = _color; // デフォルトカラーも更新
-}
-
-void UIButton::SetCallBacks(std::function<void()> _onFocusGained,
-    std::function<void()> _onFocusLost,
-    std::function<void()> _onFocusUpdate,
-    std::function<void()> _onClickStart,
-    std::function<void()> _onClickEnd)
-{
-    SetCallBackOnFocusGained(_onFocusGained);
-    SetCallBackOnFocusLost(_onFocusLost);
-    SetCallBackOnFocusUpdate(_onFocusUpdate);
-    onClickStart_ = _onClickStart;
-    onClickEnd_ = _onClickEnd;
+    if (onFocusLostCallback_)
+    {
+        onFocusLostCallback_();
+    }
 }
 
 void UIButton::OnClickStart()
 {
-    // クリック開始時の処理
-    isClickEnd_ = true;
-    isTriggered_ = false;
+    if (onClickStart_)
+    {
+        onClickStart_();
+    }
 }
 
 void UIButton::OnClickEnd()
 {
-    // クリック終了時の処理
-    isClickEnd_ = false;
+    if (onClickEnd_)
+    {
+        onClickEnd_();
+    }
+    isClickProcessing_ = false;
 }

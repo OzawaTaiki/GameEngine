@@ -44,7 +44,7 @@ private:
 
     Direction GetDirectionFromInput() const;
 
-    bool CheckConfirm() const;
+    //bool CheckConfirm() const;
 
     void ChangeFocus(UISelectable* _element);
 

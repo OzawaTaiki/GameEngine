@@ -17,12 +17,12 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
     rtvManager_->CreateRenderTarget("postEffect", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
     rtvManager_->CreateRenderTarget("ShadowMap", 4096, 4096, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  Vector4(1.0f, 1.0f, 1.0f, 1.0f),true);
 
-    PSOManager::GetInstance()->CreatePSOForPostEffect("GrayScale", L"GrayScale.hlsl");
-    PSOManager::GetInstance()->CreatePSOForPostEffect("Vignette", L"Vignetting.hlsl");
-    PSOManager::GetInstance()->CreatePSOForPostEffect("BoxFilter", L"BoxFilter.hlsl");
-    PSOManager::GetInstance()->CreatePSOForPostEffect("Gauss", L"GaussianFilter.hlsl");
-    PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
-    PSOManager::GetInstance()->CreatePSOForPostEffect("RadialBlur", L"RadialBlur.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("GrayScale", L"GrayScale.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("Vignette", L"Vignetting.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("BoxFilter", L"BoxFilter.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("Gauss", L"GaussianFilter.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("LuminanceBasedOutline", L"LuminanceBasedOutline.hlsl");
+    //PSOManager::GetInstance()->CreatePSOForPostEffect("RadialBlur", L"RadialBlur.hlsl");
 
     Dissolve::GetInstance()->Initialize();
 

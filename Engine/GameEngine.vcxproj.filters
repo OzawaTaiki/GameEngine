@@ -652,6 +652,9 @@
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
     <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp" />
+    <ClCompile Include="Features\UI\UIInteractive.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1110,6 +1113,9 @@
     </ClInclude>
     <ClInclude Include="Features\AudioSpectrum\SpectrumTextureGenerator.h">
       <Filter>Features\AudioSpectrum</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIInteractive.h">
+      <Filter>Features\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
