@@ -34,17 +34,17 @@ public:
     UISelectable* GetFocused() const { return navigator_.GetFocused(); }
 
     // 要素の生成
-    UIButton* CreateButton(const std::string& _label, const std::wstring& _text = L"");
-    UISprite* CreateSprite(const std::string& _label, const std::wstring& _text = L"");
-    UISlider* CreateSlider(const std::string& _label,float _minV, float _maxV);
+    std::shared_ptr<UIButton> CreateButton(const std::string& _label, const std::wstring& _text = L"");
+    std::shared_ptr<UISprite> CreateSprite(const std::string& _label, const std::wstring& _text = L"");
+    std::shared_ptr<UISlider> CreateSlider(const std::string& _label, float _minV, float _maxV);
 
     // 任意のUI要素を追加（UISelectableを継承した要素）
     template<typename T>
-    T* CreateElement(const std::string& _label, const std::wstring& _text = L"")
+    std::shared_ptr<T> CreateElement(const std::string& _label, const std::wstring& _text = L"")
     {
         static_assert(std::is_base_of_v<UIBase, T>, "T must inherit from UIBase");
 
-        auto element = std::make_unique<T>();
+        auto element = std::make_shared<T>();
         if (_text.empty())
             element->Initialize(_label);
         else
@@ -56,8 +56,8 @@ public:
             navigator_.RegisterSelectable(element.get());
         }
 
-        uiElements_.push_back(std::move(element));
-        return static_cast<T*>(uiElements_.back().get());
+        uiElements_.push_back(element);
+        return static_cast<std::shared_ptr<T>>(element);
     }
 
     // 要素を手動で追加
@@ -74,7 +74,7 @@ public: // 静的メンバ関数
 
 private:
 
-    UISlider* CreateSliderInternal(const std::string& _label, float _minV, float _maxV);
+    std::shared_ptr<UISlider> CreateSliderInternal(const std::string& _label, float _minV, float _maxV);
 
     static void SetupVerticalNavigation(const std::vector<UISelectable*>& _elements);
     static void SetupHorizontalNavigation(const std::vector<UISelectable*>& _elements);
@@ -84,5 +84,5 @@ private:
 
     UINavigator navigator_; // UIナビゲーター
 
-    std::vector<std::unique_ptr<UIBase>> uiElements_; // UI要素のコンテナ
+    std::vector<std::shared_ptr<UIBase>> uiElements_; // UI要素のコンテナ
 };
