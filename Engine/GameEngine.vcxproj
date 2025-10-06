@@ -242,6 +242,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\UISelectable.cpp" />
     <ClCompile Include="Features\UI\UISlider.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
+    <ClCompile Include="Features\UI\UIText.cpp" />
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
@@ -386,6 +387,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\UISelectable.h" />
     <ClInclude Include="Features\UI\UISlider.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
+    <ClInclude Include="Features\UI\UIText.h" />
     <ClInclude Include="Features\UVTransform\IUVAnimation.h" />
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Features\UVTransform\UVTransform.h" />

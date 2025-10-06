@@ -2,10 +2,10 @@
 
 #include "UISelectable.h"
 #include <Features/TextRenderer/TextGenerator.h>
-
+#include <Features/UI/UIText.h>
 enum class PadButton;
 
-class UIButton : public UISelectable
+class UIButton final : public UISelectable
 {
 public:
 
@@ -22,11 +22,11 @@ public:
     // 描画
     void Draw() override;
 
+    UIText* GetTextObject() { return text_.get(); }
+
     // テキスト操作
     void SetText(const std::wstring& _text);
     const std::wstring& GetText() const;
-    void SetTextParam(const TextParam& _param);
-    void SetTextOffset(const Vector2& _offset);
 
     void SetOnClickStart(std::function<void()> _callback);
     void SetOnClickEnd(std::function<void()> _callback);
@@ -34,9 +34,8 @@ public:
     void SetOnFocusLost(std::function<void()> _callback) { onFocusLostCallback_ = _callback; }
 
     void SetBackgroundColor(const Vector4& _color);
-    void SetTextColor(const Vector4& _color);
 
-    void ImGui();
+    void ImGuiContent() override;
 
 protected:
 
@@ -56,6 +55,11 @@ protected:
 
 
 private:
+
+    void CraeteUIText(const std::wstring& _text, const FontConfig& _config);
+
+
+private:
     // クリック状態
     bool isClickProcessing_ = false;
 
@@ -67,12 +71,13 @@ private:
     std::function<void()> onFocusGainedCallback_ = nullptr;
     std::function<void()> onFocusLostCallback_ = nullptr;
 
-    TextGenerator textGenerator_;
-    std::wstring text_ = L"";
-    TextParam textParam_;
-    Vector2 textOffset_ = { 0,0 };
+    //TextGenerator textGenerator_;
+    //std::wstring text_ = L"";
+    //TextParam textParam_;
+    //Vector2 textOffset_ = { 0,0 };
+    std::shared_ptr<UIText> text_;
 
     // ビジュアル
     Vector4 backgroundColor_ = { 0.8f, 0.8f, 0.8f, 1.0f };
-    Vector4 textColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
+    //Vector4 textColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 };

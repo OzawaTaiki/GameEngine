@@ -5,17 +5,30 @@
 #include <Debug/ImGuiManager.h>
 #include <Debug/ImGuiDebugManager.h>
 
+UIBase::UIBase()
+{
+}
+
 UIBase::~UIBase()
 {
-    //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(label_);
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("UI_" + label_);
+#endif // _DEBUG
     RemoveAllChildren();
 }
 
-void UIBase::Initialize(const std::string& _label)
+void UIBase::Initialize(const std::string& _label, bool _regsterDebugWindow)
 {
+#ifdef _DEBUG
+    if (_regsterDebugWindow)
+        ImGuiDebugManager::GetInstance()->AddDebugWindow("UI_" + _label, [this]() { this->ImGui(); });
+#endif // _DEBUG
+
     label_ = _label;
 
     jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
+
+    color_ = { 1.0f,1.0f ,1.0f ,1.0f };
 
     jsonBinder_->RegisterVariable(label_ + "_pos", &position_);
     jsonBinder_->RegisterVariable(label_ + "_size", &size_);
@@ -42,13 +55,11 @@ void UIBase::Initialize(const std::string& _label)
     sprite_->SetSize(size_);
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
-
-    color_ = { 1.0f,1.0f ,1.0f ,1.0f };
 }
 
 void UIBase::Update()
 {
-    if(!isActive_)
+    if (!isActive_)
     {
         // 非アクティブなら更新しない
         return;
@@ -136,7 +147,6 @@ void UIBase::RemoveAllChildren()
     children_.clear();
 }
 
-
 Vector2 UIBase::GetWorldPos() const
 {
     Vector2 pos = position_;
@@ -197,53 +207,73 @@ void UIBase::Save()
 void UIBase::ImGui()
 {
 #ifdef _DEBUG
-    ImGui::BeginTabBar("UI");
-    if (ImGui::BeginTabItem(label_.c_str()))
+
+    ImGui::PushID(this);
+    // UIBase独自の項目
+    if (ImGui::CollapsingHeader(label_.c_str()))
     {
-        ImGui::DragFloat2("position", &position_.x, 1.0f);
-        ImGui::DragFloat2("size", &size_.x, 1.0f);
-        ImGui::DragFloat("rotate", &rotate_, 0.01f);
-        ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
-        ImGui::Checkbox("isActive", &isActive_);
-        ImGui::Checkbox("isVisible", &isVisible_);
-        ImGui::ColorEdit4("color", &color_.x);
-
-        char buf1[255];
-        strcpy_s(buf1, directoryPath_.c_str());
-        if (ImGui::InputText("directoryPath", buf1, 255))
+        if (ImGui::TreeNode("UIBase"))
         {
-            directoryPath_ = buf1;
-        }
+            ImGui::DragFloat2("position", &position_.x, 1.0f);
+            ImGui::DragFloat2("size", &size_.x, 1.0f);
+            ImGui::DragFloat("rotate", &rotate_, 0.01f);
+            ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
+            ImGui::Checkbox("isActive", &isActive_);
+            ImGui::Checkbox("isVisible", &isVisible_);
+            ImGui::ColorEdit4("color", &color_.x);
 
-        char buf2[255];
-        strcpy_s(buf2, textureName_.c_str());
-        if (ImGui::InputText("textureName", buf2, 255))
-        {
-            textureName_ = buf2;
-        }
-
-        if (ImGui::Button("Apply"))
-        {
-            // さいごに"/"がついていない場合はつける
-            if (directoryPath_.back() != '/')
+            char buf1[255];
+            strcpy_s(buf1, directoryPath_.c_str());
+            if (ImGui::InputText("directoryPath", buf1, 255))
             {
-                directoryPath_ += "/";
+                directoryPath_ = buf1;
             }
 
-            //ConfigManager::GetInstance()->SaveData("UI");
-            textureHandle_ = TextureManager::GetInstance()->Load(textureName_, directoryPath_);
-            sprite_->SetTextureHandle(textureHandle_);
+            char buf2[255];
+            strcpy_s(buf2, textureName_.c_str());
+            if (ImGui::InputText("textureName", buf2, 255))
+            {
+                textureName_ = buf2;
+            }
+
+            if (ImGui::Button("Apply"))
+            {
+                // さいごに"/"がついていない場合はつける
+                if (directoryPath_.back() != '/')
+                {
+                    directoryPath_ += "/";
+                }
+
+                //ConfigManager::GetInstance()->SaveData("UI");
+                textureHandle_ = TextureManager::GetInstance()->Load(textureName_, directoryPath_);
+                sprite_->SetTextureHandle(textureHandle_);
+            }
+
+            if (ImGui::Button("Save"))
+            {
+                jsonBinder_->Save();
+            }
+
+            ImGui::TreePop();
         }
-        ImGui::EndTabItem();
 
-        if (ImGui::Button("Save"))
-        {
-            jsonBinder_->Save();
-        }
-
-
+        // 継承先のImGui項目
+        ImGuiContent();
     }
-    ImGui::EndTabBar();
+
+    // 子要素のImGui
+    if (!children_.empty() && ImGui::CollapsingHeader("Children"))
+    {
+        for (size_t i = 0; i < children_.size(); ++i)
+        {
+            if (children_[i])
+            {
+                children_[i]->ImGui();
+            }
+        }
+    }
+
+    ImGui::PopID();
 
 #endif // _DEBUG
 }

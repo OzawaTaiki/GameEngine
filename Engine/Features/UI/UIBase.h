@@ -17,11 +17,11 @@ class  UIBase
 {
 public:
 
-    UIBase() = default;
+    UIBase();
     virtual ~UIBase();
 
     // 初期化
-    virtual void Initialize(const std::string& _label);
+    virtual void Initialize(const std::string& _label, bool _regsterDebugWindow);
     // 更新
     virtual void Update();
     // 描画
@@ -89,6 +89,8 @@ protected:
     virtual void DrawSelf(); // 自身の描画処理
 
     void RemoveAllChildren();
+
+    virtual void ImGuiContent() {}
 
 protected:
     std::unique_ptr <Sprite> sprite_ = nullptr;

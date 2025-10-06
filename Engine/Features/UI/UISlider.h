@@ -1,12 +1,12 @@
 #pragma once
 
 #include <Features/UI/UISelectable.h>
-#include <Features/UI/UIButton.h>
+#include <Features/UI/UIText.h>
 
 #include <functional>
 
 class UIGroup;
-class UISlider : public UISelectable
+class UISlider final : public UISelectable
 {
 public:
 
@@ -14,8 +14,12 @@ public:
     ~UISlider() = default;
 
     void Initialize(const std::string& _label, float _minValue = 0.0f, float _maxValue = 1.0f);
+
     void UpdateSelf() override;
     void Draw() override;
+
+    UIText* GetLabelText() { return labelText_.get(); }
+    UIText* GetValueText() { return valueText_.get(); }
 
     // 値の設定
     void SetValue(float _value);
@@ -53,7 +57,7 @@ public:
 
     void SetDirection(SliderDirection _dir) { direction_ = _dir; }
 
-    void ImGui();
+    void ImGuiContent() override;
 
 protected:
 
@@ -89,6 +93,9 @@ protected:
     std::shared_ptr<UIBase> track_  = nullptr;  // トラックのUI要素
     std::shared_ptr<UISelectable> handle_ = nullptr;  // ハンドルのUI要素
     std::shared_ptr<UIBase> fill_   = nullptr;  // 塗りつぶしのUI要素
+
+    std::shared_ptr<UIText> labelText_ = nullptr; // ラベル表示用テキスト
+    std::shared_ptr<UIText> valueText_ = nullptr; // 値表示用テキスト
 
     bool isDraggingHandle_ = false;   // ドラッグ中かどうか
 
