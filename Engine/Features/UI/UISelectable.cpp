@@ -105,6 +105,42 @@ UISelectable* UISelectable::GetNavigationTarget(Direction _dir) const
     }
 }
 
+
+void UISelectable::ImGuiContent()
+{
+#ifdef _DEBUG
+
+    UIInteractive::ImGuiContent();
+
+    if (ImGui::TreeNode("UISelectable"))
+    {
+        ImGui::ColorEdit4("Default Color", &defaultColor_.x);
+        ImGui::ColorEdit4("Hover Color", &hoverColor_.x);
+        ImGui::ColorEdit4("Pressed Color", &pressedColor_.x);
+        ImGui::ColorEdit4("Selected Color", &selectedColor_.x);
+        ImGui::ColorEdit4("Focused Color", &focusedColor_.x);
+
+        ImGui::Text("Functions:");
+        std::string str = onDragStartCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" onDragStart" + str).c_str());
+        str = onDraggingCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" onDragging" + str).c_str());
+        str = onDragEndCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" onDragEnd" + str).c_str());
+
+        ImGui::Text("Navigation Targets:");
+        ImGui::Text((" Up: " + (upTarget_ ? upTarget_->label_ : "None")).c_str());
+        ImGui::Text((" Down: " + (downTarget_ ? downTarget_->label_ : "None")).c_str());
+        ImGui::Text((" Left: " + (leftTarget_ ? leftTarget_->label_ : "None")).c_str());
+        ImGui::Text((" Right: " + (rightTarget_ ? rightTarget_->label_ : "None")).c_str());
+
+
+        ImGui::TreePop();
+    }
+
+#endif // _DEBUG
+}
+
 void UISelectable::OnDragStart()
 {
     if (onDragStartCallback_)

@@ -44,7 +44,9 @@ void from_json(const json& _j, SequenceEvent::KeyFrame& _v);
 void to_json(json& _j, const SequenceEvent& _v);
 void from_json(const json& _j, SequenceEvent& _v);
 
-// TextParam
+
+
+/// TextParam
 void to_json(json& _j, const TextParam& _v);
 void from_json(const json& _j, TextParam& _v);
 

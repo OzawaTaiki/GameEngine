@@ -655,6 +655,9 @@
     <ClCompile Include="Features\UI\UIInteractive.cpp">
       <Filter>Features\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UIText.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1115,6 +1118,9 @@
       <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIInteractive.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIText.h">
       <Filter>Features\UI</Filter>
     </ClInclude>
   </ItemGroup>

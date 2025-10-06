@@ -5,10 +5,11 @@
 #include <Debug/Debug.h>
 
 #include <algorithm>
+#include <Utility/ConvertString/ConvertString.h>
 
 void UISlider::Initialize(const std::string& _label, float _minValue, float _maxValue)
 {
-    UIBase::Initialize(_label);
+    UIBase::Initialize(_label, true);
 
     minValue_ = _minValue;
     maxValue_ = _maxValue;
@@ -29,19 +30,19 @@ void UISlider::Initialize(const std::string& _label, float _minValue, float _max
 
     // Track UI作成（表示のみ）
     track_ = std::make_shared<UIBase>();
-    track_->Initialize(_label + "_track");
+    track_->Initialize(_label + "_track",false);
     track_->SetTextureNameAndLoad("white.png");
     AddChild(track_);
 
     // Fill UI作成（表示のみ）
     fill_ = std::make_shared<UIBase>();
-    fill_->Initialize(_label + "_fill");
+    fill_->Initialize(_label + "_fill", false);
     fill_->SetTextureNameAndLoad("white.png");
     AddChild(fill_);
 
     // Handle UI作成（UISelectable - ドラッグ可能）
     handle_ = std::make_shared<UISelectable>();
-    handle_->Initialize(_label + "_handle");
+    handle_->Initialize(_label + "_handle", false);
     handle_->SetTextureNameAndLoad("white.png");
     handle_->SetAnchor({ 0.5f, 0.5f });
     handle_->SetDefaultColor(handleColor_);
@@ -76,7 +77,13 @@ void UISlider::Initialize(const std::string& _label, float _minValue, float _max
     SetSelectedColor(Vector4{ 0.0f,0.0f,0.0f,0.0f });
     SetFocusedColor (Vector4{ 0.0f,0.0f,0.0f,0.0f });
 
+    labelText_ =  std::make_shared<UIText>();
+    labelText_->Initialize(_label + "_labelText", ConvertString(_label),FontConfig(),false);
+    AddChild(labelText_);
 
+    valueText_ = std::make_shared<UIText>();
+    valueText_->Initialize(_label + "_valueText", L"", FontConfig(), false);
+    AddChild(valueText_);
 }
 
 void UISlider::UpdateSelf()
@@ -257,14 +264,14 @@ void UISlider::SetTrackHeight(float _height)
     trackHeight_ = _height;
 }
 
-void UISlider::ImGui()
+
+void UISlider::ImGuiContent()
 {
 #ifdef _DEBUG
-    UISelectable::ImGui();
 
-    ImGui::PushID("Slider");
+    UISelectable::ImGuiContent();
 
-    if (ImGui::TreeNode("Slider Settings"))
+    if (ImGui::TreeNode("UISlider"))
     {
         ImGui::DragFloat("value", &value_, 0.1f, minValue_, maxValue_);
         ImGui::DragFloat("minValue", &minValue_);
@@ -302,8 +309,6 @@ void UISlider::ImGui()
 
         ImGui::TreePop();
     }
-
-    ImGui::PopID();
 #endif // _DEBUG
 }
 
