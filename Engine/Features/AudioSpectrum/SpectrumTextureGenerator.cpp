@@ -29,7 +29,7 @@ void SpectrumTextureGenerator::Initialize(const Vector4& _backColor)
     MakeLogRanges(512, 64, 60.0f, 13000.0f, 44100.0f, 1024);
 }
 
-void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, int32_t _drawCount)
+void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _rms, int32_t _drawCount)
 {
     CalculateWidthAndMargin(_drawCount);
 
@@ -47,8 +47,8 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
     // 定数バッファ更新
     cbData_->textureWidth = textureWidth_;
     cbData_->textureHeight = textureHeight_;
-    if (!_spectrumData.empty()) // 空なら更新しない
-        cbData_->maxMagnitude = *std::max_element(_spectrumData.begin(), _spectrumData.end());
+    //if (!_spectrumData.empty()) // 空なら更新しない
+        //cbData_->maxMagnitude = *std::max_element(_spectrumData.begin(), _spectrumData.end());
     cbData_->dataCount = static_cast<uint32_t>(std::min(_spectrumData.size(), kMaxSpectrumDataCount));
     cbData_->drawCount = _drawCount;
     cbData_->width = width_;
