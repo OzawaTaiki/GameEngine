@@ -57,6 +57,22 @@ Vector2 TextureManager::GetTextureSize(uint32_t _textureHandle)
 	return size;
 }
 
+uint32_t TextureManager::GetTextureHandle(const std::string& _name, uint32_t _srvIndex, D3D12_GPU_DESCRIPTOR_HANDLE _GPUhandle)
+{
+    auto result = IsTextureLoaded(_name);
+
+    if (result.has_value())
+        return result.value();
+
+    uint32_t index = static_cast<uint32_t>(textures_.size());
+    textures_[index].srvIndex = _srvIndex;
+    textures_[index].srvHandlerGPU = _GPUhandle;
+    //キーの保存
+    keys_[_name] = index;
+    needSort_ = true;
+    return static_cast<uint32_t>(index);
+}
+
 uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 {
 	auto result = IsTextureLoaded(_filepath);

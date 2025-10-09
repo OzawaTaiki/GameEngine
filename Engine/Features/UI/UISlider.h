@@ -69,6 +69,9 @@ protected:
     void UpdateValueFromMousePosition(const Vector2& _pos);
     void UpdateHandlePosition();
 
+    void UpdateValueText();
+
+
 protected:
 
     float value_ = 0.5f;        // スライダーの値 (0.0f ~ 1.0f)

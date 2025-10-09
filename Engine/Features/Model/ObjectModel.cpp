@@ -165,7 +165,7 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
     else
         model_->QueueCommandAndDraw(commandList, _textureHandle, materials_);
 
-    if(drawSkeleton_)
+    if (drawSkeleton_ && uniqueAnimationController_)
         uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
 }
 
