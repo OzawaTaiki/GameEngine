@@ -20,7 +20,7 @@ public:
 
     void Initialize(const Vector4& _backColor = { 0.0f,0.0f ,0.0f, 0.3f });
 
-    void Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, int32_t drawCount = 64);
+    void Generate(const std::vector<float>& _spectrumData, float _rms, int32_t drawCount = 64);
 
     D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle() const;
     uint32_t GetTextureHandle() const { return textureHandle_; }
@@ -36,13 +36,13 @@ private:
     {
         uint32_t textureWidth;
         uint32_t textureHeight;
-        float maxMagnitude;
         uint32_t dataCount; // 配列サイズ
-
         uint32_t drawCount; // 描画するバーの数
+
         float width; // バーの幅
         float margin;// バーの間隔
         float rms; // RMS値  スケールとして使う
+        float pad;
 
     };
 
