@@ -5,29 +5,42 @@
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <Debug/Debug.h>
+#include <Core/DXCommon/TextureManager/TextureManager.h>
 
 const size_t SpectrumTextureGenerator::kMaxSpectrumDataCount = 1024;
+const float SpectrumTextureGenerator::kDefaultWidth = 14.0f;// w1024 64本描画すると仮定
+const float SpectrumTextureGenerator::kDefaultMargin = 2.0f;// w1024 64本描画すると仮定
 
-SpectrumTextureGenerator::SpectrumTextureGenerator(uint32_t _textureWidth, uint32_t _textureHeight):
+
+SpectrumTextureGenerator::SpectrumTextureGenerator(uint32_t _textureWidth, uint32_t _textureHeight) :
     textureWidth_(_textureWidth),
     textureHeight_(_textureHeight),
-    width_(24.0f/2.0f),// w1024 32本描画すると仮定
-    margin_(8.0f / 2.0f) // w1024 32本描画すると仮定
+    width_(kDefaultWidth),
+    margin_(kDefaultMargin)
 {
 }
 
-void SpectrumTextureGenerator::Initialize()
+void SpectrumTextureGenerator::Initialize(const Vector4& _backColor)
 {
     CreateRootSignature();
     CreatePipelineState();
 
-    CreateBuffers();
-    MakeLogRanges(512, 64, 20.0f, 20000.0f, 44100.0f, 1024);
-
+    CreateBuffers(_backColor);
+    MakeLogRanges(512, 64, 60.0f, 13000.0f, 44100.0f, 1024);
 }
 
-void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, uint32_t _drawCount)
+void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _maxMagnitude, float _rms, int32_t _drawCount)
 {
+    CalculateWidthAndMargin(_drawCount);
+
+    //MakeLogRanges(static_cast<int32_t>(_spectrumData.size()),
+    //              static_cast<int32_t>(_drawCount),
+    //              60.0f,
+    //              13000.0f,
+    //              44100.0f,
+    //              static_cast<int32_t>(_spectrumData.size()) * 2);
+
+
     DXCommon* dxCommon = DXCommon::GetInstance();
     ID3D12GraphicsCommandList* commandList = dxCommon->GetCommandList();
 
@@ -69,26 +82,32 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
     renderTexture_->ChangeRTVState(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE SpectrumTextureGenerator::GetTextureHandle() const
+D3D12_GPU_DESCRIPTOR_HANDLE SpectrumTextureGenerator::GetTextureGPUHandle() const
 {
     return renderTexture_->GetGPUHandleofRTV();
 }
 
 void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize)
 {
+    // 同じ条件なら再計算しない
+    if (cashedDrawData_.CashEquals(bars, fftBins, sampleRate, fmin, fmax))
+        return;
+
+
+
     if (bars > 128)
     {
-        Debug::Log("Max bars is 64\n");
+        Debug::Log("Max bars is 128\n");
         bars = 128;
     }
 
 
     float logFmin = std::log(fmin);
     float logFmax = std::log(fmax);
-
+    Debug::Log("============\n");
     for (int32_t b = 0; b < bars; ++b)
     {
-        float p0 = (float)b / bars;
+            float p0 = (float)b / bars;
         float p1 = (float)(b + 1) / bars;
         float f0 = std::exp(logFmin + (logFmax - logFmin) * p0);
         float f1 = std::exp(logFmin + (logFmax - logFmin) * p1);
@@ -96,25 +115,42 @@ void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, flo
         int32_t i0 = (int32_t)std::floor(f0 * fftSize / sampleRate);
         int32_t i1 = (int32_t)std::ceil(f1 * fftSize / sampleRate);
 
-
-
         if (i0 < 0) i0 = 0;
         if (i1 >= fftBins) i1 = fftBins - 1;
         if (i1 < i0) i1 = i0;
+
+        Debug::Log(std::format("Range[{}] : min_{},max_{}\n", b, i0, i1));
 
         ranges_[b] = { i0, i1 };
 
     }
 
-    cashedDrawData_.drawCount = bars;
+    //cashedDrawData_.drawCount = bars;
     cashedDrawData_.fftBins = fftBins;
     cashedDrawData_.sampleRate = sampleRate;
+    cashedDrawData_.minHz = fmin;
+    cashedDrawData_.maxHz = fmax;
 
 }
 
+void SpectrumTextureGenerator::CalculateWidthAndMargin(int32_t _drawCount)
+{
+    if (_drawCount == 0)
+        return;
 
+    if (cashedDrawData_.drawCount == _drawCount)
+        return;
 
-void SpectrumTextureGenerator::CreateBuffers()
+    const int32_t defaultDrawCount = 64;
+
+    float scale = static_cast<float>(_drawCount) / static_cast<float>(defaultDrawCount);
+    width_ = kDefaultWidth / scale;
+    margin_ = kDefaultMargin / scale;
+
+    cashedDrawData_.drawCount = _drawCount;
+}
+
+void SpectrumTextureGenerator::CreateBuffers(const Vector4& _backColor)
 {
     DXCommon* dxCommon = DXCommon::GetInstance();
     SRVManager* srvManager = SRVManager::GetInstance();
@@ -140,12 +176,15 @@ void SpectrumTextureGenerator::CreateBuffers()
         textureWidth_,
         textureHeight_,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-        Vector4(0.0f, 0.0f, 0.0f, 0.3f),
+        _backColor,
         false
     );
 
     renderTexture_ = RTVManager::GetInstance()->GetRenderTexture(handle);
-
+    textureHandle_ = TextureManager::GetInstance()->GetTextureHandle(
+        "SpectrumTexture",
+        renderTexture_->GetSRVIndex(),
+        renderTexture_->GetGPUHandleofRTV());
 }
 
 void SpectrumTextureGenerator::CreateRootSignature()

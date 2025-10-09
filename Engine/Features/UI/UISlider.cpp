@@ -189,6 +189,8 @@ void UISlider::SetValue(float _value)
     }
 
     value_ = newValue;
+    UpdateHandlePosition();
+    UpdateValueText();
 }
 
 float UISlider::GetNormalizedValue() const
@@ -372,4 +374,9 @@ void UISlider::UpdateHandlePosition()
         float handleY = size_.y * (1.0f - GetNormalizedValue());
         handle_->SetPos({ size_.x * 0.5f, handleY });
     }
+}
+
+void UISlider::UpdateValueText()
+{
+    valueText_->SetText(std::format(L"{:.2f}", value_).c_str());
 }
