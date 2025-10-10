@@ -233,6 +233,21 @@ void AudioSpectrum::RecursiveFFT(std::vector<std::complex<float>>& _x)
     }
 }
 
+void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
+{
+    size_t N = _x.size();
+    float fN = static_cast<float>(N);
+    size_t halfN = _x.size() / 2;
+
+    std::vector<std::complex<float>> temp(N);
+    for (size_t i = 0; i < N; ++i)
+    {
+        //bit反転
+
+    }
+
+}
+
 std::vector<float> AudioSpectrum::ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex)
 {
     std::vector<float> segment(1024, 0.0f);  // ゼロで初期化

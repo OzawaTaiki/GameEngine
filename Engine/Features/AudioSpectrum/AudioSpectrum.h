@@ -40,10 +40,14 @@ public:
     void SetAudioData(const std::vector<float>& _audioData) { audioData_ = _audioData; }
     void SetSampleRate(float _sampleRate) { sampleRate_ = _sampleRate; }
 
-private:
 
     // 再帰的FFT
     static void RecursiveFFT(std::vector<std::complex<float>>& _x);
+
+    // 反復的FFT
+    static void IterativeFFT(std::vector<std::complex<float>>& _x);
+
+private:
 
     std::vector<float> ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex);
 
