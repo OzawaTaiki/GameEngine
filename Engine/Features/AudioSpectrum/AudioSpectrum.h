@@ -56,10 +56,10 @@ private:
     // 次の2のべき乗を取得
     static size_t GetNextPowerOf2(size_t _n);
 
-
+    // ビット反転
+    static uint32_t BitReversal(uint32_t _n, uint32_t _bite);
 
 private:
-
 
     float cashedTime_ = 0.0f; // 保持している時間
     std::vector<float> cashedSpectrum_; // 保持しているスペクトラム

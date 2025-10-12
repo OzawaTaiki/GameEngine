@@ -173,7 +173,8 @@ void AudioSpectrum::FFT(const std::vector<float>& _input, std::vector<std::compl
     }
 
     // 再帰的にFFTを実行
-    RecursiveFFT(_output);
+    //RecursiveFFT(_output);
+    IterativeFFT(_output);
 
 }
 
@@ -239,13 +240,44 @@ void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
     float fN = static_cast<float>(N);
     size_t halfN = _x.size() / 2;
 
-    std::vector<std::complex<float>> temp(N);
-    for (size_t i = 0; i < N; ++i)
-    {
-        //bit反転
+    if (N <= 1)
+        return;
 
+    // bits = log2(N)
+    const uint32_t bits = static_cast<uint32_t>(std::log2(N));
+
+    // ビット反転
+    for (uint32_t i = 0; i < N; ++i)
+    {
+        uint32_t j = BitReversal(i, bits);
+        if (i < j) // 一度だけ交換
+        {
+            std::swap(_x[i], _x[j]);
+        }
     }
 
+    for (uint32_t s = 1; s <= bits; ++s)
+    {
+        uint32_t m = 1 << s; // 2^s
+        uint32_t halfM = m >> 1; // m/2
+
+        float angle = -2.0f * std::numbers::pi_v<float> / static_cast<float>(m);
+        std::complex<float> wM(std::cos(angle), std::sin(angle));
+
+        for (uint32_t k =0; k < N; k += m)
+        {
+            std::complex<float> w(1.0f, 0.0f);
+            for (uint32_t j = 0; j < halfM; ++j)
+            {
+                std::complex<float> t = w * _x[k + j + halfM];
+                std::complex<float> u = _x[k + j];
+                _x[k + j] = u + t;
+                _x[k + j + halfM] = u - t;
+
+                w *= wM;
+            }
+        }
+    }
 }
 
 std::vector<float> AudioSpectrum::ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex)
@@ -316,6 +348,18 @@ size_t AudioSpectrum::GetNextPowerOf2(size_t _n)
         power <<= 1;
     }
     return power;
+}
+
+uint32_t AudioSpectrum::BitReversal(uint32_t _n, uint32_t _bite)
+{
+    uint32_t reversed = 0;
+    for (uint32_t i = 0; i < _bite; ++i)
+    {
+        reversed <<= 1;
+        reversed |= (_n & 1);
+        _n >>= 1;
+    }
+    return reversed;
 }
 
 void AudioSpectrum::RoundTripTest(const std::vector<float>& _input)
