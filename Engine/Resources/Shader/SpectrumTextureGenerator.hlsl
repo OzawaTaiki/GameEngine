@@ -55,7 +55,7 @@ float4 VSmain(uint instanceID : SV_InstanceID, uint Vertexid : SV_VertexID) : SV
     float db = 20.0f * log10(avgMagnitude + 1e-12f);
     float normalized = (db + 60.0f) / 50.0f;
     normalized = clamp(normalized, 0.0f, 1.0f);
-
+            
     // 形状 : 音量 = 8 : 2 で加算合成して音量による変化をつける
     float baseHeight = normalized * 0.8f;
     float volumeBoost = cb.rms * 0.2f;
