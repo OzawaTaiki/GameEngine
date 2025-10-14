@@ -40,8 +40,8 @@ void UIInteractive::UpdateSelf()
         {
             if (isPressed_)
             {
-                OnMouseUp();
                 OnClick();
+                OnMouseUp();
                 isPressed_ = false;
             }
         }
