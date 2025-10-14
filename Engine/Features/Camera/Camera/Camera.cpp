@@ -137,13 +137,22 @@ void Camera::QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _index) cons
 void Camera::ImGui()
 {
 #ifdef _DEBUG
+
     if (ImGuiDebugManager::GetInstance()->Begin("Camera"))
     {
+        ImGui::PushID(this);
         ImGui::DragFloat3("translate", &translate_.x, 0.01f);
         ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
 
+        ImGui::DragFloat("fovY", &fovY_, 0.01f, 1.0f, 179.0f);
+        ImGui::DragFloat("nearClip", &nearClip_, 0.01f, 0.01f, 100.0f);
+        ImGui::DragFloat("farClip", &farClip_, 1.0f, 10.0f, 10000.0f);
+        ImGui::DragFloat("aspectRatio", &aspectRatio_, 0.01f, 0.1f, 4.0f);
+
+
         ShakeParametaerSettingFromImGui();
 
+        ImGui::PopID();
         ImGui::End();
     }
 #endif // _DEBUG
