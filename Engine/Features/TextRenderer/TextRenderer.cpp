@@ -7,6 +7,7 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Math/Matrix/MatrixFunction.h>
+#include <Framework/Batch2DRenderer.h>
 
 TextRenderer* TextRenderer::GetInstance()
 {
@@ -170,7 +171,7 @@ void TextRenderer::DrawText(
 
 
         // 四角形を2つの三角形で構成（6頂点）
-        TextVertex quad[6] =
+        std::vector<Batch2DRenderer::VertexData> quad=
         {
             // 1つ目の三角形 (左上, 右上, 左下)
             {{glyphX,          glyphY,          0.0f, 1.0f}, {glyph.u0, glyph.v0}, _topColor},
@@ -187,12 +188,20 @@ void TextRenderer::DrawText(
         {
             if (_res->vertices_.size() < maxVertices_)
             {
-                _res->vertices_.push_back(quad[j]);
+                //_res->vertices_.push_back(quad[j]);
             }
         }
 
         // アフィン変換行列を設定
         _res->affineMatrices_.push_back(transformMatrix);
+        Batch2DRenderer::InstanceData data;
+        data.color = Vector4(1, 1, 1, 1);
+        data.textureIndex = _res->textureIndex_;
+        data.useTextureAlpha = 0; // テキスト
+        data.transform = transformMatrix;
+        data.uvTransform = Matrix4x4::Identity();
+
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad);
 
         // 次の文字位置に移動
         currentX += glyph.advance;
@@ -284,7 +293,7 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
 
 
         // 四角形を2つの三角形で構成（6頂点）
-        TextVertex quad[6] =
+        std::vector<Batch2DRenderer::VertexData> quad =
         {
             // 1つ目の三角形 (左上, 右上, 左下)
             {{glyphX,          glyphY,          0.0f, 1.0f}, {glyph.u0, glyph.v0}, _topColor},
@@ -301,12 +310,21 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
         {
             if (_res->vertices_.size() < maxVertices_)
             {
-                _res->vertices_.push_back(quad[j]);
+                //_res->vertices_.push_back(quad[j]);
             }
         }
 
         // アフィン変換行列を設定
         _res->affineMatrices_.push_back(transformMatrix);
+
+        Batch2DRenderer::InstanceData data;
+        data.color = Vector4(1, 1, 1, 1);
+        data.textureIndex = _res->textureIndex_;
+        data.useTextureAlpha = 0; // テキスト
+        data.transform = transformMatrix;
+        data.uvTransform = Matrix4x4::Identity();
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad);
+
 
         // 次の文字位置に移動
         currentX += glyph.advance;
@@ -421,7 +439,7 @@ void TextRenderer::UploadMatrixData(ResourceDataGroup* _res)
 
 void TextRenderer::RenderText(ResourceDataGroup* _res)
 {
-    if (_res->vertices_.empty()) return;
+    if (_res->vertices_.empty() || true) return;
 
     cmdList_->SetPipelineState(pso_);
     cmdList_->SetGraphicsRootSignature(rootSignature_);

@@ -112,6 +112,7 @@ void LayerSystem::SetLayer(LayerID _layerID)
     if (it != instance_->layerInfos_.end())
     {
         LayerInfo info = it->second;
+        instance_->currentLayerID_ = _layerID;
         std::string textureToUse = info.hasEffect ? info.effectOutputTexture : info.name;
 
         RTVManager::GetInstance()->SetRenderTexture(textureToUse);
@@ -140,6 +141,14 @@ void LayerSystem::SetLayer(const std::string& layerName)
 
 }
 
+LayerID LayerSystem::GetCurrentLayerID()
+{
+    if (!instance_)
+        Initialize();
+
+    return instance_->currentLayerID_;
+}
+
 void LayerSystem::ApplyPostEffect(const std::string& _sourceLayerName, const std::string& _targetLayerName, PostEffectBase* _effect)
 {
     if (!instance_)
@@ -159,8 +168,7 @@ void LayerSystem::ApplyPostEffect(const std::string& _sourceLayerName, const std
     }
     else
     {
-        // ソースレイヤーが存在しない場合のエラーハンドリング
-
+        // TODO : ソースレイヤーが存在しない場合のエラーハンドリング
     }
 
 }
