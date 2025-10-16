@@ -21,9 +21,8 @@ struct InstanceData
     float4 color;
 
     uint textureIndex; // SRV
-    uint useTextureAlpha; // 0ならRをalphaとする(テキスト) 1ならRGBAを使う(スプライト)
-    uint baseInstanceIndex;
-
+    uint useTextureAlpha; // 0ならRGBA、1ならR成分をアルファとして扱う
+    uint baseIndex;
     int pad;
 
 };
@@ -35,12 +34,19 @@ cbuffer ViewProjection : register(b0)
 }
 
 Texture2D<float4> textureArray[] : register(t1); // テクスチャ配列
+//Texture2D<float4> textureArray : register(t1); // テクスチャ配列
 SamplerState gSampler : register(s0);
 
+cbuffer DrawCallConstants : register(b1)
+{
+    uint vertexOffset;
+}
 
-VSOutput VSMain(VSInput input, uint instanceID : SV_InstanceID)
+
+VSOutput VSMain(VSInput input, uint vertexID : SV_VertexID)
 {
     VSOutput output;
+    uint instanceID = vertexID / 6 + vertexOffset;
     InstanceData data = instanceData[instanceID];
 
     output.position = mul(input.position, mul(data.affineMat, orthoMat));
@@ -60,6 +66,7 @@ float4 PSMain(VSOutput input) : SV_TARGET
     float2 transedUV = mul(float4(input.texCoord, 0.0f, 1.0f), data.uvTransform).xy;
 
     float4 texColor = textureArray[data.textureIndex].Sample(gSampler, transedUV);
+    //float4 texColor = textureArray.Sample(gSampler, transedUV);
 
     // useTextureAlpha が 1 なら、R成分をアルファとして扱う（テキスト）
     // useTextureAlpha が 0 なら、通常のRGBA（スプライト）

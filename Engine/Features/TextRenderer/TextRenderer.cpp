@@ -197,7 +197,7 @@ void TextRenderer::DrawText(
         Batch2DRenderer::InstanceData data;
         data.color = Vector4(1, 1, 1, 1);
         data.textureIndex = _res->textureIndex_;
-        data.useTextureAlpha = 0; // テキスト
+        data.useTextureAlpha = 1; // テキスト
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
 
@@ -320,7 +320,7 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
         Batch2DRenderer::InstanceData data;
         data.color = Vector4(1, 1, 1, 1);
         data.textureIndex = _res->textureIndex_;
-        data.useTextureAlpha = 0; // テキスト
+        data.useTextureAlpha = 1; // テキスト
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
         Batch2DRenderer::GetInstance()->AddInstace(data, quad);

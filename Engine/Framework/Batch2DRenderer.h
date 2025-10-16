@@ -25,7 +25,7 @@ public:
 
         uint32_t textureIndex;
         uint32_t useTextureAlpha; // 0: テキスト 1: スプライト
-        uint32_t instanceBaseIndex;
+        int32_t baseIndex;
 
         int32_t padding;
     };
@@ -46,6 +46,7 @@ public:
     void Render();
 
     void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v);
+    // LT RT RB LB
 
 private:
 
@@ -54,6 +55,8 @@ private:
 
     void CreateVertexBuffer();
     void CreateInstanceDataSRV();
+    void CreateIndexBuffer();
+    void CreateViewProjectionResource();
     void Reset();
 
     void CreatePipelineStateObject();
@@ -87,9 +90,16 @@ private:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
     VertexData* vertexMap_ = nullptr;
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
+    D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceResource_;
     InstanceData* instanceMap_ = nullptr;
     uint32_t instanceDataSRVIndex_ = 0;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> viewProjectionResource_;
+    Matrix4x4* viewProjectionMap_ = nullptr;
+
 
     std::vector<DrawData> drawDataList_;
     std::vector<uint32_t> sortIndices_;

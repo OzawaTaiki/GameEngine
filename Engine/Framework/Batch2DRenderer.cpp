@@ -5,6 +5,7 @@
 #include <Debug/Debug.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Framework/LayerSystem/LayerSystem.h>
+#include <Math/Matrix/MatrixFunction.h>
 
 Batch2DRenderer* Batch2DRenderer::GetInstance()
 {
@@ -19,6 +20,8 @@ void Batch2DRenderer::Initialize()
 
     CreateVertexBuffer();
     CreateInstanceDataSRV();
+    //CreateIndexBuffer();
+    CreateViewProjectionResource();
 
     // 初期容量確保
     drawDataList_.reserve(kMaxInstanceCount_);
@@ -42,16 +45,27 @@ void Batch2DRenderer::Render()
     commandList->SetGraphicsRootSignature(rootSignature_.Get());
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    //commandList->IASetIndexBuffer(&indexBufferView_);
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     commandList->SetGraphicsRootDescriptorTable(0, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(instanceDataSRVIndex_));
-    commandList->SetGraphicsRootConstantBufferView(1, instanceResource_->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, viewProjectionResource_->GetGPUVirtualAddress());
     commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(0));
 
+    UINT vertexOffset = 0;
     for (const auto& cmd : drawCommands_)
     {
         LayerSystem::SetLayer(cmd.layer);
-        commandList->DrawInstanced(6, cmd.instanceCount, 0, cmd.startInstance);
+        commandList->SetGraphicsRoot32BitConstants(
+            3,                  // RootParameterIndex
+            1,                  // Num32BitValuesToSet
+            &vertexOffset,      // pSrcData
+            0                   // DestOffsetIn32BitValues
+        );
+
+        //commandList->DrawInstanced(6 * cmd.instanceCount, 1, startVertexLocation, 0);
+        commandList->DrawInstanced(6 * cmd.instanceCount, 1, vertexOffset, 0);
+        vertexOffset += 6 * cmd.instanceCount;
     }
 
     Reset();
@@ -63,6 +77,7 @@ void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vecto
     data.instance = _instance;
     data.layer = LayerSystem::GetCurrentLayerID();
     data.order = static_cast<uint32_t>(drawDataList_.size());
+
     data.vertices = _v;
 
     drawDataList_.push_back(data);
@@ -93,6 +108,49 @@ void Batch2DRenderer::CreateInstanceDataSRV()
         CreateSRVForStructureBuffer(instanceDataSRVIndex_, instanceResource_.Get(), kMaxInstanceCount_, sizeof(InstanceData));
 
     //ZeroMemory(&instanceMap_[0], sizeof(InstanceData) * kMaxInstanceCount_);
+}
+
+void Batch2DRenderer::CreateIndexBuffer()
+{
+    // 四角形用のインデックス (0,1,2, 2,1,3)
+    std::vector<uint16_t> indices;
+    indices.reserve(6 * kMaxInstanceCount_);
+
+    // 各四角形のインデックスを生成
+    for (uint32_t i = 0; i < kMaxInstanceCount_; ++i)
+    {
+        uint16_t baseIndex = static_cast<uint16_t>(i * 4);
+        // 1つ目の三角形
+        indices.push_back(baseIndex + 0);
+        indices.push_back(baseIndex + 1);
+        indices.push_back(baseIndex + 2);
+        // 2つ目の三角形
+        indices.push_back(baseIndex + 2);
+        indices.push_back(baseIndex + 1);
+        indices.push_back(baseIndex + 3);
+    }
+
+    uint32_t indexBufferSize = sizeof(uint16_t) * 6 * kMaxInstanceCount_;
+    indexResource_ = DXCommon::GetInstance()->CreateBufferResource(indexBufferSize);
+
+    uint16_t* indexMap = nullptr;
+    indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
+    std::copy(indices.begin(), indices.end(), indexMap);
+    indexResource_->Unmap(0, nullptr);
+
+    indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+    indexBufferView_.SizeInBytes = indexBufferSize;
+    indexBufferView_.Format = DXGI_FORMAT_R16_UINT;
+}
+
+void Batch2DRenderer::CreateViewProjectionResource()
+{
+    viewProjectionResource_ = DXCommon::GetInstance()->
+        CreateBufferResource(sizeof(Matrix4x4));
+
+    viewProjectionResource_->Map(0, nullptr, reinterpret_cast<void**>(&viewProjectionMap_));
+
+    *viewProjectionMap_ = MakeOrthographicMatrix(0, 0, 1280, 720, -1.0f, 1.0f);
 }
 
 void Batch2DRenderer::Reset()
@@ -206,6 +264,7 @@ void Batch2DRenderer::CreateRootSignature()
     // テクスチャ用
     descriptorRange[0].BaseShaderRegister = 1;
     descriptorRange[0].NumDescriptors = UINT_MAX;//数は最大
+    //descriptorRange[0].NumDescriptors = 1;//数は最大
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -217,7 +276,7 @@ void Batch2DRenderer::CreateRootSignature()
 
 
     //RootParameter作成
-    D3D12_ROOT_PARAMETER rootParameters[3] = {};
+    D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
     // instanceData
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -235,6 +294,12 @@ void Batch2DRenderer::CreateRootSignature()
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[0];
     rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+
+    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootParameters[3].Constants.ShaderRegister = 1; // b2
+    rootParameters[3].Constants.RegisterSpace = 0;
+    rootParameters[3].Constants.Num32BitValues = 1; // uint32_t 1個
 
 
     descriptionRootSignature.pParameters = rootParameters;
@@ -276,12 +341,15 @@ void Batch2DRenderer::UploadData()
 {
     for (size_t i = 0; i < sortIndices_.size(); ++i)
     {
+        if (i >= 1024)
+            return;
+
         uint32_t index = sortIndices_[i];  // ソート後のインデックス
         const DrawData& data = drawDataList_[index];
 
 
         // 頂点データをコピー
-        const size_t vertexCount = 6; // 2D四角形は6頂点
+        const size_t vertexCount = 6; // 2D四角形は4頂点
         std::copy_n(data.vertices.data(), vertexCount, &vertexMap_[i * vertexCount]);
         // インスタンスデータをコピー
         instanceMap_[i] = data.instance;
@@ -300,6 +368,8 @@ void Batch2DRenderer::BuildDrawCommands()
     currentCommand.startInstance = 0;
     currentCommand.instanceCount = 1;
 
+    uint32_t baseIndex = 0;
+
     for (size_t i = 1; i < sortIndices_.size(); ++i)
     {
         int currentLayer = drawDataList_[sortIndices_[i]].layer;
@@ -313,6 +383,8 @@ void Batch2DRenderer::BuildDrawCommands()
         {
             // レイヤーが変わった：現在のコマンドを保存
             drawCommands_.push_back(currentCommand);
+
+            baseIndex = currentCommand.instanceCount;
 
             // 新しいコマンドを開始
             currentCommand.layer = currentLayer;
