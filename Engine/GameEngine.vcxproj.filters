@@ -660,6 +660,9 @@
     <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp">
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
+    <ClCompile Include="Framework\Batch2DRenderer.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1124,6 +1127,9 @@
     <ClInclude Include="Features\UI\UIText.h">
       <Filter>Features\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\Batch2DRenderer.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1217,6 +1223,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\SpectrumTextureGenerator.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Batch2DInstancing.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

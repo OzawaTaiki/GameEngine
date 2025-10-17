@@ -338,7 +338,6 @@ void ObjectModel::ImGui()
     {
         SetModel(filePathBuffer_);
     }
-
     if(uniqueAnimationController_)
     {
         if(ImGui::CollapsingHeader("Skeleton"))

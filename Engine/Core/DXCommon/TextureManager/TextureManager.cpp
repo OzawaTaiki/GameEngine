@@ -73,6 +73,11 @@ uint32_t TextureManager::GetTextureHandle(const std::string& _name, uint32_t _sr
     return static_cast<uint32_t>(index);
 }
 
+uint32_t TextureManager::GetSRVIndex(uint32_t _textureHandle)
+{
+	return textures_[_textureHandle].srvIndex;
+}
+
 uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 {
 	auto result = IsTextureLoaded(_filepath);

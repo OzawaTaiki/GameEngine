@@ -2,7 +2,8 @@
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector4.h>
 #include <Math/Matrix/Matrix4x4.h>
-#include <Features/Model/Color/ObjectColor.h>
+
+#include <Framework/Batch2DRenderer.h>
 
 #include <string>
 #include <memory>
@@ -12,14 +13,14 @@ class Sprite
 {
 public:
 
-    Sprite(const std::string& _name );
+    Sprite(const std::string& _name);
     ~Sprite() ;
 
     void Initialize();
+    void Initialize(uint32_t _textureHandle);
     void Update();
     void Draw();
     void Draw(const Vector4& _color);
-    void Draw(D3D12_GPU_DESCRIPTOR_HANDLE _handle);
 
     // worldMat
     Vector2 translate_ = {0.0f,0.0f };
@@ -36,8 +37,8 @@ public:
     static void StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight);
     static void PreDraw();
 
-    void SetTextureHandle(uint32_t _textureHandle) { textureHandle_ = _textureHandle; }
-    void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; CalculateVertex(); }
+    void SetTextureHandle(uint32_t _textureHandle);
+    void SetAnchor(const Vector2& _anchor);
 
     void SetSize(const Vector2& _size);
     void SetColor(const Vector4& _color);
@@ -46,51 +47,32 @@ public:
     void SetLeftTop(const Vector2& _leftTop);
 
     void ImGui();
-private: 
+private:
 
     static uint32_t winWidth_;
     static uint32_t winHeight_;
 
-    void TransferData(ID3D12GraphicsCommandList *_commandList );
+    void UpdateVertexData();
+    void UpdateInstanceData();
 
-    void CalculateVertex();
-    void CalculateMatrix();
-
-    uint32_t textureHandle_ = 0;
+    uint32_t textureHandle_ = UINT32_MAX;
 
     Vector2 defaultTextureSize_ = { 100.0f,100.0f };
     Vector2 anchor_ = { 0.5f, 0.5f };
     Vector4 color_ = {};
-    Matrix4x4 worldMat_ = {};
-    Matrix4x4 uvTransMat_ = {};
-    Matrix4x4 orthoMat_= {};
-
-    struct ConstantBufferData
-    {
-        Matrix4x4 worldMat;
-        Matrix4x4 uvTransMat;
-    };
-
-    std::unique_ptr<ObjectColor> colorObj_ = nullptr;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> matResource_ = nullptr;
-    ConstantBufferData* constMap_ = nullptr;
-
-
-    struct VertexData
-    {
-        Vector4 position;
-        Vector2 texcoord;
-    };
-
-    VertexData* vConstMap_ = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResource_ = nullptr;
-    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferView_ = {};
 
     std::string name_ = "";
 
     Vector2 lefttop_ = { 0.0f,0.0f };
     Vector2 size_ = { 100.0f,100.0f };
 
+
+    std::vector<Batch2DRenderer::VertexData> vertexData_= {};
+    Batch2DRenderer::InstanceData instanceData_ = {};
+
+    // 頂点データを計算する必要があるか
+    bool isVertexDirty_ = true;
+    // instanceDataを計算する必要があるか
+    bool isDirty_ = true;
 
 };
