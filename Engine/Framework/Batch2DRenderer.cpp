@@ -20,7 +20,6 @@ void Batch2DRenderer::Initialize()
 
     CreateVertexBuffer();
     CreateInstanceDataSRV();
-    //CreateIndexBuffer();
     CreateViewProjectionResource();
 
     // 初期容量確保
@@ -33,8 +32,8 @@ void Batch2DRenderer::Render()
     if (drawDataList_.empty())
         return;
 
-    SortData();
-    UploadData();
+    //SortData();
+     UploadData();
     BuildDrawCommands();
 
 
@@ -71,13 +70,31 @@ void Batch2DRenderer::Render()
     Reset();
 }
 
-void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v)
+void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint32_t _order)
 {
+    if (drawDataList_.size() + 1 >= kMaxInstanceCount_)
+        return;
+
     DrawData data;
     data.instance = _instance;
-    data.layer = LayerSystem::GetCurrentLayerID();
-    data.order = static_cast<uint32_t>(drawDataList_.size());
+    data.sortKey.layer = LayerSystem::GetCurrentLayerID();
+    data.sortKey.internalOrder = static_cast<uint32_t>(drawDataList_.size());
+    data.sortKey.userOrder = _order;
+    data.vertices = _v;
 
+    drawDataList_.push_back(data);
+    sortIndices_.push_back(static_cast<uint32_t>(sortIndices_.size()));
+}
+
+void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v)
+{
+    if (drawDataList_.size() + 1 >= kMaxInstanceCount_)
+        return;
+
+    DrawData data;
+    data.instance = _instance;
+    data.sortKey.layer = LayerSystem::GetCurrentLayerID();
+    data.sortKey.internalOrder = static_cast<uint32_t>(drawDataList_.size());
     data.vertices = _v;
 
     drawDataList_.push_back(data);
@@ -110,39 +127,6 @@ void Batch2DRenderer::CreateInstanceDataSRV()
     //ZeroMemory(&instanceMap_[0], sizeof(InstanceData) * kMaxInstanceCount_);
 }
 
-void Batch2DRenderer::CreateIndexBuffer()
-{
-    // 四角形用のインデックス (0,1,2, 2,1,3)
-    std::vector<uint16_t> indices;
-    indices.reserve(6 * kMaxInstanceCount_);
-
-    // 各四角形のインデックスを生成
-    for (uint32_t i = 0; i < kMaxInstanceCount_; ++i)
-    {
-        uint16_t baseIndex = static_cast<uint16_t>(i * 4);
-        // 1つ目の三角形
-        indices.push_back(baseIndex + 0);
-        indices.push_back(baseIndex + 1);
-        indices.push_back(baseIndex + 2);
-        // 2つ目の三角形
-        indices.push_back(baseIndex + 2);
-        indices.push_back(baseIndex + 1);
-        indices.push_back(baseIndex + 3);
-    }
-
-    uint32_t indexBufferSize = sizeof(uint16_t) * 6 * kMaxInstanceCount_;
-    indexResource_ = DXCommon::GetInstance()->CreateBufferResource(indexBufferSize);
-
-    uint16_t* indexMap = nullptr;
-    indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
-    std::copy(indices.begin(), indices.end(), indexMap);
-    indexResource_->Unmap(0, nullptr);
-
-    indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-    indexBufferView_.SizeInBytes = indexBufferSize;
-    indexBufferView_.Format = DXGI_FORMAT_R16_UINT;
-}
-
 void Batch2DRenderer::CreateViewProjectionResource()
 {
     viewProjectionResource_ = DXCommon::GetInstance()->
@@ -157,8 +141,8 @@ void Batch2DRenderer::Reset()
 {
     drawDataList_.clear();
     sortIndices_.clear();
-}
 
+}
 void Batch2DRenderer::CreatePipelineStateObject()
 {
     HRESULT hr = S_FALSE;
@@ -329,11 +313,7 @@ void Batch2DRenderer::SortData()
                          const auto& dataA = drawDataList_[a];
                          const auto& dataB = drawDataList_[b];
 
-                         // layerで昇順、同じlayerならorderで昇順
-                         if (dataA.layer != dataB.layer)
-                             return dataA.layer < dataB.layer;
-
-                         return dataA.order < dataB.order;
+                         return dataA.sortKey < dataB.sortKey;
                      });
 }
 
@@ -341,17 +321,14 @@ void Batch2DRenderer::UploadData()
 {
     for (size_t i = 0; i < sortIndices_.size(); ++i)
     {
-        if (i >= 1024)
-            return;
-
         uint32_t index = sortIndices_[i];  // ソート後のインデックス
         const DrawData& data = drawDataList_[index];
-
 
         // 頂点データをコピー
         const size_t vertexCount = 6; // 2D四角形は4頂点
         std::copy_n(data.vertices.data(), vertexCount, &vertexMap_[i * vertexCount]);
         // インスタンスデータをコピー
+
         instanceMap_[i] = data.instance;
     }
 }
@@ -364,7 +341,7 @@ void Batch2DRenderer::BuildDrawCommands()
 
     // レイヤーごとにグループ化
     DrawCommand currentCommand;
-    currentCommand.layer = drawDataList_[sortIndices_[0]].layer;
+    currentCommand.layer = drawDataList_[sortIndices_[0]].sortKey.layer;
     currentCommand.startInstance = 0;
     currentCommand.instanceCount = 1;
 
@@ -372,7 +349,7 @@ void Batch2DRenderer::BuildDrawCommands()
 
     for (size_t i = 1; i < sortIndices_.size(); ++i)
     {
-        int currentLayer = drawDataList_[sortIndices_[i]].layer;
+        int currentLayer = drawDataList_[sortIndices_[i]].sortKey.layer;
 
         if (currentLayer == currentCommand.layer)
         {
@@ -383,8 +360,6 @@ void Batch2DRenderer::BuildDrawCommands()
         {
             // レイヤーが変わった：現在のコマンドを保存
             drawCommands_.push_back(currentCommand);
-
-            baseIndex = currentCommand.instanceCount;
 
             // 新しいコマンドを開始
             currentCommand.layer = currentLayer;

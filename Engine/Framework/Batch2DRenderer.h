@@ -24,18 +24,13 @@ public:
         Vector4 color;
 
         uint32_t textureIndex;
-        uint32_t useTextureAlpha; // 0: テキスト 1: スプライト
-        int32_t baseIndex;
+        uint32_t useTextureAlpha; // 1: テキスト 0: スプライト
 
-        int32_t padding;
+        int32_t padding[2];
     };
 
-    struct DrawCommand
-    {
-        int32_t layer;
-        uint32_t startInstance;
-        uint32_t instanceCount;
-    };
+
+
 
 
 public:
@@ -45,6 +40,7 @@ public:
     void Initialize();
     void Render();
 
+    void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint32_t _order);
     void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v);
     // LT RT RB LB
 
@@ -55,7 +51,6 @@ private:
 
     void CreateVertexBuffer();
     void CreateInstanceDataSRV();
-    void CreateIndexBuffer();
     void CreateViewProjectionResource();
     void Reset();
 
@@ -67,12 +62,38 @@ private:
     void BuildDrawCommands();
 
 private:
+    struct DrawCommand
+    {
+        int32_t layer;
+        uint32_t startInstance;
+        uint32_t instanceCount;
+    };
+
+    struct SortKey
+    {
+        uint8_t layer; // レイヤー
+        uint16_t userOrder; // ユーザー指定の順序
+        uint8_t internalOrder; // 内部的な順序 (追加された順番)
+
+        uint32_t GetSortKey() const
+        {
+            uint32_t key = 0;
+            key |= static_cast<uint32_t>(userOrder) << 24;
+            key |= static_cast<uint32_t>(internalOrder) << 8;
+            key |= static_cast<uint32_t>(layer);
+            return key;
+        }
+
+        bool operator<(const SortKey& other) const
+        {
+            return GetSortKey() < other.GetSortKey();
+        }
+    };
 
     // 描画用データ ソート用
     struct DrawData
     {
-        uint32_t layer;
-        uint32_t order;
+        SortKey sortKey;
 
         std::vector<VertexData> vertices; // 2D四角形を描画するための6頂点分のデータ
         InstanceData instance;
@@ -89,9 +110,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
     VertexData* vertexMap_ = nullptr;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-    D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceResource_;
     InstanceData* instanceMap_ = nullptr;

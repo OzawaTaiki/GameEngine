@@ -201,7 +201,9 @@ void TextRenderer::DrawText(
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
 
-        Batch2DRenderer::GetInstance()->AddInstace(data, quad);
+        uint32_t order = rand() % 5;
+
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad, 0);
 
         // 次の文字位置に移動
         currentX += glyph.advance;
@@ -323,7 +325,9 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
         data.useTextureAlpha = 1; // テキスト
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
-        Batch2DRenderer::GetInstance()->AddInstace(data, quad);
+        uint32_t order = rand() % 5;
+
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad, 0);
 
 
         // 次の文字位置に移動

@@ -87,6 +87,9 @@ void Framework::Initialize(const std::wstring& _winTitle)
     textRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
         Vector2(static_cast<float>(WinApp::kWindowWidth_), static_cast<float>(WinApp::kWindowHeight_)));
 
+    batch2DRenderer_ = Batch2DRenderer::GetInstance();
+    batch2DRenderer_->Initialize();
+
     collisionManager_ = CollisionManager::GetInstance();
 
     sceneManager_ = SceneManager::GetInstance();

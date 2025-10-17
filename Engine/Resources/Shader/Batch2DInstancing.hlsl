@@ -22,8 +22,7 @@ struct InstanceData
 
     uint textureIndex; // SRV
     uint useTextureAlpha; // 0ならRGBA、1ならR成分をアルファとして扱う
-    uint baseIndex;
-    int pad;
+    int2 pad;
 
 };
 
@@ -46,12 +45,12 @@ cbuffer DrawCallConstants : register(b1)
 VSOutput VSMain(VSInput input, uint vertexID : SV_VertexID)
 {
     VSOutput output;
-    uint instanceID = vertexID / 6 + vertexOffset;
+    uint instanceID = (vertexID + vertexOffset) / 6;
     InstanceData data = instanceData[instanceID];
 
     output.position = mul(input.position, mul(data.affineMat, orthoMat));
     output.texCoord = input.texCoord;
-    output.vColor = data.color;
+    output.vColor = input.vColor;
     output.instanceID = instanceID;
 
     return output;
