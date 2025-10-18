@@ -212,6 +212,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\ObjectModel.cpp" />
     <ClCompile Include="Features\Model\Primitive\Builder\PrimitiveBuilder.cpp" />
     <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Cube.cpp" />
     <ClCompile Include="Features\Model\Primitive\Cylinder.cpp" />
     <ClCompile Include="Features\Model\Primitive\Plane.cpp" />
     <ClCompile Include="Features\Model\Primitive\Ring.cpp" />
@@ -353,6 +354,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\ObjectModel.h" />
     <ClInclude Include="Features\Model\Primitive\Builder\PrimitiveBuilder.h" />
     <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h" />
+    <ClInclude Include="Features\Model\Primitive\Cube.h" />
     <ClInclude Include="Features\Model\Primitive\Cylinder.h" />
     <ClInclude Include="Features\Model\Primitive\Plane.h" />
     <ClInclude Include="Features\Model\Primitive\Primitive.h" />

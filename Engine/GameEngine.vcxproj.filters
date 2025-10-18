@@ -663,6 +663,9 @@
     <ClCompile Include="Framework\Batch2DRenderer.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Cube.cpp">
+      <Filter>Features\Model\Primitive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1129,6 +1132,9 @@
     </ClInclude>
     <ClInclude Include="Framework\Batch2DRenderer.h">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Cube.h">
+      <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
