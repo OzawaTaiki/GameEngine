@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <Features/Sprite/Sprite.h>
 
 class EffectEditorScene : public BaseScene
 {
@@ -37,7 +38,7 @@ private:
     std::shared_ptr<LightGroup> lights_;
 
     std::vector<std::unique_ptr<ObjectModel>> objectModels_;
-
+    std::unique_ptr<Sprite> backgroundSprite_ = nullptr;
     // === エフェクト管理 ===
     std::vector<std::unique_ptr<Effect>> effects_;
     int selectedEffectIndex_ = -1;
