@@ -9,10 +9,9 @@ UIButton::UIButton()
 
 void UIButton::Initialize(const std::string& _label)
 {
-    UISelectable::Initialize(_label);
+    UISelectable::Initialize(_label,true);
 
     jsonBinder_->RegisterVariable(label_ + "backgroundColor", &backgroundColor_);
-    jsonBinder_->RegisterVariable(label_ + "textColor", &textColor_);
 
     // ボタンのデフォルト色設定
     SetDefaultColor({ 0.8f, 0.8f, 0.8f, 1.0f });
@@ -32,8 +31,8 @@ void UIButton::Initialize(const std::string& _label, const std::wstring& _text)
 void UIButton::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config)
 {
     Initialize(_label);
-    textGenerator_.Initialize(_config);
-    text_ = _text;
+
+    CraeteUIText(_text, _config);
 }
 
 void UIButton::UpdateSelf()
@@ -52,31 +51,18 @@ void UIButton::Draw()
     if (!isVisible_)
         return;
 
-    textParam_.position = GetWorldPos() + textOffset_;
-
     UIBase::Draw();
-    textGenerator_.Draw(text_, textParam_);
+    text_->Draw();
 }
 
 void UIButton::SetText(const std::wstring& _text)
 {
-    text_ = _text;
+    text_->SetText(_text);
 }
 
 const std::wstring& UIButton::GetText() const
 {
-    return text_;
-}
-
-void UIButton::SetTextParam(const TextParam& _param)
-{
-    textParam_ = _param;
-}
-
-void UIButton::SetTextOffset(const Vector2& _offset)
-{
-    textOffset_ = _offset;
-    // Drawで位置更新をしているためここでは必要ない
+    return text_->GetText();
 }
 
 void UIButton::SetOnClickStart(std::function<void()> _callback)
@@ -95,47 +81,78 @@ void UIButton::SetBackgroundColor(const Vector4& _color)
     SetDefaultColor(backgroundColor_);
 }
 
-void UIButton::SetTextColor(const Vector4& _color)
-{
-    textColor_ = _color;
-    textParam_.SetColor(textColor_);
-}
-
-void UIButton::ImGui()
+void UIButton::ImGuiContent()
 {
 #ifdef _DEBUG
-    UISelectable::ImGui();
 
-    ImGui::PushID("Button");
+    UISelectable::ImGuiContent();
 
-    if (ImGui::TreeNode("Button Settings"))
+    if (ImGui::TreeNode("UIButton"))
     {
-        if (ImGui::ColorEdit4("backgroundColor", &backgroundColor_.x))
-        {
-            SetBackgroundColor(backgroundColor_);
-        }
+        ImGui::ColorEdit4("backgroundColor", &backgroundColor_.x);
 
-        if (ImGui::ColorEdit4("textColor", &textColor_.x))
+        if (text_)
         {
-            SetTextColor(textColor_);
+            //    // テキスト編集
+            //    char buf[256];
+            //std::string str = ConvertString(text_->GetText());
+            //strcpy_s(buf, str.c_str());
+            //if (ImGui::InputText("text", buf, 256))
+            //{
+            //    str = buf;
+            //    SetText(std::wstring(str.begin(), str.end()));
+            //}
         }
-
-        // テキスト編集
-        char buf[256];
-        std::string str = ConvertString(text_);
-        strcpy_s(buf, str.c_str());
-        if (ImGui::InputText("text", buf, 256))
+        else
         {
-            str = buf;
-            SetText(std::wstring(str.begin(), str.end()));
+            if (ImGui::Button("Enable Text"))
+            {
+                CraeteUIText(L"Button", FontConfig());
+            }
         }
 
         ImGui::TreePop();
     }
 
-    ImGui::PopID();
-#endif
+
+#endif // _DEBUG
 }
+//
+//void UIButton::ImGui()
+//{
+//#ifdef _DEBUG
+//    UISelectable::ImGui();
+//
+//    ImGui::PushID("Button");
+//
+//    if (ImGui::TreeNode("Button Settings"))
+//    {
+//        if (ImGui::ColorEdit4("backgroundColor", &backgroundColor_.x))
+//        {
+//            SetBackgroundColor(backgroundColor_);
+//        }
+//
+//        if (ImGui::ColorEdit4("textColor", &textColor_.x))
+//        {
+//            SetTextColor(textColor_);
+//        }
+//
+//        // テキスト編集
+//        char buf[256];
+//        std::string str = ConvertString(text_);
+//        strcpy_s(buf, str.c_str());
+//        if (ImGui::InputText("text", buf, 256))
+//        {
+//            str = buf;
+//            SetText(std::wstring(str.begin(), str.end()));
+//        }
+//
+//        ImGui::TreePop();
+//    }
+//
+//    ImGui::PopID();
+//#endif
+//}
 
 void UIButton::OnClick()
 {
@@ -193,4 +210,12 @@ void UIButton::OnClickEnd()
         onClickEnd_();
     }
     isClickProcessing_ = false;
+}
+
+void UIButton::CraeteUIText(const std::wstring& _text, const FontConfig& _config)
+{
+    text_ = std::make_shared<UIText>();
+    text_->Initialize(label_ + "_text", _text, _config, false);
+
+    AddChild(text_);
 }

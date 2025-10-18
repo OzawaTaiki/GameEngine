@@ -28,7 +28,7 @@ Model* Ring::Generate(const std::string& _name)
     float endOuterRadius = Lerp(innerRadius_, outerRadius_, endOuterRadiusRatio_);
 
     // 円環の頂点数を計算
-    int32_t vertexCount = (divide_) * 2;
+    int32_t vertexCount = (divide_) * 2 + 2;
     int32_t indexCount = divide_ * 6;
     std::vector<VertexData> vertices(vertexCount);
     std::vector<uint32_t> indices(indexCount);
@@ -52,7 +52,7 @@ Model* Ring::Generate(const std::string& _name)
 
         vertices[index].normal = { 0.0f,1.0f,0.0f };
 
-        vertices[index].texcoord = { static_cast<float>(index) / static_cast<float>(divide_),0.0f };
+        vertices[index].texcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),0.0f };
 
         // 内側の頂点
         vertices[index + 1].position.x = cos * innerRadius_;
@@ -60,9 +60,9 @@ Model* Ring::Generate(const std::string& _name)
         vertices[index + 1].position.z = 0.0f;
         vertices[index + 1].position.w = 1.0f;
 
-        vertices[index + 1].normal = { 0.0f,1.0f,0.0f };
+        vertices[index + 1].normal = { 0.0f,0.0f ,1.0f };
 
-        vertices[index + 1].texcoord = { static_cast<float>(index + 1) / static_cast<float>(divide_),1.0f };
+        vertices[index + 1].texcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),1.0f };
 
 
         if (flipU_)
@@ -102,7 +102,8 @@ Model* Ring::Generate(const std::string& _name)
 void Ring::NormalizeAngles()
 {
     // 開始角度が終了角度より大きい場合はスワップ
-    if (startAngle_ > endAngle_) {
+    if (startAngle_ > endAngle_)
+    {
         std::swap(startAngle_, endAngle_);
         std::swap(startOuterRadiusRatio_, endOuterRadiusRatio_);
     }
@@ -117,11 +118,13 @@ void Ring::NormalizeAngles()
     if (endAngle_ < 0) endAngle_ += 2.0f * PI;
 
     // 開始角度と終了角度が同じ場合、完全な円にする
-    if (std::abs(startAngle_ - endAngle_) < 0.0001f) {
+    if (std::abs(startAngle_ - endAngle_) < 0.0001f)
+    {
         endAngle_ = startAngle_ + 2.0f * PI;
     }
     // 終了角度が開始角度より小さい場合、2π加える
-    else if (endAngle_ < startAngle_) {
+    else if (endAngle_ < startAngle_)
+    {
         endAngle_ += 2.0f * PI;
     }
 

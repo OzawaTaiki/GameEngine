@@ -49,7 +49,7 @@ public:
     void SetSelectedColor   (const Vector4& _color) { selectedColor_ = _color; }
     void SetFocusedColor    (const Vector4& _color) { focusedColor_ = _color; }
 
-
+    void ImGuiContent() override;
 protected:
 
     // ドラッグイベント

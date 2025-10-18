@@ -212,6 +212,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\ObjectModel.cpp" />
     <ClCompile Include="Features\Model\Primitive\Builder\PrimitiveBuilder.cpp" />
     <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp" />
+    <ClCompile Include="Features\Model\Primitive\Cube.cpp" />
     <ClCompile Include="Features\Model\Primitive\Cylinder.cpp" />
     <ClCompile Include="Features\Model\Primitive\Plane.cpp" />
     <ClCompile Include="Features\Model\Primitive\Ring.cpp" />
@@ -242,11 +243,13 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\UISelectable.cpp" />
     <ClCompile Include="Features\UI\UISlider.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
+    <ClCompile Include="Features\UI\UIText.cpp" />
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
     <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp" />
     <ClCompile Include="Features\WaveformDisplay\WaveformDisplay.cpp" />
+    <ClCompile Include="Framework\Batch2DRenderer.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\LayerSystem\LayerSystem.cpp" />
     <ClCompile Include="Math\BezierCurve3D.cpp" />
@@ -351,6 +354,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\ObjectModel.h" />
     <ClInclude Include="Features\Model\Primitive\Builder\PrimitiveBuilder.h" />
     <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h" />
+    <ClInclude Include="Features\Model\Primitive\Cube.h" />
     <ClInclude Include="Features\Model\Primitive\Cylinder.h" />
     <ClInclude Include="Features\Model\Primitive\Plane.h" />
     <ClInclude Include="Features\Model\Primitive\Primitive.h" />
@@ -386,12 +390,14 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\UISelectable.h" />
     <ClInclude Include="Features\UI\UISlider.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
+    <ClInclude Include="Features\UI\UIText.h" />
     <ClInclude Include="Features\UVTransform\IUVAnimation.h" />
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
     <ClInclude Include="Features\UVTransform\UVTransformAnimation.h" />
     <ClInclude Include="Features\WaveformDisplay\WaveformAnalyzer.h" />
     <ClInclude Include="Features\WaveformDisplay\WaveformDisplay.h" />
+    <ClInclude Include="Framework\Batch2DRenderer.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\LayerSystem\LayerSystem.h" />
     <ClInclude Include="Math\BezierCurve3D.h" />
@@ -421,7 +427,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Utility\FileDialog\FileDialog.h" />
     <ClInclude Include="Utility\StringUtils\StringUitls.h" />
-    <ClInclude Include="VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -455,6 +460,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\Shader\Batch2DInstancing.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

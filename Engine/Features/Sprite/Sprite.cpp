@@ -23,39 +23,30 @@ Sprite::~Sprite()
 
 void Sprite::Initialize()
 {
-    color_ = { 1,1,1,1 };
-    colorObj_ = std::make_unique<ObjectColor>();
-    colorObj_->Initialize();
-    colorObj_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-
-    matResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
-    matResource_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
-
-    constMap_->worldMat = MakeIdentity4x4();
-    constMap_->uvTransMat = MakeIdentity4x4();
-
-
-    vertexResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData)*6);
-    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
-
-    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
-    vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-
-    vConstMap_[0].texcoord = {0.0f,1.0f };
-    vConstMap_[1].texcoord = {0.0f,0.0f };
-    vConstMap_[2].texcoord = {1.0f,1.0f };
-    vConstMap_[3].texcoord = vConstMap_[1].texcoord;
-    vConstMap_[4].texcoord = {1.0f,0.0f };
-    vConstMap_[5].texcoord = vConstMap_[2].texcoord;
+    if (textureHandle_ == UINT32_MAX)
+        SetTextureHandle(TextureManager::GetInstance()->Load("white.png"));
 
     defaultTextureSize_ = TextureManager::GetInstance()->GetTextureSize(textureHandle_);
-    CalculateVertex();
+
+    vertexData_.resize(6);
+
+    isDirty_ = true;
+    isVertexDirty_ = true;
+
+    UpdateVertexData();
+    UpdateInstanceData();
+}
+
+void Sprite::Initialize(uint32_t _textureHandle)
+{
+    SetTextureHandle(_textureHandle);
+    Initialize();
 }
 
 void Sprite::Update()
 {
+    UpdateVertexData();
+    UpdateInstanceData();
 
 #ifdef _DEBUG
     ImGui();
@@ -64,40 +55,19 @@ void Sprite::Update()
 
 void Sprite::Draw()
 {
-    auto commandList = DXCommon::GetInstance()->GetCommandList();
-    TransferData(commandList);
-    colorObj_->SetColor(color_);
-
-    commandList->DrawInstanced(6, 1, 0, 0);
-
+    UpdateVertexData();
+    UpdateInstanceData();
+    Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
 }
 
 void Sprite::Draw(const Vector4& _color)
 {
-    PreDraw();
-    auto commandList = DXCommon::GetInstance()->GetCommandList();
-    TransferData(commandList);
-    colorObj_->SetColor(_color);
-
-    commandList->DrawInstanced(6, 1, 0, 0);
+    SetColor(_color);
+    UpdateVertexData();
+    UpdateInstanceData();
+    Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
 }
 
-void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE _handle)
-{
-    PreDraw();
-    auto commandList = DXCommon::GetInstance()->GetCommandList();
-
-    CalculateMatrix();
-    colorObj_->SetColor(color_);
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
-
-    commandList->SetGraphicsRootConstantBufferView(0, matResource_->GetGPUVirtualAddress());
-    colorObj_->QueueCommand(commandList, 1);
-    commandList->SetGraphicsRootDescriptorTable(2, _handle);
-
-    commandList->DrawInstanced(6, 1, 0, 0);
-}
 
 std::unique_ptr<Sprite> Sprite::Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor)
 {
@@ -121,100 +91,122 @@ void Sprite::PreDraw()
     SpriteManager::GetInstance()->PreDraw();
 }
 
+void Sprite::SetTextureHandle(uint32_t _textureHandle)
+{
+    textureHandle_ = _textureHandle;
+    isDirty_ = true;
+}
+
+void Sprite::SetAnchor(const Vector2& _anchor)
+{
+    anchor_ = _anchor;
+    isVertexDirty_ = true;
+}
 void Sprite::SetSize(const Vector2& _size)
 {
     scale_ = _size / defaultTextureSize_;
+    isDirty_ = true;
 }
 
 void Sprite::SetColor(const Vector4& _color)
 {
     color_ = _color;
+    isDirty_ = true;
 }
 
 void Sprite::SetUVSize(const Vector2& _size)
 {
     uvScale_ = _size / defaultTextureSize_;
+    isDirty_ = true;
 }
 
 void Sprite::SetLeftTop(const Vector2& _leftTop)
 {
     uvTranslate_ = _leftTop / defaultTextureSize_;
+    isDirty_ = true;
 }
 
-void Sprite::TransferData(ID3D12GraphicsCommandList* _commandList)
+void Sprite::UpdateVertexData()
 {
-    CalculateMatrix();
-    _commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    if (!isVertexDirty_)
+        return;
 
-    _commandList->SetGraphicsRootConstantBufferView(0, matResource_->GetGPUVirtualAddress());
-    colorObj_->QueueCommand(_commandList,1);
-    _commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetGPUHandle(textureHandle_));
-}
-
-void Sprite::CalculateVertex()
-{
     Vector2 size = defaultTextureSize_;
 
-    vConstMap_[0].position = {
-        -anchor_.x * size.x ,
-        (1.0f - anchor_.y) * size.y ,0.0f,1.0f }; // 左下
+    vertexData_[0] = {
+        .position ={-anchor_.x * size.x ,(1.0f - anchor_.y) * size.y ,0.0f,1.0f },
+        .texCoord = { 0.0f,1.0f },
+        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+    };
+    vertexData_[1] = {
+        .position ={-anchor_.x * size.x ,-anchor_.y * size.y ,0.0f,1.0f },
+        .texCoord = { 0.0f,0.0f },
+        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+    };
+    vertexData_[2] = {
+        .position ={(1.0f - anchor_.x) * size.x ,(1.0f - anchor_.y) * size.y ,0.0f,1.0f },
+        .texCoord = { 1.0f,1.0f },
+        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+    };
+    vertexData_[3] = vertexData_[1];
+    vertexData_[4] = {
+        .position ={(1.0f - anchor_.x) * size.x ,-anchor_.y * size.y ,0.0f,1.0f },
+        .texCoord = { 1.0f,0.0f },
+        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+    };
+    vertexData_[5] = vertexData_[2];
 
-    vConstMap_[1].position = {
-        -anchor_.x * size.x,
-        -anchor_.y * size.y,0.0f,1.0f }; // 左上
-
-    vConstMap_[2].position = {
-        (1.0f - anchor_.x) * size.x,
-        (1.0f - anchor_.y) * size.y,0.0f,1.0f }; // 右下
-
-    vConstMap_[4].position = {
-        (1.0f - anchor_.x) * size.x ,
-        -anchor_.y * size.y ,0.0f,1.0f }; // 右上
-
-
-    vConstMap_[3].position = vConstMap_[1].position;
-    vConstMap_[5].position = vConstMap_[2].position;
-
+    isVertexDirty_ = false;
 }
 
-void Sprite::CalculateMatrix()
+void Sprite::UpdateInstanceData()
 {
+    if (!isDirty_)
+        return;
+
     Vector3 s = { scale_,1.0f };
     Vector3 r = { 0.0f,0.0f ,rotate_ };
     Vector3 t = { translate_,0.0f };
-    constMap_->worldMat = MakeAffineMatrix(s, r, t);
-
-    Matrix4x4 vp = Inverse(MakeIdentity4x4()) * MakeOrthographicMatrix(0, 0, static_cast<float> (winWidth_), static_cast<float>(winHeight_), -1.0f, 1.0);
-    constMap_->worldMat *= vp;
-
+    instanceData_.transform = MakeAffineMatrix(s, r, t);
 
     s = { uvScale_,1.0f };
     r = { 0.0f,0.0f ,uvRotate_ };
     t = { uvTranslate_,0.0f };
-    constMap_->uvTransMat = MakeAffineMatrix(s, r, t);
+    instanceData_.uvTransform = MakeAffineMatrix(s, r, t);
+
+    instanceData_.color = color_;
+    instanceData_.textureIndex = TextureManager::GetInstance()->GetSRVIndex(textureHandle_);
+    instanceData_.useTextureAlpha = 0;
+
+    isDirty_ = false;
 }
 void Sprite::ImGui()
 {
 #ifdef _DEBUG
+    bool isDirty = false;
     ImGui::PushID(this);
-    ImGui::DragFloat2("Translate", &translate_.x);
-    ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
-    ImGui::DragFloat("Rotate", &rotate_, 0.01f);
-    ImGui::DragFloat2("UVTranslate", &uvTranslate_.x, 0.01f);
-    ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f);
-    ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f);
-    ImGui::ColorEdit4("Color", &color_.x);
-    if(ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f))
-    {
-        CalculateVertex();
-    }
-
-    ImGui::DragFloat2("Size", &size_.x, 0.01f);
-    ImGui::DragFloat2("LeftTop", &lefttop_.x, 0.01f);
+    isDirty |= ImGui::DragFloat2("Translate", &translate_.x);
+    isDirty |= ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
+    isDirty |= ImGui::DragFloat("Rotate", &rotate_, 0.01f);
+    isDirty |= ImGui::DragFloat2("UVTranslate", &uvTranslate_.x, 0.01f);
+    isDirty |= ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f);
+    isDirty |= ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f);
+    isDirty |= ImGui::ColorEdit4("Color", &color_.x);
+    isDirty |= ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f);
+    isDirty |= ImGui::DragFloat2("Size", &size_.x, 0.01f);
+    isDirty |= ImGui::DragFloat2("LeftTop", &lefttop_.x, 0.01f);
     if (ImGui::Button("Set"))
     {
         SetUVSize(size_);
         SetLeftTop(lefttop_);
+    }
+
+    if (isDirty)
+    {
+        isDirty_ = true;
+        isVertexDirty_ = true;
+        UpdateVertexData();
+        UpdateInstanceData();
     }
 
     ImGui::PopID();

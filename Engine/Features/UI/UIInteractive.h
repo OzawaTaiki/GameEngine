@@ -24,6 +24,8 @@ public:
     void SetOnHovering  (std::function<void()> _callback) { onHoveringCallback_ = _callback; }
     void SetOnHoverExit (std::function<void()> _callback) { onHoverExitCallback_ = _callback; }
 
+
+    void ImGuiContent() override;
 protected:
 
     virtual void OnClick();         // クリック時の処理（オーバーライド可能）

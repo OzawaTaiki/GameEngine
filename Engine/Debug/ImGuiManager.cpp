@@ -17,8 +17,9 @@ void ImGuiManager::Initialize()
     DXCommon* dx = DXCommon::GetInstance();
 
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.Fonts->AddFontFromFileTTF("Resources/fonts/NotoSansJP-Regular.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 
 
     ImGui::StyleColorsDark();

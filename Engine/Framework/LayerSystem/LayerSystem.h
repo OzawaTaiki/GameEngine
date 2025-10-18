@@ -55,6 +55,8 @@ public:
     // レイヤー名で設定する
     static void SetLayer(const std::string& layerName);
 
+    static LayerID GetCurrentLayerID();
+
     static void ApplyPostEffect(const std::string& _sourceLayerName,
         const std::string& _targetLayerName,
         PostEffectBase* _effect);
@@ -68,14 +70,13 @@ public:
 
 private:
 
-
-
     // singleton
     static std::unique_ptr<LayerSystem> instance_;
 
+    LayerID currentLayerID_ = 0;
+
     std::unordered_map<LayerID, LayerInfo> layerInfos_;
     std::unordered_map<std::string, LayerID> nameToID_;
-
 
 private:
 

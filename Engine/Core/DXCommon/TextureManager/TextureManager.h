@@ -25,6 +25,8 @@ public:
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t _textureHandle);
     Vector2 GetTextureSize(uint32_t _textureHandle);
 
+    uint32_t GetTextureHandle(const std::string& _name, uint32_t _srvIndex, D3D12_GPU_DESCRIPTOR_HANDLE _GPUhandle);
+    uint32_t GetSRVIndex(uint32_t _textureHandle);
 private:
 
     uint32_t LoadTexture(const std::string& _filepath);

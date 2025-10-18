@@ -40,8 +40,8 @@ void UIInteractive::UpdateSelf()
         {
             if (isPressed_)
             {
-                OnMouseUp();
                 OnClick();
+                OnMouseUp();
                 isPressed_ = false;
             }
         }
@@ -62,6 +62,27 @@ bool UIInteractive::IsMousePointerInside() const
 {
     Vector2 mousePos = Input::GetInstance()->GetMousePosition();
     return IsPointInside(mousePos);
+}
+
+
+void UIInteractive::ImGuiContent()
+{
+#ifdef _DEBUG
+    if (ImGui::TreeNode("UIInteractive"))
+    {
+        ImGui::Text("Functions:");
+        std::string str = onClickCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" - OnClick()" + str).c_str());
+        str = onHoverEnterCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" - OnHoverEnter()" + str).c_str());
+        str = onHoveringCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" - OnHovering()" + str).c_str());
+        str = onHoverExitCallback_ ? " [Set]" : " [Not Set]";
+        ImGui::Text((" - OnHoverExit()" + str).c_str());
+
+        ImGui::TreePop();
+    }
+#endif // _DEBUG
 }
 
 void UIInteractive::OnClick()

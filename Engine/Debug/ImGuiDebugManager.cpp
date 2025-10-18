@@ -261,7 +261,7 @@ void ImGuiDebugManager::SelectItemWindow()
 {
     // アイテムを選択するウィンドウ
 #ifdef _DEBUG
-    if (this->Begin("Select Item"))
+    if (this->Begin("Items"))
     {
         size_t i = 0;
         for (auto& [name, func] : debugWindows_)

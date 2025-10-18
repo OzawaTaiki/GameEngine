@@ -22,9 +22,6 @@
     <Filter Include="Core\WinApp">
       <UniqueIdentifier>{54C4CE14-B237-4482-95E3-CCCC049633CCDB5B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{6C508C7F-BAFB-46AC-A253-CCCCCDA37F84F688}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features">
       <UniqueIdentifier>{719279EC-C263-4B7A-BA22-CCCC590CB5BA874D}</UniqueIdentifier>
     </Filter>
@@ -267,6 +264,9 @@
     </Filter>
     <Filter Include="Core\DXCommon\RTV">
       <UniqueIdentifier>{67a797a2-75d3-4270-a7f6-9ebe4ea3d28e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{6C508C7F-BAFB-46AC-A253-CCCCCDA37F84F688}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -651,9 +651,20 @@
     <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp">
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
-    <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp" />
     <ClCompile Include="Features\UI\UIInteractive.cpp">
       <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIText.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp">
+      <Filter>Features\AudioSpectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Batch2DRenderer.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\Model\Primitive\Cube.cpp">
+      <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1083,7 +1094,6 @@
     <ClInclude Include="System\Audio\VoiceCallback.h">
       <Filter>System\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="VoiceCallback.h" />
     <ClInclude Include="Features\UI\UISlider.h">
       <Filter>Features\UI</Filter>
     </ClInclude>
@@ -1116,6 +1126,15 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UIInteractive.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIText.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Batch2DRenderer.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Model\Primitive\Cube.h">
+      <Filter>Features\Model\Primitive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1210,6 +1229,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\SpectrumTextureGenerator.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Batch2DInstancing.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
