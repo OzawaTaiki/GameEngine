@@ -1930,7 +1930,7 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         // Alpha: SrcAlpha + DestAlpha（通常は飽和）
         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
 
@@ -1942,19 +1942,19 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
         // Alpha: DestAlpha - SrcAlpha（ただし0以下にはならない）
         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_REV_SUBTRACT;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
 
     case PSOFlags::BlendMode::Multiply:
         // 乗算ブレンド: Src * Dest
         // RGB
-        blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+        blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
+        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         // Alpha: SrcAlpha * DestAlpha
-        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
-        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
 
