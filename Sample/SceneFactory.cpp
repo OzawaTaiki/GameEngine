@@ -2,7 +2,7 @@
 
 #include "SampleScene.h"
 #include "deveScene/DeveScene.h"
-//#include <Features/Scene/ParticleTestScene.h>
+#include <Features/Effect/Editor/EffectEditorScene.h>
 
 std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
 {
@@ -10,10 +10,10 @@ std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
     {
         return std::make_unique<SampleScene>();
     }
-    /*else if (_name == "ParticleTest")
+    else if (_name == "EffectTest")
     {
-        return std::make_unique<ParticleTestScene>();
-    }*/
+        return std::make_unique<EffectEditorScene>();
+    }
     else if (_name == "Develop")
     {
         return std::make_unique<DeveScene>();
@@ -34,10 +34,10 @@ std::string SceneFactory::ShowDebugWindow()
     {
         return "Sample";
     }
-   /* if (ImGui::Button("ParticleTest"))
+    if (ImGui::Button("EffectTest"))
     {
-        return "ParticleTest";
-    }*/
+        return "EffectTest";
+    }
     if (ImGui::Button("Develop"))
     {
         return "Develop";

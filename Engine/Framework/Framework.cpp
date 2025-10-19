@@ -10,6 +10,7 @@
 #include <Framework/LayerSystem/LayerSystem.h>
 
 #include <Debug/ImGuiDebugManager.h>
+#include <Features/Model/Primitive/Builder/PrimitiveBuilder.h>
 
 
 
@@ -86,6 +87,8 @@ void Framework::Initialize(const std::wstring& _winTitle)
     textRenderer_ = TextRenderer::GetInstance();
     textRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
         Vector2(static_cast<float>(WinApp::kWindowWidth_), static_cast<float>(WinApp::kWindowHeight_)));
+
+    PrimitiveBuilder::BuildAndRegisterAll();
 
     batch2DRenderer_ = Batch2DRenderer::GetInstance();
     batch2DRenderer_->Initialize();

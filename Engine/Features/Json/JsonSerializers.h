@@ -74,6 +74,9 @@ void from_json(const json& _j, PrimitiveSettings::CylinderData& _cylinder);
 void to_json(json& _j, const PrimitiveSettings::RingData& _ring);
 void from_json(const json& _j, PrimitiveSettings::RingData& _ring);
 
+void to_json(json& _j, const PrimitiveSettings::CubeData& _cube);
+void from_json(const json& _j, PrimitiveSettings::CubeData& _cube);
+
 // CreatedPrimitive
 void to_json(json& _j, const CreatedPrimitive& _data);
 void from_json(const json& _j, CreatedPrimitive& _data);

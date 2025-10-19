@@ -1,0 +1,67 @@
+{
+    "createdTime": 1760804829,
+    "settings": {
+        "cylinder": {
+            "bottomRadius": 1.0,
+            "endAngle": 6.283180236816406,
+            "hasBottom": false,
+            "hasTop": false,
+            "height": 2.0,
+            "loop": true,
+            "startAngle": 0.0,
+            "topRadius": 1.0
+        },
+        "divide": 16,
+        "flipU": false,
+        "flipV": false,
+        "name": "1x1cube",
+        "plane": {
+            "normal": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+            },
+            "pivot": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 2.0,
+                "y": 2.0
+            }
+        },
+        "ring": {
+            "endAngle": 6.283180236816406,
+            "endOuterRadiusRatio": 1.0,
+            "innerRadius": 0.5,
+            "outerRadius": 1.0,
+            "startAngle": 0.0,
+            "startOuterRadiusRatio": 1.0
+        },
+        "triangle": {
+            "normal": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -1.0
+            },
+            "vertex0": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "vertex1": {
+                "x": -1.0,
+                "y": -1.0,
+                "z": 0.0
+            },
+            "vertex2": {
+                "x": 1.0,
+                "y": -1.0,
+                "z": 0.0
+            }
+        }
+    },
+    "type": "Cube",
+    "version": "1.0"
+}

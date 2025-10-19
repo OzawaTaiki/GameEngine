@@ -6,6 +6,7 @@
 #include <System/Time/Time.h>
 #include <algorithm>
 #include <filesystem>
+#include <Framework/LayerSystem/LayerSystem.h>
 
 EffectEditorScene::~EffectEditorScene()
 {
@@ -59,6 +60,15 @@ void EffectEditorScene::Initialize(SceneData* _sceneData)
 
     // フレーム履歴初期化
     frameTimeHistory_.resize(kFrameHistorySize, 0.0f);
+
+    uint32_t texture = TextureManager::GetInstance()->Load("white.png");
+    backgroundSprite_ = Sprite::Create("particle_Editor_back", texture,{0.0f,0.0f });
+    backgroundSprite_->scale_ = { 1280.0f,720.0f };
+
+    LayerSystem::Initialize();
+    LayerSystem::CreateLayer("EffectEditorScene_Layer_0", 0, PSOFlags::BlendMode::Normal);
+    LayerSystem::CreateLayer("EffectEditorScene_Layer_1", 1, PSOFlags::BlendMode::Normal);
+
 #endif
 }
 
@@ -107,6 +117,13 @@ void EffectEditorScene::Update()
 void EffectEditorScene::Draw()
 {
 #ifdef _DEBUG
+    LayerSystem::SetLayer("EffectEditorScene_Layer_0");
+
+    Sprite::PreDraw();
+    backgroundSprite_->Draw();
+
+    LayerSystem::SetLayer("EffectEditorScene_Layer_1");
+
     // 背景描画
     if (usesSkyBox_ && skyBox_)
     {

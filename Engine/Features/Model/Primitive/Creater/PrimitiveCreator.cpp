@@ -53,54 +53,66 @@ Model* PrimitiveCreator::CreatePrimitive(PrimitiveType type, const PrimitiveSett
 
     switch (type)
     {
-    case PrimitiveType::Plane:
-    {
-        auto plane = std::make_unique<Plane>();
-        plane->SetNormal(settings.plane.normal);
-        plane->SetSize(settings.plane.size);
-        plane->SetPivot(settings.plane.pivot);
-        plane->SetFlipU(settings.flipU);
-        plane->SetFlipV(settings.flipV);
-        primitive = std::move(plane);
-        break;
-    }
-    case PrimitiveType::Triangle:
-    {
-        auto triangle = std::make_unique<Triangle>();
-        triangle->SetVertices(settings.triangle.vertex0, settings.triangle.vertex1, settings.triangle.vertex2);
-        triangle->SetNormal(settings.triangle.normal);
-        triangle->SetFlipU(settings.flipU);
-        triangle->SetFlipV(settings.flipV);
-        primitive = std::move(triangle);
-        break;
-    }
-    case PrimitiveType::Cylinder:
-    {
-        auto cylinder = std::make_unique<Cylinder>(settings.cylinder.topRadius, settings.cylinder.bottomRadius, settings.cylinder.height);
-        cylinder->SetDivide(settings.divide);
-        cylinder->SetTop(settings.cylinder.hasTop);
-        cylinder->SetBottom(settings.cylinder.hasBottom);
-        cylinder->SetStartAngle(settings.cylinder.startAngle);
-        cylinder->SetEndAngle(settings.cylinder.endAngle);
-        cylinder->SetLoop(settings.cylinder.loop);
-        cylinder->SetFlipU(settings.flipU);
-        cylinder->SetFlipV(settings.flipV);
-        primitive = std::move(cylinder);
-        break;
-    }
-    case PrimitiveType::Ring:
-    {
-        auto ring = std::make_unique<Ring>(settings.ring.innerRadius, settings.ring.outerRadius);
-        ring->SetDivide(settings.divide);
-        ring->SetStartAngle(settings.ring.startAngle);
-        ring->SetEndAngle(settings.ring.endAngle);
-        ring->SetStartOuterRadiusRatio(settings.ring.startOuterRadiusRatio);
-        ring->SetEndOuterRadiusRatio(settings.ring.endOuterRadiusRatio);
-        ring->SetFlipU(settings.flipU);
-        ring->SetFlipV(settings.flipV);
-        primitive = std::move(ring);
-        break;
-    }
+        case PrimitiveType::Plane:
+        {
+            auto plane = std::make_unique<Plane>();
+            plane->SetNormal(settings.plane.normal);
+            plane->SetSize(settings.plane.size);
+            plane->SetPivot(settings.plane.pivot);
+            plane->SetFlipU(settings.flipU);
+            plane->SetFlipV(settings.flipV);
+            primitive = std::move(plane);
+            break;
+        }
+        case PrimitiveType::Triangle:
+        {
+            auto triangle = std::make_unique<Triangle>();
+            triangle->SetVertices(settings.triangle.vertex0, settings.triangle.vertex1, settings.triangle.vertex2);
+            triangle->SetNormal(settings.triangle.normal);
+            triangle->SetFlipU(settings.flipU);
+            triangle->SetFlipV(settings.flipV);
+            primitive = std::move(triangle);
+            break;
+        }
+        case PrimitiveType::Cylinder:
+        {
+            auto cylinder = std::make_unique<Cylinder>(settings.cylinder.topRadius, settings.cylinder.bottomRadius, settings.cylinder.height);
+            cylinder->SetDivide(settings.divide);
+            cylinder->SetTop(settings.cylinder.hasTop);
+            cylinder->SetBottom(settings.cylinder.hasBottom);
+            cylinder->SetStartAngle(settings.cylinder.startAngle);
+            cylinder->SetEndAngle(settings.cylinder.endAngle);
+            cylinder->SetLoop(settings.cylinder.loop);
+            cylinder->SetFlipU(settings.flipU);
+            cylinder->SetFlipV(settings.flipV);
+            primitive = std::move(cylinder);
+            break;
+        }
+        case PrimitiveType::Ring:
+        {
+            auto ring = std::make_unique<Ring>(settings.ring.innerRadius, settings.ring.outerRadius);
+            ring->SetDivide(settings.divide);
+            ring->SetStartAngle(settings.ring.startAngle);
+            ring->SetEndAngle(settings.ring.endAngle);
+            ring->SetStartOuterRadiusRatio(settings.ring.startOuterRadiusRatio);
+            ring->SetEndOuterRadiusRatio(settings.ring.endOuterRadiusRatio);
+            ring->SetFlipU(settings.flipU);
+            ring->SetFlipV(settings.flipV);
+            primitive = std::move(ring);
+            break;
+        }
+        case PrimitiveType::Cube:
+        {
+            auto cube = std::make_unique<Cube>();
+            cube->SetSize(settings.cube.size);
+            cube->SetPivot(settings.cube.pivot);
+            cube->HasTop(settings.cube.hasTop);
+            cube->HasBottom(settings.cube.hasBottom);
+            cube->SetFlipU(settings.flipU);
+            cube->SetFlipV(settings.flipV);
+            primitive = std::move(cube);
+            break;
+        }
     }
 
     if (primitive)
@@ -114,10 +126,10 @@ Model* PrimitiveCreator::CreatePrimitive(PrimitiveType type, const PrimitiveSett
 void PrimitiveCreator::DrawParameterSettings()
 {
     // プリミティブタイプ選択
-    const char* types[] = { "Plane", "Triangle", "Cylinder", "Ring" };
+    const char* types[] = { "Plane", "Triangle", "Cylinder", "Ring","Cube"};
     int currentTypeIndex = static_cast<int>(currentType_);
 
-    if (ImGui::Combo("Type", &currentTypeIndex, types, 4))
+    if (ImGui::Combo("Type", &currentTypeIndex, types, _countof(types)))
     {
         currentType_ = static_cast<PrimitiveType>(currentTypeIndex);
     }
@@ -154,6 +166,9 @@ void PrimitiveCreator::DrawParameterSettings()
         break;
     case PrimitiveType::Ring:
         DrawRingSettings();
+        break;
+    case PrimitiveType::Cube:
+        DrawCubeSettings();
         break;
     }
 }
@@ -314,7 +329,20 @@ void PrimitiveCreator::DrawSelectedPrimitiveParameters()
             ImGui::Text("Start Outer Radius Ratio: %.2f", primitive.settings.ring.startOuterRadiusRatio);
             ImGui::Text("End Outer Radius Ratio: %.2f", primitive.settings.ring.endOuterRadiusRatio);
             break;
+        case PrimitiveType::Cube:
+            ImGui::Text("Size: (%.2f, %.2f, %.2f)",
+                        primitive.settings.cube.size.x,
+                        primitive.settings.cube.size.y,
+                        primitive.settings.cube.size.z);
+            ImGui::Text("Pivot: (%.2f, %.2f, %.2f)",
+                        primitive.settings.cube.pivot.x,
+                        primitive.settings.cube.pivot.y,
+                        primitive.settings.cube.pivot.z);
+            ImGui::Text("Has Top: %s", primitive.settings.cube.hasTop ? "Yes" : "No");
+            ImGui::Text("Has Bottom: %s", primitive.settings.cube.hasBottom ? "Yes" : "No");
+            break;
         }
+
 
         ImGui::Separator();
 
@@ -421,6 +449,15 @@ void PrimitiveCreator::DrawRingSettings()
     ImGui::DragFloat("End Outer Radius Ratio", &currentSettings_.ring.endOuterRadiusRatio, 0.01f, 0.0f, 1.0f);
 }
 
+void PrimitiveCreator::DrawCubeSettings()
+{
+    ImGui::DragFloat3("Size", &currentSettings_.cube.size.x, 0.1f, 0.1f, 10.0f);
+    ImGui::DragFloat3("Pivot", &currentSettings_.cube.pivot.x, 0.01f, -1.0f, 1.0f);
+    ImGui::Checkbox("Has Top", &currentSettings_.cube.hasTop);
+    ImGui::SameLine();
+    ImGui::Checkbox("Has Bottom", &currentSettings_.cube.hasBottom);
+}
+
 const char* PrimitiveCreator::PrimitiveTypeToString(PrimitiveType type)
 {
     switch (type)
@@ -429,6 +466,7 @@ const char* PrimitiveCreator::PrimitiveTypeToString(PrimitiveType type)
     case PrimitiveType::Triangle: return "Triangle";
     case PrimitiveType::Cylinder: return "Cylinder";
     case PrimitiveType::Ring: return "Ring";
+    case PrimitiveType::Cube: return "Cube";
     default: return "Unknown";
     }
 }
