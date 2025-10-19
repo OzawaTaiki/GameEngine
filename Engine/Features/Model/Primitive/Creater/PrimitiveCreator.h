@@ -5,6 +5,7 @@
 #include <Features/Model/Primitive/Triangle.h>
 #include <Features/Model/Primitive/Cylinder.h>
 #include <Features/Model/Primitive/Ring.h>
+#include <Features/Model/Primitive/Cube.h>
 #include <Features/Model/Model.h>
 #include <Features/Json/Loader/JsonFileIO.h>
 
@@ -20,7 +21,8 @@ enum class PrimitiveType
     Plane,
     Triangle,
     Cylinder,
-    Ring
+    Ring,
+    Cube
 };
 
 /// <summary>
@@ -74,6 +76,15 @@ struct PrimitiveSettings
         float startOuterRadiusRatio = 1.0f;
         float endOuterRadiusRatio = 1.0f;
     } ring;
+
+    // Cube用設定
+    struct CubeData
+    {
+        Vector3 size = { 1.0f, 1.0f, 1.0f };
+        Vector3 pivot = { 0.0f, 0.0f, 0.0f };
+        bool hasTop = true;
+        bool hasBottom = true;
+    } cube;
 };
 
 /// <summary>
@@ -141,6 +152,7 @@ private:
     void DrawTriangleSettings();
     void DrawCylinderSettings();
     void DrawRingSettings();
+    void DrawCubeSettings();
 
     /// <summary>
     /// プリミティブをファイルに保存

@@ -123,6 +123,18 @@ Model* PrimitiveBuilder::CreateModelFromJson(const json& j)
             primitive = std::move(ring);
             break;
         }
+        case PrimitiveType::Cube:
+        {
+            auto cube = std::make_unique<Cube>();
+            cube->SetSize(settings.cube.size);
+            cube->SetPivot(settings.cube.pivot);
+            cube->HasTop(settings.cube.hasTop);
+            cube->HasBottom(settings.cube.hasBottom);
+            cube->SetFlipU(settings.flipU);
+            cube->SetFlipV(settings.flipV);
+            primitive = std::move(cube);
+            break;
+        }
         default:
             Debug::Log("Unknown primitive type\n");
             return nullptr;

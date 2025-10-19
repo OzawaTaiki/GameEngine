@@ -287,6 +287,9 @@ void to_json(json& _j, const PrimitiveType& _type)
     case PrimitiveType::Ring:
         _j = "Ring";
         break;
+    case PrimitiveType::Cube:
+        _j = "Cube";
+        break;
     default:
         _j = "Unknown";
         break;
@@ -304,6 +307,8 @@ void from_json(const json& _j, PrimitiveType& _type)
         _type = PrimitiveType::Cylinder;
     else if (typeStr == "Ring")
         _type = PrimitiveType::Ring;
+    else if (typeStr == "Cube")
+        _type = PrimitiveType::Cube;
     else
         throw std::runtime_error("Invalid PrimitiveType: " + typeStr);
 }
@@ -395,6 +400,26 @@ void from_json(const json& _j, PrimitiveSettings::RingData& _ring)
     _ring.endAngle = _j.value("endAngle", 6.28318f);
     _ring.startOuterRadiusRatio = _j.value("startOuterRadiusRatio", 1.0f);
     _ring.endOuterRadiusRatio = _j.value("endOuterRadiusRatio", 1.0f);
+}
+
+void to_json(json& _j, const PrimitiveSettings::CubeData& _cube)
+{
+    _j = json{
+        {"size", _cube.size},
+        {"pivot", _cube.pivot},
+        {"hasTop", _cube.hasTop},
+        {"hasBottom", _cube.hasBottom}
+    };
+}
+
+void from_json(const json& _j, PrimitiveSettings::CubeData& _cube)
+{
+    if (_j.contains("size"))
+        _cube.size = _j["size"].get<Vector3>();
+    if (_j.contains("pivot"))
+        _cube.pivot = _j["pivot"].get<Vector3>();
+    _cube.hasTop = _j.value("hasTop", true);
+    _cube.hasBottom = _j.value("hasBottom", true);
 }
 
 void to_json(json& _j, const PrimitiveSettings& _settings)

@@ -5,7 +5,7 @@
 #include "SceneFactory.h"
 
 #include <System/Time/Time_MT.h>
-#include <Essential/ParticleModifierFactory.h>
+#include "ParticleModifierFactory.h"
 
 #include <Framework/LayerSystem/LayerSystem.h>
 
@@ -26,18 +26,13 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
 
     collisionManager_->Initialize(Vector2(100, 100), 5, Vector2(-50, -50), 1.0f);
 
-    PrimitiveBuilder::BuildAndRegisterAll();
-
     Time_MT::GetInstance()->Initialize();
 
     LayerSystem::Initialize();
 
-    Setting::Load();
-
-    AudioSystem::GetInstance()->SetMasterVolume(Setting::current_.masterVolume);
 
     // 最初のシーンで初期化
-    sceneManager_->Initialize("GameScene");
+    sceneManager_->Initialize("EffectTest");
 }
 
 void SampleFramework::Update()
@@ -97,8 +92,6 @@ void SampleFramework::Draw()
 
 void SampleFramework::Finalize()
 {
-    Setting::Save();
-
     Time_MT::GetInstance()->Finalize();
     Framework::Finalize();
 }
