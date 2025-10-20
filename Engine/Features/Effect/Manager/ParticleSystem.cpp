@@ -115,6 +115,8 @@ void ParticleSystem::DrawParticles()
 {
     auto cmdList = DXCommon::GetInstance()->GetCommandList();
 
+
+    cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmdList->SetGraphicsRootSignature(rootSignature_);
 
     for (auto& [key, particleList] : particles_)
@@ -123,7 +125,6 @@ void ParticleSystem::DrawParticles()
             continue;
 
         cmdList->SetPipelineState(psoMap_[particleList.psoIndex]);
-
         cmdList->IASetVertexBuffers(0, 1, particleList.model->GetMeshPtr()->GetVertexBufferView());
         cmdList->IASetIndexBuffer(particleList.model->GetMeshPtr()->GetIndexBufferView());
 
