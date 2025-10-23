@@ -80,6 +80,7 @@ void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData,
     // リソースバリア
     // テクスチャとして扱えるようにする
     renderTexture_->ChangeRTVState(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    renderTexture_->CancelClear();
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE SpectrumTextureGenerator::GetTextureGPUHandle() const
@@ -131,6 +132,11 @@ void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, flo
     cashedDrawData_.minHz = fmin;
     cashedDrawData_.maxHz = fmax;
 
+}
+
+void SpectrumTextureGenerator::ReserveClear()
+{
+    renderTexture_->ReserveClear();
 }
 
 void SpectrumTextureGenerator::CalculateWidthAndMargin(int32_t _drawCount)

@@ -4,8 +4,8 @@
 
 const uint32_t RTVManager::kMaxRTVIndex_ = 64;
 const uint32_t RTVManager::kMaxDSVIndex_ = 64;
- uint32_t RTVManager::winWidth_ = 0;
- uint32_t RTVManager::winHeight_ = 0;
+uint32_t RTVManager::winWidth_ = 0;
+uint32_t RTVManager::winHeight_ = 0;
 
 
 
@@ -146,13 +146,21 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
     uint32_t rtvIndex = AllocateRTVIndex();
 
     auto it = textureMap_.find(_name);
-    if (it != textureMap_.end())
-        return it->second;
+
+    int32_t num = 1;
+    std::string name = _name;
+    // 同名が存在する場合
+    while (it != textureMap_.end())
+    {
+        name = _name + "_" + std::to_string(num);
+        it = textureMap_.find(name);
+        ++num;
+    }
 
     auto rtvResource = CreateRenderTextureResource(_width, _height, rtvIndex, _colorFormat, _clearColor);
+    rtvResource->SetName((L"RenderTarget_" + std::wstring(name.begin(), name.end())).c_str());
 
-
-    textureMap_[_name] = rtvIndex;
+    textureMap_[name] = rtvIndex;
 
     renderTargets_[rtvIndex] = std::make_unique<RenderTarget>();
     renderTargets_[rtvIndex]->Initialize(rtvResource, GetCPURTVDescriptorHandle(rtvIndex), _colorFormat, _width, _height);
@@ -189,7 +197,8 @@ uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _widt
 
     // キューブマップリソースを作成
     auto cubemapResource = CreateCubemapResource(_width, _height, rtvIndex, _colorFormat, _clearColor);
-    if (!cubemapResource) {
+    if (!cubemapResource)
+    {
         return 0; // リソース作成失敗
     }
 
@@ -234,7 +243,8 @@ uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _widt
 
     // 深度バッファを作成（必要な場合）
     uint32_t dsvIndex = 0;
-    if (_createDSV) {
+    if (_createDSV)
+    {
         dsvIndex = AllocateDSVIndex();
 
         // キューブマップ用の深度バッファを作成
@@ -269,7 +279,8 @@ uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _widt
             &depthClearValue,
             IID_PPV_ARGS(depthResource.GetAddressOf()));
 
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             dsvResources_[dsvIndex] = depthResource;
 
             // 深度ステンシルビューの作成
@@ -309,14 +320,16 @@ void RTVManager::QueuePointLightShadowMapToSRV(uint32_t _handle, uint32_t _index
 {
     // キューブマップの存在確認
     auto it = cubemaps_.find(_handle);
-    if (it == cubemaps_.end()) {
+    if (it == cubemaps_.end())
+    {
         return; // シャドウマップが存在しない
     }
 
     auto& cubemapData = it->second;
     auto renderTarget = renderTargets_[_handle].get();
 
-    if (!renderTarget || !cubemapData.resource) {
+    if (!renderTarget || !cubemapData.resource)
+    {
         return; // レンダーターゲットまたはリソースが存在しない
     }
 
@@ -358,7 +371,7 @@ uint32_t RTVManager::CreateComputeOutputTexture(const std::string& _name, uint32
         return it->second;
 
     // UAVフラグも追加したリソース作成
-    auto rtvResource = CreateRenderTextureResourceWithUAV(_width, _height, rtvIndex, _format,_clearColor);
+    auto rtvResource = CreateRenderTextureResourceWithUAV(_width, _height, rtvIndex, _format, _clearColor);
 
     textureMap_[_name] = rtvIndex;
 
@@ -433,7 +446,7 @@ ID3D12Resource* RTVManager::GetCubemapResource(uint32_t _handle) const
 }
 
 
-Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResource( uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
+Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResource(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
 {
 
     Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource = nullptr;
@@ -468,11 +481,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResource( 
         &heapProperties,					// Heapの設定
         D3D12_HEAP_FLAG_NONE,				// Heapの特別な設定は特になし。
         &resourceDesc,						// Resourceの設定
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
         &clearValue,						// クリア値
         IID_PPV_ARGS(renderTextureResource.GetAddressOf())); // 作成するResourceポインタへのポインタ
 
-	assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr));
 
 
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -649,7 +662,7 @@ uint32_t RTVManager::AllocateDSVIndex()
 D3D12_CPU_DESCRIPTOR_HANDLE RTVManager::GetCPUDSVDescriptorHandle(uint32_t _index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += (dsvDescriptorSize_  * _index);
+    handleCPU.ptr += (dsvDescriptorSize_ * _index);
     return handleCPU;
 }
 

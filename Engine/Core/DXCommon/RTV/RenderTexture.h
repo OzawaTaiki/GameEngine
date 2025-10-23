@@ -31,6 +31,7 @@ public:
     void SetClearColor(float _color[4])                         { clearValue_[0] = _color[0];   clearValue_[1] = _color[1]; clearValue_[2] = _color[2]; clearValue_[3] = _color[3]; }
     void SetClearColor(const Vector4& _color)                   { clearValue_[0] = _color.x ;   clearValue_[1] = _color.y;  clearValue_[2] = _color.z;  clearValue_[3] = _color.w;  }
 
+
     void SetRenderTexture();
     void SetDepthStencil();
 
@@ -57,6 +58,8 @@ public:
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandleofRTV() const { return SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndexofRTV_); }
 
 
+    void ReserveClear() { needClear_ = true; }
+    void CancelClear() { needClear_ = false; }
     void Clear(ID3D12GraphicsCommandList* _cmdList);
 
 private:
@@ -84,4 +87,5 @@ private:
     D3D12_VIEWPORT viewport_{};
     D3D12_RECT scissorRect_{};
 
+    bool needClear_ = true; // レンダーターゲットをクリアする必要があるか
 };
