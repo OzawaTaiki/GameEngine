@@ -249,6 +249,9 @@ void RenderTarget::Draw()
 
 void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
 {
+    if (!needClear_)
+        return;
+
     // クリア前に適切な状態に遷移させる
     if (DSVCurrentState_ != D3D12_RESOURCE_STATE_DEPTH_WRITE)
     {

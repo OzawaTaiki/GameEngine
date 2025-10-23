@@ -29,6 +29,7 @@ public:
     void SetMargin(float _margin) { margin_ = _margin; }
 
     void MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize);
+    void ReserveClear();
 private:
 
 
