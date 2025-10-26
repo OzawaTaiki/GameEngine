@@ -57,8 +57,8 @@ float4 VSmain(uint instanceID : SV_InstanceID, uint Vertexid : SV_VertexID) : SV
     normalized = clamp(normalized, 0.0f, 1.0f);
             
     // 形状 : 音量 = 8 : 2 で加算合成して音量による変化をつける
-    float baseHeight = normalized * 0.8f;
-    float volumeBoost = cb.rms * 0.2f;
+    float baseHeight = normalized * 0.6f;
+    float volumeBoost = cb.rms * 0.4f;
     float scale = baseHeight + volumeBoost;
     float y = localpos.y * scale; // 高さを変える
     y = clamp(y, 0.0f, 1.0f);

@@ -28,7 +28,7 @@ public:
     void SetWidth(float _width) { width_ = _width; }
     void SetMargin(float _margin) { margin_ = _margin; }
 
-    void MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize);
+    void MakeLogRanges(float sampleRate, float fmin=100.0f, float fmax=10000.0f, int32_t bars=48, int32_t fftBins=512, int32_t fftSize=1024);
     void ReserveClear();
 private:
 
@@ -122,7 +122,7 @@ private:
 
         bool operator==(const DrawData& other) const
         {
-            return 
+            return
                 drawCount   == other.drawCount &&
                 fftBins     == other.fftBins &&
                 sampleRate  == other.sampleRate &&
