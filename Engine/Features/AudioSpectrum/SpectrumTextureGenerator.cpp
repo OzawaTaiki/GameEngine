@@ -26,20 +26,12 @@ void SpectrumTextureGenerator::Initialize(const Vector4& _backColor)
     CreatePipelineState();
 
     CreateBuffers(_backColor);
-    MakeLogRanges(512, 64, 60.0f, 13000.0f, 44100.0f, 1024);
+    MakeLogRanges(44100.0f);
 }
 
 void SpectrumTextureGenerator::Generate(const std::vector<float>& _spectrumData, float _rms, int32_t _drawCount)
 {
     CalculateWidthAndMargin(_drawCount);
-
-    //MakeLogRanges(static_cast<int32_t>(_spectrumData.size()),
-    //              static_cast<int32_t>(_drawCount),
-    //              60.0f,
-    //              13000.0f,
-    //              44100.0f,
-    //              static_cast<int32_t>(_spectrumData.size()) * 2);
-
 
     DXCommon* dxCommon = DXCommon::GetInstance();
     ID3D12GraphicsCommandList* commandList = dxCommon->GetCommandList();
@@ -88,7 +80,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SpectrumTextureGenerator::GetTextureGPUHandle() cons
     return renderTexture_->GetGPUHandleofRTV();
 }
 
-void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, float fmin, float fmax, float sampleRate, int32_t fftSize)
+void  SpectrumTextureGenerator::MakeLogRanges(float sampleRate,  float fmin, float fmax, int32_t bars, int32_t fftBins, int32_t fftSize)
 {
     // 同じ条件なら再計算しない
     if (cashedDrawData_.CashEquals(bars, fftBins, sampleRate, fmin, fmax))
@@ -131,7 +123,6 @@ void  SpectrumTextureGenerator::MakeLogRanges(int32_t fftBins, int32_t bars, flo
     cashedDrawData_.sampleRate = sampleRate;
     cashedDrawData_.minHz = fmin;
     cashedDrawData_.maxHz = fmax;
-
 }
 
 void SpectrumTextureGenerator::ReserveClear()
