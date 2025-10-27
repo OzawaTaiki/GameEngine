@@ -135,8 +135,24 @@ void ParticleEmitter::GenerateParticles()
         {
         case EmitterShape::Box:
         {
-            Vector3 boxOffset = RandomGenerator::GetInstance()->GetRandValue(initParams_.boxOffset.GetValue(), boxSize_ / 2.0f);
-            initParam.position = boxOffset;
+            Vector3 randomPos = RandomGenerator::GetInstance()->GetRandValue({ 0,0,0 }, boxSize_);
+            randomPos -= boxSize_ / 2.0f; // 中心を基準にする
+            Vector3 inner = initParams_.boxInnerSize.GetValue();
+
+            // X軸: 内径より内側なら外側に押し出す
+            if (std::abs(randomPos.x) < inner.x)
+                randomPos.x = (randomPos.x < 0) ? -inner.x : inner.x;
+
+            // Y軸: 内径より内側なら外側に押し出す
+            if (std::abs(randomPos.y) < inner.y)
+                randomPos.y = (randomPos.y < 0) ? -inner.y : inner.y;
+
+            // Z軸: 内径より内側なら外側に押し出す
+            if (std::abs(randomPos.z) < inner.z)
+                randomPos.z = (randomPos.z < 0) ? -inner.z : inner.z;
+
+            initParam.position = randomPos;
+
             break;
         }
         case EmitterShape::Sphere:
@@ -408,10 +424,10 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("billboard_y", &initParams_.billboard[1]);
     jsonBinder_->RegisterVariable("billboard_z", &initParams_.billboard[2]);
 
-    jsonBinder_->RegisterVariable("BoxOffset_Random", &initParams_.boxOffset.isRandom);
-    jsonBinder_->RegisterVariable("BoxOffset_Min", &initParams_.boxOffset.minV);
-    jsonBinder_->RegisterVariable("BoxOffset_Max", &initParams_.boxOffset.maxV);
-    jsonBinder_->RegisterVariable("BoxOffset_Value", &initParams_.boxOffset.value);
+    jsonBinder_->RegisterVariable("BoxOffset_Random", &initParams_.boxInnerSize.isRandom);
+    jsonBinder_->RegisterVariable("BoxOffset_Min", &initParams_.boxInnerSize.minV);
+    jsonBinder_->RegisterVariable("BoxOffset_Max", &initParams_.boxInnerSize.maxV);
+    jsonBinder_->RegisterVariable("BoxOffset_Value", &initParams_.boxInnerSize.value);
 
     jsonBinder_->RegisterVariable("SphereOffset_Random", &initParams_.sphereOffset.isRandom);
     jsonBinder_->RegisterVariable("SphereOffset_Min", &initParams_.sphereOffset.minV);
@@ -503,8 +519,9 @@ bool ParticleEmitter::ValidateSettings() const
 void ParticleEmitter::ShowDebugWindow()
 {
     // 一意なIDを使用してウィンドウを識別
-    ImGui::PushID(instanceID_);
+    ImGui::PushID(this);
     {
+        ImGui::PushID("emitter");
         if (ImGui::Button("Emit"))
             GenerateParticles();
 
@@ -595,7 +612,9 @@ void ParticleEmitter::ShowDebugWindow()
                 }
             }
         }
+        ImGui::PopID();
 
+        ImGui::PushID("initParams");
         if (ImGui::CollapsingHeader("Particle Init Params"))
         {
             if (ImGui::TreeNode("Use Model"))
@@ -732,6 +751,7 @@ void ParticleEmitter::ShowDebugWindow()
                 ImGui::TreePop();
             }
         }
+        ImGui::PopID();
     }
     ImGui::PopID(); // Pop ID for this emitter
 }
@@ -766,7 +786,7 @@ void ParticleEmitter::DebugWindowForPosition()
     {
     case EmitterShape::Box:
     {
-        auto& boxOffset = initParams_.boxOffset;
+        auto& boxOffset = initParams_.boxInnerSize;
 
         int imBoxOffset = static_cast<int>(!boxOffset.isRandom);
 
@@ -782,7 +802,7 @@ void ParticleEmitter::DebugWindowForPosition()
         }
         else
         {
-            ImGui::DragFloat3("Box Offset", &boxOffset.value.x, 0.01f);
+            ImGui::DragFloat3("Box Inner Size", &boxOffset.value.x, 0.01f);
         }
         break;
     }
@@ -803,7 +823,7 @@ void ParticleEmitter::DebugWindowForPosition()
         }
         else
         {
-            ImGui::DragFloat("Sphere Offset", &sphereOffset.value, 0.01f);
+            ImGui::DragFloat("Sphere Inner Size", &sphereOffset.value, 0.01f);
         }
         break;
     }
