@@ -71,7 +71,7 @@ enum class ParticleLifeTimeType : uint32_t {
 struct ParticleInitParamsForGenerator
 {
     // 位置関連
-    Range<Vector3> boxOffset = { Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0) };
+    Range<Vector3> boxInnerSize = { Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0) };
     Range<float> sphereOffset = { 0.0f, 0.0f, 0.0f };
 
     // 動作関連
