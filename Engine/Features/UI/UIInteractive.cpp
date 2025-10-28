@@ -1,10 +1,20 @@
 #include "UIInteractive.h"
+#include <Features/UI/Collider//UIRentangleCollider.h>
 
 #include <System/Input/Input.h>
 
 
+UIInteractive::UIInteractive()
+{
+    // デフォルトで矩形コライダーを使用
+    collider_ = std::make_unique<UIRentangleCollider>();
+}
+
 void UIInteractive::UpdateSelf()
 {
+    // Colliderのキャッシュを更新
+    collider_->UpdateCache(this);
+
     Input* input = Input::GetInstance();
 
     // マウスポインタがUI要素内にあるか判定
@@ -58,10 +68,25 @@ void UIInteractive::UpdateSelf()
     }
 }
 
+void UIInteractive::SetCollider(std::unique_ptr<IUICollider> _collider)
+{
+    collider_ = std::move(_collider);
+    if (collider_)
+    {
+        collider_->UpdateCache(this);
+    }
+}
+
 bool UIInteractive::IsMousePointerInside() const
 {
     Vector2 mousePos = Input::GetInstance()->GetMousePosition();
-    return IsPointInside(mousePos);
+
+    // Colliderがあればそれを使用、なければUIBaseのデフォルト判定
+    if (collider_)
+    {
+        return collider_->IsPointInside(mousePos);
+    }
+    return false;
 }
 
 
@@ -80,6 +105,13 @@ void UIInteractive::ImGuiContent()
         str = onHoverExitCallback_ ? " [Set]" : " [Not Set]";
         ImGui::Text((" - OnHoverExit()" + str).c_str());
 
+        ImGui::TreePop();
+    }
+
+    // Colliderのデバッグ表示
+    if (collider_ && ImGui::TreeNode("Collider"))
+    {
+        collider_->ImGui();
         ImGui::TreePop();
     }
 #endif // _DEBUG

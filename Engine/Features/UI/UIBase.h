@@ -38,6 +38,10 @@ public:
     void SetPos(const Vector2& _pos) { position_ = _pos; };
     Vector2 GetWorldPos() const;
 
+    Vector2 GetLeftTopPos() const { return GetWorldPos() - size_ * anchor_; }
+    Vector2 GetRightBottomPos() const { return GetWorldPos() + size_ - size_ * anchor_; }
+    Vector2 GetCenterPos() const { return GetWorldPos() + size_ * (Vector2{ 0.5f,0.5f } - anchor_); }
+
     const Vector2& GetSize() const { return size_; }
     void SetSize(const Vector2& _size) { size_ = _size; };
 
@@ -56,8 +60,6 @@ public:
 
     bool IsVisible() const { return isVisible_; }
     void SetVisible(bool _isVisible) { isVisible_ = _isVisible; }
-
-
 
     //bool IsMousePointerInside() const;
     //bool IsPointInside(const Vector2& _point) const;

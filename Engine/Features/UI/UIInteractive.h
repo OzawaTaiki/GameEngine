@@ -1,13 +1,17 @@
 #pragma once
 
 #include <Features/UI/UIBase.h>
+#include <Features/UI/Collider/Interface/IUICollider.h>
 #include <functional>
+#include <memory>
+
+class IUICollider;
 
 // 入力機能を持つUI基底クラス
 class UIInteractive : public UIBase
 {
 public:
-    UIInteractive() = default;
+    UIInteractive();
     virtual ~UIInteractive() = default;
 
     void UpdateSelf() override; // 自身の更新処理
@@ -17,6 +21,9 @@ public:
     bool IsHovered() const { return isHovered_; }
     bool IsPressed() const { return isPressed_; }
 
+    // Collider関連
+    void SetCollider(std::unique_ptr<IUICollider> _collider);
+    IUICollider* GetCollider() const { return collider_.get(); }
 
     // イベントコールバック
     void SetOnClick     (std::function<void()> _callback) { onClickCallback_ = _callback; }
@@ -42,6 +49,8 @@ protected:
     bool isHovered_     = false; // マウスオーバーしているか
     bool wasHovered_    = false; // 前フレームでマウスオーバーしていたか
     bool isPressed_     = false; // マウスボタンが押されているか
+
+    std::unique_ptr<IUICollider> collider_ = nullptr; // 衝突判定用コライダー
 
     std::function<void()> onClickCallback_      = nullptr;
     std::function<void()> onHoverEnterCallback_ = nullptr;
