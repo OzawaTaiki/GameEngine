@@ -382,11 +382,13 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\TextRenderer\TextGenerator.h" />
     <ClInclude Include="Features\TextRenderer\TextParam.h" />
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h" />
     <ClInclude Include="Features\UI\UIInteractive.h" />
     <ClInclude Include="Features\UI\UINavigator.h" />
     <ClInclude Include="Features\UI\UIBase.h" />
     <ClInclude Include="Features\UI\UIButton.h" />
     <ClInclude Include="Features\UI\UIGroup.h" />
+    <ClInclude Include="Features\UI\UIRentangleCollider.h" />
     <ClInclude Include="Features\UI\UISelectable.h" />
     <ClInclude Include="Features\UI\UISlider.h" />
     <ClInclude Include="Features\UI\UISprite.h" />

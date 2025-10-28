@@ -268,6 +268,12 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{6C508C7F-BAFB-46AC-A253-CCCCCDA37F84F688}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\UI\Collider">
+      <UniqueIdentifier>{c899e28c-0b3e-4574-9785-9ebe67a45a4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\Collider\Interface">
+      <UniqueIdentifier>{7dd03427-5f33-4b92-bfa0-d950485e133a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -1135,6 +1141,12 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Cube.h">
       <Filter>Features\Model\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h">
+      <Filter>Features\UI\Collider\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIRentangleCollider.h">
+      <Filter>Features\UI\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
