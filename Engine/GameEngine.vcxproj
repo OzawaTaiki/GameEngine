@@ -235,8 +235,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp" />
     <ClCompile Include="Features\TextRenderer\TextGenerator.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
-    <ClCompile Include="Features\UI\Collider\Interface\IUICollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp" />
+    <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp" />
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIRentangleCollider.cpp" />
@@ -389,6 +389,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h" />
     <ClInclude Include="Features\UI\Collider\UICircleCollider.h" />
+    <ClInclude Include="Features\UI\Collider\UIColliderFactory.h" />
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIRentangleCollider.h" />

@@ -1,5 +1,6 @@
 #include "UIInteractive.h"
-#include <Features/UI/Collider//UIRentangleCollider.h>
+#include <Features/UI/Collider/UIRentangleCollider.h>
+#include <Features/UI/Collider/UIColliderFactory.h>
 
 #include <System/Input/Input.h>
 
@@ -8,12 +9,16 @@ UIInteractive::UIInteractive()
 {
     // デフォルトで矩形コライダーを使用
     collider_ = std::make_unique<UIRentangleCollider>();
+    colliderType_ = ColliderType::Rectangle;
 }
 
 void UIInteractive::UpdateSelf()
 {
     // Colliderのキャッシュを更新
-    collider_->UpdateCache(this);
+    if (collider_)
+    {
+        collider_->UpdateCache(this);
+    }
 
     Input* input = Input::GetInstance();
 
@@ -81,11 +86,13 @@ bool UIInteractive::IsMousePointerInside() const
 {
     Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 
-    // Colliderがあればそれを使用、なければUIBaseのデフォルト判定
+    // Colliderで判定
     if (collider_)
     {
         return collider_->IsPointInside(mousePos);
     }
+
+    // Colliderがない場合はfalse（通常はありえない）
     return false;
 }
 
@@ -108,10 +115,24 @@ void UIInteractive::ImGuiContent()
         ImGui::TreePop();
     }
 
-    // Colliderのデバッグ表示
-    if (collider_ && ImGui::TreeNode("Collider"))
+    // Colliderのデバッグ表示と選択UI
+    if (ImGui::TreeNode("Collider"))
     {
-        collider_->ImGui();
+        // ファクトリを使ってColliderタイプを選択
+        auto newCollider = UIColliderFactory::ImGuiSelectCollider(colliderType_);
+        if (newCollider)
+        {
+            SetCollider(std::move(newCollider));
+        }
+
+        // 現在のColliderのパラメータ表示
+        if (collider_)
+        {
+            ImGui::Separator();
+            ImGui::Text("Current Parameters:");
+            collider_->ImGui();
+        }
+
         ImGui::TreePop();
     }
 #endif // _DEBUG
