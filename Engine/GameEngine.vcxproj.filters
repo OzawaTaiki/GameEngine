@@ -681,8 +681,12 @@
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp" />
-    <ClCompile Include="Features\UI\Collider\Interface\IUICollider.cpp" />
+    <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp">
+      <Filter>Features\UI\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp">
+      <Filter>Features\UI\Collider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1166,6 +1170,9 @@
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h">
+      <Filter>Features\UI\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\UIColliderFactory.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
   </ItemGroup>

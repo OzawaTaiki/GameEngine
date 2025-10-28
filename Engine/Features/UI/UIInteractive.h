@@ -24,6 +24,7 @@ public:
     // Collider関連
     void SetCollider(std::unique_ptr<IUICollider> _collider);
     IUICollider* GetCollider() const { return collider_.get(); }
+    ColliderType GetColliderType() const { return colliderType_; }
 
     // イベントコールバック
     void SetOnClick     (std::function<void()> _callback) { onClickCallback_ = _callback; }
@@ -51,6 +52,7 @@ protected:
     bool isPressed_     = false; // マウスボタンが押されているか
 
     std::unique_ptr<IUICollider> collider_ = nullptr; // 衝突判定用コライダー
+    ColliderType colliderType_ = ColliderType::Rectangle; // 現在のColliderタイプ
 
     std::function<void()> onClickCallback_      = nullptr;
     std::function<void()> onHoverEnterCallback_ = nullptr;
