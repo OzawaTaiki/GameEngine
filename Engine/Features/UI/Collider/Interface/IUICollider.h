@@ -23,6 +23,17 @@ enum class ColliderType
 class IUICollider
 {
 public:
+    /// <summary>
+    /// トランスフォームモード
+    /// UI依存：UIBaseのパラメータ（位置、サイズ、回転など）を使用
+    /// 独立：コライダー独自のパラメータを使用
+    /// </summary>
+    enum class TransformMode
+    {
+        UIDependent,    // UI依存モード
+        Independent     // 独立モード
+    };
+
     virtual ~IUICollider() = default;
 
     /// <summary>
@@ -50,4 +61,19 @@ public:
     /// コライダーの形状をデバッグ描画する
     /// </summary>
     virtual void DrawDebug() const {};
+
+    /// <summary>
+    /// トランスフォームモードを設定する
+    /// </summary>
+    /// <param name="_mode">設定するモード</param>
+    void SetTransformMode(TransformMode _mode) { transformMode_ = _mode; }
+
+    /// <summary>
+    /// トランスフォームモードを取得する
+    /// </summary>
+    /// <returns>現在のトランスフォームモード</returns>
+    TransformMode GetTransformMode() const { return transformMode_; }
+
+protected:
+    TransformMode transformMode_ = TransformMode::UIDependent;  // デフォルトはUI依存
 };

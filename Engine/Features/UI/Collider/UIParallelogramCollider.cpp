@@ -37,11 +37,24 @@ bool UIParallelogramCollider::IsPointInside(const Vector2& _point) const
 
 void UIParallelogramCollider::UpdateCache(const UIBase* _uiBase)
 {
-    // UIBaseから必要な情報を取得
-    Vector2 center = _uiBase->GetCenterPos();
-    Vector2 size = _uiBase->GetSize();
-    float rotate = _uiBase->GetRotate();
-    Vector2 anchor = _uiBase->GetAnchor();
+    // パラメータを選択（UI依存 or 独立モード）
+    Vector2 center, size;
+    float rotate;
+
+    if (transformMode_ == TransformMode::UIDependent)
+    {
+        // UI依存モード：UIBaseから情報を取得
+        center = _uiBase->GetCenterPos();
+        size = _uiBase->GetSize();
+        rotate = _uiBase->GetRotate();
+    }
+    else
+    {
+        // 独立モード：UIのローカル座標系で計算
+        center = _uiBase->GetCenterPos() + localOffset_;
+        size = localSize_;
+        rotate = _uiBase->GetRotate() + localRotate_;  // UI回転 + ローカル回転
+    }
 
     // 1. スキュー行列（計算前の比率値を使用）
     // スキュー変換行列: [1   sx]   sx = skew_.x (Y座標に対するX方向のずれ)
@@ -53,33 +66,26 @@ void UIParallelogramCollider::UpdateCache(const UIBase* _uiBase)
         0.0f,    0.0f,    0.0f, 1.0f
     };
 
-    // 2. スケール行列（UIのサイズを適用）
-    Matrix4x4 scaleMatrix = MakeScaleMatrix({ size.x,size.y, 1.0f });
+    // 2. スケール行列（サイズを適用）
+    Matrix4x4 scaleMatrix = MakeScaleMatrix({ size.x, size.y, 1.0f });
 
-    // 3. 回転行列（UIの回転を適用）
+    // 3. 回転行列（回転を適用）
     Matrix4x4 rotateMatrix = MakeRotateZMatrix(rotate);
 
-    // 4. 平行移動行列（UIの位置を適用）
+    // 4. 平行移動行列（位置を適用）
     Matrix4x4 translateMatrix = MakeTranslateMatrix({ center.x, center.y, 0.0f });
 
     // 変換行列を合成（重要：右から左へ適用される）
     // 頂点に対して：スキュー → スケール → 回転 → 平行移動 の順で変換
     Matrix4x4 transformMatrix = skewMatrix * scaleMatrix * rotateMatrix * translateMatrix;
 
-    // 正規化された頂点（-0.5 ~ 0.5の範囲の単位矩形)
+    // 正規化された頂点（0.0 ~ 1.0の範囲の単位矩形、中心基準）
     Vector3 normalizedCorners[4] = {
-        { 0.0f, 0.0f, 0.0f }, // 左下
-        { 1.0f, 0.0f, 0.0f }, // 右下
-        { 1.0f, 1.0f, 0.0f }, // 右上
-        { 0.0f, 1.0f, 0.0f }  // 左上
+        { -0.5f, -0.5f, 0.0f }, // 左下
+        {  0.5f, -0.5f, 0.0f }, // 右下
+        {  0.5f,  0.5f, 0.0f }, // 右上
+        { -0.5f,  0.5f, 0.0f }  // 左上
     };
-
-    // アンカーオフセットを適用（アンカーポイントの調整）
-    for (int i = 0; i < 4; i++)
-    {
-        normalizedCorners[i].x -= anchor.x;
-        normalizedCorners[i].y -= anchor.y;
-    }
 
     // 変換行列を適用してワールド座標の頂点を計算
     for (int i = 0; i < 4; i++)
@@ -92,7 +98,36 @@ void UIParallelogramCollider::UpdateCache(const UIBase* _uiBase)
 void UIParallelogramCollider::ImGui()
 {
 #ifdef _DEBUG
+    // トランスフォームモード選択
+    const char* modes[] = { "UI Dependent", "Independent" };
+    int currentMode = static_cast<int>(transformMode_);
+    if (ImGui::Combo("Transform Mode", &currentMode, modes, 2))
+    {
+        transformMode_ = static_cast<TransformMode>(currentMode);
+    }
+
+    // スキュー値（両モード共通）
+    ImGui::Separator();
+    ImGui::Text("Skew (Common)");
+    ImGui::DragFloat2("Skew", &skew_.x, 0.01f, -1.0f, 1.0f);
+
+    // 独立モードの場合のみパラメータ編集可能
+    if (transformMode_ == TransformMode::Independent)
+    {
+        ImGui::Separator();
+        ImGui::Text("Independent Parameters (Local)");
+        ImGui::DragFloat2("Offset from UI Center", &localOffset_.x, 1.0f);
+        ImGui::DragFloat2("Size", &localSize_.x, 1.0f, 0.0f, 1000.0f);
+        ImGui::DragFloat("Rotate (Radians)", &localRotate_, 0.01f);
+    }
+    else
+    {
+        ImGui::Separator();
+        ImGui::TextDisabled("(Using UI parameters)");
+    }
+
     // 計算済みの頂点座標を表示（デバッグ用）
+    ImGui::Separator();
     if (ImGui::TreeNode("World Corners"))
     {
         for (int i = 0; i < 4; i++)

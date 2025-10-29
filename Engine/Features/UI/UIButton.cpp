@@ -52,7 +52,8 @@ void UIButton::Draw()
         return;
 
     UIBase::Draw();
-    text_->Draw();
+    if(text_)
+        text_->Draw();
 }
 
 void UIButton::SetText(const std::wstring& _text)

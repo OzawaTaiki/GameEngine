@@ -82,21 +82,6 @@ std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
         newCollider = Create(newType);
     }
 
-    // 平行四辺形の場合、スキュー値の編集UI
-    if (currentType == ColliderType::Parallelogram)
-    {
-        ImGui::Indent();
-        if (ImGui::DragFloat2("Skew", &tempSkew_.x, 0.01f, -1.0f, 1.0f))
-        {
-            // スキュー値が変更されたら新しいColliderを作成
-            newCollider = Create(currentType);
-        }
-
-        // ヘルプテキスト
-        ImGui::TextDisabled("(X: horizontal skew, Y: vertical skew)");
-        ImGui::Unindent();
-    }
-
     return newCollider;
 #else
     // Release時は何もしない
