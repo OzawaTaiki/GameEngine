@@ -11,6 +11,7 @@ enum class ColliderType
     Circle,         // 円形
     Ellipse,        // 楕円形
     Parallelogram,  // 平行四辺形
+    Quad,           // 四角形（4頂点自由設定）
 
     Max
 };

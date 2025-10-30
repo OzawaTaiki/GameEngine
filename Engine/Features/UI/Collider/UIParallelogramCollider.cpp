@@ -145,6 +145,6 @@ void UIParallelogramCollider::DrawDebug() const
     {
         Vector2 start = worldCorners_[i];
         Vector2 end = worldCorners_[(i + 1) % 4];
-        LineDrawer::GetInstance()->RegisterPoint(start, end, Vector4(0, 1, 0, 1));
+        LineDrawer::GetInstance()->DebugDraw(start, end, Vector4(0, 1, 0, 1));
     }
 }

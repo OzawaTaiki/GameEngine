@@ -37,10 +37,14 @@ public:
     void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, bool _frontDraw = false);
     void DrawCircle(const Vector3& _center, float _radius, const float _segmentCount, const Vector3& _normal, const Vector4& _color, bool _frontDraw = false);
 
+
+    //void DebugDraw(const Vector3& _start, const Vector3& _end, const Vector4& _color);
+    void DebugDraw(const Vector2& _start, const Vector2& _end, const Vector4& _color = Vector4{ 0,1,0,1 });
 private:
     void Draw3Dlines();
     void Draw2Dlines();
     void Draw3DlinesAlways();
+    void DrawDebugLine();
 
     void TransferData();
 
@@ -87,6 +91,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceFor3DAlways_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewFor3DAlways_ = {};
 
+#ifdef _DEBUG
+    PointData* vConstMapForDebug_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource>      vertexResourceForDebug_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW                    vertexBufferViewForDebug_ = {};
+    uint32_t indexForDebug_ = 0u;
+    void CreateDebugResources();
+#endif
 
     void SetVerties();
 
