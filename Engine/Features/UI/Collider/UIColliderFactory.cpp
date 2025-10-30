@@ -3,6 +3,7 @@
 #include <Features/UI/Collider/UIRentangleCollider.h>
 #include <Features/UI/Collider/UIEllipseCollider.h>
 #include <Features/UI/Collider/UIParallelogramCollider.h>
+#include <Features/UI/Collider/UIQuadCollider.h>
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -27,6 +28,9 @@ std::unique_ptr<IUICollider> UIColliderFactory::Create(ColliderType type)
     case ColliderType::Parallelogram:
         return std::make_unique<UIParallelogramCollider>(tempSkew_);
 
+    case ColliderType::Quad:
+        return std::make_unique<UIQuadCollider>();
+
     default:
         // デフォルトは矩形
         return std::make_unique<UIRentangleCollider>();
@@ -49,6 +53,9 @@ const char* UIColliderFactory::GetTypeName(ColliderType type)
     case ColliderType::Parallelogram:
         return "Parallelogram";
 
+    case ColliderType::Quad:
+        return "Quad";
+
     default:
         return "Unknown";
     }
@@ -66,7 +73,8 @@ std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
         GetTypeName(ColliderType::Rectangle),
         GetTypeName(ColliderType::Circle),
         GetTypeName(ColliderType::Ellipse),
-        GetTypeName(ColliderType::Parallelogram)
+        GetTypeName(ColliderType::Parallelogram),
+        GetTypeName(ColliderType::Quad)
     };
 
     int currentIndex = static_cast<int>(currentType);

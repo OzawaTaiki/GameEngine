@@ -4,6 +4,7 @@
 #include <numbers>
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
+#include <Framework/LayerSystem/LayerSystem.h>
 
 LineDrawer* LineDrawer::GetInstance()
 {
@@ -67,6 +68,10 @@ void LineDrawer::Initialize()
     vertexBufferViewFor2D_.SizeInBytes = sizeof(PointData) * kMaxNum;
     vertexBufferViewFor2D_.StrideInBytes = sizeof(PointData);
 
+#ifdef _DEBUG
+    CreateDebugResources();
+#endif
+
 
 
     SetVerties();
@@ -117,8 +122,11 @@ void LineDrawer::RegisterPoint(const Vector2& _start, const Vector2& _end, const
 
 void LineDrawer::Draw()
 {
-
-    if (indexFor3d_ == 0u && indexFor2d_ == 0u && indexFor3dAlways_ == 0) return;
+    if (indexFor3d_ == 0u && indexFor2d_ == 0u && indexFor3dAlways_ == 0
+#ifdef _DEBUG
+        && indexForDebug_ == 0u
+#endif // _DEBUG
+        ) return;
 
     TransferData();
     auto commandList = DXCommon::GetInstance()->GetCommandList();
@@ -130,6 +138,9 @@ void LineDrawer::Draw()
     Draw3Dlines();
     Draw2Dlines();
     Draw3DlinesAlways();
+#ifdef _DEBUG
+    DrawDebugLine();
+#endif
 }
 
 void LineDrawer::Draw3Dlines()
@@ -175,6 +186,24 @@ void LineDrawer::Draw3DlinesAlways()
     commandList->DrawInstanced(indexFor3dAlways_, indexFor3dAlways_ / 2, 0, 0);
 
     indexFor3dAlways_ = 0u;
+}
+
+void LineDrawer::DrawDebugLine()
+{
+#ifdef _DEBUG
+    if (indexForDebug_ == 0u) return;
+
+    auto prevLayer = LayerSystem::GetCurrentLayerID();
+    LayerSystem::SetLayer("Debug_line");
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewForDebug_);
+    commandList->SetGraphicsRootConstantBufferView(0, resourceForMat2D_->GetGPUVirtualAddress());
+    commandList->DrawInstanced(indexForDebug_, indexForDebug_ / 2, 0, 0);
+    indexForDebug_ = 0u;
+
+    LayerSystem::SetLayer(prevLayer);
+#endif
 }
 
 void LineDrawer::DrawOBB(const Matrix4x4& _affineMat, bool _frontDraw)
@@ -284,12 +313,40 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
 }
 
 
+void LineDrawer::DebugDraw(const Vector2& _start, const Vector2& _end, const Vector4& _color)
+{
+#ifdef _DEBUG
+    assert(indexForDebug_ + 2 < kMaxNum && "The line instance is too large");
+
+    vConstMapForDebug_[indexForDebug_].position = { _start.x,_start.y,0.0f, 1.0f };
+    vConstMapForDebug_[indexForDebug_++].color = _color;
+
+    vConstMapForDebug_[indexForDebug_].position = { _end.x, _end.y,0.0f,1.0f };
+    vConstMapForDebug_[indexForDebug_++].color = _color;
+#endif
+}
+
+
 void LineDrawer::TransferData()
 {
     if (cameraFor3dptr_)
         matFor3dConstMap_->vp = cameraFor3dptr_->GetViewProjection();
     if (cameraFor2dptr_)
         matFor2dConstMap_->vp = cameraFor2dptr_->GetViewProjection();
+}
+
+void LineDrawer::CreateDebugResources()
+{
+#ifdef _DEBUG
+    vertexResourceForDebug_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
+    vertexResourceForDebug_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMapForDebug_));
+
+    vertexBufferViewForDebug_.BufferLocation = vertexResourceForDebug_->GetGPUVirtualAddress();
+    vertexBufferViewForDebug_.SizeInBytes = sizeof(PointData) * kMaxNum;
+    vertexBufferViewForDebug_.StrideInBytes = sizeof(PointData);
+
+    LayerSystem::CreateLayer("Debug_line", 1000);
+#endif
 }
 
 void LineDrawer::SetVerties()
