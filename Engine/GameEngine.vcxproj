@@ -239,6 +239,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp" />
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp" />
+    <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIRentangleCollider.cpp" />
     <ClCompile Include="Features\UI\UIInteractive.cpp" />
     <ClCompile Include="Features\UI\UINavigator.cpp" />
@@ -392,6 +393,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\Collider\UIColliderFactory.h" />
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h" />
+    <ClInclude Include="Features\UI\Collider\UIQuadCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIRentangleCollider.h" />
     <ClInclude Include="Features\UI\UIInteractive.h" />
     <ClInclude Include="Features\UI\UINavigator.h" />

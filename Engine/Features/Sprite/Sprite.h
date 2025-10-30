@@ -46,6 +46,9 @@ public:
     void SetUVSize(const Vector2& _size);
     void SetLeftTop(const Vector2& _leftTop);
 
+    void SetOrder(int16_t _order) { order_ = _order; }
+    uint16_t GetOrder() const { return order_; }
+
     void ImGui();
 private:
 
@@ -69,6 +72,7 @@ private:
 
     std::vector<Batch2DRenderer::VertexData> vertexData_= {};
     Batch2DRenderer::InstanceData instanceData_ = {};
+    int16_t order_ = UINT16_MAX;
 
     // 頂点データを計算する必要があるか
     bool isVertexDirty_ = true;

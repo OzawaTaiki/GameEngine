@@ -15,7 +15,7 @@ TextRenderer* TextRenderer::GetInstance()
     return &instance;
 }
 
-void TextRenderer::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList,  const Vector2& _windowSize)
+void TextRenderer::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const Vector2& _windowSize)
 {
     if (!_device || !_cmdList)
         return;
@@ -26,7 +26,7 @@ void TextRenderer::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* 
     windowSize_ = _windowSize;
 
     maxCharacters_ = 1500;
-    maxVertices_ = 6 * maxCharacters_ ;// 1500文字分の頂点を確保
+    maxVertices_ = 6 * maxCharacters_;// 1500文字分の頂点を確保
 
     auto psoMana = PSOManager::GetInstance();
     // パイプラインステートオブジェクトの取得
@@ -80,29 +80,29 @@ void TextRenderer::EndFrame()
     }
 }
 
-void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, const Vector4& _color)
+void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, uint16_t _order, const Vector4& _color)
 {
     auto res = EnsureAtlasResources(_atlas);
-    DrawText(_text, _pos, { 1.0f, 1.0f }, 0.0f, { 0.5f, 0.5f }, _color, _color, res);
+    DrawText(_text, _pos, { 1.0f, 1.0f }, 0.0f, { 0.5f, 0.5f }, _color, _color, res, _order);
 }
 
-void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param)
+void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order)
 {
     auto res = EnsureAtlasResources(_atlas);
 
     if (_param.useOutline)
     {
         if (_param.useGradient)
-            DrawTextWithOutline(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.bottomColor, _param.outlineColor, _param.outlineScale, res);
+            DrawTextWithOutline(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.bottomColor, _param.outlineColor, _param.outlineScale, res, _order);
         else
-            DrawTextWithOutline(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, _param.outlineColor, _param.outlineScale, res);
+            DrawTextWithOutline(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, _param.outlineColor, _param.outlineScale, res, _order);
     }
     else
     {
         if (_param.useGradient)
-            DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.bottomColor, res);
+            DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.bottomColor, res, _order);
         else
-            DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, res);
+            DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, res, _order);
     }
 }
 
@@ -114,7 +114,8 @@ void TextRenderer::DrawText(
     const Vector2& _piv,
     const Vector4& _topColor,
     const Vector4& _bottomColor,
-    ResourceDataGroup* _res)
+    ResourceDataGroup* _res,
+    uint16_t _order)
 {
     if (_text.empty()) return;
 
@@ -183,15 +184,6 @@ void TextRenderer::DrawText(
             {{glyphX + glyphW, glyphY + glyphH, 0.0f, 1.0f}, {glyph.u1, glyph.v1}, _bottomColor}
         };
 
-        // 頂点配列に追加
-        for (int j = 0; j < 6; ++j)
-        {
-            if (_res->vertices_.size() < maxVertices_)
-            {
-                //_res->vertices_.push_back(quad[j]);
-            }
-        }
-
         // アフィン変換行列を設定
         _res->affineMatrices_.push_back(transformMatrix);
         Batch2DRenderer::InstanceData data;
@@ -201,16 +193,15 @@ void TextRenderer::DrawText(
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
 
-        uint32_t order = rand() % 5;
-
-        Batch2DRenderer::GetInstance()->AddInstace(data, quad, 0);
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad, _order);
 
         // 次の文字位置に移動
         currentX += glyph.advance;
     }
 }
 
-void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
+void TextRenderer::DrawTextWithOutline(
+    const std::wstring& _text,
     const Vector2& _pos,
     const Vector2& _scale,
     float _rotate,
@@ -219,7 +210,8 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
     const Vector4& _bottomColor,
     const Vector4& _outlineColor,
     float _outlineThickness,
-    ResourceDataGroup* _res)
+    ResourceDataGroup* _res,
+    uint16_t _order)
 {
     if (_text.empty()) return;
 
@@ -244,7 +236,7 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
         };
 
         // アウトライン色で本関数を再帰的に呼び出す（本体色でなく、単色）
-        DrawText(_text, offsetPos, _scale, _rotate, _piv, _outlineColor, _outlineColor, _res);
+        DrawText(_text, offsetPos, _scale, _rotate, _piv, _outlineColor, _outlineColor, _res, _order);
     }
 
     float currentX = 0;
@@ -307,15 +299,6 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
             {{glyphX + glyphW, glyphY + glyphH, 0.0f, 1.0f}, {glyph.u1, glyph.v1}, _bottomColor}
         };
 
-        // 頂点配列に追加
-        for (int j = 0; j < 6; ++j)
-        {
-            if (_res->vertices_.size() < maxVertices_)
-            {
-                //_res->vertices_.push_back(quad[j]);
-            }
-        }
-
         // アフィン変換行列を設定
         _res->affineMatrices_.push_back(transformMatrix);
 
@@ -325,16 +308,14 @@ void TextRenderer::DrawTextWithOutline(const std::wstring& _text,
         data.useTextureAlpha = 1; // テキスト
         data.transform = transformMatrix;
         data.uvTransform = Matrix4x4::Identity();
-        uint32_t order = rand() % 5;
 
-        Batch2DRenderer::GetInstance()->AddInstace(data, quad, 0);
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad, _order);
 
 
         // 次の文字位置に移動
         currentX += glyph.advance;
     }
 }
-
 
 TextRenderer::ResourceDataGroup* TextRenderer::EnsureAtlasResources(AtlasData* _atlas)
 {

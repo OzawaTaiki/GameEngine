@@ -32,8 +32,8 @@ void Batch2DRenderer::Render()
     if (drawDataList_.empty())
         return;
 
-    //SortData();
-     UploadData();
+    SortData();
+    UploadData();
     BuildDrawCommands();
 
 
@@ -70,7 +70,7 @@ void Batch2DRenderer::Render()
     Reset();
 }
 
-void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint32_t _order)
+void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint16_t _order)
 {
     if (drawDataList_.size() + 1 >= kMaxInstanceCount_)
         return;
@@ -95,6 +95,7 @@ void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vecto
     data.instance = _instance;
     data.sortKey.layer = LayerSystem::GetCurrentLayerID();
     data.sortKey.internalOrder = static_cast<uint32_t>(drawDataList_.size());
+    data.sortKey.userOrder = UINT16_MAX;
     data.vertices = _v;
 
     drawDataList_.push_back(data);

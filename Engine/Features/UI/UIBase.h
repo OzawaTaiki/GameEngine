@@ -51,6 +51,9 @@ public:
     void SetAnchor(const Vector2& _anchor) { anchor_ = _anchor; };
     const Vector2& GetAnchor() const { return anchor_; }
 
+    uint16_t GetOrder() const { return sprite_->GetOrder(); }
+    void SetOrder(int16_t _order) { sprite_->SetOrder(_order); }
+
     // 判定
     bool IsPointInside(const Vector2& _point) const;
 
