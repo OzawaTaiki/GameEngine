@@ -20,9 +20,18 @@ void UIText::Draw()
     if (!isVisible_)
         return;
 
+    uint16_t order = GetOrder();
+    if(order == UINT16_MAX)
+    {
+        if (parent_)
+        {
+            order = parent_->GetOrder();
+        }
+    }
+
     TextParam param = textParam_;
     param.position += GetWorldPos();
-    textGenerator_.Draw(text_, param);
+    textGenerator_.Draw(text_, param, order);
 
     for (auto& child : children_)
     {

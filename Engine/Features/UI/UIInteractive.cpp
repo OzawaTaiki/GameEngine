@@ -71,6 +71,14 @@ void UIInteractive::UpdateSelf()
             isPressed_ = false;
         }
     }
+
+#ifdef _DEBUG
+    // デバッグ用のCollider描画
+    if (collider_)
+    {
+        collider_->DrawDebug();
+    }
+#endif // _DEBUG
 }
 
 void UIInteractive::SetCollider(std::unique_ptr<IUICollider> _collider)

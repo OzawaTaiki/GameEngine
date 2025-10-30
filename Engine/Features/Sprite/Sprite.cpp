@@ -57,15 +57,20 @@ void Sprite::Draw()
 {
     UpdateVertexData();
     UpdateInstanceData();
-    Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
+    if (order_ == UINT16_MAX)
+    {
+        Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
+    }
+    else
+    {
+        Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_, order_);
+    }
 }
 
 void Sprite::Draw(const Vector4& _color)
 {
     SetColor(_color);
-    UpdateVertexData();
-    UpdateInstanceData();
-    Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
+    Draw();
 }
 
 
@@ -195,6 +200,9 @@ void Sprite::ImGui()
     isDirty |= ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f);
     isDirty |= ImGui::DragFloat2("Size", &size_.x, 0.01f);
     isDirty |= ImGui::DragFloat2("LeftTop", &lefttop_.x, 0.01f);
+    int order = order_;
+    ImGui::InputInt("Order", &order);
+    order_ = static_cast<int16_t>(order);
     if (ImGui::Button("Set"))
     {
         SetUVSize(size_);

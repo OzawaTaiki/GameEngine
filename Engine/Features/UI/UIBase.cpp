@@ -41,6 +41,9 @@ void UIBase::Initialize(const std::string& _label, bool _regsterDebugWindow)
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_ + "_label", &label_);
 
+    int16_t order = UINT16_MAX;
+    jsonBinder_->GetVariableValue(label_ + "_order", order);
+
     if (textureName_ == "")
         textureName_ = "white.png";
 
@@ -55,6 +58,7 @@ void UIBase::Initialize(const std::string& _label, bool _regsterDebugWindow)
     sprite_->SetSize(size_);
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
+    sprite_->SetOrder(order);
 }
 
 void UIBase::Update()
@@ -105,6 +109,21 @@ void UIBase::DrawSelf()
     sprite_->rotate_ = rotate_;
     sprite_->SetAnchor(anchor_);
     sprite_->SetTextureHandle(textureHandle_);
+
+    // orderの設定: 自身がUINT16_MAXなら親のorderを使用、親がいない場合は0
+    int16_t currentOrder = sprite_->GetOrder();
+    if (currentOrder == UINT16_MAX)
+    {
+        if (parent_)
+        {
+            sprite_->SetOrder(parent_->GetOrder());
+        }
+        else
+        {
+            sprite_->SetOrder(0);
+        }
+    }
+
     sprite_->Draw(color_);
 }
 
@@ -156,14 +175,6 @@ Vector2 UIBase::GetWorldPos() const
     return pos;
 }
 
-//
-//bool UIBase::IsMousePointerInside() const
-//{
-//    Vector2 mPos = Input::GetInstance()->GetMousePosition();
-//
-//    return IsPointInside(mPos);
-//}
-
 bool UIBase::IsPointInside(const Vector2& _point) const
 {
     // アンカーを考慮した四頂点の計算
@@ -182,13 +193,6 @@ bool UIBase::IsPointInside(const Vector2& _point) const
     return false;
 }
 
-//
-//void UIBase::SetParent(UIBase* _parent)
-//{
-//    if (_parent)
-//        parent_ = _parent;
-//}
-
 void UIBase::SetTextureNameAndLoad(const std::string& _textureName)
 {
     textureName_ = _textureName;
@@ -201,6 +205,7 @@ void UIBase::Save()
     if (jsonBinder_)
     {
         jsonBinder_->Save();
+        jsonBinder_->SendVariable(label_ + "_order", sprite_->GetOrder());
     }
 }
 
@@ -220,6 +225,10 @@ void UIBase::ImGui()
             ImGui::DragFloat2("anchor", &anchor_.x, 0.01f);
             ImGui::Checkbox("isActive", &isActive_);
             ImGui::Checkbox("isVisible", &isVisible_);
+            int order = sprite_->GetOrder();
+            if (ImGui::InputInt("order", &order))
+                sprite_->SetOrder(static_cast<int16_t>(order));
+
             ImGui::ColorEdit4("color", &color_.x);
 
             char buf1[255];
@@ -251,7 +260,7 @@ void UIBase::ImGui()
 
             if (ImGui::Button("Save"))
             {
-                jsonBinder_->Save();
+                Save();
             }
 
             ImGui::TreePop();

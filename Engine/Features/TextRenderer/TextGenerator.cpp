@@ -12,12 +12,12 @@ void TextGenerator::Initialize(const FontConfig& _config)
     renderer_ = TextRenderer::GetInstance();
 }
 
-void TextGenerator::Draw(const std::wstring& _text, const Vector2& _pos, const Vector4& _color)
+void TextGenerator::Draw(const std::wstring& _text, const Vector2& _pos, const Vector4& _color, uint16_t _order)
 {
-    renderer_->DrawText(_text, atlasData_,_pos, _color);
+    renderer_->DrawText(_text, atlasData_, _pos, _order, _color);
 }
 
-void TextGenerator::Draw(const std::wstring& _text, const TextParam& _param)
+void TextGenerator::Draw(const std::wstring& _text, const TextParam& _param, uint16_t _order)
 {
-    renderer_->DrawText(_text, atlasData_, _param);
+    renderer_->DrawText(_text, atlasData_, _param, _order);
 }

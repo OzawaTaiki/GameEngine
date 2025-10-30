@@ -38,9 +38,9 @@ public:
 
     void EndFrame();
 
-    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, const Vector4& _color = { 1,1,1,1 });
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, uint16_t _order = UINT16_MAX, const Vector4& _color = { 1,1,1,1 });
 
-    void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param);
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order = UINT16_MAX);
 
 
 
@@ -72,7 +72,7 @@ private:
     };
 
 private:
-    void DrawText(const std::wstring& _text, const Vector2& _pos, const Vector2& _scale, float _rotate, const Vector2& _piv, const Vector4& _topColor, const Vector4& _bottomColor, ResourceDataGroup* _res);
+    void DrawText(const std::wstring& _text, const Vector2& _pos, const Vector2& _scale, float _rotate, const Vector2& _piv, const Vector4& _topColor, const Vector4& _bottomColor, ResourceDataGroup* _res, uint16_t _order);
     void DrawTextWithOutline(
         const std::wstring& _text,
         const Vector2& _pos,
@@ -83,7 +83,8 @@ private:
         const Vector4& _bottomColor,
         const Vector4& _outlineColor,
         float _outlineThickness,
-        ResourceDataGroup* _res);
+        ResourceDataGroup* _res,
+        uint16_t _order);
 
     // アトラスデータを設定
     ResourceDataGroup* EnsureAtlasResources(AtlasData* _atlas);
