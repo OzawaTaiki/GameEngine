@@ -2,6 +2,7 @@
 
 #include <Features/Animation/Sequence/SequenceEvent.h>
 #include <Features/Json/JsonBinder.h>
+#include <Debug/Debug.h>
 
 #include <json.hpp>
 #include <list>
@@ -61,7 +62,7 @@ public:
                 return sequenceEvent.second->GetValue<T>();
             }
         }
-        throw std::runtime_error("Invalid label");
+        Debug::Log("SequenceEvent::GetValue Invalid label");
         return T();
     }
 
@@ -78,7 +79,7 @@ public:
                 return sequenceEvent.second->GetValueAtTime<T>(_time);
             }
         }
-        throw std::runtime_error("Invalid label");
+        Debug::Log("SequenceEvent::GetValueInvalid label");
         return T();
     }
 

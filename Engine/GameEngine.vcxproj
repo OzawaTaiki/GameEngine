@@ -238,6 +238,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp" />
     <ClCompile Include="Features\UI\Collider\UIColliderSerializer.cpp" />
+    <ClCompile Include="Features\UI\Collider\UICollisionManager.cpp" />
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp" />
@@ -393,6 +394,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\Collider\UICircleCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIColliderFactory.h" />
     <ClInclude Include="Features\UI\Collider\UIColliderSerializer.h" />
+    <ClInclude Include="Features\UI\Collider\UICollisionManager.h" />
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIQuadCollider.h" />
