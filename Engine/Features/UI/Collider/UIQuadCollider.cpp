@@ -1,5 +1,6 @@
 #include "UIQuadCollider.h"
 #include <Features/LineDrawer/LineDrawer.h>
+#include <Features/UI/UIBase.h>
 
 bool UIQuadCollider::IsPointInside(const Vector2& _point) const
 {

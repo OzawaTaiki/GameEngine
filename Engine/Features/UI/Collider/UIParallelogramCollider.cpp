@@ -1,10 +1,8 @@
 #include "UIParallelogramCollider.h"
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
-
-#ifdef _DEBUG
-#include <imgui.h>
-#endif
+#include <Features/UI/UIBase.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <Features/LineDrawer/LineDrawer.h>
 
 bool UIParallelogramCollider::IsPointInside(const Vector2& _point) const

@@ -690,6 +690,9 @@
     <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UIColliderSerializer.cpp">
+      <Filter>Features\UI\Collider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1179,6 +1182,9 @@
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIQuadCollider.h">
+      <Filter>Features\UI\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\UIColliderSerializer.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
   </ItemGroup>

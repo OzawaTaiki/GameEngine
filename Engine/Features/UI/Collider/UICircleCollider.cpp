@@ -1,4 +1,6 @@
 #include "UICircleCollider.h"
+#include <Features/UI/UIBase.h>
+
 
 bool UICircleCollider::IsPointInside(const Vector2& _point) const
 {

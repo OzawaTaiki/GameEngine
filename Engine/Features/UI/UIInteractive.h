@@ -14,6 +14,8 @@ public:
     UIInteractive();
     virtual ~UIInteractive() = default;
 
+    void Initialize(const std::string& _label, bool _regsterDebugWindow) override;
+
     void UpdateSelf() override; // 自身の更新処理
 
     // マウス判定
@@ -32,7 +34,7 @@ public:
     void SetOnHovering  (std::function<void()> _callback) { onHoveringCallback_ = _callback; }
     void SetOnHoverExit (std::function<void()> _callback) { onHoverExitCallback_ = _callback; }
 
-
+    void Save() override;
     void ImGuiContent() override;
 protected:
 

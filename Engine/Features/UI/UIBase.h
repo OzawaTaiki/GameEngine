@@ -84,7 +84,7 @@ public:
 
     const std::string& GetLabel() const { return label_; }
 
-    void Save();
+    virtual void Save();
     void ImGui();
 
 protected:

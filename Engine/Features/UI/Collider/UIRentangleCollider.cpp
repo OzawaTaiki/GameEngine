@@ -1,4 +1,5 @@
 #include "UIRentangleCollider.h"
+#include <Features/UI/UIBase.h>
 
 bool UIRentangleCollider::IsPointInside(const Vector2& _point) const
 {

@@ -200,8 +200,8 @@ void UIBase::Save()
 {
     if (jsonBinder_)
     {
-        jsonBinder_->Save();
         jsonBinder_->SendVariable(label_ + "_order", sprite_->GetOrder());
+        jsonBinder_->Save();
     }
 }
 
