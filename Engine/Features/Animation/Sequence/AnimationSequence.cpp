@@ -38,13 +38,12 @@ void AnimationSequence::Initialize(const std::string& _filepath)
         }
 
     }
-
-
 }
 
 void AnimationSequence::Update(float _deltaTime)
 {
     currentTime_ += _deltaTime;
+    currentTime_ = std::clamp(currentTime_, 0.0f, maxPlayTime_);
     for (auto& sequenceEvent : sequenceEvents_)
     {
         sequenceEvent.second->Update(currentTime_);

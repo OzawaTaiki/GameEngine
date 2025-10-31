@@ -38,9 +38,9 @@ public:
 
     void EndFrame();
 
-    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, uint16_t _order = UINT16_MAX, const Vector4& _color = { 1,1,1,1 });
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, uint16_t _order = 0, const Vector4& _color = { 1,1,1,1 });
 
-    void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order = UINT16_MAX);
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order = 0);
 
 
 

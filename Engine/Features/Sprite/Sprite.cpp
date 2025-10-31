@@ -57,14 +57,7 @@ void Sprite::Draw()
 {
     UpdateVertexData();
     UpdateInstanceData();
-    if (order_ == UINT16_MAX)
-    {
-        Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_);
-    }
-    else
-    {
-        Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_, order_);
-    }
+    Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_, order_);
 }
 
 void Sprite::Draw(const Vector4& _color)
