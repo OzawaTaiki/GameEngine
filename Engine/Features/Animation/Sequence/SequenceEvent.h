@@ -51,6 +51,12 @@ public:
     T GetValue() const { return std::get<T>(value_); }
     ParameterValue GetValue() const { return value_; }
 
+    template<typename T>
+    T GetValueAtTime(float _time) const
+    {
+        return CalculateValueAtTime<T>(_time);
+    }
+
     void ClearSelectKeyFrames();
 
     std::list<KeyFrame>& GetKeyFrames() { return keyFrames_; }
@@ -77,6 +83,10 @@ public:
 private:
 
     void InitializeValueFromKeyFrames();
+
+    // 指定された時間での値を計算する内部関数
+    template<typename T>
+    T CalculateValueAtTime(float _time) const;
 
 private:
     enum class UseType {

@@ -1,4 +1,5 @@
 #include "UIEllipseCollider.h"
+#include <Features/UI/UIBase.h>
 
 
 bool UIEllipseCollider::IsPointInside(const Vector2& _point) const

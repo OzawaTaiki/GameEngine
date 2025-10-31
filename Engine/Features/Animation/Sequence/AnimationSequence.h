@@ -65,6 +65,23 @@ public:
         return T();
     }
 
+    template<typename T>
+    T GetValueAtTime(const std::string& _label,float _time) const
+    {
+        for (auto& sequenceEvent : sequenceEvents_)
+        {
+            if (sequenceEvent.second->GetLabel() == _label)
+            {
+                // keyframeが空のとき
+                if (sequenceEvent.second->GetKeyFrames().empty())
+                    return T();
+                return sequenceEvent.second->GetValueAtTime<T>(_time);
+            }
+        }
+        throw std::runtime_error("Invalid label");
+        return T();
+    }
+
     std::list<SequenceEvent*> GetSequenceEvents();
 
 private:

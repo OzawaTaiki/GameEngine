@@ -12,6 +12,18 @@ UIInteractive::UIInteractive()
     colliderType_ = ColliderType::Rectangle;
 }
 
+void UIInteractive::Initialize(const std::string& _label, bool _regsterDebugWindow)
+{
+    UIBase::Initialize(_label, _regsterDebugWindow);
+
+    jsonBinder_->RegisterVariable("colliderType", reinterpret_cast<uint32_t*>(&colliderType_));
+
+    UIColliderData colliderData;
+    jsonBinder_->GetVariableValue("collider", colliderData);
+    collider_ = colliderData.CreateCollider();
+
+}
+
 void UIInteractive::UpdateSelf()
 {
     // Colliderのキャッシュを更新
@@ -104,6 +116,15 @@ bool UIInteractive::IsMousePointerInside() const
     return false;
 }
 
+
+void UIInteractive::Save()
+{
+    UIColliderData colliderData = UIColliderData::FromCollider(collider_.get(), colliderType_);
+
+    // JsonBinderに送信
+    jsonBinder_->SendVariable("collider", colliderData);
+    UIBase::Save();
+}
 
 void UIInteractive::ImGuiContent()
 {

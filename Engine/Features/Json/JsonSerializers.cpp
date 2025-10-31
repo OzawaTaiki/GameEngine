@@ -1,4 +1,5 @@
 #include "JsonSerializers.h"
+#include <Features/UI/Collider/UIColliderSerializer.h>
 
 #include <Utility/StringUtils/StringUitls.h>
 

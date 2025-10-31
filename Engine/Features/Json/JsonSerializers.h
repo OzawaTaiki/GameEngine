@@ -7,6 +7,7 @@
 #include <Features/Animation/Sequence/SequenceEvent.h>
 #include <Features/TextRenderer/TextParam.h>
 #include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
+#include <Features/UI/Collider/UIColliderSerializer.h>
 
 #include <json.hpp>
 
@@ -80,3 +81,18 @@ void from_json(const json& _j, PrimitiveSettings::CubeData& _cube);
 // CreatedPrimitive
 void to_json(json& _j, const CreatedPrimitive& _data);
 void from_json(const json& _j, CreatedPrimitive& _data);
+
+
+/// UIColliderSerializer.h
+
+// ColliderType
+void to_json(json& _j, const ColliderType& _type);
+void from_json(const json& _j, ColliderType& _type);
+
+// IUICollider::TransformMode
+void to_json(json& _j, const IUICollider::TransformMode& _mode);
+void from_json(const json& _j, IUICollider::TransformMode& _mode);
+
+// UIColliderData
+void to_json(json& _j, const UIColliderData& _data);
+void from_json(const json& _j, UIColliderData& _data);

@@ -1,6 +1,8 @@
 #pragma once
 #include <Math/Vector/Vector2.h>
-#include <Features/UI/UIBase.h>
+
+// 前方宣言 (循環参照防止)
+class UIBase;
 
 /// <summary>
 /// UIコライダーの種類
