@@ -72,7 +72,7 @@ private:
 
     std::vector<Batch2DRenderer::VertexData> vertexData_= {};
     Batch2DRenderer::InstanceData instanceData_ = {};
-    int16_t order_ = UINT16_MAX;
+    int16_t order_ = 0;
 
     // 頂点データを計算する必要があるか
     bool isVertexDirty_ = true;

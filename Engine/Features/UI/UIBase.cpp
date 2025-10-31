@@ -41,7 +41,7 @@ void UIBase::Initialize(const std::string& _label, bool _regsterDebugWindow)
     jsonBinder_->RegisterVariable(label_ + "_directoryPath", &directoryPath_);
     jsonBinder_->RegisterVariable(label_ + "_label", &label_);
 
-    int16_t order = UINT16_MAX;
+    int16_t order = 0;
     jsonBinder_->GetVariableValue(label_ + "_order", order);
 
     if (textureName_ == "")
@@ -112,15 +112,11 @@ void UIBase::DrawSelf()
 
     // orderの設定: 自身がUINT16_MAXなら親のorderを使用、親がいない場合は0
     int16_t currentOrder = sprite_->GetOrder();
-    if (currentOrder == UINT16_MAX)
+    if (currentOrder == 0)
     {
         if (parent_)
         {
             sprite_->SetOrder(parent_->GetOrder());
-        }
-        else
-        {
-            sprite_->SetOrder(0);
         }
     }
 

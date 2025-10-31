@@ -21,7 +21,7 @@ void UIText::Draw()
         return;
 
     uint16_t order = GetOrder();
-    if(order == UINT16_MAX)
+    if(order == 0)
     {
         if (parent_)
         {

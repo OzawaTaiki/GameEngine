@@ -40,8 +40,7 @@ public:
     void Initialize();
     void Render();
 
-    void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint16_t _order);
-    void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v);
+    void AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v, uint16_t _order = 0);
     // LT RT RB LB
 
 private:

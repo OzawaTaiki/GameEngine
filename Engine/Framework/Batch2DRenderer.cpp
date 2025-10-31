@@ -86,23 +86,6 @@ void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vecto
     sortIndices_.push_back(static_cast<uint32_t>(sortIndices_.size()));
 }
 
-void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vector<VertexData>& _v)
-{
-    if (drawDataList_.size() + 1 >= kMaxInstanceCount_)
-        return;
-
-    DrawData data;
-    data.instance = _instance;
-    data.sortKey.layer = LayerSystem::GetCurrentLayerID();
-    data.sortKey.internalOrder = static_cast<uint32_t>(drawDataList_.size());
-    data.sortKey.userOrder = UINT16_MAX;
-    data.vertices = _v;
-
-    drawDataList_.push_back(data);
-    sortIndices_.push_back(static_cast<uint32_t>(sortIndices_.size()));
-
-}
-
 void Batch2DRenderer::CreateVertexBuffer()
 {
     vertexResource_ = DXCommon::GetInstance()->

@@ -152,6 +152,15 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         ImGui::DragFloat("##SnapInterval", &snappingInterval, 0.01f, 0.01f, 1.0f, "%.2f");
         ImGui::EndGroup();
 
+
+        ImGui::SameLine();
+        ImGui::Spacing();
+        ImGui::SameLine();
+        if (ImGui::Button("Save", ImVec2(45, 0)))
+        {
+            _sequence->Save();
+        }
+
         ImGui::EndChild();
     }
 
