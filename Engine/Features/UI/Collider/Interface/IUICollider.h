@@ -77,6 +77,10 @@ public:
     /// <returns>現在のトランスフォームモード</returns>
     TransformMode GetTransformMode() const { return transformMode_; }
 
+    bool GetIsHit() const { return isHit_; }
+    void SetHit(bool _isHit) { isHit_ = _isHit; }
 protected:
     TransformMode transformMode_ = TransformMode::UIDependent;  // デフォルトはUI依存
+
+    bool isHit_ = false; // 衝突中フラグ
 };

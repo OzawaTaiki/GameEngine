@@ -3,6 +3,7 @@
 #include <Features/UI/Collider/UIColliderFactory.h>
 
 #include <System/Input/Input.h>
+#include "Collider/UICollisionManager.h"
 
 
 UIInteractive::UIInteractive()
@@ -29,14 +30,14 @@ void UIInteractive::UpdateSelf()
     // Colliderのキャッシュを更新
     if (collider_)
     {
+        UICollisionManager::GetInstance()->RegisterElement(collider_.get(), sprite_->GetOrder());
         collider_->UpdateCache(this);
+        isHovered_ = collider_->GetIsHit();
     }
 
     Input* input = Input::GetInstance();
 
     // マウスポインタがUI要素内にあるか判定
-    wasHovered_ = isHovered_;
-    isHovered_ = IsMousePointerInside();
 
     // ホバー状態の変化を検出
     if (isHovered_ && !wasHovered_)
@@ -84,6 +85,7 @@ void UIInteractive::UpdateSelf()
         }
     }
 
+    wasHovered_ = isHovered_;
 #ifdef _DEBUG
     // デバッグ用のCollider描画
     if (collider_)
@@ -104,18 +106,8 @@ void UIInteractive::SetCollider(std::unique_ptr<IUICollider> _collider)
 
 bool UIInteractive::IsMousePointerInside() const
 {
-    Vector2 mousePos = Input::GetInstance()->GetMousePosition();
-
-    // Colliderで判定
-    if (collider_)
-    {
-        return collider_->IsPointInside(mousePos);
-    }
-
-    // Colliderがない場合はfalse（通常はありえない）
-    return false;
+    return isHovered_;
 }
-
 
 void UIInteractive::Save()
 {
