@@ -41,6 +41,7 @@ void UIEllipseCollider::UpdateCache(const UIBase* _uiBase)
 
 void UIEllipseCollider::ImGui()
 {
+#ifdef _DEBUG
     // トランスフォームモード選択
     const char* modes[] = { "UI Dependent", "Independent" };
     int currentMode = static_cast<int>(transformMode_);
@@ -68,4 +69,5 @@ void UIEllipseCollider::ImGui()
     ImGui::Text("World Position (Debug)");
     ImGui::Text("Center: (%.1f, %.1f)", center_.x, center_.y);
     ImGui::Text("Radius: (%.1f, %.1f)", radius_.x, radius_.y);
+#endif // _DEBUG
 }

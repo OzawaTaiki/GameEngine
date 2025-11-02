@@ -20,6 +20,8 @@ public:
     UISelectable();
     virtual ~UISelectable() = default;
 
+    void Initialize(const std::string& _label, bool _regsterDebugWindow = true) override;
+
     void UpdateSelf () override;
 
 

@@ -30,6 +30,7 @@ void UIRentangleCollider::UpdateCache(const UIBase* _uiBase)
 
 void UIRentangleCollider::ImGui()
 {
+#ifdef _DEBUG
     // トランスフォームモード選択
     const char* modes[] = { "UI Dependent", "Independent" };
     int currentMode = static_cast<int>(transformMode_);
@@ -57,4 +58,5 @@ void UIRentangleCollider::ImGui()
     ImGui::Text("World Position (Debug)");
     ImGui::Text("Left Top: (%.1f, %.1f)", leftTop_.x, leftTop_.y);
     ImGui::Text("Right Bottom: (%.1f, %.1f)", rightBottom_.x, rightBottom_.y);
+#endif // _DEBUG
 }

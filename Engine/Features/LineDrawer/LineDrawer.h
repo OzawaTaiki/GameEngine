@@ -40,6 +40,7 @@ public:
 
     //void DebugDraw(const Vector3& _start, const Vector3& _end, const Vector4& _color);
     void DebugDraw(const Vector2& _start, const Vector2& _end, const Vector4& _color = Vector4{ 0,1,0,1 });
+    void DebugDrawCircle(const Vector2& _center, float _radius, const Vector4& _color = Vector4{ 0,1,0,1 });
 private:
     void Draw3Dlines();
     void Draw2Dlines();

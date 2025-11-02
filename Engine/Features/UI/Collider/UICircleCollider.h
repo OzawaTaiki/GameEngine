@@ -58,6 +58,8 @@ public:
     /// <returns>円の半径</returns>
     float GetIndependentRadius() const { return independentRadius_; }
 
+
+    void DrawDebug() const override;
 private:
     // 実際の判定に使用するキャッシュ
     Vector2 center_ = { 0, 0 };  // 円の中心（ワールド座標）
