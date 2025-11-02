@@ -326,6 +326,21 @@ void LineDrawer::DebugDraw(const Vector2& _start, const Vector2& _end, const Vec
 #endif
 }
 
+void LineDrawer::DebugDrawCircle(const Vector2& _center, float _radius, const Vector4& _color)
+{
+#ifdef _DEBUG
+    const float kEvery = std::numbers::pi_v<float> *2.0f / 32.0f; // 32分割
+    for (uint32_t index = 0; index < 32; ++index)
+    {
+        float rad = index * kEvery;
+        float nextRad = (index + 1) * kEvery;
+        Vector2 spos = _center + Vector2{ std::cos(rad) * _radius, std::sin(rad) * _radius };
+        Vector2 epos = _center + Vector2{ std::cos(nextRad) * _radius, std::sin(nextRad) * _radius };
+        DebugDraw(spos, epos, _color);
+    }
+#endif
+}
+
 
 void LineDrawer::TransferData()
 {
@@ -335,9 +350,9 @@ void LineDrawer::TransferData()
         matFor2dConstMap_->vp = cameraFor2dptr_->GetViewProjection();
 }
 
+#ifdef _DEBUG
 void LineDrawer::CreateDebugResources()
 {
-#ifdef _DEBUG
     vertexResourceForDebug_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(PointData) * kMaxNum);
     vertexResourceForDebug_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMapForDebug_));
 
@@ -345,9 +360,9 @@ void LineDrawer::CreateDebugResources()
     vertexBufferViewForDebug_.SizeInBytes = sizeof(PointData) * kMaxNum;
     vertexBufferViewForDebug_.StrideInBytes = sizeof(PointData);
 
-    LayerSystem::CreateLayer("Debug_line", 1000);
-#endif
+    LayerSystem::CreateLayer("Debug_line", 100000);
 }
+#endif
 
 void LineDrawer::SetVerties()
 {

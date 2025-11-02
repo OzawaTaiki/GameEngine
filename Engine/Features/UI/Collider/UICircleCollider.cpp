@@ -1,5 +1,6 @@
 #include "UICircleCollider.h"
 #include <Features/UI/UIBase.h>
+#include <Features/LineDrawer/LineDrawer.h>
 
 
 bool UICircleCollider::IsPointInside(const Vector2& _point) const
@@ -34,6 +35,7 @@ void UICircleCollider::UpdateCache(const UIBase* _uiBase)
 
 void UICircleCollider::ImGui()
 {
+#ifdef _DEBUG
     // トランスフォームモード選択
     const char* modes[] = { "UI Dependent", "Independent" };
     int currentMode = static_cast<int>(transformMode_);
@@ -61,4 +63,10 @@ void UICircleCollider::ImGui()
     ImGui::Text("World Position (Debug)");
     ImGui::Text("Center: (%.1f, %.1f)", center_.x, center_.y);
     ImGui::Text("Radius: %.1f", radius_);
+#endif // _DEBUG
+}
+
+void UICircleCollider::DrawDebug() const
+{
+    LineDrawer::GetInstance()->DebugDrawCircle(center_, radius_);
 }

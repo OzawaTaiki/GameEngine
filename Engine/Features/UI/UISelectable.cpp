@@ -6,6 +6,17 @@ UISelectable::UISelectable()
 {
 }
 
+void UISelectable::Initialize(const std::string& _label, bool _regsterDebugWindow)
+{
+    UIInteractive::Initialize(_label, _regsterDebugWindow);
+
+    jsonBinder_->RegisterVariable("defaultColor", &defaultColor_);
+    jsonBinder_->RegisterVariable("hoverColor", &hoverColor_);
+    jsonBinder_->RegisterVariable("pressedColor", &pressedColor_);
+    jsonBinder_->RegisterVariable("selectedColor", &selectedColor_);
+    jsonBinder_->RegisterVariable("focusedColor", &focusedColor_);
+}
+
 void UISelectable::UpdateSelf()
 {
     UIInteractive::UpdateSelf();

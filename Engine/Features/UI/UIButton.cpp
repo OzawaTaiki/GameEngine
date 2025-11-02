@@ -14,11 +14,11 @@ void UIButton::Initialize(const std::string& _label)
     jsonBinder_->RegisterVariable(label_ + "backgroundColor", &backgroundColor_);
 
     // ボタンのデフォルト色設定
-    SetDefaultColor({ 0.8f, 0.8f, 0.8f, 1.0f });
-    SetHoverColor({ 0.9f, 0.9f, 0.9f, 1.0f });
-    SetPressedColor({ 0.6f, 0.6f, 0.6f, 1.0f });
-    SetSelectedColor({ 0.7f, 0.7f, 1.0f, 1.0f });
-    SetFocusedColor({ 1.0f, 1.0f, 0.8f, 1.0f });
+    //SetDefaultColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+    //SetHoverColor({ 0.9f, 0.9f, 0.9f, 1.0f });
+    //SetPressedColor({ 0.6f, 0.6f, 0.6f, 1.0f });
+    //SetSelectedColor({ 0.7f, 0.7f, 1.0f, 1.0f });
+    //SetFocusedColor({ 1.0f, 1.0f, 0.8f, 1.0f });
 
 
 }
