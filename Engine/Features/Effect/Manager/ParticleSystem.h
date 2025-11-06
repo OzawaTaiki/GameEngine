@@ -129,7 +129,7 @@ private:
         ParticleForGPU* mappedInstanceBuffer = nullptr;
     };
 
-    std::map<std::string, ParticleGroup> particles_;
+    std::unordered_map<std::string, ParticleGroup> particles_;
 
     std::map<PSOFlags, ID3D12PipelineState*> psoMap_;
     ID3D12RootSignature* rootSignature_;

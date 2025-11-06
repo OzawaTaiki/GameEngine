@@ -16,6 +16,9 @@ void LayerSystem::Initialize()
     RTVManager::GetInstance()->
         CreateRenderTarget("final", WinApp::kWindowWidth_, WinApp::kWindowHeight_,
             DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
+
+    PSOManager::GetInstance()->CreatePSOForComposite(PSOFlags::BlendMode::PremultipliedAdd);
+
 }
 
 LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority, PSOFlags::BlendMode _blendmode)
@@ -203,7 +206,15 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     {
         if (info->enabled && info->renderTarget)
         {
-            PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::Composite | info->blendMode);
+            // レイヤー合成時は、加算ブレンドの場合PremultipliedAddを使用
+            // (レイヤー内で既にアルファが乗算済みのため、合成時にアルファを再度乗算しない)
+            PSOFlags::BlendMode compositeBlendMode = info->blendMode;
+            if (compositeBlendMode == PSOFlags::BlendMode::Add)
+            {
+                compositeBlendMode = PSOFlags::BlendMode::PremultipliedAdd;
+            }
+
+            PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::Composite | compositeBlendMode);
             std::string textureToUse = info->hasEffect ? info->effectOutputTexture : info->name;
 
             RTVManager::GetInstance()->DrawRenderTexture(textureToUse);

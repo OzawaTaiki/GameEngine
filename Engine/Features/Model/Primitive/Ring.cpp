@@ -34,7 +34,6 @@ Model* Ring::Generate(const std::string& _name)
     std::vector<uint32_t> indices(indexCount);
 
     const float kRadianPerDivide = (endAngle_ - startAngle_) / divide_;
-
     // 頂点の座標を計算
     for (int32_t index = 0; index < vertexCount; index += 2)
     {
@@ -52,17 +51,46 @@ Model* Ring::Generate(const std::string& _name)
 
         vertices[index].normal = { 0.0f,1.0f,0.0f };
 
-        vertices[index].texcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),0.0f };
 
         // 内側の頂点
         vertices[index + 1].position.x = cos * innerRadius_;
         vertices[index + 1].position.y = sin * innerRadius_;
         vertices[index + 1].position.z = 0.0f;
         vertices[index + 1].position.w = 1.0f;
-
         vertices[index + 1].normal = { 0.0f,0.0f ,1.0f };
 
-        vertices[index + 1].texcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),1.0f };
+        Vector2 innerTexcoord, outerTexcoord;
+
+        if(uvMode_ == RingUVMode::Radial)
+        {
+            outerTexcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),0.0f };
+            innerTexcoord = { static_cast<float>(index) / static_cast<float>(divide_ * 2),1.0f };
+        }
+        else
+        {
+            // 外側
+            outerTexcoord = {
+            (cos * outerRadius_) / (outerRadius_ * 2.0f) + 0.5f,
+            (sin * outerRadius_) / (outerRadius_ * 2.0f) + 0.5f
+            };
+            // 内側
+            innerTexcoord = {
+                (cos * innerRadius_) / (outerRadius_ * 2.0f) + 0.5f,
+                (sin * innerRadius_) / (outerRadius_ * 2.0f) + 0.5f
+            };
+        }
+        // UV座標の設定
+        // 外側
+        vertices[index].texcoord =
+        {
+            Lerp(uvRange_.uMin, uvRange_.uMax, outerTexcoord.x),
+            Lerp(uvRange_.vMin, uvRange_.vMax, outerTexcoord.y)
+        };
+        vertices[index + 1].texcoord =
+        {
+            Lerp(uvRange_.uMin, uvRange_.uMax, innerTexcoord.x),
+            Lerp(uvRange_.vMin, uvRange_.vMax, innerTexcoord.y)
+        };
 
 
         if (flipU_)

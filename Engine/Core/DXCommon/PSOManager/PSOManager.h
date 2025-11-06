@@ -35,7 +35,8 @@ struct PSOFlags
         Add = 1 << 0,
         Sub = 1 << 1,
         Multiply = 1 << 2,
-        Screen = 1 << 3
+        Screen = 1 << 3,
+        PremultipliedAdd = 1 << 4  // レイヤー合成用（アルファ乗算なし）
     };
     enum class CullMode
     {
