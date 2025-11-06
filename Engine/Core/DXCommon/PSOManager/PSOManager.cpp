@@ -514,6 +514,7 @@ void PSOManager::CreateDefaultPSOs()
 
     CreatePSOForOffScreen();
     CreatePSOForComposite(PSOFlags::BlendMode::Normal);
+    CreatePSOForComposite(PSOFlags::BlendMode::Normal);
     CreatePSOForDLShadowMap();
     CreatePSOForPLShadowMap();
 }
@@ -1930,7 +1931,7 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         // Alpha: SrcAlpha + DestAlpha（通常は飽和）
         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
 
@@ -1966,6 +1967,19 @@ D3D12_BLEND_DESC PSOManager::GetBlendDesc(PSOFlags _flag)
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         // Alpha: 同様にスクリーン合成
         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        break;
+
+    case PSOFlags::BlendMode::PremultipliedAdd:
+        // プリマルチプライド加算: Src * 1 + Dest * 1
+        // レイヤー合成用。既にアルファが乗算済みのRGB値を想定
+        // RGB
+        blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+        // Alpha: SrcAlpha + DestAlpha
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
         break;
