@@ -91,13 +91,8 @@ public:
 
     // === ファイル操作 (一時的) ===
     bool LoadFromFile(std::string_view _filePath);
-    bool SaveToFile(std::string_view _filePath) const;
+    bool SaveToFile() const;
     bool Save() const;
-
-    // === プリセット管理 ===
-    bool LoadPreset(std::string_view _presetName);
-    bool SavePreset(std::string_view _presetName) const;
-    static std::vector<std::string> GetAvailablePresets();
 
     // === イベントコールバック ===
     using EffectCallback = std::function<void(Effect*)>;
@@ -110,7 +105,6 @@ public:
     void SetAllEmittersActive(bool _active);
     void SetEmitterGroupActive(std::string_view _groupName, bool _active);
     void ScaleAllEmitters(float _scale);
-    void SetAllEmitterColors(const Vector4& _color);
 
     // === パフォーマンス統計 ===
     struct Statistics {

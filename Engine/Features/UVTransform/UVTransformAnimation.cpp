@@ -51,7 +51,6 @@ void UVTransformAnimation::Update(float _deltaTime)
         }
     }
 
-    float progress = currentTime_ / duration_;
     for (auto* transform : transforms_) {
         if (transform) {
             // スクロール更新

@@ -94,7 +94,7 @@ private:
     /// <param name="_compressionRate">0.0~1.0</param>
     /// <param name="totalDuration">音声の総時間(秒)</param>
     /// <returns>ウィンドウサイズ(ミリ秒)</returns>
-    static float CompressionRateToWindowSize(float _compressionRate, float totalDuration);
+    static float CompressionRateToWindowSize(float _compressionRate);
 
 
 private:

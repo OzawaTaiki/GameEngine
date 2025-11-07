@@ -9,9 +9,9 @@
 static std::string NormalizeKey(const std::string& s) {
     if (s.empty()) return s;
     std::string result = s;
-    result[0] = std::toupper(result[0]);
+    result[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[0])));
     for (size_t i = 1; i < result.size(); ++i) {
-        result[i] = std::tolower(result[i]);
+        result[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(result[i])));
     }
     return result;
 }

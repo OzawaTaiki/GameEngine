@@ -1,22 +1,24 @@
 #include "CommandList.h"
 #include <cassert>
+#include <Debug/Debug.h>
 
-CommandList::CommandList(ID3D12Device* device, CommandListType type) : type_(type) {
+CommandList::CommandList(ID3D12Device* device, CommandListType type) : type_(type)
+{
     HRESULT hr;
 
     // コマンドリストタイプを変換
     D3D12_COMMAND_LIST_TYPE d3dType = D3D12_COMMAND_LIST_TYPE_DIRECT;
     switch (type)
     {
-    case CommandListType::Graphics:
-        d3dType = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        break;
-    case CommandListType::Compute:
-        d3dType = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-        break;
-    case CommandListType::Copy:
-        d3dType = D3D12_COMMAND_LIST_TYPE_COPY;
-        break;
+        case CommandListType::Graphics:
+            d3dType = D3D12_COMMAND_LIST_TYPE_DIRECT;
+            break;
+        case CommandListType::Compute:
+            d3dType = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+            break;
+        case CommandListType::Copy:
+            d3dType = D3D12_COMMAND_LIST_TYPE_COPY;
+            break;
     }
 
     // コマンドキューの作成
@@ -50,14 +52,17 @@ CommandList::CommandList(ID3D12Device* device, CommandListType type) : type_(typ
     assert(fenceEvent_ != nullptr);
 }
 
-CommandList::~CommandList() {
-    if (fenceEvent_) {
+CommandList::~CommandList()
+{
+    if (fenceEvent_)
+    {
         CloseHandle(fenceEvent_);
         fenceEvent_ = nullptr;
     }
 }
 
-void CommandList::Reset(ID3D12PipelineState* initialState) {
+void CommandList::Reset(ID3D12PipelineState* initialState)
+{
     // コマンドアロケーターをリセット
     HRESULT hr = commandAllocator_->Reset();
     assert(SUCCEEDED(hr));
@@ -69,7 +74,8 @@ void CommandList::Reset(ID3D12PipelineState* initialState) {
     isRecording_ = true;
 }
 
-void CommandList::Execute(bool waitForCompletion) {
+void CommandList::Execute(bool waitForCompletion)
+{
     assert(isRecording_);
 
     // コマンドリストを閉じる
@@ -90,20 +96,29 @@ void CommandList::Execute(bool waitForCompletion) {
     isRecording_ = false;
 
     // 必要に応じてGPU処理の完了を待機
-    if (waitForCompletion) {
+    if (waitForCompletion)
+    {
         WaitForGpu();
     }
 }
 
-void CommandList::WaitForGpu() {
-    if (fence_->GetCompletedValue() < fenceValue_) {
+void CommandList::WaitForGpu()
+{
+    if (fence_->GetCompletedValue() < fenceValue_)
+    {
         HRESULT hr = fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
-        assert(SUCCEEDED(hr));
+        if (FAILED(hr))
+        {
+            Debug::Log("Failed to set event on fence completion");
+            assert(false && "Failed to set event on fence completion");
+            return;
+        }
         WaitForSingleObject(fenceEvent_, INFINITE);
     }
 }
 
-void CommandList::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
+void CommandList::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after)
+{
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;

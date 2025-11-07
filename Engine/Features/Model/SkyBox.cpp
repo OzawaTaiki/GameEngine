@@ -66,9 +66,6 @@ void SkyBox::Draw(const Camera* _camera)
 
 }
 
-void SkyBox::Draw(const Camera* _camera,const Vector4& _color)
-{
-}
 
 void SkyBox::SetColor(const Vector4& _color)
 {

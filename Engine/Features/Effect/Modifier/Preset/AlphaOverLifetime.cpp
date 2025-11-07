@@ -2,7 +2,7 @@
 
 Easing::EasingFunc AlphaOverLifetime::easingType_ = Easing::EasingFunc::EaseOutExpo;
 
-void AlphaOverLifetime::Apply(Particle* _particle, float _deltaTime)
+void AlphaOverLifetime::Apply(Particle* _particle, [[maybe_unused]] float _deltaTime)
 {
     if (_particle == nullptr)
         return;

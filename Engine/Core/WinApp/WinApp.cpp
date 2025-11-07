@@ -5,6 +5,7 @@
 #include <imgui_impl_win32.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif // _DEBUG
+#include <Debug/Debug.h>
 
 #pragma comment (lib,"winmm.lib")
 
@@ -47,7 +48,12 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void WinApp::Initilize(const wchar_t* _title, uint32_t _width, uint32_t _height, UINT _style)
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to initialize COM library");
+        assert(false && "Failed to initialize COM library");
+		return;
+    }	
 
 	//ウィンドウプロシージャ
 	wndClass_.lpfnWndProc = WindowProc;

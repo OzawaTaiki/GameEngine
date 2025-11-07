@@ -62,8 +62,8 @@ const char* UIColliderFactory::GetTypeName(ColliderType type)
 }
 
 std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
-    ColliderType& currentType,
-    const std::string& label)
+    [[maybe_unused]]ColliderType& currentType,
+    [[maybe_unused]] const std::string& label)
 {
 #ifdef _DEBUG
     std::unique_ptr<IUICollider> newCollider = nullptr;

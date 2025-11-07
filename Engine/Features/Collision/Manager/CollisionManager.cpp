@@ -114,9 +114,9 @@ void CollisionManager::CheckCollisions()
             Collider* colliderB = colliders_[j];
             potentialCollisions_.emplace_back(colliderA, colliderB);
         }
-        for (auto& staticColliders_ : staticColliders_)
+        for (auto& staticCollider : staticColliders_)
         {
-            Collider* colliderB = staticColliders_;
+            Collider* colliderB = staticCollider;
             potentialCollisions_.emplace_back(colliderA, colliderB);
         }
     }
@@ -314,7 +314,7 @@ void CollisionManager::DrawColliders()
     }
 }
 
-void CollisionManager::ImGui(bool* _open)
+void CollisionManager::ImGui([[maybe_unused]] bool* _open)
 {
 #ifdef _DEBUG
     ImGui::Begin("CollisionManager", _open);

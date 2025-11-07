@@ -2,7 +2,7 @@
 
 #include <Math/Vector/VectorFunction.h>
 
-void RotationBasedMovementModifier::Apply(Particle* particle, float deltaTime)
+void RotationBasedMovementModifier::Apply(Particle* particle, [[maybe_unused]] float deltaTime)
 {
 
     if (!particle) return;

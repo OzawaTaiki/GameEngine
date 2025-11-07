@@ -137,7 +137,7 @@ void LightingSystem::SetShadowMapSize(uint32_t _size)
     {// ディレクショナルライトのシャドウマップを更新
         auto dirLight = group->GetDirectionalLight();
         if (dirLight && dirLight->IsCastShadow()) {
-            dirLight->UpdateViewProjection(shadowMapSize_);
+            dirLight->UpdateViewProjection();
         }
 
         // ポイントライトのシャドウマップを更新

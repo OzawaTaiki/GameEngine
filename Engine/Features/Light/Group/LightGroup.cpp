@@ -1,5 +1,5 @@
 #include "LightGroup.h"
-#include <Debug/ImGuiDebugManager.h> 
+#include <Debug/ImGuiDebugManager.h>
 
 uint32_t LightGroup::shadowMapSize_ = 4096;
 
@@ -19,7 +19,7 @@ void LightGroup::SetDirectionalLight(std::shared_ptr<DirectionalLightComponent> 
     directionalLight_ = _light;
     if (directionalLight_) {
         // シャドウマップサイズを更新
-        directionalLight_->UpdateViewProjection(shadowMapSize_);
+        directionalLight_->UpdateViewProjection();
     }
     dirty_ = true;
 }
@@ -262,7 +262,7 @@ void LightGroup::DrawDirectionalLightImGui()
 
         if(isDirty)
         {
-            directionalLight_->UpdateViewProjection(shadowMapSize_);
+            directionalLight_->UpdateViewProjection();
         }
 
     }
@@ -331,7 +331,7 @@ void LightGroup::DrawPointLightsImGui()
 
                     if (dirty)
                     {
-                        light->UpdateViewProjections(shadowMapSize_);
+                        light->UpdateViewProjections();
                     }
 
                     ImGui::PopID();

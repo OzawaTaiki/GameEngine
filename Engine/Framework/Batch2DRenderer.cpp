@@ -77,8 +77,8 @@ void Batch2DRenderer::AddInstace(const InstanceData& _instance, const std::vecto
 
     DrawData data;
     data.instance = _instance;
-    data.sortKey.layer = LayerSystem::GetCurrentLayerID();
-    data.sortKey.internalOrder = static_cast<uint32_t>(drawDataList_.size());
+    data.sortKey.layer = static_cast<uint8_t>(LayerSystem::GetCurrentLayerID());
+    data.sortKey.internalOrder = static_cast<uint8_t>(drawDataList_.size());
     data.sortKey.userOrder = _order;
     data.vertices = _v;
 
@@ -329,7 +329,6 @@ void Batch2DRenderer::BuildDrawCommands()
     currentCommand.startInstance = 0;
     currentCommand.instanceCount = 1;
 
-    uint32_t baseIndex = 0;
 
     for (size_t i = 1; i < sortIndices_.size(); ++i)
     {

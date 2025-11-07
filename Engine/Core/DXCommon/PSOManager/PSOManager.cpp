@@ -42,7 +42,6 @@ std::optional<ID3D12PipelineState*> PSOManager::GetPipeLineStateObject(PSOFlags 
     else
     {
         PSOFlags::Type type = _flag.GetType();
-        uint64_t index = static_cast<uint64_t>(_flag);
 
         switch (type)
         {

@@ -27,11 +27,8 @@ bool RayCollisionManager::RayCast(const Ray& _ray, Collider* _other, RayCastHit&
     case BoundingBox::Capsule_3D:
         return RayCastCapsule(_ray, static_cast<CapsuleCollider*>(_other), _hit);
     default:
-        return false;
+        return _hit.hit;
     }
-
-    return _hit.hit;
-
 }
 
 

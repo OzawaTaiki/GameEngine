@@ -521,7 +521,7 @@ bool Effect::LoadFromFile(std::string_view _filePath)
     }
 }
 
-bool Effect::SaveToFile(std::string_view _filePath) const
+bool Effect::SaveToFile() const
 {
     try
     {
@@ -538,7 +538,7 @@ bool Effect::SaveToFile(std::string_view _filePath) const
         {
             if (emitter)
             {
-                emitter->SaveToFile("");  // エミッター固有のパスで保存
+                emitter->SaveToFile();  // エミッター固有のパスで保存
             }
         }
 
@@ -554,46 +554,9 @@ bool Effect::SaveToFile(std::string_view _filePath) const
 
 bool Effect::Save() const
 {
-    return SaveToFile("");
+    return SaveToFile();
 }
 
-bool Effect::LoadPreset(std::string_view _presetName)
-{
-    std::string presetPath = "Resources/Data/Particles/Presets/" + std::string(_presetName) + ".json";
-    return LoadFromFile(presetPath);
-}
-
-bool Effect::SavePreset(std::string_view _presetName) const
-{
-    std::string presetPath = "Resources/Data/Particles/Presets/" + std::string(_presetName) + ".json";
-    return SaveToFile(presetPath);
-}
-
-std::vector<std::string> Effect::GetAvailablePresets()
-{
-    std::vector<std::string> presets;
-    std::string presetDir = "Resources/Data/Particles/Presets/";
-
-    try
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(presetDir))
-        {
-            if (entry.is_regular_file() && entry.path().extension() == ".json")
-            {
-                presets.push_back(entry.path().stem().string());
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        // ディレクトリが存在しない場合など
-        std::string errorMsg = "Failed to load presets: " + std::string(e.what());
-        return {};
-    }
-
-    std::sort(presets.begin(), presets.end());
-    return presets;
-}
 
 void Effect::SetAllEmittersActive(bool _active)
 {
@@ -629,16 +592,6 @@ void Effect::ScaleAllEmitters(float _scale)
     }
 }
 
-void Effect::SetAllEmitterColors(const Vector4& _color)
-{
-    for (auto& emitter : emitters_)
-    {
-        if (emitter)
-        {
-            // emitter->SetColor(_color); // 実装が必要
-        }
-    }
-}
 
 void Effect::UpdateWorldMatrix()
 {
@@ -827,41 +780,6 @@ void Effect::ShowDebugWindow()
         if (ImGui::Button("Deactivate All"))
         {
             SetAllEmittersActive(false);
-        }
-    }
-
-    // プリセット
-    if (ImGui::CollapsingHeader("Presets"))
-    {
-        ImGui::InputText("Preset Name", presetNameBuf_, sizeof(presetNameBuf_));
-
-        ImGui::SameLine();
-        if (ImGui::Button("Save Preset"))
-        {
-            if (strlen(presetNameBuf_) > 0)
-            {
-                SavePreset(presetNameBuf_);
-            }
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Load Preset"))
-        {
-            if (strlen(presetNameBuf_) > 0)
-            {
-                LoadPreset(presetNameBuf_);
-            }
-        }
-
-        ImGui::Separator();
-
-        auto presets = GetAvailablePresets();
-        for (const auto& preset : presets)
-        {
-            if (ImGui::Selectable(preset.c_str()))
-            {
-                strncpy_s(presetNameBuf_, sizeof(presetNameBuf_), preset.c_str(), _TRUNCATE);
-            }
         }
     }
 

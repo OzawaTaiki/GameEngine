@@ -152,7 +152,7 @@ std::vector<float> SegmentedAudioGenerator::GenerateChordProgression(int _sample
 
 void SpectrumTest::Test()
 {
-    AudioSpectrum audioSpectrum(1024, 0.5f);
+    AudioSpectrum audioSpectrum(1024);
     const int sampleRate = 44100;
     const float duration = 5.0f;
 

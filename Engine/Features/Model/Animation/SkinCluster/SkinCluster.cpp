@@ -43,7 +43,6 @@ void SkinCluster::CreateResources(uint32_t _jointsSize, uint32_t _vertexSize, co
             continue;
         }
         inverseBindPoseMatrices_[it->second] = jointweight.second.inverseBindPoseMatrix;
-        int i = 0;
         for (const auto& vertexWeight : jointweight.second.vertexWeights)
         {
             VertexInfluenceData& influenceData = mappedInfluence_[vertexWeight.vertexIndex];

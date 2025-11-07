@@ -223,7 +223,6 @@ void ImGuiHelper::DrawGradientEditor(std::list<std::pair<float, Vector4>>& _colo
         {
             // 色を変更
             ImVec4 colVec4 = ImVec4(color.x, color.y, color.z, color.w);
-            ImU32 colU32 = ImGui::GetColorU32(colVec4);
         }
         if (ImGui::DragFloat("Time", &time, 0.01f, 0.0f, 1.0f))
         {
@@ -488,7 +487,6 @@ void ImGuiHelper::TimeLine::Draw(AnimationSequence* _sequence)
         drawList->AddRectFilled(ImVec2(timeAxisCountStartPos.x, OverlapRectPos.y),
             ImVec2(timeAxisCountStartPos.x + timeAxisRectSize.x, OverlapRectPos.y + windowSize.y),
             ImU32(0xa0202020));
-        CreateEventButton(_sequence);
 
         // シーケンスの時間を表示
         ImGui::Text("CurrentTime:%f", currentTime);
@@ -499,13 +497,8 @@ void ImGuiHelper::TimeLine::Draw(AnimationSequence* _sequence)
 
 }
 
-void ImGuiHelper::TimeLine::CreateEventButton(AnimationSequence* _sequence)
-{
 
-
-}
-
-void ImGuiHelper::DrawTitleBar(const char* _text, const ImVec4& _color)
+void ImGuiHelper::DrawTitleBar(const char* _text)
 {
     // 描画リストの取得
     ImDrawList* draw_list = ImGui::GetWindowDrawList();

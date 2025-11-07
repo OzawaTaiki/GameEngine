@@ -130,7 +130,7 @@ Direction UINavigator::GetDirectionFromInput() const
     {
         for (const auto& keycode : keys)
         {
-            if (input_->IsPadTriggered(static_cast<PadButton>(keycode)) || input_->IsKeyTriggered(keycode))
+            if (input_->IsPadTriggered(static_cast<PadButton>(static_cast<uint8_t>(keycode))) || input_->IsKeyTriggered(static_cast<uint8_t>(keycode)))
             {
                 switch (action)
                 {

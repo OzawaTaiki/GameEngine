@@ -29,7 +29,7 @@ void FontCache::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cm
     FontConfig config = {};
 
     auto atlasData = std::make_unique<AtlasData>();
-    atlasData->Initialize(device_, cmdList_, windowSize_, config.fontFilePath, config.fontSize, config.atlasSize);
+    atlasData->Initialize(device_, cmdList_, config.fontFilePath, config.fontSize, config.atlasSize);
 
     atlasDataMap_.emplace(std::make_pair(config.fontFilePath, config.fontSize), std::move(atlasData));
 }
@@ -46,7 +46,7 @@ AtlasData* FontCache::GetAtlasData(const std::string& _fontFilePath, float _font
 
     // 存在しない場合は新しく作成
     auto atlasData = std::make_unique<AtlasData>();
-    atlasData->Initialize(device_, cmdList_, windowSize_, _fontFilePath, _fontSize, { 4096, 4096 });
+    atlasData->Initialize(device_, cmdList_,  _fontFilePath, _fontSize, { 4096, 4096 });
 
     AtlasData* atlasPtr = atlasData.get();
 

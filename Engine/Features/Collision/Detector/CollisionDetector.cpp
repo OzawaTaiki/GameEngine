@@ -714,8 +714,6 @@ bool CollisionDetector::IntersectSphereCapsule(SphereCollider* _sphere, CapsuleC
 bool CollisionDetector::IntersectAABBOBB(AABBCollider* _aabb, OBBCollider* _obb, ColliderInfo& _info)
 {
     // プレイヤーなど、Y軸のみ回転のOBBかチェック
-    const WorldTransform* obbTransform = _obb->GetWorldTransform();
-
     // 一般的なケースは従来の方法
     OBBCollider tempOBB(true);
     tempOBB.SetBoundingBox(BoundingBox::OBB_3D);
@@ -944,7 +942,7 @@ bool CollisionDetector::IntersectRotatedRect_vs_AxisAlignedRect(const Vector2& _
     Vector2 centerDiff = _rectCenter - aabbCenter;
 
     float minOverlap = FLT_MAX;
-    Vector2 bestAxis;
+    Vector2 bestAxis = Vector2(0.0f, 0.0f);
 
     // 4つの軸でテスト: AABB の X軸、Z軸、回転矩形の X軸、Z軸
 

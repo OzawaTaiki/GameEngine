@@ -10,7 +10,7 @@ public:
     VoiceCallBack() = default;
     ~VoiceCallBack() = default;
 
-    void OnVoiceProcessingPassStart(UINT32 BytesRequired) override {}
+    void OnVoiceProcessingPassStart([[maybe_unused]] UINT32 BytesRequired) override {}
     void OnVoiceProcessingPassEnd() override {}
     void OnStreamEnd() override { if (onStreamEndCallback_) onStreamEndCallback_(); }
     void OnBufferStart(void* pBufferContext) override { if (onBufferStartCallback_) onBufferStartCallback_(pBufferContext); }

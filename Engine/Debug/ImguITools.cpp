@@ -33,7 +33,7 @@ void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Ve
     ImGui::SetNextWindowSize(ImVec2(300, 300));
     if (ImGui::BeginPopup("GradientEditor"))
     {
-        ImGuiHelper::DrawTitleBar("GradientEditor", ImVec4(1, 1, 1, 1));
+        ImGuiHelper::DrawTitleBar("GradientEditor");
 
         ImGuiHelper::DrawGradientEditor(_colors);
 
@@ -90,10 +90,8 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
         ImGui::BeginChild("ControlPanel", controlPanelSize, true);
 
         // 固定幅レイアウトを使用
-        float panelWidth = ImGui::GetContentRegionAvail().x;
         float leftControlsWidth = 200.0f;  // 左側のコントロール幅
         float centerControlsWidth = 200.0f; // 中央のコントロール幅
-        float rightControlsWidth = 200.0f;  // 右側のコントロール幅
 
         // 左側のコントロール：再生/停止/巻き戻しボタン
         ImGui::BeginGroup();
@@ -784,8 +782,8 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 
         // ループ処理
         if (_sequence->IsLooping()) {
-            float maxTime = _sequence->GetMaxPlayTime();
-            if (currentTime >= maxTime) {
+            float sequenceMaxTime = _sequence->GetMaxPlayTime();
+            if (currentTime >= sequenceMaxTime) {
                 currentTime = 0.0f;
             }
         }

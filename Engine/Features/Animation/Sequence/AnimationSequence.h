@@ -42,7 +42,7 @@ public:
     void MarkEventForDeletion(SequenceEvent* _sequenceEvent);
 
     template<typename T>
-    void CreateSequenceEvent(const std::string& _label, T _value, float _startTime = 0.0f, uint32_t _easingType = 0)
+    void CreateSequenceEvent(const std::string& _label, T _value)
     {
         SequenceEvent* sequenceEvent = new SequenceEvent(_label, _value);
         AddSequenceEvent(sequenceEvent);

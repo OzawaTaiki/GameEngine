@@ -45,7 +45,7 @@ public:
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
     void SetShadowFactor(float shadowFactor) { data_.shadowFactor = shadowFactor; }
 
-    void UpdateViewProjections(uint32_t shadowMapSize);
+    void UpdateViewProjections();
 
     void CreateShadowMaps(uint32_t shadowMapSize);
     void ReleaseShadowMaps();
@@ -56,6 +56,6 @@ private:
     std::vector<uint32_t> shadowMapHandles_;
 
     // キューブマップ各面のビュー行列計算ヘルパー
-    void CalculateCubemapViewProjections(uint32_t shadowMapSize);
+    void CalculateCubemapViewProjections();
     Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };

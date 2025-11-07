@@ -62,7 +62,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateCubemapResource(
         uint32_t _width,
         uint32_t _height,
-        uint32_t _rtvIndex,
         DXGI_FORMAT _format,
         const Vector4& _clearColor);
 

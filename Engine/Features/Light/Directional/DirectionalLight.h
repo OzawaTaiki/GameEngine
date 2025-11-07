@@ -32,14 +32,14 @@ public:
 
 
     void SetColor(const Vector4& color) { data_.color = color; }
-    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); UpdateViewProjection(0); }
+    void SetDirection(const Vector3& direction) { data_.direction = direction.Normalize(); UpdateViewProjection(); }
     void SetIntensity(float intensity) { data_.intensity = intensity; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
     void SetShadowFactor(float shadowFactor) { data_.shadowFactor = shadowFactor; }
 
 
-    void UpdateViewProjection(uint32_t shadowMapSize);
+    void UpdateViewProjection();
 
     uint32_t GetShadowMapHandle() const { return shadowMapHandle_; }
     void SetShadowMapHandle(uint32_t handle) { shadowMapHandle_ = handle; }

@@ -133,7 +133,6 @@ private:
     void ImGuiCameraControls();
     void ImGuiEnvironmentSettings();
     void ImGuiModelControls();
-    void ImGuiTemplateSelector();
     void ImGuiFileOperations();
     void ImGuiHelpWindow();
 

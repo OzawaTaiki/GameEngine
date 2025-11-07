@@ -61,13 +61,13 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     CHECK_HR(hr, "Failed to set major type");
     hr = pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_Float);    // PCM形式
     CHECK_HR(hr, "Failed to set subtype");
-    hr = pMFSourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType.Get()); // 出力メディアタイプの設定
+    hr = pMFSourceReader->SetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), nullptr, pMFMediaType.Get()); // 出力メディアタイプの設定
     CHECK_HR(hr, "Failed to set current media type");
 
     //pMFMediaType->Release();
 
     // 現在のメディアタイプを取得
-    hr = pMFSourceReader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pMFMediaType);
+    hr = pMFSourceReader->GetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), &pMFMediaType);
     CHECK_HR(hr, "Failed to get current media type");
 
     // WAVEFORMATEXの取得
@@ -84,7 +84,7 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
 
         // サンプルの読み込み
         hr = pMFSourceReader->ReadSample(
-            MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+            static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM),
             0,
             nullptr,
             &dwStreamFlags,

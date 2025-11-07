@@ -13,8 +13,8 @@ class Sprite
 {
 public:
 
-    Sprite(const std::string& _name);
-    ~Sprite() ;
+    Sprite(const std::string& _name, bool _debugWinddow = false);
+    ~Sprite();
 
     void Initialize();
     void Initialize(uint32_t _textureHandle);

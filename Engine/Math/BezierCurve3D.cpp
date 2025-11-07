@@ -114,7 +114,7 @@ void BezierCurve3D::Draw(const Vector3& _worldPos, const Vector4& _color) const
     // 連続する点間に線を描画
     for (size_t i = 1; i < points.size(); ++i)
     {
-        LineDrawer::GetInstance()->RegisterPoint(points[i - 1], points[i], _color);
+        LineDrawer::GetInstance()->RegisterPoint(_worldPos + points[i - 1], _worldPos + points[i], _color);
     }
 }
 
@@ -635,9 +635,6 @@ std::vector<float> BezierCurve3D::GenerateEquallySpacedTValues(int _numPoints) c
 
     if (equallySpacedPoints.size() > 1)
     {
-        // 曲線の全長を計算
-        float totalLength = CalculateTotalLength();
-
         // 始点からの累積距離
         float accumulatedDistance = 0.0f;
 

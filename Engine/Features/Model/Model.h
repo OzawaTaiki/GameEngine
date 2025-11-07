@@ -32,10 +32,6 @@ public:
     static Model* CreateFromMesh(std::unique_ptr<Mesh> _mesh);
     static Model* CreateFromVertices(std::vector<VertexData> _vertices, std::vector<uint32_t> _indices, const std::string& _name);
 
-    void Initialize();
-
-    void Update(float _deltaTime);
-
     void Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color);
     void Draw(const WorldTransform& _transform, const Camera* _camera, ObjectColor* _color);
 
@@ -45,7 +41,6 @@ public:
     void QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, uint32_t _textureHandle, const Vector4& _color, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh = nullptr) const;
 
     void QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList, MargedMesh* _margedMesh = nullptr) const;
-
     void QueueLightCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index) const;
 
     void SetLightGroup(LightGroup* _lightGroup) { lightGroup_ = std::unique_ptr<LightGroup>(_lightGroup); }

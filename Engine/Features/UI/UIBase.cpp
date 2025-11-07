@@ -17,7 +17,7 @@ UIBase::~UIBase()
     RemoveAllChildren();
 }
 
-void UIBase::Initialize(const std::string& _label, bool _regsterDebugWindow)
+void UIBase::Initialize(const std::string& _label, [[maybe_unused]] bool _regsterDebugWindow)
 {
 #ifdef _DEBUG
     if (_regsterDebugWindow)

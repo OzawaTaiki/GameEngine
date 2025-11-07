@@ -24,8 +24,8 @@ Model* Ring::Generate(const std::string& _name)
     NormalizeRadius();
 
     // 内半径と外半径の比率を計算]// TODO
-    float startOuterRadius = Lerp(innerRadius_, outerRadius_, startOuterRadiusRatio_);
-    float endOuterRadius = Lerp(innerRadius_, outerRadius_, endOuterRadiusRatio_);
+    //float startOuterRadius = Lerp(innerRadius_, outerRadius_, startOuterRadiusRatio_);
+    //float endOuterRadius = Lerp(innerRadius_, outerRadius_, endOuterRadiusRatio_);
 
     // 円環の頂点数を計算
     int32_t vertexCount = (divide_) * 2 + 2;

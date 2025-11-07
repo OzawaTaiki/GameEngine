@@ -4,8 +4,10 @@
 #include <Debug/Debug.h>
 #include <numeric>
 
-AudioSpectrum::AudioSpectrum(size_t windowSize, float _overlapRatio)
+AudioSpectrum::AudioSpectrum(size_t windowSize)
 {
+    // ウィンドウサイズを2のべき乗に調整
+    windowSize_ = GetNextPowerOf2(windowSize);
 }
 
 // X(k) = Σ[n=0 to N-1] x(n) * e^(-i*2π*k*n/N)
@@ -183,14 +185,7 @@ std::vector<float> AudioSpectrum::GetSpectrumAtTime(float _time)
     if (std::abs(_time - cashedTime_) < 0.01f)
         return cashedSpectrum_;
 
-    size_t centerIndex = static_cast<size_t>(sampleRate_ * _time);
-    const size_t windowHalfSize = 1024 / 2;
-    size_t s = centerIndex - windowHalfSize;
-    size_t e = centerIndex + windowHalfSize;
-    if (centerIndex < windowHalfSize)        s = 0;
-    if (e >= audioData_.size()) e = audioData_.size() - 1;
-
-    auto spectrum = ComputeSpectrum(_time, s, e);
+    auto spectrum = ComputeSpectrum(_time);
 
     // キャッシュ更新
     cashedTime_ = _time;
@@ -237,8 +232,6 @@ void AudioSpectrum::RecursiveFFT(std::vector<std::complex<float>>& _x)
 void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
 {
     size_t N = _x.size();
-    float fN = static_cast<float>(N);
-    size_t halfN = _x.size() / 2;
 
     if (N <= 1)
         return;
@@ -280,12 +273,12 @@ void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
     }
 }
 
-std::vector<float> AudioSpectrum::ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex)
+std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
 {
     std::vector<float> segment(1024, 0.0f);  // ゼロで初期化
 
     size_t centerIndex = static_cast<size_t>(sampleRate_ * _time);
-    size_t windowHalfSize = 512;
+    size_t windowHalfSize = static_cast<size_t>(windowSize_ * 0.5f);
 
     // 音声データから取得可能な範囲を計算
     size_t audioStart = (centerIndex >= windowHalfSize) ? centerIndex - windowHalfSize : 0;
