@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <string>
+#include <algorithm>
 
 struct UVRange
 {
