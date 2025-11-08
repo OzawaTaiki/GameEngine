@@ -308,12 +308,12 @@ void LineDrawer::DrawCircle(const Vector3& _center, float _radius, const float _
             tangent2 * std::sin(nextRad) * _radius;
 
         // 線分を登録
-        RegisterPoint(spos, epos, _frontDraw);
+        RegisterPoint(spos, epos, _color, _frontDraw);
     }
 }
 
 
-void LineDrawer::DebugDraw(const Vector2& _start, const Vector2& _end, const Vector4& _color)
+void LineDrawer::DebugDraw([[maybe_unused]] const Vector2& _start, [[maybe_unused]] const Vector2& _end, [[maybe_unused]] const Vector4& _color)
 {
 #ifdef _DEBUG
     assert(indexForDebug_ + 2 < kMaxNum && "The line instance is too large");
@@ -326,7 +326,7 @@ void LineDrawer::DebugDraw(const Vector2& _start, const Vector2& _end, const Vec
 #endif
 }
 
-void LineDrawer::DebugDrawCircle(const Vector2& _center, float _radius, const Vector4& _color)
+void LineDrawer::DebugDrawCircle([[maybe_unused]] const Vector2& _center, [[maybe_unused]] float _radius, [[maybe_unused]] const Vector4& _color)
 {
 #ifdef _DEBUG
     const float kEvery = std::numbers::pi_v<float> *2.0f / 32.0f; // 32分割
@@ -404,7 +404,6 @@ void LineDrawer::SetVerties()
             uint32_t nextLon = (lon + 1) % div; // 経度方向でループ
 
             uint32_t nextLat = (lat + 1) * div + lon;
-            uint32_t nextLonLat = (lat + 1) * div + nextLon;
 
             sphereIndices_.push_back(current);
             sphereIndices_.push_back((lat * div + nextLon) % sphereVertices_.size());

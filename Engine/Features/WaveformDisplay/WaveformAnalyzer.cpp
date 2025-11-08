@@ -16,14 +16,10 @@ std::vector<float> WaveformAnalyzer::ExtractRawWaveformMaxMin(const SoundInstanc
 
     float duration = _soundInstance->GetDuration();
 
-    // 1ピクセルあたりの時間
-    float timePerPixel = _displayDuration / _displayWidth;
-
     // 音声データのいろいろ
     uint32_t soundID = _soundInstance->GetSoundID();
     const WAVEFORMATEX& format = audioSystem->GetSoundFormat(soundID);
     const BYTE* buffer = audioSystem->GetBuffer(soundID);
-    size_t bufferSize = audioSystem->GetBufferSize(soundID);
     const float* waveformF = reinterpret_cast<const float*>(buffer); // float配列として扱う
 
     size_t sampleCount = static_cast<size_t>(duration * sampleRate * format.nChannels);
@@ -109,7 +105,7 @@ std::vector<float> WaveformAnalyzer::AnalyzeRMS(const SoundInstance* _soundInsta
     float compressionRate = GetCompressionRatio(_compressionLevel);
 
     // 圧縮率からウィンドウサイズを計算
-    float windowSizeMs = CompressionRateToWindowSize(compressionRate, _soundInstance->GetDuration());
+    float windowSizeMs = CompressionRateToWindowSize(compressionRate);
 
     // サンプルレート
     float sampleRate = _soundInstance->GetSampleRate();
@@ -249,10 +245,9 @@ float WaveformAnalyzer::GetCompressionRatio(Waveform::CompressionLevel _compress
         default:
             return 0.6f; // デフォルトは中程度
     }
-    return 0.0f;
 }
 
-float WaveformAnalyzer::CompressionRateToWindowSize(float _compressionRate, float totalDuration)
+float WaveformAnalyzer::CompressionRateToWindowSize(float _compressionRate)
 {
     float minWindowMs = 2.0f;   // 最高品質時（100%）
     float maxWindowMs = 50.0f; // 最低品質時（20%）

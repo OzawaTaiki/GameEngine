@@ -129,9 +129,9 @@ private:
                 minHz       == other.minHz &&
                 maxHz       == other.maxHz;
         }
-        bool CashEquals(size_t drawCount, size_t fftBins, float sampleRate, float minHz, float maxHz) const
+        bool CashEquals(size_t _drawCount, size_t _fftBins, float _sampleRate, float _minHz, float _maxHz) const
         {
-            return *this == DrawData{ drawCount, fftBins, sampleRate,minHz,maxHz };
+            return *this == DrawData{ _drawCount, _fftBins, _sampleRate, _minHz, _maxHz };
         }
     };
 

@@ -15,7 +15,7 @@ EffectEditorScene::~EffectEditorScene()
 #endif
 }
 
-void EffectEditorScene::Initialize(SceneData* _sceneData)
+void EffectEditorScene::Initialize([[maybe_unused]] SceneData* _sceneData)
 {
 #ifdef _DEBUG
     // カメラ初期化
@@ -1333,14 +1333,16 @@ void EffectEditorScene::PasteEmitterProperties()
 
 void EffectEditorScene::ShowErrorDialog(const std::string& _message)
 {
-    // エラーダイアログの実装
-    // ImGuiのポップアップを使用
+    // TODO: ImGuiでエラーダイアログを表示する実装
+    // 現在は何もしない（リンクエラー回避用）
+    (void)_message;
 }
 
 void EffectEditorScene::ShowInfoDialog(const std::string& _message)
 {
-    // 情報ダイアログの実装
-    // ImGuiのポップアップを使用
+    // TODO: ImGuiで情報ダイアログを表示する実装
+    // 現在は何もしない（リンクエラー回避用）
+    (void)_message;
 }
 
 void EffectEditorScene::ShowTooltip(const std::string& _text)

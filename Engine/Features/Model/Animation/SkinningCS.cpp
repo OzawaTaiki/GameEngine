@@ -100,7 +100,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> SkinningCS::CreateOutputVertexResource(si
         &resourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
         IID_PPV_ARGS(&outputVertexResource));
 
-    assert(SUCCEEDED(hr));
+    if(FAILED(hr))
+    {
+        Debug::Log("Error: Failed to create output vertex resource in SkinningCS");
+        assert(false && "Failed to create output vertex resource in SkinningCS");
+        return nullptr;
+    }
 
     return outputVertexResource;
 }

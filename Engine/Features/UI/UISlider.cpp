@@ -103,7 +103,7 @@ void UISlider::UpdateSelf()
     // キーボード入力でスライダー操作（フォーカス時）
     if (isFocused_)
     {
-        float step = useStep_ ? stepSize_ : (maxValue_ - minValue_) * 0.01f;
+        //float step = useStep_ ? stepSize_ : (maxValue_ - minValue_) * 0.01f;
 
         if (direction_ == SliderDirection::Horizontal)
         {

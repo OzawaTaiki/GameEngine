@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <string>
+#include <cassert>
 #include <unordered_map>
 #include <wrl.h>
 #include <array>
@@ -120,7 +121,8 @@ struct PSOFlags
     {
         if (!HasType())
         {
-            throw std::runtime_error("Typeが設定されていません");
+            //throw std::runtime_error("Typeが設定されていません");
+            assert("Typeが設定されていません" && false);
             return Type::None;
         }
         return static_cast<Type>(value & TypeMask);

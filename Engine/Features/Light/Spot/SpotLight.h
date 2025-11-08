@@ -55,7 +55,7 @@ public:
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
 
-    void UpdateViewProjection(uint32_t shadowMapSize);
+    void UpdateViewProjection();
 
     void CreateShadowMap(uint32_t shadowMapSize);
     void ReleaseShadowMap();

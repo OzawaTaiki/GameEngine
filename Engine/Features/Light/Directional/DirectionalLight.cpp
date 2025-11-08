@@ -18,7 +18,7 @@ void DirectionalLightComponent::Update()
     data_.direction = data_.direction.Normalize();
 }
 
-void DirectionalLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
+void DirectionalLightComponent::UpdateViewProjection()
 {
     if (!data_.castShadow) return;
 

@@ -126,11 +126,9 @@ public:
 
     // === 検索・比較系 (一時的なため std::string_view) ===
     bool HasModifier(std::string_view _modifierName) const;
-    ParticleEmitter* FindChild(std::string_view _name) const;
 
     // === ファイル操作系 (一時的なため std::string_view) ===
-    bool LoadFromFile(std::string_view _filePath);
-    bool SaveToFile(std::string_view _filePath) const;
+    bool SaveToFile() const;
     void LoadTexture(std::string_view _texturePath);
     void LoadModel(std::string_view _modelPath);
 

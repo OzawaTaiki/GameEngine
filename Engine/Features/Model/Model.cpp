@@ -17,14 +17,6 @@
 
 const std::string Model::defaultDirpath_ = "Resources/models/";
 
-void Model::Initialize()
-{
-
-}
-
-void Model::Update(float _deltaTime)
-{
-}
 
 void Model::Draw(const WorldTransform& _transform, const Camera* _camera, uint32_t _textureHandle, ObjectColor* _color)
 {

@@ -61,7 +61,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -101,7 +101,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -114,6 +114,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <Optimization>MinSpace</Optimization>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,7 +178,12 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Collision\Tree\QuadTree.cpp" />
     <ClCompile Include="Features\ColorMask\ColorMask.cpp" />
     <ClCompile Include="Features\Effect\Editor\EffectEditorScene.cpp" />
-    <ClCompile Include="Features\Effect\Effect\Effect.cpp" />
+    <ClCompile Include="Features\Effect\Effect\Effect.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Features\Effect\Emitter\ParticleEmitter.cpp" />
     <ClCompile Include="Features\Effect\Manager\ParticleSystem.cpp" />
     <ClCompile Include="Features\Effect\Modifier\Preset\AlphaOverLifetime.cpp" />
@@ -319,7 +325,12 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Collision\Tree\QuadTree.h" />
     <ClInclude Include="Features\ColorMask\ColorMask.h" />
     <ClInclude Include="Features\Effect\Editor\EffectEditorScene.h" />
-    <ClInclude Include="Features\Effect\Effect\Effect.h" />
+    <ClInclude Include="Features\Effect\Effect\Effect.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Features\Effect\Emitter\ParticleEmitter.h" />
     <ClInclude Include="Features\Effect\Manager\ParticleSystem.h" />
     <ClInclude Include="Features\Effect\Modifier\IPaticleMoifierFactory.h" />

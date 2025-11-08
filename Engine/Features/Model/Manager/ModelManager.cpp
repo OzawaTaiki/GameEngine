@@ -81,7 +81,7 @@ Model* ModelManager::Create(const std::string& _name)
     return models_[name].get();
 }
 
-void ModelManager::ImGui(bool* _open)
+void ModelManager::ImGui([[maybe_unused]]bool* _open)
 {
 #ifdef _DEBUG
 

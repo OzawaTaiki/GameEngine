@@ -108,9 +108,6 @@ void WaveformDisplay::CalculateDisplayRange()
 
     endTime_ = std::min(musicDuration, startTime_ + displayTimeWindow_);
 
-    size_t startSample  = static_cast<size_t>(clampedDisplayStartTime * sampleRate_);
-    size_t endSample    = static_cast<size_t>(clampedDisplayEndTime * sampleRate_);
-
     float sizePerSec    = std::ceil(bounds_.size.x / displayTimeWindow_); // 1秒あたりの
     float size          = std::ceil(sizePerSec * musicDuration);
 
@@ -153,7 +150,6 @@ std::vector<float> WaveformDisplay::LanczosResample(const std::vector<float>& _i
         float x = i * ratio;
         int xInt = static_cast<int>(x);
 
-        float xFrac = x - xInt;
         float sum = 0.0f;
         float weightSum = 0.0f;
 

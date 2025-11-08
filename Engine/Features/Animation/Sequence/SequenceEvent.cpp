@@ -189,7 +189,7 @@ void SequenceEvent::MarkForDelete()
     isDelete_ = true;
 }
 
-void SequenceEvent::EditKeyFrameValue(KeyFrame& _keyFrame)
+void SequenceEvent::EditKeyFrameValue([[maybe_unused]] KeyFrame& _keyFrame)
 {
 #ifdef _DEBUG
     static float speed = 1.0f;

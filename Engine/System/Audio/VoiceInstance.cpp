@@ -93,11 +93,14 @@ void VoiceInstance::Resume()
 
 void VoiceInstance::FadeIn(float _fadeTime)
 {
-
+    // todo : 実装
+    _fadeTime;
 }
 
 void VoiceInstance::FadeOut(float _fadeTime)
 {
+    // todo : 実装
+    _fadeTime;
 }
 
 void VoiceInstance::SetVolume(float _volume)

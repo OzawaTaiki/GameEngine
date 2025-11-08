@@ -223,7 +223,7 @@ void Collider::UpdateCollisionState()
     currentCollisions_.clear();
 }
 
-SphereCollider::SphereCollider(const char* _name) : Collider()
+SphereCollider::SphereCollider([[maybe_unused]]const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Sphere_3D);
 #ifdef _DEBUG
@@ -325,12 +325,12 @@ void SphereCollider::ImGui()
 #endif // _DEBUG
 }
 
- SphereCollider::SphereCollider(bool _isTemporary) : Collider()
+ SphereCollider::SphereCollider([[maybe_unused]] bool _isTemporary) : Collider()
 {
     SetBoundingBox(BoundingBox::Sphere_3D);
 }
 
-AABBCollider::AABBCollider(const char* _name) : Collider()
+ AABBCollider::AABBCollider([[maybe_unused]]const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::AABB_3D);
 #ifdef _DEBUG
@@ -456,12 +456,12 @@ void AABBCollider::ImGui()
 #endif // _DEBUG
 }
 
-AABBCollider::AABBCollider(bool _isTemporary) : Collider()
+AABBCollider::AABBCollider([[maybe_unused]] bool _isTemporary) : Collider()
 {
     SetBoundingBox(BoundingBox::AABB_3D);
 }
 
-OBBCollider::OBBCollider(const char* _name) : Collider()
+OBBCollider::OBBCollider([[maybe_unused]] const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::OBB_3D);
 #ifdef _DEBUG
@@ -636,12 +636,12 @@ void OBBCollider::ImGui()
 #endif // _DEBUG
 }
 
-OBBCollider::OBBCollider(bool _isTemporary) : Collider()
+OBBCollider::OBBCollider([[maybe_unused]] bool _isTemporary) : Collider()
 {
     SetBoundingBox(BoundingBox::OBB_3D);
 }
 
- CapsuleCollider::CapsuleCollider(const char* _name) : Collider()
+ CapsuleCollider::CapsuleCollider([[maybe_unused]] const char* _name) : Collider()
 {
     SetBoundingBox(BoundingBox::Capsule_3D);
 #ifdef _DEBUG
@@ -926,7 +926,7 @@ Vector3 CapsuleCollider::GetCapsuleAABBSize()
     return max - min;
 }
 
-CapsuleCollider::CapsuleCollider(bool _isTemporary) : Collider()
+CapsuleCollider::CapsuleCollider([[maybe_unused]] bool _isTemporary) : Collider()
 {
     SetBoundingBox(BoundingBox::Capsule_3D);
 }

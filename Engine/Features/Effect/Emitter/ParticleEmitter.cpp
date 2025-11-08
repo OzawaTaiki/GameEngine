@@ -273,36 +273,7 @@ bool ParticleEmitter::HasModifier(std::string_view _modifierName) const
         }) != initParams_.modifiers.end();
 }
 
-ParticleEmitter* ParticleEmitter::FindChild(std::string_view _name) const
-{
-    // 子エミッターシステムがある場合はここに実装
-    return nullptr;
-}
-
-bool ParticleEmitter::LoadFromFile(std::string_view _filePath)
-{
-    try
-    {
-        if (jsonBinder_)
-        {
-            // jsonBinder_->LoadFromFile(_filePath); // 実装が必要
-            ClearError();
-            return true;
-        }
-        else
-        {
-            SetError("JsonBinder not initialized");
-            return false;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        SetError("Failed to load from file: " + std::string(e.what()));
-        return false;
-    }
-}
-
-bool ParticleEmitter::SaveToFile(std::string_view _filePath) const
+bool ParticleEmitter::SaveToFile() const
 {
     try
     {

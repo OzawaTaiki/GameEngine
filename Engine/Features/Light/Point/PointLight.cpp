@@ -23,10 +23,10 @@ void PointLightComponent::Update()
     }
 }
 
-void PointLightComponent::UpdateViewProjections(uint32_t shadowMapSize)
+void PointLightComponent::UpdateViewProjections()
 {
     if (!data_.castShadow) return;
-    CalculateCubemapViewProjections(shadowMapSize);
+    CalculateCubemapViewProjections();
 }
 
 void PointLightComponent::CreateShadowMaps(uint32_t shadowMapSize)
@@ -38,8 +38,6 @@ void PointLightComponent::CreateShadowMaps(uint32_t shadowMapSize)
 
     // 6面分のシャドウマップを作成
     std::string mapName = name_ + "_ShadowMap";
-
-    shadowMapSize = 4096;
 
     uint32_t handle =
         RTVManager::GetInstance()->CreateCubemapRenderTarget(
@@ -54,7 +52,7 @@ void PointLightComponent::CreateShadowMaps(uint32_t shadowMapSize)
     shadowMapHandles_.push_back(handle);
 
     // ビュー射影行列を更新
-    UpdateViewProjections(shadowMapSize);
+    UpdateViewProjections();
 }
 
 void PointLightComponent::ReleaseShadowMaps()
@@ -62,7 +60,7 @@ void PointLightComponent::ReleaseShadowMaps()
     shadowMapHandles_.clear();
 }
 
-void PointLightComponent::CalculateCubemapViewProjections(uint32_t shadowMapSize)
+void PointLightComponent::CalculateCubemapViewProjections()
 {// キューブマップの6面の視点方向
     // +X, -X, +Y, -Y, +Z, -Z
     const Vector3 directions[6] = {

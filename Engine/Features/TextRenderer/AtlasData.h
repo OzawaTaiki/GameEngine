@@ -34,7 +34,7 @@ class  AtlasData
 {
 public:
 
-    void Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const Vector2& _windowSize, const std::string& _fontFilePath, float _fontSize, const Vector2& _atlasSize);
+    void Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const std::string& _fontFilePath, float _fontSize, const Vector2& _atlasSize);
 
 public: /// アクセッサ
 

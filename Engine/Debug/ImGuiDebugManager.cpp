@@ -72,7 +72,7 @@ void ImGuiDebugManager::ShowDebugWindow()
 #endif // _DEBUG
 }
 
-bool ImGuiDebugManager::Begin(const std::string& _name)
+bool ImGuiDebugManager::Begin([[maybe_unused]] const std::string& _name)
 {
 #ifdef _DEBUG
     // 始めてのとき

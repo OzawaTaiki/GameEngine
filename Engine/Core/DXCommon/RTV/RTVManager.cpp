@@ -1,6 +1,7 @@
 #include "RTVManager.h"
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Debug/Debug.h>
 
 const uint32_t RTVManager::kMaxRTVIndex_ = 64;
 const uint32_t RTVManager::kMaxDSVIndex_ = 64;
@@ -196,7 +197,7 @@ uint32_t RTVManager::CreateCubemapRenderTarget(std::string _name, uint32_t _widt
     uint32_t rtvIndex = AllocateRTVIndex();
 
     // キューブマップリソースを作成
-    auto cubemapResource = CreateCubemapResource(_width, _height, rtvIndex, _colorFormat, _clearColor);
+    auto cubemapResource = CreateCubemapResource(_width, _height, _colorFormat, _clearColor);
     if (!cubemapResource)
     {
         return 0; // リソース作成失敗
@@ -485,7 +486,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResource(u
         &clearValue,						// クリア値
         IID_PPV_ARGS(renderTextureResource.GetAddressOf())); // 作成するResourceポインタへのポインタ
 
-    assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create RenderTexture Resource");
+        assert(false && "Failed to create RenderTexture Resource");
+        return nullptr;
+    }
 
 
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -533,8 +539,12 @@ void RTVManager::CreateDepthStencilTextureResource(uint32_t _width, uint32_t _he
         &depthClearValue, // Clear値の値
         IID_PPV_ARGS(depthStencilResource.GetAddressOf())); // 作成するResourceポインタへのポインタ
 
-    assert(SUCCEEDED(hr));
-
+    if(FAILED(hr))
+    {
+        Debug::Log("Failed to create DepthStencil Resource");
+        assert(false && "Failed to create DepthStencil Resource");
+        return;
+    }
     auto dsvHandle = GetCPUDSVDescriptorHandle(_dsvIndex);
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
@@ -586,7 +596,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResourceWi
         &clearValue,
         IID_PPV_ARGS(renderTextureResource.GetAddressOf()));
 
-    assert(SUCCEEDED(hr) && "Failed to create compute output texture");
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create compute output texture");
+        assert(false && "Failed to create compute output texture");
+        return nullptr;
+    }
 
     // RTV作成
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -600,7 +615,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateRenderTextureResourceWi
 
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_t _width, uint32_t _height, uint32_t _rtvIndex, DXGI_FORMAT _format, const Vector4& _clearColor)
+Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_t _width, uint32_t _height, DXGI_FORMAT _format, const Vector4& _clearColor)
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> cubemapResource = nullptr;
 
@@ -639,7 +654,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> RTVManager::CreateCubemapResource(uint32_
         &clearValue,
         IID_PPV_ARGS(cubemapResource.GetAddressOf()));
 
-    assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create cubemap resource");
+        assert(false && "Failed to create cubemap resource");
+        return nullptr;
+    }
 
     return cubemapResource;
 }

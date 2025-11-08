@@ -11,8 +11,7 @@ public:
     /// コンストラクタ
     /// </summary>
     /// <param name="windowSize">FFTの窓サイズ (2のべき乗)</param>
-    /// <param name="_overlapRatio">オーバーラップ率 (0.0f ~ 1.0f) 解像度と速度のトレードオフ</param>
-    AudioSpectrum(size_t windowSize = 1024, float _overlapRatio = 0.5f);
+    AudioSpectrum(size_t windowSize = 1024);
 
     ~AudioSpectrum()= default;
 
@@ -49,7 +48,7 @@ public:
 
 private:
 
-    std::vector<float> ComputeSpectrum(float _time, size_t _startIndex, size_t _endIndex);
+    std::vector<float> ComputeSpectrum(float _time);
 
     static float HanningWindowValue(size_t _N, size_t _n);
 
@@ -60,7 +59,7 @@ private:
     static uint32_t BitReversal(uint32_t _n, uint32_t _bite);
 
 private:
-
+    size_t windowSize_ = 1024; // 窓サイズ
     float cashedTime_ = 0.0f; // 保持している時間
     std::vector<float> cashedSpectrum_; // 保持しているスペクトラム
 

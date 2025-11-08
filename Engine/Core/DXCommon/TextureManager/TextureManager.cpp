@@ -152,7 +152,6 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
         Debug::Log(str);
 		assert("Failed to load texture" && false);
 		throw std::runtime_error("Failed to load texture");
-		return {};
     }
 
 
@@ -178,7 +177,6 @@ DirectX::ScratchImage TextureManager::GetMipImage(const std::string& _filepath)
         std::string str = "Failed to generate mipmaps for texture: " + _filepath;
         Debug::Log(str);
 		throw std::runtime_error("Failed to generate mipmaps for texture");
-		return {};
     }
 
 
@@ -212,7 +210,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 		D3D12_RESOURCE_STATE_COPY_DEST,//データ転送される設定
 		nullptr,//clearの最適値 使わないのでnullptr
 		IID_PPV_ARGS(resource.GetAddressOf()));//作成するresourceポインタへのポインタ
-	assert(SUCCEEDED(hr));
+
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create texture resource\n");
+        assert("Failed to create texture resource" && false);
+        return nullptr;
+    }
 
 	return resource;
 }
@@ -273,7 +277,7 @@ TextureManager::~TextureManager()
 #endif // _DEBUG
 }
 
-void TextureManager::ImGui(bool* _open)
+void TextureManager::ImGui([[maybe_unused]] bool* _open)
 {
 #ifdef _DEBUG
     ImGui::Begin("TextureManager",_open);

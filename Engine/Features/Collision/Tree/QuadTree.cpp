@@ -113,12 +113,12 @@ void QuadTree::GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*
         {
             if (!isChild)
             {
-                auto data = cell->GetFirstData();
-                while (data)
+                auto cellData = cell->GetFirstData();
+                while (cellData)
                 {
-                    _stac.push_back(data->GetData());
+                    _stac.push_back(cellData->GetData());
                     ++objCount;
-                    data = data->GetNextData();
+                    cellData = cellData->GetNextData();
                 }
             }
             isChild = true;

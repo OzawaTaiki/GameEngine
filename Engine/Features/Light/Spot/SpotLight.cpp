@@ -29,7 +29,7 @@ void SpotLightComponent::Update()
 
     if (data_.castShadow && shadowMapHandle_ != 0)
     {
-        UpdateViewProjection(1024);
+        UpdateViewProjection();
     }
 }
 
@@ -45,7 +45,7 @@ void SpotLightComponent::SetFalloutStartAngle(float angleDegree)
     data_.falloutStartAngle = std::cosf(angleRad);
 }
 
-void SpotLightComponent::UpdateViewProjection(uint32_t shadowMapSize)
+void SpotLightComponent::UpdateViewProjection()
 {
     if (!data_.castShadow) 
         return;
@@ -94,7 +94,7 @@ void SpotLightComponent::CreateShadowMap(uint32_t shadowMapSize)
     );
 
     // ビュー射影行列を更新
-    UpdateViewProjection(shadowMapSize);
+    UpdateViewProjection();
 }
 
 void SpotLightComponent::ReleaseShadowMap()

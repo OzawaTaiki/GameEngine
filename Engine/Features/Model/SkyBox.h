@@ -13,7 +13,6 @@ public:
     void Initialize(const Vector3& _scale, bool _useQuaternion = true);
     void Update();
     void Draw(const Camera* _camera);
-    void Draw(const Camera* _camera,const Vector4& _color );
 
     void SetColor(const Vector4& _color);
 

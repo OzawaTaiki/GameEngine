@@ -55,7 +55,6 @@ namespace ImGuiHelper
         /// <param name="_sequence"></param>
         void Draw(AnimationSequence* _sequence);
 
-        void CreateEventButton(AnimationSequence* _sequence);
     }
 
 
@@ -64,7 +63,7 @@ namespace ImGuiHelper
     /// </summary>
     /// <param name="_text">タイトル</param>
     /// <param name="_color">背景の色</param>
-    void DrawTitleBar(const char* _text, const ImVec4& _color);
+    void DrawTitleBar(const char* _text);
 
 
 }

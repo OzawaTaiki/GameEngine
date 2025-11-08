@@ -19,7 +19,7 @@ public:
     // コンストラクタ
     Ray() : origin_({ 0,0,0 }), direction_({ 0,0,1 }), length_((std::numeric_limits<float>::max)()) {}
     // コンストラクタ
-    Ray(const Vector3& _origin, const Vector3& _direction, float _length = (std::numeric_limits<float>::max)()) : origin_(_origin), direction_(_direction) {}
+    //Ray(const Vector3& _origin, const Vector3& _direction, float _length = (std::numeric_limits<float>::max)()) : origin_(_origin), direction_(_direction) {}
 
     // デストラクタ
     ~Ray() = default;

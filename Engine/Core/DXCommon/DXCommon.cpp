@@ -99,8 +99,6 @@ void DXCommon::PostDraw()
 {
 	HRESULT hr = S_FALSE;
 
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
 	//画面に書く処理はすべて終わり，画面に移すので状態を遷移
 	//今回はRenderTargetからPresentにする
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -205,7 +203,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(uint32_t _
 	HRESULT hr = device_->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
 												  &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 												  IID_PPV_ARGS(&bufferResource));
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create buffer resource");
+        assert(false && "Failed to create buffer resource");
+        return nullptr;
+    }
 
 	return bufferResource;
 }
@@ -235,7 +238,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateUAVBufferResource(uint32_
 		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
 		IID_PPV_ARGS(&bufferResource));
 
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create UAV buffer resource");
+        assert(false && "Failed to create UAV buffer resource");
+        return nullptr;
+    }
 
 	return bufferResource;
 }
@@ -271,8 +279,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateReadbackResources(size_t 
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
 		IID_PPV_ARGS(&readbackBuffer));
-	assert(SUCCEEDED(hr));
 
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create readback buffer resource");
+        assert(false && "Failed to create readback buffer resource");
+        return nullptr;
+    }
 	return readbackBuffer;
 }
 
@@ -604,7 +617,12 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DXCommon::CreateDescriptorHeap(D3D1
 	descRiptorHeapDesc.Flags = _shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	HRESULT hr = device_->CreateDescriptorHeap(&descRiptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	//ディスクリプターヒープが生成できなかったので起動できない
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create descriptor heap");
+        assert(false && "Failed to create descriptor heap");
+        return nullptr;
+    }
 	return descriptorHeap;
 }
 
@@ -693,7 +711,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateDepthStencilTextureResour
 		&depthClearValue, // Clear値の値
 		IID_PPV_ARGS(resource.GetAddressOf())); // 作成するResourceポインタへのポインタ
 
-	assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create depth stencil texture resource");
+        assert(false && "Failed to create depth stencil texture resource");
+        return nullptr;
+    }
 
 
 	return resource;
