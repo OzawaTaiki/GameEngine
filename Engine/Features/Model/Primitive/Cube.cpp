@@ -67,14 +67,16 @@ std::array<Vector3, 8> Cube::CalculateVertices() const
 {
     std::array<Vector3, 8> vertices = defaultVertices_;
 
-    Vector3 halfSize = size_.x * 0.5f;
 
     for (auto& v : vertices)
     {
-        v.x = (v.x - pivot_.x) * halfSize.x;
-        v.y = (v.y - pivot_.y) * halfSize.y;
-        v.z = (v.z - pivot_.z) * halfSize.z;
+        v.x = v.x - pivot_.x * 0.5f;
+        v.y = v.y - pivot_.y * 0.5f;
+        v.z = v.z - pivot_.z * 0.5f;
 
+        v.x *= size_.x;
+        v.y *= size_.y;
+        v.z *= size_.z;
     }
 
     return vertices;
