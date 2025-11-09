@@ -274,6 +274,9 @@
     <Filter Include="Features\UI\Collider\Interface">
       <UniqueIdentifier>{7dd03427-5f33-4b92-bfa0-d950485e133a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\Rect">
+      <UniqueIdentifier>{b6a15ff8-94e3-4ac9-aa8e-75d1dbba2172}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -694,6 +697,9 @@
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UICollisionManager.cpp" />
+    <ClCompile Include="Math\Rect\Rect.cpp">
+      <Filter>Math\Rect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1190,6 +1196,9 @@
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UICollisionManager.h">
       <Filter>Features\UI\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Rect\Rect.h">
+      <Filter>Math\Rect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

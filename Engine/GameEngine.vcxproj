@@ -273,6 +273,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Math\MyLib.cpp" />
     <ClCompile Include="Math\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Math\Random\RandomGenerator.cpp" />
+    <ClCompile Include="Math\Rect\Rect.cpp" />
     <ClCompile Include="Math\Vector\Vector2.cpp" />
     <ClCompile Include="Math\Vector\Vector3.cpp" />
     <ClCompile Include="Math\Vector\VectorFunction.cpp" />
@@ -437,6 +438,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Math\Quaternion\Quaternion.h" />
     <ClInclude Include="Math\Quaternion\QuaternionTransform.h" />
     <ClInclude Include="Math\Random\RandomGenerator.h" />
+    <ClInclude Include="Math\Rect\Rect.h" />
     <ClInclude Include="Math\Vector\Vector2.h" />
     <ClInclude Include="Math\Vector\Vector3.h" />
     <ClInclude Include="Math\Vector\Vector4.h" />
