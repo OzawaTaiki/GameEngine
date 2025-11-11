@@ -6,6 +6,7 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif // _DEBUG
 #include <Debug/Debug.h>
+#include <System/Input/TextInputManager.h>
 
 #pragma comment (lib,"winmm.lib")
 
@@ -39,6 +40,13 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		// OSに対して，アプリの終了を伝える
 		PostQuitMessage(0);
 		return 0;
+
+	case WM_CHAR:
+        // キー入力（文字）
+        wchar_t c = static_cast<wchar_t>(wparam);
+        if (c >= 32 && c != 127)  // 制御文字は除外
+			TextInputManager::GetInstance()->PushChar(c);
+        return 0;
 	}
 
 	// 標準のメッセージ処理を行う
@@ -53,7 +61,7 @@ void WinApp::Initilize(const wchar_t* _title, uint32_t _width, uint32_t _height,
         Debug::Log("Failed to initialize COM library");
         assert(false && "Failed to initialize COM library");
 		return;
-    }	
+    }
 
 	//ウィンドウプロシージャ
 	wndClass_.lpfnWndProc = WindowProc;

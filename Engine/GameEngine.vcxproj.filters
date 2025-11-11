@@ -700,6 +700,12 @@
     <ClCompile Include="Math\Rect\Rect.cpp">
       <Filter>Math\Rect</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UITextBox.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Input\TextInputManager.cpp">
+      <Filter>System\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1199,6 +1205,12 @@
     </ClInclude>
     <ClInclude Include="Math\Rect\Rect.h">
       <Filter>Math\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextBox.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Input\TextInputManager.h">
+      <Filter>System\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

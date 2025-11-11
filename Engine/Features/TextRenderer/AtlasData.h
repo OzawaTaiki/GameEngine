@@ -52,9 +52,12 @@ public: /// アクセッサ
 
     // グリフ情報を取得
     GlyphInfo GetGlyph(wchar_t _character);
+    GlyphInfo GetGlyph(wchar_t _character) const;
 
     // テキストエリアを取得する
     Vector2 GetStringAreaSize(const std::wstring& _text, const Vector2& _scale);
+
+    Vector2 GetStringAreaSize(const std::wstring& _text, const Vector2& _scale) const;
 
 private:
 
