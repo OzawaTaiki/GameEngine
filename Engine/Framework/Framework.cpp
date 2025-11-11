@@ -65,7 +65,7 @@ void Framework::Initialize(const std::wstring& _winTitle)
     lineDrawer_->Initialize();
 
     input_ = Input::GetInstance();
-    input_->Initilize(winApp_);
+    input_->Initilize(winApp_); 
 
     particleManager_ = ParticleSystem::GetInstance();
     particleManager_->Initialize();

@@ -43,7 +43,10 @@ public:
 
     void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order = 0);
 
-    //void DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const Vector2& _pos, const Vector2& _piv, uint16_t _order = 0, const Vector4& _color = { 1,1,1,1 });
+
+    void DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
+
 
 private:
 
@@ -87,16 +90,17 @@ private:
         ResourceDataGroup* _res,
         uint16_t _order);
 
-    /*void DrawTextWithinRect(
+    void DrawTextWithinRect(
         const std::wstring& _text,
         const Rect& _rect,
+        const Vector2& _pos,
         const Vector2& _scale,
         float _rotate,
         const Vector2& _piv,
         const Vector4& _topColor,
         const Vector4& _bottomColor,
         ResourceDataGroup* _res,
-        uint16_t _order);*/
+        uint16_t _order);
 
     // アトラスデータを設定
     ResourceDataGroup* EnsureAtlasResources(AtlasData* _atlas);

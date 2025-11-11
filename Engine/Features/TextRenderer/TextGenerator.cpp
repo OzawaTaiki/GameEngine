@@ -21,8 +21,14 @@ void TextGenerator::Draw(const std::wstring& _text, const TextParam& _param, uin
 {
     renderer_->DrawText(_text, atlasData_, _param, _order);
 }
-//
-//void TextGenerator::Draw(const std::wstring& _text, const Rect& _rect, const TextParam& _param, uint16_t _order)
-//{
-//    renderer_->DrawText(_text, atlasData_, _rect, _param, _order);
-//}
+
+void TextGenerator::Draw(const std::wstring& _text, const Rect& _rect, const Vector2& _pos, const Vector2& _piv, const Vector4& _color, uint16_t _order)
+{
+    renderer_->DrawText(_text, atlasData_, _rect, _pos, _piv, _order, _color);
+}
+
+
+void TextGenerator::Draw(const std::wstring& _text, const Rect& _rect, const TextParam& _param, uint16_t _order)
+{
+    renderer_->DrawText(_text, atlasData_, _rect, _param, _order);
+}

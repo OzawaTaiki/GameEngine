@@ -105,10 +105,22 @@ void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const 
             DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, res, _order);
     }
 }
-//
-//void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order)
-//{
-//}
+void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const Vector2& _pos, const Vector2& _piv, uint16_t _order, const Vector4& _color)
+{
+    if (_text.empty()) return;
+    auto res = EnsureAtlasResources(_atlas);
+    DrawTextWithinRect(_text, _rect, _pos, { 1.0f, 1.0f }, 0.0f, _piv, _color, _color, res, _order);
+}
+
+void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order)
+{
+    if (_text.empty()) return;
+
+    auto res = EnsureAtlasResources(_atlas);
+
+    DrawTextWithinRect(_text, _rect, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.bottomColor, res, _order);
+
+}
 
 void TextRenderer::DrawText(
     const std::wstring& _text,
@@ -321,18 +333,118 @@ void TextRenderer::DrawTextWithOutline(
     }
 }
 
-//void TextRenderer::DrawTextWithinRect(
-//    const std::wstring& _text,
-//    const Rect& _rect,
-//    const Vector2& _scale,
-//    float _rotate,
-//    const Vector2& _piv,
-//    const Vector4& _topColor,
-//    const Vector4& _bottomColor,
-//    ResourceDataGroup* _res,
-//    uint16_t _order)
-//{
-//}
+void TextRenderer::DrawTextWithinRect(const std::wstring& _text, const Rect& _rect, const Vector2& _pos, const Vector2& _scale, float _rotate, const Vector2& _piv, const Vector4& _topColor, const Vector4& _bottomColor, ResourceDataGroup* _res, uint16_t _order)
+{
+    if (_text.empty()) return;
+
+    float currentX = 0;
+    float currentY = 0;
+
+    AtlasData* atlas = _res->atlasData_;
+    float fontSize = atlas->GetFontSize();
+    float fontAscent = atlas->GetFontAscent();
+
+    Vector2 anchor = _piv;
+    Vector2 stringArea = atlas->GetStringAreaSize(_text, _scale);
+    Vector2 pivot = { stringArea.x * anchor.x, stringArea.y * anchor.y };
+
+
+    Vector3 scale3D = { _scale.x, _scale.y, 1.0f };
+    Vector3 rotate3D = { 0.0f, 0.0f, _rotate };
+    Vector3 translate3D = { _pos.x, _pos.y, 0.0f };
+    Matrix4x4 transformMatrix = MakeAffineMatrix(scale3D, rotate3D, translate3D);
+
+
+    for (size_t i = 0; i < _text.length(); ++i)
+    {
+        wchar_t character = _text[i];
+
+        // 改行処理
+        if (character == L'\n')
+        {
+            currentX = 0;
+            currentY += fontSize;
+            continue;
+        }
+
+        // スペース処理
+        if (character == L' ')
+        {
+            currentX += fontSize * 0.3f;  // スペース幅
+            continue;
+        }
+
+        // グリフ情報取得
+        GlyphInfo glyph = atlas->GetGlyph(character);
+        if (!glyph.isValid)
+        {
+            continue;
+        }
+
+        // 文字の描画位置計算（ローカル座標）
+        float glyphX = (currentX + glyph.bearingX) * _scale.x - pivot.x;
+        float baseline = currentY + fontAscent;
+        float glyphY = (baseline + glyph.bearingY) * _scale.y - pivot.y;
+        float glyphW = glyph.width * _scale.x;
+        float glyphH = glyph.height * _scale.y;
+
+        // Rect範囲（ローカル座標）
+        Vector2 rectLeftTop = _rect.leftTop;
+        Vector2 rectRightBottom = _rect.GetRightBottom();
+
+        // グリフの矩形範囲
+        float glyphLeft = glyphX;
+        float glyphRight = glyphX + glyphW;
+        float glyphTop = glyphY;
+        float glyphBottom = glyphY + glyphH;
+
+        // 完全にrect外にある場合はスキップ
+        if (glyphRight < rectLeftTop.x || glyphLeft > rectRightBottom.x ||
+            glyphBottom < rectLeftTop.y || glyphTop > rectRightBottom.y)
+        {
+            currentX += glyph.advance;
+            continue;
+        }
+
+        // クリッピング計算
+        float clippedLeft = std::max(glyphLeft, rectLeftTop.x);
+        float clippedRight = std::min(glyphRight, rectRightBottom.x);
+        float clippedTop = std::max(glyphTop, rectLeftTop.y);
+        float clippedBottom = std::min(glyphBottom, rectRightBottom.y);
+
+        // UV座標の調整
+        float u0 = glyph.u0 + (glyph.u1 - glyph.u0) * (clippedLeft - glyphLeft) / glyphW;
+        float u1 = glyph.u1 - (glyph.u1 - glyph.u0) * (glyphRight - clippedRight) / glyphW;
+        float v0 = glyph.v0 + (glyph.v1 - glyph.v0) * (clippedTop - glyphTop) / glyphH;
+        float v1 = glyph.v1 - (glyph.v1 - glyph.v0) * (glyphBottom - clippedBottom) / glyphH;
+
+        // 四角形を2つの三角形で構成
+        std::vector<Batch2DRenderer::VertexData> quad=
+        {
+            {{clippedLeft,  clippedTop,    0.0f, 1.0f}, {u0, v0}, _topColor},
+            {{clippedRight, clippedTop,    0.0f, 1.0f}, {u1, v0}, _topColor},
+            {{clippedLeft,  clippedBottom, 0.0f, 1.0f}, {u0, v1}, _bottomColor},
+            {{clippedLeft,  clippedBottom, 0.0f, 1.0f}, {u0, v1}, _bottomColor},
+            {{clippedRight, clippedTop,    0.0f, 1.0f}, {u1, v0}, _topColor},
+            {{clippedRight, clippedBottom, 0.0f, 1.0f}, {u1, v1}, _bottomColor}
+        };
+
+        // アフィン変換行列を設定
+        _res->affineMatrices_.push_back(transformMatrix);
+        Batch2DRenderer::InstanceData data;
+        data.color = Vector4(1, 1, 1, 1);
+        data.textureIndex = _res->textureIndex_;
+        data.useTextureAlpha = 1; // テキスト
+        data.transform = transformMatrix;
+        data.uvTransform = Matrix4x4::Identity();
+
+        Batch2DRenderer::GetInstance()->AddInstace(data, quad, _order);
+
+        // 次の文字位置に移動
+        currentX += glyph.advance;
+    }
+}
+
 
 TextRenderer::ResourceDataGroup* TextRenderer::EnsureAtlasResources(AtlasData* _atlas)
 {

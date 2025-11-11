@@ -55,6 +55,9 @@ public:
     void OnFocusLost() override;
 
     std::string GetText() const;
+    void SetText(const std::string& _text);
+
+    void ImGuiContent() override;
 
 private:
 
@@ -94,6 +97,10 @@ private:
     /// </summary>
     /// <returns>カーソルのX座標</returns>
     float CalculateCursorXPosition() const;
+    /// <summary>
+    /// スクロールオフセット更新
+    /// </summary>
+    void UpdateScrollOffset();
 private:
 
     bool isAcceptingInput_= false;
@@ -107,6 +114,7 @@ private:
     TextGenerator textGenerator_;
 
     TextParam textParam_;
+    Vector2 textOffset_;
 
     float cursorTimer_ = 0.0f; // カーソル点滅タイマー
     float cursorBlinkInterval_ = 0.5f; // カーソル点滅間隔（秒）
