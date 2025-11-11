@@ -11,7 +11,7 @@ void UITextBox::Initialize(const std::string& _label, bool _regsterDebugWindow)
     InitializeTextGenerator(FontConfig());
     textParam_.pivot.x = 0.0f;
 
-    anchor_.y = 0.1f;
+    anchor_.x = 0.1f;
     anchor_.y = 0.5f;
     cursorTimer_ = 0.0f;
     cursorBlinkInterval_ = 0.5f;
@@ -174,11 +174,13 @@ void UITextBox::MoveCursor()
 
     if (input->IsKeyTriggered(DIK_LEFT))
     {
-        cursor_--;
+        if (cursor_ > 0)
+            cursor_--;
     }
     else if (input->IsKeyTriggered(DIK_RIGHT))
     {
-        cursor_++;
+        if (cursor_ < text_.length())
+            cursor_++;
     }
     else if (input->IsKeyTriggered(DIK_UP))
     {
