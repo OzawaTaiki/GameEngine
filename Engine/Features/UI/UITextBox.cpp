@@ -5,6 +5,11 @@
 #include <System/Input/Input.h>
 #include <System/Time/Time.h>
 
+namespace
+{
+Vector2 padding = { 10.0f, 3.0f };
+}
+
 void UITextBox::Initialize(const std::string& _label, bool _regsterDebugWindow)
 {
     UISelectable::Initialize(_label, _regsterDebugWindow);
@@ -15,6 +20,11 @@ void UITextBox::Initialize(const std::string& _label, bool _regsterDebugWindow)
     anchor_.y = 0.5f;
     cursorTimer_ = 0.0f;
     cursorBlinkInterval_ = 0.5f;
+    textOffset_ ={ 0.0f, 0.0f };
+
+    textRect_.size = GetSize();
+    Vector2 local = GetAnchor();
+    textRect_.leftTop = GetLeftTopPos() - textRect_.size * local;
 }
 
 void UITextBox::UpdateSelf()
@@ -42,6 +52,10 @@ void UITextBox::UpdateSelf()
     ProcessInput();
     // カーソルの点滅更新
     UpdateCursor();
+
+    textRect_.size = GetSize() - padding * 2;
+    textRect_.leftTop = -size_ * anchor_ + padding;
+
 }
 
 void UITextBox::Draw()
@@ -50,9 +64,12 @@ void UITextBox::Draw()
         return;
 
     UIInteractive::DrawSelf();
-    textParam_.position = GetWorldPos();
-    textGenerator_.Draw(text_, textParam_, GetOrder());
 
+    Rect scrolledRect = textRect_;
+    scrolledRect.leftTop.x -= textOffset_.x + padding.x;  // 文字列を左にスクロールする場合、rectを右にずらす
+
+    // textOffset_ は pos ではなく rect に適用
+    textGenerator_.Draw(text_, scrolledRect, GetWorldPos() + textOffset_ + padding, anchor_, { 1,1,1,1 }, GetOrder());
     // カーソルの描画
     DrawCursor();
     // | を挿入すると文字の位置がずれるため、別描画する
@@ -87,6 +104,26 @@ std::string UITextBox::GetText() const
     return ConvertString(text_);
 }
 
+void UITextBox::SetText(const std::string& _text)
+{
+    text_ = ConvertString(_text);
+    cursor_ = text_.length();
+}
+
+void UITextBox::ImGuiContent()
+{
+#ifdef _DEBUG
+    UISelectable::ImGuiContent();
+    ImGui::Separator();
+    textParam_.ImGui();
+    ImGui::DragFloat2("Text Offset", &textOffset_.x, 1.0f);
+    ImGui::Separator();
+    ImGui::Text("Text Box Content: %s", ConvertString(text_).c_str());
+    ImGui::Text("Cursor Position: %zu", cursor_);
+#endif // _DEBUG
+
+}
+
 void UITextBox::DrawCursor()
 {
     if (!showCursor_)
@@ -106,9 +143,9 @@ void UITextBox::DrawCursor()
         textStartPos.x -= stringArea.x * textParam_.pivot.x;
         textStartPos.y -= stringArea.y * textParam_.pivot.y;
 
-        // カーソルの絶対座標
+        // カーソルの絶対座標（スクロールオフセットを適用）
         Vector2 cursorPos = textStartPos;
-        cursorPos.x += cursorXOffset;
+        cursorPos.x += cursorXOffset + textOffset_.x;
         cursorPos.y += stringArea.y * 0.5f; // 中央揃え
 
         // カーソルを描画
@@ -139,6 +176,10 @@ void UITextBox::ProcessInput()
 
     // カーソル移動
     MoveCursor();
+
+    // スクロールオフセット更新
+    UpdateScrollOffset();
+
     // Enterキーでフォーカスを外す
     if (input->IsKeyTriggered(DIK_RETURN))
     {
@@ -155,7 +196,8 @@ void UITextBox::BackSpace()
         return;
     }
     text_.erase(cursor_ - 1, 1);
-    cursor_--;
+    if (cursor_ > 0)
+        cursor_--;
 }
 
 void UITextBox::Delete()
@@ -213,7 +255,7 @@ float UITextBox::CalculateCursorXPosition() const
 {
     // カーソルが先頭なら0
     if (cursor_ == 0)
-        return 0.0f;
+        return padding.x;
 
     const AtlasData* atlas = textGenerator_.GetAtlasData();
     if (!atlas)
@@ -229,7 +271,7 @@ float UITextBox::CalculateCursorXPosition() const
         // 改行処理
         if (character == L'\n')
         {
-            currentX = 0.0f;
+            currentX = padding.x; // 行頭に戻る
             continue;
         }
 
@@ -249,5 +291,39 @@ float UITextBox::CalculateCursorXPosition() const
         currentX += glyph.advance;
     }
 
-    return currentX * textParam_.scale.x;
+    return currentX * textParam_.scale.x + padding.x;
+}
+
+void UITextBox::UpdateScrollOffset()
+{
+    if (!isAcceptingInput_)
+        return;
+
+    // カーソルのローカルX座標（textOffset_適用前）
+    float cursorX = CalculateCursorXPosition();
+
+    // スクロール適用後の表示位置
+    float displayCursorX = cursorX + textOffset_.x;
+
+    // textRect_のサイズ
+    float rectWidth = textRect_.size.x;
+    float margin = padding.x;
+
+    // カーソルが右端を超えた場合
+    if (displayCursorX > rectWidth - margin)
+    {
+        textOffset_.x -= (displayCursorX - (rectWidth - margin));
+    }
+
+    // カーソルが左端より左にある場合
+    if (displayCursorX < margin)
+    {
+        textOffset_.x += (margin - displayCursorX);
+    }
+
+    // スクロール範囲制限（右端は無制限、左端は0まで）
+    if (textOffset_.x > 0.0f)
+    {
+        textOffset_.x = 0.0f;
+    }
 }

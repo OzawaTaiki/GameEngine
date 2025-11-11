@@ -21,7 +21,10 @@ public:
 
     void Draw(const std::wstring& _text, const TextParam& _param, uint16_t _order = 0);
 
-    //void Draw(const std::wstring& _text, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
+    void Draw(const std::wstring& _text, const Rect& _rect, const Vector2& _pos, const Vector2& _piv ={ 0.5f,0.5f}, const Vector4& _color = { 1,1,1,1 }, uint16_t _order = 0);
+
+    void Draw(const std::wstring& _text, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
+
 
     const AtlasData* GetAtlasData() const { return atlasData_; }
 private:
