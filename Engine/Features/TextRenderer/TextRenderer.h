@@ -22,6 +22,7 @@
 #ifdef DrawText
 #undef DrawText
 #endif // DrawText
+#include <Math/Rect/Rect.h>
 
 class TextRenderer
 {
@@ -42,7 +43,7 @@ public:
 
     void DrawText(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param, uint16_t _order = 0);
 
-
+    //void DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
 
 private:
 
@@ -85,6 +86,17 @@ private:
         float _outlineThickness,
         ResourceDataGroup* _res,
         uint16_t _order);
+
+    /*void DrawTextWithinRect(
+        const std::wstring& _text,
+        const Rect& _rect,
+        const Vector2& _scale,
+        float _rotate,
+        const Vector2& _piv,
+        const Vector4& _topColor,
+        const Vector4& _bottomColor,
+        ResourceDataGroup* _res,
+        uint16_t _order);*/
 
     // アトラスデータを設定
     ResourceDataGroup* EnsureAtlasResources(AtlasData* _atlas);

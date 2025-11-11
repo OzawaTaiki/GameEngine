@@ -2,6 +2,7 @@
 
 #include <Features/TextRenderer/AtlasData.h>
 #include <Features/TextRenderer/TextParam.h>
+#include <Math/Rect/Rect.h>
 
 
 #ifdef DrawText
@@ -20,6 +21,9 @@ public:
 
     void Draw(const std::wstring& _text, const TextParam& _param, uint16_t _order = 0);
 
+    //void Draw(const std::wstring& _text, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
+
+    const AtlasData* GetAtlasData() const { return atlasData_; }
 private:
 
     TextRenderer* renderer_ = nullptr;

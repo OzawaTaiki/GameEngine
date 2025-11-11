@@ -225,6 +225,51 @@ Vector2 AtlasData::GetStringAreaSize(const std::wstring& _text, const Vector2& _
 
 }
 
+Vector2 AtlasData::GetStringAreaSize(const std::wstring& _text, const Vector2& _scale) const
+{
+    Vector2 area = {};
+    if (_text.empty()) return area;
+    float currentX = 0.0f;
+    float currentY = 0.0f;
+    float maxWidth = 0.0f;
+    float lineHeight = fontSize_ * _scale.y;
+    for (size_t i = 0; i < _text.length(); ++i)
+    {
+        wchar_t character = _text[i];
+        // 改行処理
+        if (character == L'\n')
+        {
+            currentX = 0.0f;
+            currentY += lineHeight;
+            maxWidth = (std::max)(maxWidth, currentX);
+            continue;
+        }
+        // スペース処理
+        if (character == L' ')
+        {
+            currentX += fontSize_ * 0.3f * _scale.x;  // スペース幅
+            continue;
+        }
+        // グリフ情報取得
+        auto it = glyphs_.find(character);
+        if (it == glyphs_.end() || !it->second.isValid)
+        {
+            continue;
+        }
+        const GlyphInfo& glyph = it->second;
+        // 文字の幅を加算
+        currentX += glyph.advance * _scale.x;
+    }
+
+    area.x = currentX;
+    area.y = currentY + lineHeight;
+
+    if (area.x < 0.0f) area.x = 0.0f;
+    if (area.y < 0.0f) area.y = 0.0f;
+
+    return area;
+}
+
 GlyphInfo AtlasData::GetGlyph(wchar_t _character)
 {
     auto it = glyphs_.find(_character);
@@ -243,6 +288,19 @@ GlyphInfo AtlasData::GetGlyph(wchar_t _character)
     }
 
     return glyph;
+}
+
+GlyphInfo AtlasData::GetGlyph(wchar_t _character) const
+{
+    auto it = glyphs_.find(_character);
+    if (it != glyphs_.end())
+    {
+        return it->second;
+    }
+
+    GlyphInfo invalidGlyph = {};
+    invalidGlyph.isValid = false;
+    return invalidGlyph;
 }
 
 GlyphInfo AtlasData::GenerateGlyph(wchar_t _character)

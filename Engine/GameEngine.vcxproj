@@ -258,6 +258,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\UISlider.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
     <ClCompile Include="Features\UI\UIText.cpp" />
+    <ClCompile Include="Features\UI\UITextBox.cpp" />
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
@@ -282,6 +283,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
     <ClCompile Include="System\Input\Input.cpp" />
+    <ClCompile Include="System\Input\TextInputManager.cpp" />
     <ClCompile Include="System\Time\GameTime.cpp" />
     <ClCompile Include="System\Time\GameTimeChannel.cpp" />
     <ClCompile Include="System\Time\Stopwatch.cpp" />
@@ -420,6 +422,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\UISlider.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
     <ClInclude Include="Features\UI\UIText.h" />
+    <ClInclude Include="Features\UI\UITextBox.h" />
     <ClInclude Include="Features\UVTransform\IUVAnimation.h" />
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
@@ -449,6 +452,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Audio\VoiceCallback.h" />
     <ClInclude Include="System\Audio\VoiceInstance.h" />
     <ClInclude Include="System\Input\Input.h" />
+    <ClInclude Include="System\Input\TextInputManager.h" />
     <ClInclude Include="System\Time\GameTime.h" />
     <ClInclude Include="System\Time\GameTimeChannel.h" />
     <ClInclude Include="System\Time\Stopwatch.h" />

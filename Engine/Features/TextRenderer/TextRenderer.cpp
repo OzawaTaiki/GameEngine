@@ -105,6 +105,10 @@ void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const 
             DrawText(_text, _param.position, _param.scale, _param.rotate, _param.pivot, _param.topColor, _param.topColor, res, _order);
     }
 }
+//
+//void TextRenderer::DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order)
+//{
+//}
 
 void TextRenderer::DrawText(
     const std::wstring& _text,
@@ -316,6 +320,19 @@ void TextRenderer::DrawTextWithOutline(
         currentX += glyph.advance;
     }
 }
+
+//void TextRenderer::DrawTextWithinRect(
+//    const std::wstring& _text,
+//    const Rect& _rect,
+//    const Vector2& _scale,
+//    float _rotate,
+//    const Vector2& _piv,
+//    const Vector4& _topColor,
+//    const Vector4& _bottomColor,
+//    ResourceDataGroup* _res,
+//    uint16_t _order)
+//{
+//}
 
 TextRenderer::ResourceDataGroup* TextRenderer::EnsureAtlasResources(AtlasData* _atlas)
 {
