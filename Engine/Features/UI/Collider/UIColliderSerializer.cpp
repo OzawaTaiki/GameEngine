@@ -7,6 +7,7 @@
 #include "UIColliderFactory.h"
 
 #include <Features/Json/JsonSerializers.h>
+#include "UIConvexPolygonCollider.h"
 
 // ColliderTypeのJSON変換
 void to_json(json& _j, const ColliderType& _type)
@@ -28,6 +29,9 @@ void to_json(json& _j, const ColliderType& _type)
     case ColliderType::Quad:
         _j = "Quad";
         break;
+    case ColliderType::ConvexPolygon:
+        _j = "ConvexPolygon";
+        break;
     default:
         _j = "Unknown";
         break;
@@ -47,6 +51,8 @@ void from_json(const json& _j, ColliderType& _type)
         _type = ColliderType::Parallelogram;
     else if (typeStr == "Quad")
         _type = ColliderType::Quad;
+    else if (typeStr == "ConvexPolygon")
+        _type = ColliderType::ConvexPolygon;
     else
         _type = ColliderType::Rectangle; // デフォルト
 }
@@ -170,6 +176,22 @@ std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
         collider = std::move(quad);
         break;
     }
+    case ColliderType::ConvexPolygon:
+    {
+        auto convexPolygon = std::make_unique<UIConvexPolygonCollider>();
+        if (parameters.contains("localVertices") && parameters["localVertices"].is_array())
+        {
+            auto vertices = parameters["localVertices"];
+            std::vector<Vector2> localVertices;
+            for (const auto& vertex : vertices)
+            {
+                localVertices.push_back(vertex.get<Vector2>());
+            }
+            convexPolygon->SetLocalVertices(localVertices);
+        }
+        collider = std::move(convexPolygon);
+        break;
+    }
 
     default:
         // デフォルトは矩形
@@ -246,7 +268,19 @@ UIColliderData UIColliderData::FromCollider(const IUICollider* _collider, Collid
         };
         break;
     }
-
+    case ColliderType::ConvexPolygon:
+    {
+        auto convexPolygon = static_cast<const UIConvexPolygonCollider*>(_collider);
+        json vertices = json::array();
+        for (const auto& vertex : convexPolygon->GetLocalVertices())
+        {
+            vertices.push_back(vertex);
+        }
+        data.parameters = json{
+            {"localVertices", vertices}
+        };
+        break;
+    }
     default:
         data.parameters = json::object();
         break;

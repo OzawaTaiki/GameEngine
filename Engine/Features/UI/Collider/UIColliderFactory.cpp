@@ -8,6 +8,7 @@
 #ifdef _DEBUG
 #include <imgui.h>
 #endif
+#include "UIConvexPolygonCollider.h"
 
 // 静的メンバ変数の初期化
 Vector2 UIColliderFactory::tempSkew_ = { 0.0f, 0.0f };
@@ -16,24 +17,27 @@ std::unique_ptr<IUICollider> UIColliderFactory::Create(ColliderType type)
 {
     switch (type)
     {
-    case ColliderType::Rectangle:
-        return std::make_unique<UIRentangleCollider>();
+        case ColliderType::Rectangle:
+            return std::make_unique<UIRentangleCollider>();
 
-    case ColliderType::Circle:
-        return std::make_unique<UICircleCollider>();
+        case ColliderType::Circle:
+            return std::make_unique<UICircleCollider>();
 
-    case ColliderType::Ellipse:
-        return std::make_unique<UIEllipseCollider>();
+        case ColliderType::Ellipse:
+            return std::make_unique<UIEllipseCollider>();
 
-    case ColliderType::Parallelogram:
-        return std::make_unique<UIParallelogramCollider>(tempSkew_);
+        case ColliderType::Parallelogram:
+            return std::make_unique<UIParallelogramCollider>(tempSkew_);
 
-    case ColliderType::Quad:
-        return std::make_unique<UIQuadCollider>();
+        case ColliderType::Quad:
+            return std::make_unique<UIQuadCollider>();
 
-    default:
-        // デフォルトは矩形
-        return std::make_unique<UIRentangleCollider>();
+        case ColliderType::ConvexPolygon:
+            return std::make_unique<UIConvexPolygonCollider>();
+
+        default:
+            // デフォルトは矩形
+            return std::make_unique<UIRentangleCollider>();
     }
 }
 
@@ -41,28 +45,30 @@ const char* UIColliderFactory::GetTypeName(ColliderType type)
 {
     switch (type)
     {
-    case ColliderType::Rectangle:
-        return "Rectangle";
+        case ColliderType::Rectangle:
+            return "Rectangle";
 
-    case ColliderType::Circle:
-        return "Circle";
+        case ColliderType::Circle:
+            return "Circle";
 
-    case ColliderType::Ellipse:
-        return "Ellipse";
+        case ColliderType::Ellipse:
+            return "Ellipse";
 
-    case ColliderType::Parallelogram:
-        return "Parallelogram";
+        case ColliderType::Parallelogram:
+            return "Parallelogram";
 
-    case ColliderType::Quad:
-        return "Quad";
+        case ColliderType::Quad:
+            return "Quad";
+        case ColliderType::ConvexPolygon:
+            return "ConvexPolygon";
 
-    default:
-        return "Unknown";
+        default:
+            return "Unknown";
     }
 }
 
 std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
-    [[maybe_unused]]ColliderType& currentType,
+    [[maybe_unused]] ColliderType& currentType,
     [[maybe_unused]] const std::string& label)
 {
 #ifdef _DEBUG
@@ -74,7 +80,8 @@ std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
         GetTypeName(ColliderType::Circle),
         GetTypeName(ColliderType::Ellipse),
         GetTypeName(ColliderType::Parallelogram),
-        GetTypeName(ColliderType::Quad)
+        GetTypeName(ColliderType::Quad),
+        GetTypeName(ColliderType::ConvexPolygon)
     };
 
     int currentIndex = static_cast<int>(currentType);
