@@ -16,7 +16,6 @@ void UITextBox::Initialize(const std::string& _label, bool _regsterDebugWindow)
     InitializeTextGenerator(FontConfig());
     textParam_.pivot.x = 0.0f;
 
-    anchor_.x = 0.1f;
     anchor_.y = 0.5f;
     cursorTimer_ = 0.0f;
     cursorBlinkInterval_ = 0.5f;

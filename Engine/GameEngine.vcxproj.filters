@@ -696,7 +696,6 @@
     <ClCompile Include="Features\UI\Collider\UIColliderSerializer.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UICollisionManager.cpp" />
     <ClCompile Include="Math\Rect\Rect.cpp">
       <Filter>Math\Rect</Filter>
     </ClCompile>
@@ -705,6 +704,12 @@
     </ClCompile>
     <ClCompile Include="System\Input\TextInputManager.cpp">
       <Filter>System\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UICollisionManager.cpp">
+      <Filter>Features\UI\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UIConvexPolygonCollider.cpp">
+      <Filter>Features\UI\Collider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1211,6 +1216,9 @@
     </ClInclude>
     <ClInclude Include="System\Input\TextInputManager.h">
       <Filter>System\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\UIConvexPolygonCollider.h">
+      <Filter>Features\UI\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

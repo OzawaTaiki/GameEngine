@@ -14,6 +14,7 @@ enum class ColliderType
     Ellipse,        // 楕円形
     Parallelogram,  // 平行四辺形
     Quad,           // 四角形（4頂点自由設定）
+    ConvexPolygon,  // 凸多角形
 
     Max
 };
