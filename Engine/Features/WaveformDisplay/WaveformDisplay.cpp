@@ -385,7 +385,7 @@ void WaveformDisplay::CreateConstantBuffer(const Matrix4x4& _matVP)
     mapData_->displayHeight = bounds_.size.y;
     mapData_->displayWidth = bounds_.size.x;
     mapData_->startTime = startTime_;
-    mapData_->screenSize = Vector2(1280, 720);
+    mapData_->screenSize = WinApp::kWindowSize_;
     mapData_->matViewProj = _matVP;
 
 }

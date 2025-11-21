@@ -24,6 +24,13 @@ std::string TextInputManager::GetInputText()
     return result;
 }
 
+std::wstring TextInputManager::GetInputWText()
+{
+    std::wstring result = inputBuffer_;
+    inputBuffer_.clear();
+    return result;
+}
+
 void TextInputManager::Clear()
 {
     inputBuffer_.clear();

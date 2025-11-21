@@ -170,8 +170,14 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Collision\CollisionLayer\CollisionLayerManager.cpp" />
     <ClCompile Include="Features\Collision\Detector\CollisionDetector.cpp" />
     <ClCompile Include="Features\Collision\Manager\CollisionManager.cpp" />
-    <ClCompile Include="Features\Collision\RayCast\Ray.cpp" />
-    <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp" />
+    <ClCompile Include="Features\Collision\RayCast\Ray.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\Collision\RayCast\RayCollisionManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Features\Collision\Shapes.cpp" />
     <ClCompile Include="Features\Collision\SpiralHashGird\SpatialHashGrid.cpp" />
     <ClCompile Include="Features\Collision\Tree\Cell.cpp" />
@@ -279,6 +285,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Math\Vector\Vector2.cpp" />
     <ClCompile Include="Math\Vector\Vector3.cpp" />
     <ClCompile Include="Math\Vector\VectorFunction.cpp" />
+    <ClCompile Include="Settings\EngineSettings.cpp" />
     <ClCompile Include="System\Audio\Audio.cpp" />
     <ClCompile Include="System\Audio\AudioSystem.cpp" />
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
@@ -290,11 +297,13 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="System\Time\Stopwatch.cpp" />
     <ClCompile Include="System\Time\Time.cpp" />
     <ClCompile Include="System\Time\Time_MT.cpp" />
+    <ClCompile Include="UISliderWithInput.cpp" />
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Utility\FileDialog\FileDialog.cpp" />
     <ClCompile Include="Utility\StringUtils\StringUitls.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants\MathConstants.h" />
     <ClInclude Include="Core\DXCommon\CmdList\CommandList.h" />
     <ClInclude Include="Core\DXCommon\DXCommon.h" />
     <ClInclude Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.h" />
@@ -321,8 +330,14 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Collision\CollisionLayer\CollisionLayerManager.h" />
     <ClInclude Include="Features\Collision\Detector\CollisionDetector.h" />
     <ClInclude Include="Features\Collision\Manager\CollisionManager.h" />
-    <ClInclude Include="Features\Collision\RayCast\Ray.h" />
-    <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h" />
+    <ClInclude Include="Features\Collision\RayCast\Ray.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\Collision\RayCast\RayCollisionManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Features\Collision\Shapes.h" />
     <ClInclude Include="Features\Collision\SpiralHashGird\SpatialHashGrid.h" />
     <ClInclude Include="Features\Collision\Tree\Cell.h" />
@@ -448,6 +463,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Math\Vector\Vector3.h" />
     <ClInclude Include="Math\Vector\Vector4.h" />
     <ClInclude Include="Math\Vector\VectorFunction.h" />
+    <ClInclude Include="Settings\EngineSettings.h" />
     <ClInclude Include="System\Audio\Audio.h" />
     <ClInclude Include="System\Audio\AudioSystem.h" />
     <ClInclude Include="System\Audio\SoundInstance.h" />
@@ -460,6 +476,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Time\Stopwatch.h" />
     <ClInclude Include="System\Time\Time.h" />
     <ClInclude Include="System\Time\Time_MT.h" />
+    <ClInclude Include="UISliderWithInput.h" />
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Utility\FileDialog\FileDialog.h" />
     <ClInclude Include="Utility\StringUtils\StringUitls.h" />

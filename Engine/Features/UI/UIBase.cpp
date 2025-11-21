@@ -5,6 +5,12 @@
 #include <Debug/ImGuiManager.h>
 #include <Debug/ImGuiDebugManager.h>
 
+namespace
+{
+Vector2 defaultPosition = { 100.0f, 100.0f };
+Vector2 defaultSize     = { 100.0f, 100.0f };
+}
+
 UIBase::UIBase()
 {
 }
@@ -29,6 +35,8 @@ void UIBase::Initialize(const std::string& _label, [[maybe_unused]] bool _regste
     jsonBinder_ = std::make_unique<JsonBinder>(_label, "Resources/Data/UI/");
 
     color_ = { 1.0f,1.0f ,1.0f ,1.0f };
+    position_ = defaultPosition;
+    size_ = defaultSize;
 
     jsonBinder_->RegisterVariable(label_ + "_pos", &position_);
     jsonBinder_->RegisterVariable(label_ + "_size", &size_);

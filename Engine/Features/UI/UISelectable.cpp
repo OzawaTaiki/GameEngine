@@ -2,6 +2,15 @@
 #include <Debug/Debug.h>
 #include <System/Input/Input.h>
 
+namespace
+{
+Vector4 initDefaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+Vector4 initHoverColor   = { 0.8f, 0.8f, 0.8f, 1.0f };
+Vector4 initPressedColor = { 0.6f, 0.6f, 0.6f, 1.0f };
+Vector4 initSelectedColor= { 0.7f, 0.7f, 1.0f, 1.0f };
+Vector4 initFocusedColor = { 1.0f, 1.0f, 0.8f, 1.0f };
+}
+
 UISelectable::UISelectable()
 {
 }
@@ -9,6 +18,13 @@ UISelectable::UISelectable()
 void UISelectable::Initialize(const std::string& _label, bool _regsterDebugWindow)
 {
     UIInteractive::Initialize(_label, _regsterDebugWindow);
+
+    // 初期色設定
+    defaultColor_  = initDefaultColor;
+    hoverColor_    = initHoverColor;
+    pressedColor_  = initPressedColor;
+    selectedColor_ = initSelectedColor;
+    focusedColor_  = initFocusedColor;
 
     jsonBinder_->RegisterVariable("defaultColor", &defaultColor_);
     jsonBinder_->RegisterVariable("hoverColor", &hoverColor_);

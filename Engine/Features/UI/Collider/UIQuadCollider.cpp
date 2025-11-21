@@ -36,10 +36,10 @@ void UIQuadCollider::UpdateCache(const UIBase* _uiBase)
         Vector2 leftTop = _uiBase->GetLeftTopPos();
         Vector2 rightBottom = _uiBase->GetRightBottomPos();
 
-        worldCorners_[0] = { leftTop.x, rightBottom.y };      // 左下
-        worldCorners_[1] = { rightBottom.x, rightBottom.y };  // 右下
-        worldCorners_[2] = { rightBottom.x, leftTop.y };      // 右上
-        worldCorners_[3] = { leftTop.x, leftTop.y };          // 左上
+        worldCorners_[0] = { leftTop.x, leftTop.y };          // 左上
+        worldCorners_[1] = { rightBottom.x, leftTop.y };      // 右上
+        worldCorners_[2] = { rightBottom.x, rightBottom.y };  // 右下
+        worldCorners_[3] = { leftTop.x, rightBottom.y };      // 左下
     }
     else
     {

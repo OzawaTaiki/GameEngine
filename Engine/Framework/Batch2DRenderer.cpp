@@ -2,6 +2,7 @@
 
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
+#include <Core/WinApp/WinApp.h>
 #include <Debug/Debug.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Framework/LayerSystem/LayerSystem.h>
@@ -118,7 +119,7 @@ void Batch2DRenderer::CreateViewProjectionResource()
 
     viewProjectionResource_->Map(0, nullptr, reinterpret_cast<void**>(&viewProjectionMap_));
 
-    *viewProjectionMap_ = MakeOrthographicMatrix(0, 0, 1280, 720, -1.0f, 1.0f);
+    *viewProjectionMap_ = MakeOrthographicMatrix(0, 0, WinApp::kWindowSize_.x, WinApp::kWindowSize_.y, -1.0f, 1.0f);
 }
 
 void Batch2DRenderer::Reset()

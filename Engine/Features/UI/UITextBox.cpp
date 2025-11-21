@@ -42,9 +42,8 @@ void UITextBox::UpdateSelf()
     std::string inputText = TextInputManager::GetInstance()->GetInputText();
     if (!inputText.empty())
     {
-        std::wstring wideInput = ConvertString(inputText);
-        text_.insert(cursor_, wideInput);  // カーソル位置に挿入
-        cursor_ += wideInput.length();     // カーソルを進める
+        pendingText_.insert(cursor_, inputText);  // カーソル位置に挿入
+        cursor_ += inputText.length();     // カーソルを進める
     }
 
     // 入力処理
@@ -68,7 +67,7 @@ void UITextBox::Draw()
     scrolledRect.leftTop.x -= textOffset_.x + padding.x;  // 文字列を左にスクロールする場合、rectを右にずらす
 
     // textOffset_ は pos ではなく rect に適用
-    textGenerator_.Draw(text_, scrolledRect, GetWorldPos() + textOffset_ + padding, anchor_, { 1,1,1,1 }, GetOrder());
+    textGenerator_.Draw(ConvertString(pendingText_), scrolledRect, GetWorldPos() + textOffset_ + padding, anchor_, { 1,1,1,1 }, GetOrder());
     // カーソルの描画
     DrawCursor();
     // | を挿入すると文字の位置がずれるため、別描画する
@@ -80,6 +79,8 @@ void UITextBox::OnClick()
     textInput->Clear();
     textInput->SetAcceptingInput(true);
     isAcceptingInput_ = true;
+
+    pendingText_ = confirmedText_;
 }
 
 void UITextBox::OnFocusGained()
@@ -88,6 +89,8 @@ void UITextBox::OnFocusGained()
     textInput->Clear();
     textInput->SetAcceptingInput(true);
     isAcceptingInput_ = true;
+
+    pendingText_ = confirmedText_;
 }
 
 void UITextBox::OnFocusLost()
@@ -96,17 +99,26 @@ void UITextBox::OnFocusLost()
     textInput->SetAcceptingInput(false);
     isAcceptingInput_ = false;
     showCursor_ = false;
+
+    if (ValidateInputChar())
+    {
+        // 有効なら確定
+        confirmedText_ = pendingText_;
+    }
+    else
+    {
+        // 無効ならキャンセル
+        pendingText_ = confirmedText_;
+        cursor_ = pendingText_.length();
+    }
 }
 
-std::string UITextBox::GetText() const
-{
-    return ConvertString(text_);
-}
 
 void UITextBox::SetText(const std::string& _text)
 {
-    text_ = ConvertString(_text);
-    cursor_ = text_.length();
+    pendingText_ = _text;
+    confirmedText_ = _text;
+    cursor_ = pendingText_.length();
 }
 
 void UITextBox::ImGuiContent()
@@ -117,10 +129,12 @@ void UITextBox::ImGuiContent()
     textParam_.ImGui();
     ImGui::DragFloat2("Text Offset", &textOffset_.x, 1.0f);
     ImGui::Separator();
-    ImGui::Text("Text Box Content: %s", ConvertString(text_).c_str());
     ImGui::Text("Cursor Position: %zu", cursor_);
+    ImGui::Separator();
+    ImGui::Text("Pending Text: %s", ConvertString(pendingText_).c_str());
+    ImGui::Text("Confirmed Text: %s", ConvertString(confirmedText_).c_str());
+    ImGui::Text("Input Text Type: %s", GetInputTextTypeString().c_str());
 #endif // _DEBUG
-
 }
 
 void UITextBox::DrawCursor()
@@ -135,7 +149,7 @@ void UITextBox::DrawCursor()
         float cursorXOffset = CalculateCursorXPosition();
 
         // テキスト全体のサイズを取得（pivot補正用）
-        Vector2 stringArea = atlas->GetStringAreaSize(text_, textParam_.scale);
+        Vector2 stringArea = atlas->GetStringAreaSize(ConvertString(pendingText_), textParam_.scale);
 
         // テキスト開始位置（pivotを考慮）
         Vector2 textStartPos = GetWorldPos();
@@ -154,7 +168,6 @@ void UITextBox::DrawCursor()
 
         textGenerator_.Draw(L"|", cursorParam, GetOrder() + 1);
     }
-
 }
 
 void UITextBox::ProcessInput()
@@ -183,30 +196,32 @@ void UITextBox::ProcessInput()
     if (input->IsKeyTriggered(DIK_RETURN))
     {
         OnFocusLost();
+        if (onTextConfirmed_)
+            onTextConfirmed_();
     }
 
 }
 
 void UITextBox::BackSpace()
 {
-    size_t len = text_.length();
+    size_t len = pendingText_.length();
     if (len == 0 || cursor_ == 0)
     {
         return;
     }
-    text_.erase(cursor_ - 1, 1);
+    pendingText_.erase(cursor_ - 1, 1);
     if (cursor_ > 0)
         cursor_--;
 }
 
 void UITextBox::Delete()
 {
-    size_t len = text_.length();
+    size_t len = pendingText_.length();
     if (len == 0 || cursor_ >= len)
     {
         return;
     }
-    text_.erase(cursor_, 1);
+    pendingText_.erase(cursor_, 1);
 }
 
 void UITextBox::MoveCursor()
@@ -220,7 +235,7 @@ void UITextBox::MoveCursor()
     }
     else if (input->IsKeyTriggered(DIK_RIGHT))
     {
-        if (cursor_ < text_.length())
+        if (cursor_ < pendingText_.length())
             cursor_++;
     }
     else if (input->IsKeyTriggered(DIK_UP))
@@ -229,10 +244,10 @@ void UITextBox::MoveCursor()
     }
     else if (input->IsKeyTriggered(DIK_DOWN))
     {
-        cursor_ = text_.length();
+        cursor_ = pendingText_.length();
     }
 
-    cursor_ = std::clamp(cursor_, size_t(0), text_.length());
+    cursor_ = std::clamp(cursor_, size_t(0), pendingText_.length());
 }
 
 void UITextBox::InitializeTextGenerator(const FontConfig& _fontConfig)
@@ -250,6 +265,7 @@ void UITextBox::UpdateCursor()
         showCursor_ = !showCursor_;
     }
 }
+
 float UITextBox::CalculateCursorXPosition() const
 {
     // カーソルが先頭なら0
@@ -263,9 +279,9 @@ float UITextBox::CalculateCursorXPosition() const
     float currentX = 0.0f;
     float fontSize = atlas->GetFontSize();
     // TextRenderer::DrawText() と同じロジック
-    for (size_t i = 0; i < cursor_ && i < text_.length(); ++i)
+    for (size_t i = 0; i < cursor_ && i < pendingText_.length(); ++i)
     {
-        wchar_t character = text_[i];
+        wchar_t character = pendingText_[i];
 
         // 改行処理
         if (character == L'\n')
@@ -324,5 +340,117 @@ void UITextBox::UpdateScrollOffset()
     if (textOffset_.x > 0.0f)
     {
         textOffset_.x = 0.0f;
+    }
+}
+
+bool UITextBox::ValidateInputChar()
+{
+    if (pendingText_.empty())
+        return true;
+
+    switch (inputTextType_)
+    {
+        case InputTextType::Text:
+        {
+            return true;
+        }
+        case InputTextType::Integer:
+        {
+            char c = pendingText_.front();
+            size_t i = 0;
+            if (c == '-' || c == '+')
+                i = 1;// 符号は先頭のみ許可
+
+            for (; i < pendingText_.length(); ++i)
+            {
+                if (!std::isdigit(pendingText_[i]))
+                {
+                    return false;// 数字以外が含まれている
+                }
+            }
+            return true;
+        }
+        case InputTextType::Float:
+        {
+            char c = pendingText_.front();
+            size_t i = 0;
+            bool decimalPointFound = false;
+            if (c == '-' || c == '+')
+                i = 1; // 符号は先頭のみ許可
+            for (; i < pendingText_.length(); ++i)
+            {
+                if (pendingText_[i] == '.')
+                {
+                    if (decimalPointFound)
+                        return false; // 2つ目の小数点は不可
+                    decimalPointFound = true;
+                }
+                else if (!std::isdigit(pendingText_[i]))
+                {
+                    return false; // 数字以外が含まれている
+                }
+            }
+            return true;
+        }
+        case InputTextType::FileName:
+        {
+            // ファイル名に使用できない文字をチェック
+            const std::string invalidChars = R"(\/:*?"<>|)";
+            for (char c : pendingText_)
+            {
+                if (invalidChars.find(c) != std::string::npos)
+                {
+                    return false; // 無効な文字が含まれている
+                }
+            }
+            return true;
+        }
+        case InputTextType::Alphabet:
+        {
+            for (char c : pendingText_)
+            {
+                if (!std::isalpha(static_cast<unsigned char>(c)))
+                {
+                    return false; // 英字以外が含まれている
+                }
+            }
+            return true;
+        }
+        case InputTextType::Numeric:
+        {
+            for (char c : pendingText_)
+            {
+                if (!std::isdigit(static_cast<unsigned char>(c)))
+                {
+                    return false; // 数字以外が含まれている
+                }
+            }
+            return true;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+}
+
+std::string UITextBox::GetInputTextTypeString() const
+{
+    switch (inputTextType_)
+    {
+        case InputTextType::Text:
+            return "Text";
+        case InputTextType::Integer:
+            return "Integer";
+        case InputTextType::Float:
+            return "Float";
+        case InputTextType::FileName:
+            return "FileName";
+        case InputTextType::Alphabet:
+            return "Alphabet";
+        case InputTextType::Numeric:
+            return "Numeric";
+        default:
+            return "Unknown";
     }
 }

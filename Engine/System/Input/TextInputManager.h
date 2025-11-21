@@ -14,6 +14,7 @@ public:
     void SetAcceptingInput(bool accepting) { isAcceptingInput_ = accepting; }
 
     std::string GetInputText();
+    std::wstring GetInputWText();
 
     void Clear();
 

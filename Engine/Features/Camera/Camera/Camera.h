@@ -3,6 +3,7 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Matrix/Matrix4x4.h>
 #include <System/Time/GameTime.h>
+#include <Core/WinApp/WinApp.h>
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -20,7 +21,7 @@ public:
     Camera() = default;
     ~Camera() = default;
 
-    void Initialize(CameraType _cameraType = CameraType::Perspective, const Vector2& _winSize = { 1280.0f, 720.0f });
+    void Initialize(CameraType _cameraType = CameraType::Perspective, const Vector2& _winSize = WinApp::kWindowSize_);
     void Update();
     void Draw();
 
@@ -62,7 +63,7 @@ public:
     Vector3 translate_ = { 0.0f,0.0f ,-20.0f };
 
     float fovY_ = 0.45f;
-    float aspectRatio_ = 16.0f / 9.0f;
+    float aspectRatio_ = WinApp::kWindowSize_.x / WinApp::kWindowSize_.y;
     float nearClip_ = 0.1f;
     float farClip_ = 1000.0f;
 
@@ -80,8 +81,8 @@ private:
 private:
     // ortho用
     Vector2 LeftTop_ = { 0.0f, 0.0f }; // 左上座標
-    Vector2 RightBottom_ = { 1280.0f, 720.0f }; // 右下座標
-    Vector2 winSize_ = { 1280.0f, 720.0f }; // 正射影投影のサイズ
+    Vector2 RightBottom_ = WinApp::kWindowSize_; // 右下座標
+    Vector2 winSize_ = WinApp::kWindowSize_; // 正射影投影のサイズ
 
     // シェイク用変数たち
     bool shaking_ = false;

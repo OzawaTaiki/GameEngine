@@ -13,7 +13,7 @@ public:
     UISlider()  = default;
     ~UISlider() = default;
 
-    void Initialize(const std::string& _label, float _minValue = 0.0f, float _maxValue = 1.0f);
+    void Initialize(const std::string& _label, float _minValue = 0.0f, float _maxValue = 1.0f, bool _regsterDebugWindow = true);
 
     void UpdateSelf() override;
     void Draw() override;

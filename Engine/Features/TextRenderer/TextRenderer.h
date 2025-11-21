@@ -23,6 +23,7 @@
 #undef DrawText
 #endif // DrawText
 #include <Math/Rect/Rect.h>
+#include <Core/WinApp/WinApp.h>
 
 class TextRenderer
 {
@@ -32,7 +33,7 @@ public:
 public:
 
 
-    void Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const Vector2& _windowSize = { 1280,720 });
+    void Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const Vector2& _windowSize = WinApp::kWindowSize_);
     void Finalize();
 
     void BeginFrame();

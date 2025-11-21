@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <Framework/LayerSystem/LayerSystem.h>
+#include <Core/WinApp/WinApp.h>
 
 EffectEditorScene::~EffectEditorScene()
 {
@@ -63,7 +64,7 @@ void EffectEditorScene::Initialize([[maybe_unused]] SceneData* _sceneData)
 
     uint32_t texture = TextureManager::GetInstance()->Load("white.png");
     backgroundSprite_ = Sprite::Create("particle_Editor_back", texture,{0.0f,0.0f });
-    backgroundSprite_->scale_ = { 1280.0f,720.0f };
+    backgroundSprite_->scale_ = WinApp::kWindowSize_;
 
     LayerSystem::Initialize();
     LayerSystem::CreateLayer("EffectEditorScene_Layer_0", 0, PSOFlags::BlendMode::Normal);
