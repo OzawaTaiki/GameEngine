@@ -8,8 +8,8 @@
 
 #include <Debug/ImGuiDebugManager.h>
 
-uint32_t Sprite::winWidth_ = 1280;
-uint32_t Sprite::winHeight_ = 720;
+uint32_t Sprite::winWidth_ = WinApp::kWindowWidth_;
+uint32_t Sprite::winHeight_ = WinApp::kWindowHeight_;
 
 Sprite::Sprite(const std::string& _name, bool _debugWinddow)
 {

@@ -7,13 +7,18 @@
 #include <algorithm>
 #include <Utility/ConvertString/ConvertString.h>
 
-void UISlider::Initialize(const std::string& _label, float _minValue, float _maxValue)
+namespace
 {
-    UIBase::Initialize(_label, true);
+
+}
+
+void UISlider::Initialize(const std::string& _label, float _minValue, float _maxValue, bool _regsterDebugWindow)
+{
+    UIBase::Initialize(_label, _regsterDebugWindow);
 
     minValue_ = _minValue;
     maxValue_ = _maxValue;
-    value_ = _minValue;
+    value_ = (_minValue + _maxValue) * 0.5f;
     prevValue_ = value_;
 
     // JsonBinderに登録

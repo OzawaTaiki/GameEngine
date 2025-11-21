@@ -31,8 +31,6 @@ void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
 
 void Camera::Update()
 {
-
-
     if (shaking_)
     {
         UpdateShake();

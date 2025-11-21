@@ -4,6 +4,16 @@
 #include <Features/UI/UISelectable.h>
 #include <Math/Rect/Rect.h>
 
+enum class InputTextType
+{
+    Text,       // 全ての文字
+    Integer,    // 整数のみ
+    Float,      // 浮動小数点数
+    FileName,   // ファイル名に使えない文字以外
+    Alphabet,   // 英字のみ
+    Numeric     // 数字のみ
+};
+
 /// <summary>
 /// テキストボックスUI
 /// 背景なし、テキスト入力可能なUI
@@ -13,7 +23,8 @@ class UITextBox : public UISelectable
 {
 public:
 
-    UITextBox() = default;
+    UITextBox(InputTextType _inputTextType = InputTextType::Text)
+        : inputTextType_(_inputTextType){ }
     ~UITextBox() override = default;
 
     /// <summary>
@@ -34,6 +45,20 @@ public:
     void Draw() override;
 
     /// <summary>
+    /// テキストを任意の型で取得
+    /// </summary>
+    /// <typeparam name="T">期待する型型</typeparam>
+    /// <param name="outValue">出力先変数</param>
+    /// <returns>変換成功ならtrue</returns>
+    template<typename T>
+    bool GetValueAs(T& outValue) const
+    {
+        std::istringstream iss(confirmedText_);
+        iss >> outValue;
+        return !iss.fail() && iss.eof();  // 変換成功 & 全文字列消費
+    }
+
+    /// <summary>
     /// テキスト表示領域の設定
     /// </summary>
     /// <param name="_rect">表示領域</param>
@@ -48,14 +73,33 @@ public:
     void SetTextParam(const TextParam& _param) { textParam_ = _param; }
     TextParam& GetTextParam() { return textParam_; }
 
+    // ==================
+    // コールバック
+    // ==================
     void OnClick() override;
 
     void OnFocusGained() override;
 
     void OnFocusLost() override;
 
-    std::string GetText() const;
+    void SetOnConfirmed(const std::function<void()>& _callback) { onTextConfirmed_ = _callback; }
+
+
+    /// <summary>
+    /// 確定テキストの取得
+    /// </summary>
+    /// <returns>確定テキスト</returns>
+    std::string GetConfirmedText() const { return confirmedText_; }
+
+    /// <summary>
+    /// テキストの設定
+    /// </summary>
+    /// <param name="_text">設定テキスト</param>
     void SetText(const std::string& _text);
+    /// 初期化時などに使用する
+
+    template<typename T>
+    void SetValue(T _value);
 
     void ImGuiContent() override;
 
@@ -101,13 +145,29 @@ private:
     /// スクロールオフセット更新
     /// </summary>
     void UpdateScrollOffset();
+
+    /// <summary>
+    /// 入力文字の検証
+    /// </summary>
+    /// <returns>>有効な文字ならtrue</returns>
+    bool ValidateInputChar();
+
+    // ヘルパー
+    std::string GetInputTextTypeString() const;
+
+
 private:
 
     bool isAcceptingInput_= false;
 
     Rect textRect_;
 
-    std::wstring text_;
+    // 確定前のテキスト
+    std::string pendingText_;
+    // 確定テキスト
+    std::string confirmedText_;
+
+    InputTextType inputTextType_ = InputTextType::Text;
 
     size_t cursor_ = 0;
 
@@ -120,4 +180,41 @@ private:
     float cursorBlinkInterval_ = 0.5f; // カーソル点滅間隔（秒）
     bool showCursor_ = true; // カーソル表示フラグ
 
+
+    std::function<void()> onTextConfirmed_; // テキスト確定時コールバック
 };
+
+template<typename T>
+inline void UITextBox::SetValue(T _value)
+{
+    std::string formattedText;
+
+    switch (inputTextType_)
+    {
+        case InputTextType::Integer:
+        case InputTextType::Numeric:
+        {
+            // 整数としてフォーマット
+            formattedText = std::to_string(static_cast<int>(_value));
+            break;
+        }
+        case InputTextType::Float:
+        {
+            // 浮動小数点数としてフォーマット
+            std::ostringstream oss;
+            oss << _value;
+            formattedText = oss.str();
+            break;
+        }
+        default:
+        {
+            // その他の型は文字列化
+            formattedText = std::to_string(_value);
+            break;
+        }
+    }
+
+    pendingText_ = formattedText;
+    confirmedText_ = formattedText;
+    cursor_ = pendingText_.length();
+}
