@@ -20,8 +20,9 @@ void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const Wave
     CreatePipeline();
     CreateConstantBuffer(_matVP);
     CreateVertexBuffer();
-
-    SetSampleRate(_soundInstance->GetSampleRate());
+    float samapleRate = 120.0f;
+    if (_soundInstance) samapleRate = _soundInstance->GetSampleRate();
+    SetSampleRate(samapleRate);
 
     lineDrawer_ = LineDrawer::GetInstance();
 
@@ -70,7 +71,13 @@ void WaveformDisplay::SetSampleRate(float _sampleRate)
 
 void WaveformDisplay::SetSoundInstance(const SoundInstance* _soundInstance)
 {
-    soundInstance_ = _soundInstance;    
+    if (!_soundInstance)
+        return;
+
+    if (soundInstance_ == _soundInstance)
+        return;
+
+    soundInstance_ = _soundInstance;
     SetSampleRate(_soundInstance->GetSampleRate());
 
     waveformCache_ = WaveformAnalyzer::ExtractRawWaveformMaxMin(soundInstance_, bounds_.size.x, displayTimeWindow_);

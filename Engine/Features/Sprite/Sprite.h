@@ -41,10 +41,14 @@ public:
     void SetAnchor(const Vector2& _anchor);
 
     void SetSize(const Vector2& _size);
+    Vector2 GetSize() const { return scale_ * defaultTextureSize_; }
     void SetColor(const Vector4& _color);
 
     void SetUVSize(const Vector2& _size);
     void SetLeftTop(const Vector2& _leftTop);
+
+    // スプライト矩形とマウスポインタとの衝突判定
+    bool IsHitTest(const Vector2& _mousePos) const;
 
     void SetOrder(int16_t _order) { order_ = _order; }
     uint16_t GetOrder() const { return order_; }

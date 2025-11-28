@@ -125,6 +125,18 @@ void Sprite::SetLeftTop(const Vector2& _leftTop)
     isDirty_ = true;
 }
 
+bool Sprite::IsHitTest(const Vector2& _mousePos) const
+{
+    // スプライトの四隅のワールド座標を計算
+    Vector2 size = defaultTextureSize_ * scale_;
+    Vector2 topLeft = translate_ - Vector2(anchor_.x * size.x, (1.0f - anchor_.y) * size.y);
+    Vector2 bottomRight = topLeft + size;
+
+    // マウスポインタがスプライトの矩形内にあるか判定
+    return (_mousePos.x >= topLeft.x && _mousePos.x <= bottomRight.x &&
+            _mousePos.y >= topLeft.y && _mousePos.y <= bottomRight.y);
+}
+
 void Sprite::UpdateVertexData()
 {
     if (!isVertexDirty_)

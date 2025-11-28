@@ -50,6 +50,9 @@ public:
     /// <returns></returns>
     std::string AddColliderDebugWindow(const std::string& _name, std::function<void()> _func);
 
+    bool ChangeAllWindowVisible();
+    void HideAllWindow() {isAllWindowHidden_ = true;}
+    void ShowAllWindow() {isAllWindowHidden_ = false; }
 
     bool RegisterMenuItem(const std::string& _name, std::function<void(bool*)> _func);
 
