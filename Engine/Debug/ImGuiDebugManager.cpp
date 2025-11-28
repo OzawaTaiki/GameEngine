@@ -180,6 +180,12 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
     return name;
 }
 
+bool ImGuiDebugManager::ChangeAllWindowVisible()
+{
+    isAllWindowHidden_ = !isAllWindowHidden_;
+    return isAllWindowHidden_;
+}
+
 bool ImGuiDebugManager::RegisterMenuItem(const std::string& _name, std::function<void(bool*)> _func)
 {
     if (_func == nullptr)
