@@ -253,7 +253,7 @@ void LineDrawer::Draw()
     }
 }
 
-void LineDrawer::DebugDraw(const Vector2& start, const Vector2& end, const Vector4& color)
+void LineDrawer::DebugDraw([[maybe_unused]] const Vector2& start, [[maybe_unused]] const Vector2& end, [[maybe_unused]] const Vector4& color)
 {
 #ifdef _DEBUG
     LayerID id = LayerSystem::GetCurrentLayerID();
@@ -269,7 +269,7 @@ void LineDrawer::DebugDraw(const Vector2& start, const Vector2& end, const Vecto
 #endif //_DEBUG
 }
 
-void LineDrawer::DebugDrawCircle(const Vector2& center, float radius, const Vector4& color)
+void LineDrawer::DebugDrawCircle([[maybe_unused]] const Vector2& center, [[maybe_unused]]float radius, [[maybe_unused]] const Vector4& color)
 {
 #ifdef _DEBUG
     LayerID id = LayerSystem::GetCurrentLayerID();
