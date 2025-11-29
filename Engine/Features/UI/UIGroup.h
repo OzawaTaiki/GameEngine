@@ -33,6 +33,10 @@ public:
     void SetFocused(UISelectable* _element) { navigator_.SetFocused(_element); }
     UISelectable* GetFocused() const { return navigator_.GetFocused(); }
 
+    UIBase* GetElementByLabel(const std::string& _label) const;
+    UIBase* GetElementByIndex(size_t _index) const;
+    std::vector<std::shared_ptr<UIBase>> GetAllElements() const { return uiElements_; }
+
     // 要素の生成
     std::shared_ptr<UIButton> CreateButton(const std::string& _label, const std::wstring& _text = L"");
     std::shared_ptr<UISprite> CreateSprite(const std::string& _label, const std::wstring& _text = L"");

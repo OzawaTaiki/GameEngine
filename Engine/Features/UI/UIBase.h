@@ -77,10 +77,11 @@ public:
     void SetTextureNameAndLoad(const std::string& _textureName);
 
     // UV変換
-    void SetUVTranslate(const Vector2& _uvTranslate) { sprite_->uvTranslate_ = _uvTranslate; }
-    void SetUVScale(const Vector2& _uvScale) { sprite_->uvScale_ = _uvScale; }
-    void SetUVRotate(float _uvRotate) { sprite_->uvRotate_ = _uvRotate; }
+    void SetUVTranslate(const Vector2& _uvTranslate) { uvTransform_.SetOffset(_uvTranslate); }
+    void SetUVScale(const Vector2& _uvScale) { uvTransform_.SetScale(_uvScale); }
+    void SetUVRotate(float _uvRotate) { uvTransform_.SetRotation(_uvRotate); }
 
+    UVTransform& GetUVTransform() { return uvTransform_; }
 
     const std::string& GetLabel() const { return label_; }
 
@@ -105,6 +106,8 @@ protected:
     Vector2 size_       = { 0,0 };
     float   rotate_     =   0.0f;
     Vector2 anchor_     = { 0,0 };
+
+    UVTransform uvTransform_ = {};
 
     // 状態
     bool isActive_ = true;
