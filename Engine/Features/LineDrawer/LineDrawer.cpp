@@ -5,6 +5,11 @@
 #include <cassert>
 #include <numbers>
 
+namespace
+{
+LayerID debugLineLayer = 0;
+}
+
 LineDrawer* LineDrawer::GetInstance()
 {
     static LineDrawer instance;
@@ -68,7 +73,7 @@ void LineDrawer::Initialize()
     // 形状頂点初期化
     InitializeShapeVertices();
 
-    LayerSystem::CreateLayer("DebugLine", 100000);
+    debugLineLayer = LayerSystem::CreateLayer("DebugLine", 100000);
 }
 
 void LineDrawer::RegisterPoint(const Vector3& _start, const Vector3& _end, bool _frontDraw)
@@ -252,9 +257,15 @@ void LineDrawer::DebugDraw(const Vector2& start, const Vector2& end, const Vecto
 {
 #ifdef _DEBUG
     LayerID id = LayerSystem::GetCurrentLayerID();
-    LayerSystem::SetLayer("DebugLine");
+    bool needChange = id != debugLineLayer;
+
+    if (needChange)
+        LayerSystem::SetLayer("DebugLine");
+
     RegisterPoint(start, end, color);
-    LayerSystem::SetLayer(id);
+
+    if(needChange)
+        LayerSystem::SetLayer(id);
 #endif //_DEBUG
 }
 

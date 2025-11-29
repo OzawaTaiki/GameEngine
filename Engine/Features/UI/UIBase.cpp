@@ -293,6 +293,8 @@ void UIBase::ImGui()
 
 void UIBase::UpdateSelf()
 {
-
+    sprite_->uvTranslate_ = uvTransform_.GetOffset();
+    sprite_->uvScale_ = uvTransform_.GetScale();
+    sprite_->uvRotate_ = uvTransform_.GetRotation();
 }
 

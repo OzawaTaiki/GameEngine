@@ -38,6 +38,29 @@ void UIGroup::Draw()
     }
 }
 
+UIBase* UIGroup::GetElementByLabel(const std::string& _label) const
+{
+    auto it = std::find_if(uiElements_.begin(), uiElements_.end(),
+                           [&_label](const std::shared_ptr<UIBase>& element)
+                           {
+                               return element && element->GetLabel() == _label;
+                           });
+    if (it != uiElements_.end())
+    {
+        return it->get();
+    }
+    return nullptr;
+}
+
+UIBase* UIGroup::GetElementByIndex(size_t _index) const
+{
+    if (_index < uiElements_.size())
+    {
+        return uiElements_[_index].get();
+    }
+    return nullptr;
+}
+
 std::shared_ptr<UIButton> UIGroup::CreateButton(const std::string& _label, const std::wstring& _text)
 {
     return CreateElement<UIButton>(_label, _text);
