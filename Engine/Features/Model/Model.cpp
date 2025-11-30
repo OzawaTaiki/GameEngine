@@ -126,7 +126,7 @@ Model* Model::CreateFromVertices(std::vector<VertexData> _vertices, std::vector<
 }
 
 
-void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const std::vector<std::unique_ptr<Material>>& _materials,MargedMesh* _margedMesh) const
+void Model::QueueCommandAndDraw(ID3D12GraphicsCommandList* _commandList, const std::vector<std::unique_ptr<Material>>& _materials, MargedMesh* _margedMesh) const
 {
     QueueLightCommand(_commandList, 5);
 
@@ -294,7 +294,7 @@ void Model::QueueCommandForShadow(ID3D12GraphicsCommandList* _commandList, Marge
     }
 }
 
-void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList,uint32_t _index) const
+void Model::QueueLightCommand(ID3D12GraphicsCommandList* _commandList, uint32_t _index) const
 {
     LightingSystem::GetInstance()->QueueGraphicsCommand(_commandList, _index);
 }
@@ -374,7 +374,8 @@ void Model::LoadFile(const std::string& _filepath)
     std::string filepath = defaultDirpath_ + _filepath;
     const aiScene* scene = importer.ReadFile(filepath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs); // 三角形の並びを逆に，UVのy軸反転
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->HasMeshes()) {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->HasMeshes())
+    {
         Debug::Log("Failed to load model file: " + filepath + "\n");
         Debug::Log("\tERROR::ASSIMP::" + std::string(importer.GetErrorString()) + "\n");
         throw std::runtime_error("Failed to load model file");
@@ -386,7 +387,7 @@ void Model::LoadFile(const std::string& _filepath)
 
     if (scene->HasAnimations())
     {
-        LoadAnimation(scene, filepath,"");
+        LoadAnimation(scene, filepath, "");
     }
 
 #ifdef _DEBUG
@@ -407,7 +408,8 @@ void Model::LoadMesh(const aiScene* _scene)
 
     uint32_t currentVertexOffset = 0;
 
-    for (uint32_t meshIndex = 0; meshIndex < _scene->mNumMeshes; ++meshIndex) {
+    for (uint32_t meshIndex = 0; meshIndex < _scene->mNumMeshes; ++meshIndex)
+    {
         aiMesh* mesh = _scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());						    // 法線がないMeshは今回は非対応
         bool hasTexCoords = mesh->HasTextureCoords(0); // テクスチャ座標があるかどうか
@@ -436,7 +438,8 @@ void Model::LoadMesh(const aiScene* _scene)
         }
 
 
-        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex)
+        {
             aiFace& face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices == 3); // 三角形のみサポート
             for (uint32_t index = 0; index < face.mNumIndices; ++index)
@@ -452,7 +455,7 @@ void Model::LoadMesh(const aiScene* _scene)
 
         currentVertexOffset += mesh->mNumVertices;
 
-        pMesh->Initialize(vertices, indices,mesh->mName.C_Str());
+        pMesh->Initialize(vertices, indices, mesh->mName.C_Str());
         pMesh->SetMin(min);
         pMesh->SetMax(max);
         pMesh->SetUseMaterialIndex(mesh->mMaterialIndex);
@@ -465,15 +468,23 @@ void Model::LoadMesh(const aiScene* _scene)
 void Model::LoadMaterial(const aiScene* _scene)
 {
     material_.resize(_scene->mNumMaterials);
-    for (uint32_t materialIndex = 0; materialIndex < _scene->mNumMaterials; ++materialIndex) {
+    for (uint32_t materialIndex = 0; materialIndex < _scene->mNumMaterials; ++materialIndex)
+    {
         aiMaterial* material = _scene->mMaterials[materialIndex];
 
-        std::string path = "";
-        material_[materialIndex] = std::make_unique<Material>();
+        std::string name = material->GetName().C_Str();
+        if (_scene->mNumMaterials >= 2 && name == "defaultmaterial")
+        {
+            // マテリアルが複数あり、かつデフォルトマテリアルの場合はスキップ
+            continue;
+        }
 
+        std::string path = "";
+        material_[materialIndex] = std::make_unique<Material>(name);
         material_[materialIndex]->AnalyzeMaterial(material);
 
-        if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
+        {
             aiString textureFilePath;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 

@@ -17,7 +17,11 @@ struct aiMaterial;
 class Material
 {
 public:
+    Material(const std::string& _name = "") : name_(_name) {}
+    ~Material() = default;
 
+    // コピーコンストラクタ（ディープコピー）
+    Material(const Material& _other);
 
     void Initialize(const std::string& _texturepath);
 
@@ -32,6 +36,9 @@ public:
     void SetEnableLighting(bool _enable) { enableLighting_ = _enable; }
     void SetEnableEnvironment(bool _enable) { enableEnvironment_ = _enable; }
     void SetEnvScale(float _scale) { envScale_ = _scale; }
+
+    void SetName(const std::string& _name) { name_ = _name; }
+    const std::string& GetName() const { return name_; }
 
     void TransferData();
     void MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index);
