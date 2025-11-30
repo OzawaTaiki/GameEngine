@@ -4,6 +4,27 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
 #include <assimp/material.h>
+Material::Material(const Material& _other)
+    : uvTransform_(_other.uvTransform_)
+    , deffuseColor_(_other.deffuseColor_)
+    , hasTexture_(_other.hasTexture_)
+    , shiness_(_other.shiness_)
+    , enableLighting_(_other.enableLighting_)
+    , envScale_(_other.envScale_)
+    , enableEnvironment_(_other.enableEnvironment_)
+    , name_(_other.name_)
+    , texturePath_(_other.texturePath_)
+    , textureHandle_(_other.textureHandle_)
+{
+    // 新しいリソースを作成（ディープコピー）
+    DXCommon* dxCommon = DXCommon::GetInstance();
+    resorces_ = dxCommon->CreateBufferResource(sizeof(DataForGPU));
+    resorces_->Map(0, nullptr, reinterpret_cast<void**>(&constMap_));
+
+    // データを転送
+    TransferData();
+}
+
 
 void Material::Initialize(const std::string& _texturepath)
 {
