@@ -1,6 +1,8 @@
 #include <Framework/Framework.h>
 
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
+#include <Core/DXCommon/PSOManager/PSOFactory.h>
 #include <Features/Light/System/LightingSystem.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Features/Sprite/Sprite.h>
@@ -59,6 +61,11 @@ void Framework::Initialize(const std::wstring& _winTitle)
     rtvManager_ = RTVManager::GetInstance();
     rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
 
+    // ShaderCompiler と PSOFactory を PSOManager より前に初期化
+    ShaderCompiler::GetInstance()->Initialize();
+    ShaderCompiler::GetInstance()->RegisterCommonShaders();
+
+    PSOFactory::GetInstance()->Initialize();
 
     PSOManager::GetInstance()->Initialize();
 

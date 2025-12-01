@@ -10,9 +10,6 @@
     <Filter Include="Core\DXCommon\LeakChecker">
       <UniqueIdentifier>{19479DBC-48A7-4FE9-A2B5-CCCC9B288DBE792C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\DXCommon\PSOManager">
-      <UniqueIdentifier>{811D0C5A-FD3C-451B-BF16-CCCC09991B737C5B}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\DXCommon\SRVManager">
       <UniqueIdentifier>{13C2EA23-B647-45A9-BDD3-CCCCBA3AFF307F77}</UniqueIdentifier>
     </Filter>
@@ -283,6 +280,15 @@
     <Filter Include="Constants">
       <UniqueIdentifier>{2187de56-8fa6-4c15-821d-72c8b0b5d70f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\DXCommon\PSO">
+      <UniqueIdentifier>{811D0C5A-FD3C-451B-BF16-CCCC09991B737C5B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\DXCommon\PSO\RootSignatureBuilder">
+      <UniqueIdentifier>{8beab503-8c68-4b8f-bb79-5638ba50c4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\DXCommon\Shader">
+      <UniqueIdentifier>{4189cfae-3995-4812-aea2-54f8a3cfa93d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -292,7 +298,7 @@
       <Filter>Core\DXCommon\LeakChecker</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\PSOManager\PSOManager.cpp">
-      <Filter>Core\DXCommon\PSOManager</Filter>
+      <Filter>Core\DXCommon\PSO</Filter>
     </ClCompile>
     <ClCompile Include="Core\DXCommon\SRVManager\SRVManager.cpp">
       <Filter>Core\DXCommon\SRVManager</Filter>
@@ -721,6 +727,16 @@
     <ClCompile Include="Settings\EngineSettings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
+    <ClCompile Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.cpp">
+      <Filter>Core\DXCommon\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\PSOManager\PSOBuilder.cpp">
+      <Filter>Core\DXCommon\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\PSOManager\PSOFactory.cpp">
+      <Filter>Core\DXCommon\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="RootSignatureBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -748,7 +764,7 @@
       <Filter>Core\DXCommon\LeakChecker</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\PSOManager\PSOManager.h">
-      <Filter>Core\DXCommon\PSOManager</Filter>
+      <Filter>Core\DXCommon\PSO</Filter>
     </ClInclude>
     <ClInclude Include="Core\DXCommon\SRVManager\SRVManager.h">
       <Filter>Core\DXCommon\SRVManager</Filter>
@@ -1238,6 +1254,21 @@
     </ClInclude>
     <ClInclude Include="Constants\MathConstants.h">
       <Filter>Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOBuilder.h">
+      <Filter>Core\DXCommon\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOflags.h">
+      <Filter>Core\DXCommon\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.h">
+      <Filter>Core\DXCommon\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOFactory.h">
+      <Filter>Core\DXCommon\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="RootSignatureBuilder.h">
+      <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
