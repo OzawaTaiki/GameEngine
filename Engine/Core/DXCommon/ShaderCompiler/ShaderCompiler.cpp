@@ -24,7 +24,7 @@ void ShaderCompiler::Initialize() {
 
     cache_.clear();
     dictionary_.clear();
-
+    RegisterCommonShaders();
     Debug::Log("ShaderCompiler initialized\n");
 }
 
@@ -137,8 +137,8 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::Get(const std::string& _name) {
 
 void ShaderCompiler::RegisterCommonShaders() {
     // モデル用
-    Register("Model_VS", L"Model.VS.hlsl", L"vs_6_0");
-    Register("Model_PS", L"Model.PS.hlsl", L"ps_6_0");
+    Register("Model_VS", L"Object3d.VS.hlsl", L"vs_6_0");
+    Register("Model_PS", L"Object3d.PS.hlsl", L"ps_6_0");
 
     // スプライト用
     Register("Sprite_VS", L"Sprite.VS.hlsl", L"vs_6_0");

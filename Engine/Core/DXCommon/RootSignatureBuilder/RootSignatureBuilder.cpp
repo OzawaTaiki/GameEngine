@@ -3,6 +3,11 @@
 #include <cassert>
 #include <Core/DXCommon/DXCommon.h>
 
+RootSignatureBuilder::RootSignatureBuilder()
+{
+    flags_ = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+}
+
 RootSignatureBuilder& RootSignatureBuilder::AddCBV(UINT shaderRegister,D3D12_SHADER_VISIBILITY visibility)
 {
     D3D12_ROOT_PARAMETER param{};
@@ -114,16 +119,17 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> RootSignatureBuilder::Build()
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 
     D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
-    rootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    rootSigDesc.Flags = flags_;
 
     // DescriptorTableの範囲を設定
+    size_t tableIndex = 0;
     for (size_t i = 0; i < rootParameters_.size(); ++i)
     {
         if (rootParameters_[i].ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
         {
-            rootParameters_[i].DescriptorTable.NumDescriptorRanges = static_cast<UINT>(descriptorRanges_[0].size());
-            rootParameters_[i].DescriptorTable.pDescriptorRanges = descriptorRanges_[0].data();
-            descriptorRanges_.erase(descriptorRanges_.begin());
+            rootParameters_[i].DescriptorTable.NumDescriptorRanges = static_cast<UINT>(descriptorRanges_[tableIndex].size());
+            rootParameters_[i].DescriptorTable.pDescriptorRanges = descriptorRanges_[tableIndex].data();
+            tableIndex++;
         }
     }
     rootSigDesc.pParameters = rootParameters_.data();

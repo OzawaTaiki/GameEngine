@@ -26,6 +26,8 @@ public:
     void SetPipeLineStateObject(PSOFlags _flag);
     void SetRootSignature(PSOFlags _flag);
 
+    std::optional<ID3D12PipelineState*> GetPSO(const std::string& name);
+
     void SetPSOForPostEffect(const std::string& _name);
 
     void SetRegisterPSO(const std::string& _name);

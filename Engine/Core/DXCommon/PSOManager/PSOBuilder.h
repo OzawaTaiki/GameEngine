@@ -11,6 +11,7 @@
 
 class PSOBuilder
 {
+public:
     static PSOBuilder Create();
 
     // シェーダ設定
@@ -35,11 +36,15 @@ class PSOBuilder
     PSOBuilder& SetRootSignature(ID3D12RootSignature* _rootSig);
     PSOBuilder& UseModelRootSignature();  // Model用RootSigを自動取得
 
+    // InputLayout
+    PSOBuilder& UseModelInputLayout();  // Model用InputLayoutを設定
+
     // RTV/DSV Format
     PSOBuilder& SetRTVFormat(DXGI_FORMAT _format);
     PSOBuilder& SetDSVFormat(DXGI_FORMAT _format);
 
     // ビルド
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> Build();
     Microsoft::WRL::ComPtr<ID3D12PipelineState> Build(ID3D12RootSignature* rootSignature);
 
     // ビルド + 登録
@@ -53,6 +58,8 @@ private:
 
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob_;
     Microsoft::WRL::ComPtr<IDxcBlob> psBlob_;
+
+    ID3D12RootSignature* rootSignature_ = nullptr;
 
     bool hasVertexShader_ = false;
     bool hasPixelShader_ = false;

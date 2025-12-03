@@ -3,6 +3,14 @@
 #include "PSOFactory.h"
 #include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 
+PSOBuilder::PSOBuilder()
+    : hasVertexShader_(false)
+    , hasPixelShader_(false)
+    , hasRootSignature_(false)
+    , rootSignature_(nullptr)
+{
+}
+
 PSOBuilder PSOBuilder::Create()
 {
     PSOBuilder builder;
@@ -137,6 +145,18 @@ PSOBuilder& PSOBuilder::UseModelInputLayout()
     return *this;
 }
 
+PSOBuilder& PSOBuilder::SetRTVFormat(DXGI_FORMAT _format)
+{
+    desc_.RTVFormats[0] = _format;
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::SetDSVFormat(DXGI_FORMAT _format)
+{
+    desc_.DSVFormat = _format;
+    return *this;
+}
+
 void PSOBuilder::Validate()
 {
     assert(hasVertexShader_ && "Vertex shader not set");
@@ -152,7 +172,10 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOBuilder::Build()
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOBuilder::Build(ID3D12RootSignature* rootSignature)
 {
-    return Microsoft::WRL::ComPtr<ID3D12PipelineState>();
+    desc_.pRootSignature = rootSignature;
+    hasRootSignature_ = true;
+    Validate();
+    return PSOFactory::GetInstance()->CreateGraphicsPSO(desc_);
 }
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOBuilder::BuildAndRegister(const std::string& _name)

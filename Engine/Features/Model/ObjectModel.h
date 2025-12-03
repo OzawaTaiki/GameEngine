@@ -24,6 +24,14 @@ public:
     void Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
     void DrawShadow();
 
+    // カスタムPSOを使用した描画（RootSignatureは既存のModel用を使用）
+    void DrawWithPSO(const std::string& _psoName, const Camera* _camera);
+    void DrawWithPSO(const std::string& _psoName, const Camera* _camera, const Vector4& _color);
+    void DrawWithPSO(const std::string& _psoName, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
+    void DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera);
+    void DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera, const Vector4& _color);
+    void DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color);
+
 
     void UseQuaternion(bool _use) { useQuaternion_ = _use; }
 

@@ -113,6 +113,19 @@ void PSOManager::SetRootSignature(PSOFlags _flag)
 
 }
 
+std::optional<ID3D12PipelineState*> PSOManager::GetPSO(const std::string& name)
+{
+    // 要素があるか確認
+    auto it = registerPSO_.find(name);
+    // あったらそれを返す
+    if (it != registerPSO_.end())
+        return registerPSO_[name].Get();
+    // なかったらnullを返す
+    else
+        return std::nullopt;
+}
+
+
 void PSOManager::SetPSOForPostEffect(const std::string& _name)
 {
     // 要素があるか確認

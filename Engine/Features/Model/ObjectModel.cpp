@@ -5,6 +5,7 @@
 #include <Features/Collision/Manager/CollisionManager.h>
 #include <Debug/ImGuiDebugManager.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
+#include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Debug/Debug.h>
 
 
@@ -153,6 +154,184 @@ void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vec
 
 
     auto commandList = DXCommon::GetInstance()->GetCommandList();
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+
+    if (uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_, uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_, sharedAnimationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList, _textureHandle, materials_);
+
+    if (drawSkeleton_ && uniqueAnimationController_)
+        uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+}
+
+void ObjectModel::DrawWithPSO(const std::string& _psoName, const Camera* _camera)
+{
+    auto psoOpt = PSOManager::GetInstance()->GetPSO(_psoName);
+
+    if (!psoOpt.has_value())
+    {
+        Debug::Log("PSO not found: " + _psoName + "\n");
+        return;
+    }
+
+    DrawWithPSO(psoOpt.value(), _camera);
+}
+
+void ObjectModel::DrawWithPSO(const std::string& _psoName, const Camera* _camera, const Vector4& _color)
+{
+    auto psoOpt = PSOManager::GetInstance()->GetPSO(_psoName);
+
+    if (!psoOpt.has_value())
+    {
+        Debug::Log("PSO not found: " + _psoName + "\n");
+        return;
+    }
+
+    DrawWithPSO(psoOpt.value(), _camera, _color);
+}
+
+void ObjectModel::DrawWithPSO(const std::string& _psoName, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    auto psoOpt = PSOManager::GetInstance()->GetPSO(_psoName);
+
+    if (!psoOpt.has_value())
+    {
+        Debug::Log("PSO not found: " + _psoName + "\n");
+        return;
+    }
+
+    DrawWithPSO(psoOpt.value(), _camera, _textureHandle, _color);
+}
+
+void ObjectModel::DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera)
+{
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+    if (lightGroup)
+    {
+        auto pointLights = lightGroup->GetAllPointLights();
+        if (!pointLights.empty())
+        {
+            auto handles = pointLights[0]->GetShadowMapHandles();
+            uint32_t handle = handles[0];
+            RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+        }
+    }
+
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    // カスタムPSOを設定（RootSignatureは既存のものを使用）
+    auto rootSigOpt = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type::Model);
+    if (!rootSigOpt.has_value())
+    {
+        Debug::Log("Model RootSignature not found\n");
+        return;
+    }
+    commandList->SetGraphicsRootSignature(rootSigOpt.value());
+    commandList->SetPipelineState(_pso);
+
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+
+    if (uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, materials_,uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, materials_, sharedAnimationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList, materials_);
+
+    if (drawSkeleton_)
+    {
+        if (uniqueAnimationController_)
+            uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+        else if (sharedAnimationController_)
+            sharedAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+
+    }
+}
+
+void ObjectModel::DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+    if(lightGroup)
+    {
+        auto pointLights = lightGroup->GetAllPointLights();
+        if (!pointLights.empty())
+        {
+            auto handles = pointLights[0]->GetShadowMapHandles();
+            uint32_t handle = handles[0];
+            RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+        }
+    }
+
+    RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    // カスタムPSOを設定（RootSignatureは既存のものを使用）
+    auto rootSigOpt = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type::Model);
+    if (!rootSigOpt.has_value())
+    {
+        Debug::Log("Model RootSignature not found\n");
+        return;
+    }
+    commandList->SetGraphicsRootSignature(rootSigOpt.value());
+    commandList->SetPipelineState(_pso);
+
+    _camera->QueueCommand(commandList, 0);
+    worldTransform_.QueueCommand(commandList, 1);
+    objectColor_->QueueCommand(commandList, 3);
+    if(uniqueAnimationController_)
+        model_->QueueCommandAndDraw(commandList, materials_, uniqueAnimationController_->GetMargedMesh());
+    else if (sharedAnimationController_)
+        model_->QueueCommandAndDraw(commandList, materials_, sharedAnimationController_->GetMargedMesh());
+    else
+        model_->QueueCommandAndDraw(commandList, materials_);
+
+    if (drawSkeleton_)
+    {
+        if (uniqueAnimationController_)
+            uniqueAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+        else if (sharedAnimationController_)
+            sharedAnimationController_->DrawSkeleton(worldTransform_.matWorld_);
+    }
+}
+
+void ObjectModel::DrawWithPSO(ID3D12PipelineState* _pso, const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
+{
+    objectColor_->SetColor(_color);
+
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+
+    auto pointLights = lightGroup->GetAllPointLights();
+    if (!pointLights.empty())
+    {
+        auto handles = pointLights[0]->GetShadowMapHandles();
+        uint32_t handle = handles[0];
+        RTVManager::GetInstance()->QueuePointLightShadowMapToSRV(handle, 7);
+    }
+
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+
+    // カスタムPSOを設定（RootSignatureは既存のものを使用）
+    auto rootSigOpt = PSOManager::GetInstance()->GetRootSignature(PSOFlags::Type::Model);
+    if (!rootSigOpt.has_value())
+    {
+        Debug::Log("Model RootSignature not found\n");
+        return;
+    }
+    commandList->SetGraphicsRootSignature(rootSigOpt.value());
+    commandList->SetPipelineState(_pso);
+
     RTVManager::GetInstance()->GetRenderTexture("ShadowMap")->QueueCommandDSVtoSRV(6);
     _camera->QueueCommand(commandList, 0);
     worldTransform_.QueueCommand(commandList, 1);

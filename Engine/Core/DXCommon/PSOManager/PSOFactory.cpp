@@ -25,7 +25,11 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOFactory::CreateGraphicsPSO(
     HRESULT hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(
         &_desc, IID_PPV_ARGS(&pso)
     );
-    assert(SUCCEEDED(hr));
+    if (FAILED(hr))
+    {
+        Debug::Log("Failed to create Graphics PSO\n");
+        return nullptr;
+    }
     return pso;
 }
 

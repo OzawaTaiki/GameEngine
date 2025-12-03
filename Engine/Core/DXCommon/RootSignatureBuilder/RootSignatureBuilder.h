@@ -4,37 +4,43 @@
 #include <wrl.h>
 #include <vector>
 
-class RootSignatureBuilder {
+
+class RootSignatureBuilder
+{
 public:
     RootSignatureBuilder();
 
     // RootParameter追加
-    RootSignatureBuilder& AddCBV(UINT _shaderRegister, UINT _registerSpace = 0, D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_ALL);
-    RootSignatureBuilder& AddSRV(UINT _shaderRegister, UINT _registerSpace = 0, D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_ALL);
-    RootSignatureBuilder& AddUAV(UINT _shaderRegister, UINT _registerSpace = 0, D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_ALL);
+    RootSignatureBuilder& AddCBV(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+    RootSignatureBuilder& AddSRV(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+    RootSignatureBuilder& AddUAV(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 
     // DescriptorTable追加
     RootSignatureBuilder& AddDescriptorTable(
-        const std::vector<D3D12_DESCRIPTOR_RANGE>& _ranges,
-        D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_ALL
+        const std::vector<D3D12_DESCRIPTOR_RANGE>& ranges,
+        D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL
     );
 
     // 簡易版DescriptorTable
-    RootSignatureBuilder& AddSRVTable(UINT _numDescriptors, UINT _baseRegister, D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_PIXEL);
+    RootSignatureBuilder& AddSRVTable(UINT numDescriptors, UINT baseRegister, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_PIXEL);
+
 
     // StaticSampler追加
-    RootSignatureBuilder& AddStaticSampler(
-        UINT _shaderRegister,
-        D3D12_FILTER _filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
-        D3D12_TEXTURE_ADDRESS_MODE _addressMode = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-        D3D12_SHADER_VISIBILITY _visibility = D3D12_SHADER_VISIBILITY_PIXEL
+    RootSignatureBuilder& AddDefaultStaticSampler(
+        UINT shaderRegister,
+        D3D12_FILTER filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+        D3D12_TEXTURE_ADDRESS_MODE addressMode = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+        D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_PIXEL
     );
 
-    // Flags設定
-    RootSignatureBuilder& SetFlags(D3D12_ROOT_SIGNATURE_FLAGS _flags);
-    RootSignatureBuilder& AllowInputLayout();
-    RootSignatureBuilder& DenyVS();
-    RootSignatureBuilder& DenyPS();
+    // 深度比較用StaticSampler追加
+    RootSignatureBuilder& AddDepthComparisonStaticSampler(
+        UINT shaderRegister,
+        D3D12_FILTER filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
+        D3D12_TEXTURE_ADDRESS_MODE addressMode = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+        D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_PIXEL
+    );
+
 
     // 生成
     Microsoft::WRL::ComPtr<ID3D12RootSignature> Build();

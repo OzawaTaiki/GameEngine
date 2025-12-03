@@ -736,7 +736,9 @@
     <ClCompile Include="Core\DXCommon\PSOManager\PSOFactory.cpp">
       <Filter>Core\DXCommon\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="RootSignatureBuilder.cpp" />
+    <ClCompile Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.cpp">
+      <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1267,7 +1269,7 @@
     <ClInclude Include="Core\DXCommon\PSOManager\PSOFactory.h">
       <Filter>Core\DXCommon\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="RootSignatureBuilder.h">
+    <ClInclude Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.h">
       <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
     </ClInclude>
   </ItemGroup>
