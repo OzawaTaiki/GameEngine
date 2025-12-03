@@ -147,9 +147,19 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Core\DXCommon\CmdList\CommandList.cpp" />
     <ClCompile Include="Core\DXCommon\DXCommon.cpp" />
     <ClCompile Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.cpp" />
+    <ClCompile Include="Core\DXCommon\PSOManager\PSOBuilder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Core\DXCommon\PSOManager\PSOFactory.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Core\DXCommon\PSOManager\PSOManager.cpp" />
+    <ClCompile Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.cpp" />
     <ClCompile Include="Core\DXCommon\RTV\RenderTexture.cpp" />
     <ClCompile Include="Core\DXCommon\RTV\RTVManager.cpp" />
+    <ClCompile Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="Core\DXCommon\SRVManager\SRVManager.cpp" />
     <ClCompile Include="Core\DXCommon\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Core\WinApp\WinApp.cpp" />
@@ -307,9 +317,20 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Core\DXCommon\CmdList\CommandList.h" />
     <ClInclude Include="Core\DXCommon\DXCommon.h" />
     <ClInclude Include="Core\DXCommon\LeakChecker\D3DResourceLeakChecker.h" />
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOBuilder.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOFactory.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Core\DXCommon\PSOManager\PSOflags.h" />
     <ClInclude Include="Core\DXCommon\PSOManager\PSOManager.h" />
+    <ClInclude Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.h" />
     <ClInclude Include="Core\DXCommon\RTV\RenderTexture.h" />
     <ClInclude Include="Core\DXCommon\RTV\RTVManager.h" />
+    <ClInclude Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.h" />
     <ClInclude Include="Core\DXCommon\SRVManager\SRVManager.h" />
     <ClInclude Include="Core\DXCommon\TextureManager\TextureManager.h" />
     <ClInclude Include="Core\WinApp\WinApp.h" />
