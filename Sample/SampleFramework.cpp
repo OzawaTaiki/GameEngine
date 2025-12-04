@@ -20,9 +20,9 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
     rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
     rtvManager_->CreateRenderTarget("ShadowMap", 4096, 4096, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(1.0f, 1.0f, 1.0f, 1.0f), true);
 
-    sceneManager_->SetSceneFactory(new SceneFactory());
+    sceneManager_->SetSceneFactory(std::make_unique<SceneFactory>());
 
-    particleManager_->SetModifierFactory(new ParticleModifierFactory());
+    particleManager_->SetModifierFactory(std::make_unique<ParticleModifierFactory>());
 
     collisionManager_->Initialize(Vector2(100, 100), 5, Vector2(-50, -50), 1.0f);
 
