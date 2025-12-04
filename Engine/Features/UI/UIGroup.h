@@ -5,6 +5,7 @@
 #include <Features/UI/UIButton.h>
 #include <Features/UI/UISprite.h>
 #include <Features/UI/UISlider.h>
+#include <Features/UI/UISliderWithInput.h>
 #include <Features/UI/UISelectable.h>
 
 
@@ -41,6 +42,7 @@ public:
     std::shared_ptr<UIButton> CreateButton(const std::string& _label, const std::wstring& _text = L"");
     std::shared_ptr<UISprite> CreateSprite(const std::string& _label, const std::wstring& _text = L"");
     std::shared_ptr<UISlider> CreateSlider(const std::string& _label, float _minV, float _maxV);
+    std::shared_ptr<UISliderWithInput> CreateSliderWithInput(const std::string& _label, float _minV, float _maxV);
 
     // 任意のUI要素を追加（UISelectableを継承した要素）
     template<typename T>

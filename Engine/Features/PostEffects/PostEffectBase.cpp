@@ -27,3 +27,13 @@ void PostEffectBase::UpdateConstantBuffer(const void* data, size_t size)
         assert(false && "Invalid constant buffer data or size");
     }
 }
+
+void PostEffectBase::CreateConstantBufferResource(size_t dataSize, Microsoft::WRL::ComPtr<ID3D12Resource>& outResource, void** outDataPtr)
+{
+    // 定数バッファのリソースを作成
+    outResource = DXCommon::GetInstance()->CreateBufferResource(static_cast<uint32_t>(dataSize));
+    // マッピングしてデータポインタを取得
+    outResource->Map(0, nullptr, outDataPtr);
+    // 初期化
+    memset(*outDataPtr, 0, dataSize);
+}

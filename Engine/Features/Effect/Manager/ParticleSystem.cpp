@@ -22,7 +22,6 @@ ParticleSystem::~ParticleSystem()
 {
     ClearParticles();
 
-    delete factory_;
     factory_ = nullptr;
 
 }
@@ -138,7 +137,7 @@ void ParticleSystem::DrawParticles()
     }
 }
 
-void ParticleSystem::SetModifierFactory(IParticleMoifierFactory* _factory)
+void ParticleSystem::SetModifierFactory(std::unique_ptr<IParticleMoifierFactory> _factory)
 {
     if (factory_ == _factory ||
         _factory == nullptr)
@@ -146,17 +145,15 @@ void ParticleSystem::SetModifierFactory(IParticleMoifierFactory* _factory)
 
     if (factory_ != nullptr)
     {
-        delete factory_;
+        factory_.reset();
         factory_ = nullptr;
     }
 
-    factory_ = _factory;
+    factory_ = std::move(_factory);
 }
 
-void ParticleSystem::AddParticle(const std::string& _groupName, const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
+void ParticleSystem::AddParticle(const std::string& _groupName, const std::string& _useModelName, std::unique_ptr<Particle> _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
-    std::unique_ptr<Particle> particle_ptr(_particle);
-
 
     ParticleKey key;
     key.modelName = _useModelName;
@@ -169,7 +166,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
         group.key = key;
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
-        group.particles.push_back(std::move(particle_ptr));
+        group.particles.push_back(std::move(_particle));
 
         group.instanceBuffer = DXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * maxInstancesPerGroup);
         group.instanceBuffer->Map(0, nullptr, reinterpret_cast<void**>(&group.mappedInstanceBuffer));
@@ -206,7 +203,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
 
         it->second.psoIndex = psoFlags;
 
-        it->second.particles.push_back(std::move(particle_ptr));
+        it->second.particles.push_back(std::move(_particle));
     }
 
     // モディファイアの登録
@@ -217,7 +214,7 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
     }
 }
 
-void ParticleSystem::AddParticles(const std::string& _groupName, const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
+void ParticleSystem::AddParticles(const std::string& _groupName, const std::string& _useModelName, std::vector<std::unique_ptr<Particle>> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers)
 {
 
     ParticleKey key;
@@ -233,9 +230,9 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
         group.srvIndex = srvManager_->Allocate();
         group.instanceCount = 0;
 
-        for (Particle* particle : _particles)
+        for (auto& particle : _particles)
         {
-            group.particles.push_back(std::unique_ptr<Particle>(particle));
+            group.particles.push_back(std::move(particle));
         }
 
         group.instanceBuffer = DXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * maxInstancesPerGroup);
@@ -262,9 +259,9 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
         auto& group = it->second;
 
         // パーティクルだけを追加
-        for (Particle* particle : _particles)
+        for (auto& particle : _particles)
         {
-            group.particles.push_back(std::unique_ptr<Particle>(particle));
+            group.particles.push_back(std::move(particle));
         }
         group.textureHandle = _textureHandle;
 

@@ -21,6 +21,8 @@ protected:
     void CreateConstantBuffer(size_t dataSize);
     void UpdateConstantBuffer(const void* data, size_t size);
 
+    static void CreateConstantBufferResource(size_t dataSize, Microsoft::WRL::ComPtr<ID3D12Resource>& outResource, void** outDataPtr);
+
 protected:
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_; // パイプラインステートオブジェクト

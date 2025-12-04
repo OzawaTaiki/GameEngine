@@ -145,6 +145,17 @@ PSOBuilder& PSOBuilder::UseModelInputLayout()
     return *this;
 }
 
+PSOBuilder& PSOBuilder::UseFullScreenInputLayout()
+{
+    static D3D12_INPUT_ELEMENT_DESC inputElements[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+    };
+    desc_.InputLayout.pInputElementDescs = inputElements;
+    desc_.InputLayout.NumElements = _countof(inputElements);
+    return *this;
+}
+
 PSOBuilder& PSOBuilder::SetRTVFormat(DXGI_FORMAT _format)
 {
     desc_.RTVFormats[0] = _format;
