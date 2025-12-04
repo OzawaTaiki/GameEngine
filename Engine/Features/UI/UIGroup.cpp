@@ -78,6 +78,16 @@ std::shared_ptr<UISlider> UIGroup::CreateSlider(const std::string& _label, float
     return newSlider;
 }
 
+std::shared_ptr<UISliderWithInput> UIGroup::CreateSliderWithInput(const std::string& _label, float _minV, float _maxV)
+{
+    auto newSlider = std::make_shared<UISliderWithInput>();
+    navigator_.RegisterSelectable(newSlider.get());
+    newSlider->Initialize(_label, _minV, _maxV);
+    uiElements_.push_back(newSlider);
+
+    return newSlider;
+}
+
 void UIGroup::AddElement(std::unique_ptr<UIBase> _element)
 {
     if (!_element)

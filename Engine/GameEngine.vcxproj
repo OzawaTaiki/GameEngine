@@ -241,6 +241,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Model\Primitive\Triangle.cpp" />
     <ClCompile Include="Features\Model\SkyBox.cpp" />
     <ClCompile Include="Features\Model\Transform\WorldTransform.cpp" />
+    <ClCompile Include="Features\PostEffects\Bloom.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Features\PostEffects\BoxFilter.cpp" />
     <ClCompile Include="Features\PostEffects\DepthBasedOutline.cpp" />
     <ClCompile Include="Features\PostEffects\Dissolve.cpp" />
@@ -273,6 +277,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\UIGroup.cpp" />
     <ClCompile Include="Features\UI\UISelectable.cpp" />
     <ClCompile Include="Features\UI\UISlider.cpp" />
+    <ClCompile Include="Features\UI\UISliderWithInput.cpp" />
     <ClCompile Include="Features\UI\UISprite.cpp" />
     <ClCompile Include="Features\UI\UIText.cpp" />
     <ClCompile Include="Features\UI\UITextBox.cpp" />
@@ -307,7 +312,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="System\Time\Stopwatch.cpp" />
     <ClCompile Include="System\Time\Time.cpp" />
     <ClCompile Include="System\Time\Time_MT.cpp" />
-    <ClCompile Include="UISliderWithInput.cpp" />
     <ClCompile Include="Utility\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Utility\FileDialog\FileDialog.cpp" />
     <ClCompile Include="Utility\StringUtils\StringUitls.cpp" />
@@ -421,6 +425,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Model\Primitive\Triangle.h" />
     <ClInclude Include="Features\Model\SkyBox.h" />
     <ClInclude Include="Features\Model\Transform\WorldTransform.h" />
+    <ClInclude Include="Features\PostEffects\Bloom.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Features\PostEffects\BoxFilter.h" />
     <ClInclude Include="Features\PostEffects\DepthBasedOutline.h" />
     <ClInclude Include="Features\PostEffects\Dissolve.h" />
@@ -458,6 +466,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\UIGroup.h" />
     <ClInclude Include="Features\UI\UISelectable.h" />
     <ClInclude Include="Features\UI\UISlider.h" />
+    <ClInclude Include="Features\UI\UISliderWithInput.h" />
     <ClInclude Include="Features\UI\UISprite.h" />
     <ClInclude Include="Features\UI\UIText.h" />
     <ClInclude Include="Features\UI\UITextBox.h" />
@@ -497,7 +506,6 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Time\Stopwatch.h" />
     <ClInclude Include="System\Time\Time.h" />
     <ClInclude Include="System\Time\Time_MT.h" />
-    <ClInclude Include="UISliderWithInput.h" />
     <ClInclude Include="Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Utility\FileDialog\FileDialog.h" />
     <ClInclude Include="Utility\StringUtils\StringUitls.h" />
@@ -538,11 +546,19 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\Shader\BloomCombine.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shader\BoxFilter.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\BoxFilter.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BrightExtract.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -579,6 +595,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\GrayScale.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\HorizontalBlur.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -647,6 +667,10 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shader\TextRenderer.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\VerticalBlur.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

@@ -289,6 +289,9 @@
     <Filter Include="Core\DXCommon\Shader">
       <UniqueIdentifier>{4189cfae-3995-4812-aea2-54f8a3cfa93d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\PostEffects\Bloom">
+      <UniqueIdentifier>{619d381d-9005-4970-9909-9907347eb04a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -723,7 +726,6 @@
     <ClCompile Include="Features\UI\Collider\UIConvexPolygonCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="UISliderWithInput.cpp" />
     <ClCompile Include="Settings\EngineSettings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
@@ -738,6 +740,12 @@
     </ClCompile>
     <ClCompile Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.cpp">
       <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISliderWithInput.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\PostEffects\Bloom.cpp">
+      <Filter>Features\PosttEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1248,9 +1256,6 @@
     <ClInclude Include="Features\UI\Collider\UIConvexPolygonCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="UISliderWithInput.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Settings\EngineSettings.h">
       <Filter>Settings</Filter>
     </ClInclude>
@@ -1271,6 +1276,12 @@
     </ClInclude>
     <ClInclude Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.h">
       <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\PostEffects\Bloom.h">
+      <Filter>Features\PosttEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderWithInput.h">
+      <Filter>Features\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1369,6 +1380,18 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\Batch2DInstancing.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BloomCombine.hlsl">
+      <Filter>Shaders\PostEffects\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\BrightExtract.PS.hlsl">
+      <Filter>Shaders\PostEffects\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\HorizontalBlur.hlsl">
+      <Filter>Shaders\PostEffects\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\VerticalBlur.hlsl">
+      <Filter>Shaders\PostEffects\Bloom</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

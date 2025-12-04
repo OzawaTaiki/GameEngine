@@ -29,7 +29,7 @@ public:
     void SetTransition(std::unique_ptr<ISceneTransition> _transition);
 
     // シーンファクトリの設定
-    void SetSceneFactory(ISceneFactory* _sceneFactory);
+    void SetSceneFactory(std::unique_ptr<ISceneFactory> _sceneFactory);
 
     // シーンの予約
     // _name : 予約するシーンの名前 ファクトリ参照
@@ -43,7 +43,7 @@ public:
 
 private:
     // シーンファクトリ
-    ISceneFactory* sceneFactory_ = nullptr;
+    std::unique_ptr<ISceneFactory> sceneFactory_ = nullptr;
 
     // 現在のシーン
     std::unique_ptr<BaseScene> currentScene_ = nullptr;

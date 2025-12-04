@@ -93,7 +93,7 @@ void ParticleEmitter::GenerateParticles()
 {
     if (!ValidateSettings()) return;
 
-    std::vector<Particle*> particles(emitCount_);
+    std::vector<std::unique_ptr<Particle>> particles;
 
     Quaternion q = Quaternion::EulerToQuaternion(rotationEuler_);
     Matrix4x4 emitterTransform = MakeAffineMatrix(
@@ -198,7 +198,8 @@ void ParticleEmitter::GenerateParticles()
         initParam.size = initParams_.size.GetValue();
         initParam.speed = initParams_.speed.GetValue();
 
-        particles[i] = new Particle();
+        auto p = std::make_unique<Particle>();
+        particles[i] = std::move(p);
         particles[i]->Initialize(initParam);
     }
 
@@ -212,7 +213,7 @@ void ParticleEmitter::GenerateParticles()
     uint32_t textureHandle = TextureManager::GetInstance()->Load(initParams_.textureName);
 
     // groupnameには仮でエミッターの名前を入れている
-    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, particles, settings, textureHandle, initParams_.modifiers);
+    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, std::move(particles), settings, textureHandle, initParams_.modifiers);
 
 }
 

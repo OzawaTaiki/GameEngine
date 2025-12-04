@@ -69,10 +69,10 @@ public:
     void Update(float _deltaTime = 1.0f / 60.0f);
     void DrawParticles();
 
-    void SetModifierFactory(IParticleMoifierFactory* _factory);
+    void SetModifierFactory(std::unique_ptr<IParticleMoifierFactory> _factory);
 
-    void AddParticle(const std::string& _groupName,const std::string& _useModelName, Particle* _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
-    void AddParticles(const std::string& _groupName,const std::string& _useModelName, std::vector<Particle*> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
+    void AddParticle(const std::string& _groupName,const std::string& _useModelName,std::unique_ptr<Particle> _particle, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
+    void AddParticles(const std::string& _groupName,const std::string& _useModelName, std::vector<std::unique_ptr<Particle>> _particles, ParticleRenderSettings _settings, uint32_t _textureHandle, std::vector<std::string> _modifiers);
 
 
     void ClearParticles();
@@ -134,7 +134,7 @@ private:
     std::map<PSOFlags, ID3D12PipelineState*> psoMap_;
     ID3D12RootSignature* rootSignature_;
 
-    IParticleMoifierFactory* factory_ = nullptr;
+    std::unique_ptr<IParticleMoifierFactory> factory_ = nullptr;
 
     SRVManager* srvManager_ = nullptr;
 

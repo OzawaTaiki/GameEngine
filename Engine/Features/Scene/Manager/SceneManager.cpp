@@ -28,14 +28,13 @@ SceneManager::~SceneManager()
     ImGuiDebugManager::GetInstance()->RemoveDebugWindow("SceneManager");
 #endif // _DEBUG
 
-    delete sceneFactory_;
 }
 
-void SceneManager::SetSceneFactory(ISceneFactory* _sceneFactory)
+void SceneManager::SetSceneFactory(std::unique_ptr<ISceneFactory> _sceneFactory)
 {
     if (_sceneFactory != nullptr)
     {
-        sceneFactory_ = _sceneFactory;
+        sceneFactory_ = std::move(_sceneFactory);
     }
 }
 
