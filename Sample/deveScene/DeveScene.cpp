@@ -109,29 +109,29 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
     text_.Initialize(FontConfig());
 
-    uiGroup_ = std::make_unique<UIGroup>();
-    uiGroup_->Initialize();
-    auto button = uiGroup_->CreateButton("TestButton", L"ボタン");
-    button->SetPos({ 100,300 });
-    button->SetSize({ 200,100 });
-    button->SetOnClick([]()
-                       {
-                           Debug::Log("Button Clicked");
-                       });
+    //uiGroup_ = std::make_unique<UIGroup>();
+    //uiGroup_->Initialize();
+    //auto button = uiGroup_->CreateButton("TestButton", L"ボタン");
+    //button->SetPos({ 100,300 });
+    //button->SetSize({ 200,100 });
+    //button->SetOnClick([]()
+    //                   {
+    //                       Debug::Log("Button Clicked");
+    //                   });
 
-    auto slider = uiGroup_->CreateSlider("TestSlider", 0.0f, 100.0f);
-    slider->SetPos({ 100,450 });
-    slider->SetSize({ 300,50 });
-    slider->SetValue(50.0f);
-    slider->SetOnValueChanged([](float value)
-                              {
-                                  Debug::Log("Slider Value: " + std::to_string(value));
-                              });
+    //auto slider = uiGroup_->CreateSlider("TestSlider", 0.0f, 100.0f);
+    //slider->SetPos({ 100,450 });
+    //slider->SetSize({ 300,50 });
+    //slider->SetValue(50.0f);
+    //slider->SetOnValueChanged([](float value)
+    //                          {
+    //                              Debug::Log("Slider Value: " + std::to_string(value));
+    //                          });
 
-    auto sprite = uiGroup_->CreateSprite("TestSprite", L"スプライト");
-    sprite->SetPos({ 500,300 });
-    sprite->SetSize({ 128,128 });
-    sprite->SetTextureNameAndLoad("uvChecker.png");
+    //auto sprite = uiGroup_->CreateSprite("TestSprite", L"スプライト");
+    //sprite->SetPos({ 500,300 });
+    //sprite->SetSize({ 128,128 });
+    //sprite->SetTextureNameAndLoad("uvChecker.png");
 
 }
 
@@ -193,7 +193,7 @@ void DeveScene::Update()
 
     // モデルの更新
     ground_->Update();
-    uiGroup_->Update();
+    //uiGroup_->Update();
 
     std::wstring wstr = std::wstring(str.begin(), str.end());
     wstr += L"\nこんにちは 世界";
@@ -236,7 +236,7 @@ void DeveScene::Draw()
     Sprite::PreDraw();
     // スプライトの描画
     sprite_->Draw();
-    uiGroup_->Draw();
+    //uiGroup_->Draw();
 
     ParticleSystem::GetInstance()->DrawParticles();
 }

@@ -1,38 +1,36 @@
 #include "UICircleCollider.h"
-#include <Features/UI/UIBase.h>
+#include <Features/UI/UIElement.h>
+#include <Debug/ImGuiDebugManager.h>
 #include <Features/LineDrawer/LineDrawer.h>
-
 
 bool UICircleCollider::IsPointInside(const Vector2& _point) const
 {
-    // 中心からの距離の2乗を計算（sqrt不要で高速化）
     Vector2 diff = _point - center_;
     float distSquared = diff.x * diff.x + diff.y * diff.y;
-
-    // 半径の2乗と比較
     return distSquared <= (radius_ * radius_);
 }
 
-void UICircleCollider::UpdateCache(const UIBase* _uiBase)
+void UICircleCollider::UpdateCache(const UIElement* _uiElement)
 {
     if (transformMode_ == TransformMode::UIDependent)
     {
         // UI依存モード：UIのパラメータから計算
-        center_ = _uiBase->GetCenterPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        center_ = pos + size * 0.5f;  // 中心座標
 
         // UIのサイズから半径を計算（短い方の辺の半分）
-        Vector2 size = _uiBase->GetSize();
         radius_ = (size.x < size.y) ? (size.x * 0.5f) : (size.y * 0.5f);
     }
     else
     {
         // 独立モード：UIのローカル座標系で計算
-        // UI中心 + ローカルオフセット
-        center_ = _uiBase->GetCenterPos() + localOffset_;
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        center_ = pos + size * 0.5f + localOffset_;
         radius_ = independentRadius_;
     }
 }
-
 void UICircleCollider::ImGui()
 {
 #ifdef _DEBUG

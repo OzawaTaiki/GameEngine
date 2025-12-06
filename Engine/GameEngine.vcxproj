@@ -262,25 +262,59 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\TextRenderer\TextGenerator.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp" />
+    <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp" />
     <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp" />
     <ClCompile Include="Features\UI\Collider\UIColliderSerializer.cpp" />
     <ClCompile Include="Features\UI\Collider\UICollisionManager.cpp" />
     <ClCompile Include="Features\UI\Collider\UIConvexPolygonCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
-    <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp" />
-    <ClCompile Include="Features\UI\Collider\UIRentangleCollider.cpp" />
-    <ClCompile Include="Features\UI\UIInteractive.cpp" />
-    <ClCompile Include="Features\UI\UINavigator.cpp" />
-    <ClCompile Include="Features\UI\UIBase.cpp" />
-    <ClCompile Include="Features\UI\UIButton.cpp" />
-    <ClCompile Include="Features\UI\UIGroup.cpp" />
-    <ClCompile Include="Features\UI\UISelectable.cpp" />
-    <ClCompile Include="Features\UI\UISlider.cpp" />
-    <ClCompile Include="Features\UI\UISliderWithInput.cpp" />
-    <ClCompile Include="Features\UI\UISprite.cpp" />
-    <ClCompile Include="Features\UI\UIText.cpp" />
-    <ClCompile Include="Features\UI\UITextBox.cpp" />
+    <ClCompile Include="Features\UI\Collider\UIRecntangleCollider.cpp" />
+    <ClCompile Include="Features\UI\UIElement.cpp" />
+    <ClCompile Include="Features\UI\UIInteractive.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigator.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIBase.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIButton.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIGroup.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISelectable.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISlider.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISliderWithInput.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISprite.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIText.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextBox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransform.cpp" />
     <ClCompile Include="Features\UVTransform\UVTransformAnimation.cpp" />
@@ -451,25 +485,60 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h" />
     <ClInclude Include="Features\UI\Collider\UICircleCollider.h" />
+    <ClInclude Include="Features\UI\Collider\UIColliderComponent.h" />
     <ClInclude Include="Features\UI\Collider\UIColliderFactory.h" />
     <ClInclude Include="Features\UI\Collider\UIColliderSerializer.h" />
     <ClInclude Include="Features\UI\Collider\UICollisionManager.h" />
     <ClInclude Include="Features\UI\Collider\UIConvexPolygonCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
-    <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIQuadCollider.h" />
-    <ClInclude Include="Features\UI\Collider\UIRentangleCollider.h" />
-    <ClInclude Include="Features\UI\UIInteractive.h" />
-    <ClInclude Include="Features\UI\UINavigator.h" />
-    <ClInclude Include="Features\UI\UIBase.h" />
-    <ClInclude Include="Features\UI\UIButton.h" />
-    <ClInclude Include="Features\UI\UIGroup.h" />
-    <ClInclude Include="Features\UI\UISelectable.h" />
-    <ClInclude Include="Features\UI\UISlider.h" />
-    <ClInclude Include="Features\UI\UISliderWithInput.h" />
-    <ClInclude Include="Features\UI\UISprite.h" />
-    <ClInclude Include="Features\UI\UIText.h" />
-    <ClInclude Include="Features\UI\UITextBox.h" />
+    <ClInclude Include="Features\UI\Collider\UIRecntangleCollider.h" />
+    <ClInclude Include="Features\UI\UIComponent.h" />
+    <ClInclude Include="Features\UI\UIElement.h" />
+    <ClInclude Include="Features\UI\UIInteractive.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigator.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIBase.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButton.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIGroup.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISelectable.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISlider.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderWithInput.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISprite.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIText.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextBox.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Features\UVTransform\IUVAnimation.h" />
     <ClInclude Include="Features\UVTransform\SpriteSheetAnimetion.h" />
     <ClInclude Include="Features\UVTransform\UVTransform.h" />
