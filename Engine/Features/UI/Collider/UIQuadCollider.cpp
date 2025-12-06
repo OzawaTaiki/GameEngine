@@ -1,6 +1,7 @@
 #include "UIQuadCollider.h"
 #include <Features/LineDrawer/LineDrawer.h>
-#include <Features/UI/UIBase.h>
+#include <Features/UI/UIElement.h>
+#include <Debug/ImGuiDebugManager.h>
 
 bool UIQuadCollider::IsPointInside(const Vector2& _point) const
 {
@@ -28,13 +29,15 @@ bool UIQuadCollider::IsPointInside(const Vector2& _point) const
     return true;
 }
 
-void UIQuadCollider::UpdateCache(const UIBase* _uiBase)
+void UIQuadCollider::UpdateCache(const UIElement* _uiElement)
 {
     if (transformMode_ == TransformMode::UIDependent)
     {
         // UI依存モード：UIの左上・右下座標から矩形として計算
-        Vector2 leftTop = _uiBase->GetLeftTopPos();
-        Vector2 rightBottom = _uiBase->GetRightBottomPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        Vector2 leftTop = pos;
+        Vector2 rightBottom = pos + size;
 
         worldCorners_[0] = { leftTop.x, leftTop.y };          // 左上
         worldCorners_[1] = { rightBottom.x, leftTop.y };      // 右上
@@ -45,7 +48,9 @@ void UIQuadCollider::UpdateCache(const UIBase* _uiBase)
     {
         // 独立モード：UIのローカル座標系で計算
         // UI中心 + 各頂点のローカルオフセット
-        Vector2 uiCenter = _uiBase->GetCenterPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        Vector2 uiCenter = pos + size * 0.5f;
         for (int i = 0; i < 4; i++)
         {
             worldCorners_[i] = uiCenter + localCorners_[i];

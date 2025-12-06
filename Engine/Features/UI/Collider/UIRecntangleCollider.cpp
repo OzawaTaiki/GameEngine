@@ -1,34 +1,40 @@
-#include "UIRentangleCollider.h"
-#include <Features/UI/UIBase.h>
+#include "UIRecntangleCollider.h"
+#include <Features/UI/UIElement.h>
 
-bool UIRentangleCollider::IsPointInside(const Vector2& _point) const
+#include <Debug/ImGuiDebugManager.h>
+
+
+bool UIRectangleCollider::IsPointInside(const Vector2& _point) const
 {
-    // AABB（軸平行境界ボックス）判定
-    // 点が左上と右下の範囲内にあるかチェック
     return (_point.x >= leftTop_.x && _point.x <= rightBottom_.x &&
             _point.y >= leftTop_.y && _point.y <= rightBottom_.y);
 }
 
-void UIRentangleCollider::UpdateCache(const UIBase* _uiBase)
+void UIRectangleCollider::UpdateCache(const UIElement* _uiElement)
 {
     if (transformMode_ == TransformMode::UIDependent)
     {
-        // UI依存モード：UIのパラメータから計算
-        leftTop_ = _uiBase->GetLeftTopPos();
-        rightBottom_ = _uiBase->GetRightBottomPos();
+        // UI依存モード：UIElementのパラメータから計算
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+
+        leftTop_ = pos;
+        rightBottom_ = pos + size;
     }
     else
     {
         // 独立モード：UIのローカル座標系で計算
-        // UI中心 + オフセット ± サイズの半分
-        Vector2 center = _uiBase->GetCenterPos() + localOffset_;
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        Vector2 center = pos + size * 0.5f + localOffset_;
         Vector2 halfSize = localSize_ * 0.5f;
+
         leftTop_ = center - halfSize;
         rightBottom_ = center + halfSize;
     }
 }
 
-void UIRentangleCollider::ImGui()
+void UIRectangleCollider::ImGui()
 {
 #ifdef _DEBUG
     // トランスフォームモード選択
@@ -39,7 +45,6 @@ void UIRentangleCollider::ImGui()
         transformMode_ = static_cast<TransformMode>(currentMode);
     }
 
-    // 独立モードの場合のみパラメータ編集可能
     if (transformMode_ == TransformMode::Independent)
     {
         ImGui::Separator();
@@ -53,10 +58,10 @@ void UIRentangleCollider::ImGui()
         ImGui::TextDisabled("(Using UI parameters)");
     }
 
-    // 実際のワールド座標を表示（デバッグ用）
+    // デバッグ表示
     ImGui::Separator();
     ImGui::Text("World Position (Debug)");
     ImGui::Text("Left Top: (%.1f, %.1f)", leftTop_.x, leftTop_.y);
     ImGui::Text("Right Bottom: (%.1f, %.1f)", rightBottom_.x, rightBottom_.y);
-#endif // _DEBUG
+#endif
 }

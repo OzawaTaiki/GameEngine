@@ -24,12 +24,12 @@ public:
     bool IsPointInside(const Vector2& _point) const override;
 
     /// <summary>
-    /// UIBaseの情報から四角形の4頂点をワールド座標で計算してキャッシュする
+    /// UIElementの情報から四角形の4頂点をワールド座標で計算してキャッシュする
     /// UI依存モード：UIのサイズから矩形として計算
     /// 独立モード：ローカル座標系で設定された4頂点を使用
     /// </summary>
-    /// <param name="_uiBase">親となるUIBase</param>
-    void UpdateCache(const UIBase* _uiBase) override;
+    /// <param name="_uiElement">親となるUIElement</param>
+    void UpdateCache(const UIElement* _uiElement) override;
 
     /// <summary>
     /// ImGuiでパラメータを表示・編集する

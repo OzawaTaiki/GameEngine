@@ -32,10 +32,10 @@ public:
     bool IsPointInside(const Vector2& _point) const override;
 
     /// <summary>
-    /// UIBaseの情報から多角形の頂点をキャッシュする
+    /// UIElementの情報から多角形の頂点をキャッシュする
     /// </summary>
-    /// <param name="_uiBase">親となるUIBase</param>
-    void UpdateCache(const UIBase* _uiBase) override;
+    /// <param name="_uiElement">親となるUIElement</param>
+    void UpdateCache(const UIElement* _uiElement) override;
 
     /// <summary>
     /// ImGuiでパラメータを表示・編集する

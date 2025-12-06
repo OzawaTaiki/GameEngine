@@ -292,6 +292,9 @@
     <Filter Include="Shaders\PostEffects\Bloom">
       <UniqueIdentifier>{619d381d-9005-4970-9909-9907347eb04a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\UI\New">
+      <UniqueIdentifier>{d9111a5c-ca9e-4d49-a60c-a5a19236ae13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -690,16 +693,13 @@
     <ClCompile Include="Features\Model\Primitive\Cube.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UIRentangleCollider.cpp">
+    <ClCompile Include="Features\UI\Collider\UIRecntangleCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp">
-      <Filter>Features\UI\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp">
@@ -746,6 +746,12 @@
     </ClCompile>
     <ClCompile Include="Features\PostEffects\Bloom.cpp">
       <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIElement.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp">
+      <Filter>Features\UI\New</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1220,16 +1226,13 @@
     <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h">
       <Filter>Features\UI\Collider\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\Collider\UIRentangleCollider.h">
+    <ClInclude Include="Features\UI\Collider\UIRecntangleCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UICircleCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h">
-      <Filter>Features\UI\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIColliderFactory.h">
@@ -1282,6 +1285,15 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderWithInput.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIElement.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\UIColliderComponent.h">
+      <Filter>Features\UI\New</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

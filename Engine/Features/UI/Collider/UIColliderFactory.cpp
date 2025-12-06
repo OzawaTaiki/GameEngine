@@ -1,33 +1,24 @@
 #include "UIColliderFactory.h"
 #include <Features/UI/Collider/UICircleCollider.h>
-#include <Features/UI/Collider/UIRentangleCollider.h>
+#include <Features/UI/Collider/UIRecntangleCollider.h>
 #include <Features/UI/Collider/UIEllipseCollider.h>
-#include <Features/UI/Collider/UIParallelogramCollider.h>
 #include <Features/UI/Collider/UIQuadCollider.h>
 
-#ifdef _DEBUG
-#include <imgui.h>
-#endif
+#include <Debug/ImGuiDebugManager.h>
 #include "UIConvexPolygonCollider.h"
-
-// 静的メンバ変数の初期化
-Vector2 UIColliderFactory::tempSkew_ = { 0.0f, 0.0f };
 
 std::unique_ptr<IUICollider> UIColliderFactory::Create(ColliderType type)
 {
     switch (type)
     {
         case ColliderType::Rectangle:
-            return std::make_unique<UIRentangleCollider>();
+            return std::make_unique<UIRectangleCollider>();
 
         case ColliderType::Circle:
             return std::make_unique<UICircleCollider>();
 
         case ColliderType::Ellipse:
             return std::make_unique<UIEllipseCollider>();
-
-        case ColliderType::Parallelogram:
-            return std::make_unique<UIParallelogramCollider>(tempSkew_);
 
         case ColliderType::Quad:
             return std::make_unique<UIQuadCollider>();
@@ -37,7 +28,7 @@ std::unique_ptr<IUICollider> UIColliderFactory::Create(ColliderType type)
 
         default:
             // デフォルトは矩形
-            return std::make_unique<UIRentangleCollider>();
+            return std::make_unique<UIRectangleCollider>();
     }
 }
 
@@ -53,9 +44,6 @@ const char* UIColliderFactory::GetTypeName(ColliderType type)
 
         case ColliderType::Ellipse:
             return "Ellipse";
-
-        case ColliderType::Parallelogram:
-            return "Parallelogram";
 
         case ColliderType::Quad:
             return "Quad";
@@ -79,7 +67,6 @@ std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
         GetTypeName(ColliderType::Rectangle),
         GetTypeName(ColliderType::Circle),
         GetTypeName(ColliderType::Ellipse),
-        GetTypeName(ColliderType::Parallelogram),
         GetTypeName(ColliderType::Quad),
         GetTypeName(ColliderType::ConvexPolygon)
     };
