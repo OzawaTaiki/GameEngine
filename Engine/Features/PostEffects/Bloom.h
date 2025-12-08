@@ -46,11 +46,13 @@ private:
 
 
     void CreateBrightExtractPso();
+    void CreateDownscalePso();
     void CreateHorizontalBlurPso();
     void CreateVerticalBlurPso();
     void CreateCombinePso();
 
     void ApplyBrightExtract(const std::string& input, const std::string& output);
+    void ApplyDownscale(const std::string& input, const std::string& output);
     void ApplyBlur(const std::string& input, const std::string& output, bool horizontal);
     void ApplyCombine(const std::string& input, const std::string& bloom, const std::string& output);
 private:
@@ -62,6 +64,7 @@ private:
     };
 
     Set brightExtractSet_;
+    Set downscaleSet_;
     Set horizontalBlurSet_;
     Set verticalBlurSet_;
     Set combineSet_;
