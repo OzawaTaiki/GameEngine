@@ -93,7 +93,7 @@ void ParticleEmitter::GenerateParticles()
 {
     if (!ValidateSettings()) return;
 
-    std::vector<std::unique_ptr<Particle>> particles;
+    std::vector<std::unique_ptr<Particle>> particles(emitCount_);
 
     Quaternion q = Quaternion::EulerToQuaternion(rotationEuler_);
     Matrix4x4 emitterTransform = MakeAffineMatrix(
