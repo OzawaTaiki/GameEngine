@@ -156,6 +156,13 @@ PSOBuilder& PSOBuilder::UseFullScreenInputLayout()
     return *this;
 }
 
+PSOBuilder& PSOBuilder::SetInputLayout(const std::vector<D3D12_INPUT_ELEMENT_DESC>& _inputElements)
+{
+    desc_.InputLayout.pInputElementDescs = _inputElements.data();
+    desc_.InputLayout.NumElements = static_cast<UINT>(_inputElements.size());
+    return *this;
+}
+
 PSOBuilder& PSOBuilder::SetRTVFormat(DXGI_FORMAT _format)
 {
     desc_.RTVFormats[0] = _format;
