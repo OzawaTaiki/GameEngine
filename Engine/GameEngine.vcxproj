@@ -259,6 +259,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\TextRenderer\AtlasData.cpp" />
     <ClCompile Include="Features\TextRenderer\FontCache.cpp" />
     <ClCompile Include="Features\TextRenderer\STBImplementation.cpp" />
+    <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp" />
     <ClCompile Include="Features\TextRenderer\TextGenerator.cpp" />
     <ClCompile Include="Features\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp" />
@@ -446,6 +447,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Sprite\SpriteManager.h" />
     <ClInclude Include="Features\TextRenderer\AtlasData.h" />
     <ClInclude Include="Features\TextRenderer\FontCache.h" />
+    <ClInclude Include="Features\TextRenderer\Text3DRenderer.h" />
     <ClInclude Include="Features\TextRenderer\TextGenerator.h" />
     <ClInclude Include="Features\TextRenderer\TextParam.h" />
     <ClInclude Include="Features\TextRenderer\TextRenderer.h" />

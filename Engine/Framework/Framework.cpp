@@ -106,6 +106,9 @@ void Framework::Initialize(const std::wstring& _winTitle)
     textRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
                               WinApp::kWindowSize_);
 
+    text3DRenderer_ = Text3DRenderer::GetInstance();
+    text3DRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList());
+
     PrimitiveBuilder::BuildAndRegisterAll();
 
     batch2DRenderer_ = Batch2DRenderer::GetInstance();
@@ -133,6 +136,7 @@ void Framework::Update()
 
     // フレーム始め
     TextRenderer::GetInstance()->BeginFrame();
+    Text3DRenderer::GetInstance()->BeginFrame();
 
     Time::Update();
 

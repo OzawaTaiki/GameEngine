@@ -5,6 +5,8 @@ struct Vector2
 {
 	float x, y;
 
+    static const Vector2 zero;
+    static const Vector2 one;
 
     Vector2 operator+(const Vector2& _v)const;
     Vector2 operator-(const Vector2& _v)const;

@@ -747,6 +747,9 @@
     <ClCompile Include="Features\PostEffects\Bloom.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
+    <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
+      <Filter>Features\Text</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1282,6 +1285,9 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderWithInput.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\TextRenderer\Text3DRenderer.h">
+      <Filter>Features\Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

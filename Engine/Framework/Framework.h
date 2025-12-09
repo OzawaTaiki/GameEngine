@@ -13,6 +13,7 @@
 #include <System/Audio/Audio.h>
 #include <System/Time/Time_MT.h>
 #include <Features/TextRenderer/TextRenderer.h>
+#include <Features/TextRenderer/Text3DRenderer.h>
 #include <Features/TextRenderer/FontCache.h>
 #include <Framework/Batch2DRenderer.h>
 
@@ -53,6 +54,7 @@ protected:
     GameTime*               gameTime_               = nullptr;//
     Audio* audio_ = nullptr;//
     TextRenderer* textRenderer_ = nullptr;//
+    Text3DRenderer* text3DRenderer_ = nullptr;//
     FontCache* fontCache_ = nullptr;//
     Batch2DRenderer* batch2DRenderer_ = nullptr;//
 

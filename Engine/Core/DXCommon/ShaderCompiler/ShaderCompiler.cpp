@@ -161,6 +161,10 @@ void ShaderCompiler::RegisterCommonShaders() {
     Register("SkyBox_VS", L"SkyBox.hlsl", L"vs_6_0", L"VSMain");
     Register("SkyBox_PS", L"SkyBox.hlsl", L"ps_6_0", L"PSMain");
 
+    // Text3DRenderer用
+    Register("Text3DRenderer.VS", L"Text3DRenderer.hlsl", L"vs_6_0", L"VSmain");
+    Register("Text3DRenderer.PS", L"Text3DRenderer.hlsl", L"ps_6_0", L"PSmain");
+
     Debug::Log("Common shaders registered\n");
 }
 
