@@ -32,7 +32,7 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
 
 
     // 最初のシーンで初期化
-    sceneManager_->Initialize("EffectTest");
+    sceneManager_->Initialize("Develop");
 }
 
 void SampleFramework::Update()
