@@ -753,6 +753,12 @@
     <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UISpriteRenderComponent.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1293,6 +1299,12 @@
       <Filter>Features\UI\New</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIColliderComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISpriteRenderComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextRenderComponent.h">
       <Filter>Features\UI\New</Filter>
     </ClInclude>
   </ItemGroup>

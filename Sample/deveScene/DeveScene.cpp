@@ -133,6 +133,81 @@ void DeveScene::Initialize(SceneData* _sceneData)
     //sprite->SetSize({ 128,128 });
     //sprite->SetTextureNameAndLoad("uvChecker.png");
 
+    // --------------------------------------------------
+    // UIRenderComponent テスト
+
+    // 1. UITextRenderComponent のテスト
+    testTextElement_ = std::make_unique<UIElement>("TestText");
+    testTextElement_->SetPosition(Vector2(100.0f, 50.0f));
+    testTextElement_->SetSize(Vector2(400.0f, 50.0f));
+    testTextElement_->SetOrder(100);
+
+    FontConfig fontConfig;
+    fontConfig.fontFilePath = "Resources/Fonts/NotoSansJP-Regular.ttf";
+    fontConfig.fontSize = 32;
+
+    auto* textComp = testTextElement_->AddComponent<UITextRenderComponent>(
+        testTextElement_.get(),
+        "UITextRenderComponent Test",
+        fontConfig
+    );
+
+    TextParam textParam;
+    textParam.position = Vector2(0.0f, 0.0f);
+    textParam.bottomColor = Vector4(1.0f, 1.0f, 0.0f, 1.0f);  // 黄色
+    textParam.scale = { 1.0f,1.0f };
+    textComp->SetTextParam(textParam);
+
+    // 2. UISpriteRenderComponent のテスト
+    testSpriteElement_ = std::make_unique<UIElement>("TestSprite");
+    testSpriteElement_->SetPosition(Vector2(500.0f, 200.0f));
+    testSpriteElement_->SetSize(Vector2(128.0f, 128.0f));
+    testSpriteElement_->SetOrder(50);
+
+    auto* spriteComp = testSpriteElement_->AddComponent<UISpriteRenderComponent>(
+        testSpriteElement_.get(),
+        "uvChecker.png"
+    );
+    spriteComp->SetColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    // 3. 背景付きテキストのテスト（親子関係）
+    testBackgroundElement_ = std::make_unique<UIElement>("Background");
+    testBackgroundElement_->SetPosition(Vector2(100.0f, 500.0f));
+    testBackgroundElement_->SetSize(Vector2(400.0f, 100.0f));
+    testBackgroundElement_->SetOrder(10);
+
+    auto* bgSprite = testBackgroundElement_->AddComponent<UISpriteRenderComponent>(
+        testBackgroundElement_.get(),
+        "white.png"
+    );
+    bgSprite->SetColor(Vector4(0.2f, 0.2f, 0.8f, 0.8f));  // 半透明の青
+
+    // 子要素（テキスト）
+    auto childText = std::make_unique<UIElement>("ChildText");
+    childText->SetPosition(Vector2(20.0f, 30.0f));  // 親からの相対位置
+    childText->SetSize(Vector2(360.0f, 40.0f));
+    childText->SetOrder(20);
+    childText->SetAnchor(Vector2(0.0f, 0.0f));  // アンカーを左上に設定
+
+    FontConfig childFont;
+    childFont.fontFilePath = "Resources/Fonts/NotoSansJP-Regular.ttf";
+    childFont.fontSize = 24;
+
+    auto* childTextComp = childText->AddComponent<UITextRenderComponent>(
+        childText.get(),
+        "Background + Text Test",
+        childFont
+    );
+
+    TextParam childParam;
+    childParam.bottomColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);  // 白色
+    childTextComp->SetTextParam(childParam);
+
+    // 子要素を追加
+    auto* addedChild = testBackgroundElement_->AddChild(std::move(childText));
+    // 子要素のInitializeを呼び出す
+    addedChild->Initialize();
+
 }
 
 void DeveScene::Update()
@@ -197,7 +272,37 @@ void DeveScene::Update()
 
     std::wstring wstr = std::wstring(str.begin(), str.end());
     wstr += L"\nこんにちは 世界";
-    text_.Draw(wstr, Vector2{ 100, 100 }, Vector4{ 1, 1, 1, 1 });
+    //text_.Draw(wstr, Vector2{ 100, 100 }, Vector4{ 1, 1, 1, 1 });
+
+    // UIRenderComponent テストの更新
+    if (testTextElement_)
+    {
+        testTextElement_->Update();
+        if (auto* comp = testTextElement_->GetComponent<UITextRenderComponent>())
+            comp->Update();
+    }
+
+    if (testSpriteElement_)
+    {
+        testSpriteElement_->Update();
+        if (auto* comp = testSpriteElement_->GetComponent<UISpriteRenderComponent>())
+            comp->Update();
+    }
+
+    if (testBackgroundElement_)
+    {
+        testBackgroundElement_->Update();
+        if (auto* comp = testBackgroundElement_->GetComponent<UISpriteRenderComponent>())
+            comp->Update();
+
+        // 子要素の更新
+        for (const auto& child : testBackgroundElement_->GetChildren())
+        {
+            child->Update();
+            if (auto* childComp = child->GetComponent<UITextRenderComponent>())
+                childComp->Update();
+        }
+    }
 
     // --------------------------------
     // シーン共通更新処理
@@ -237,6 +342,35 @@ void DeveScene::Draw()
     // スプライトの描画
     sprite_->Draw();
     //uiGroup_->Draw();
+
+    // UIRenderComponent テストの描画
+    if (testSpriteElement_)
+    {
+        if (auto* comp = testSpriteElement_->GetComponent<UISpriteRenderComponent>())
+            comp->Draw();
+    }
+
+    if (testBackgroundElement_)
+    {
+        if (auto* comp = testBackgroundElement_->GetComponent<UISpriteRenderComponent>())
+            comp->Draw();
+    }
+
+    if (testTextElement_)
+    {
+        if (auto* comp = testTextElement_->GetComponent<UITextRenderComponent>())
+            comp->Draw();
+    }
+
+    if (testBackgroundElement_)
+    {
+        // 子要素の描画
+        for (const auto& child : testBackgroundElement_->GetChildren())
+        {
+            if (auto* childComp = child->GetComponent<UITextRenderComponent>())
+                childComp->Draw();
+        }
+    }
 
     ParticleSystem::GetInstance()->DrawParticles();
 }

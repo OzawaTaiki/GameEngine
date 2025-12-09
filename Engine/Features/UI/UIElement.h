@@ -27,7 +27,7 @@ public:
 
     virtual void Initialize() {}
     virtual void Update() {}
-    virtual void Draw() {}  // 追加推奨
+    virtual void Draw() {}
 
     //------------------
     // レイアウト
@@ -43,6 +43,9 @@ public:
 
     void SetAnchor(Vector2 anchor) { anchor_ = anchor; }
     Vector2 GetAnchor() const { return anchor_; }
+
+    void SetOrder(uint16_t order) { order_ = order; }
+    uint16_t GetOrder() const { return order_; }
 
     //------------------
     // 状態
@@ -108,9 +111,12 @@ protected:
     Vector2 pivot_;
     Vector2 anchor_;
 
+    uint16_t order_; // 描画順序
+
     // 状態
     bool isVisible_;
     bool isEnabled_;
+
 
 private:
     // Anchor計算用

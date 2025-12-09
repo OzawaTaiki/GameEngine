@@ -7,6 +7,7 @@ UIElement::UIElement(const std::string& name):
     size_(100.0f, 50.0f),
     pivot_(0.5f, 0.5f),
     anchor_(0.5f, 0.5f),
+    order_(0),
     isVisible_(true),
     isEnabled_(true)
 {
