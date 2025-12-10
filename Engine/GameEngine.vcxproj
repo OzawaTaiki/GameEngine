@@ -275,6 +275,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\UIElement.cpp" />
     <ClCompile Include="Features\UI\UINavigationComponent.cpp" />
     <ClCompile Include="Features\UI\UINavigationManager.cpp" />
+    <ClCompile Include="Features\UI\UISliderComponent.cpp" />
+    <ClCompile Include="Features\UI\UISliderElement.cpp" />
     <ClCompile Include="Features\UI\UIInteractive.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -504,6 +506,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\UIComponent.h" />
     <ClInclude Include="Features\UI\UINavigationComponent.h" />
     <ClInclude Include="Features\UI\UINavigationManager.h" />
+    <ClInclude Include="Features\UI\UISliderComponent.h" />
+    <ClInclude Include="Features\UI\UISliderElement.h" />
     <ClInclude Include="Features\UI\UIElement.h" />
     <ClInclude Include="Features\UI\UIInteractive.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

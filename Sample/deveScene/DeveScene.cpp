@@ -304,6 +304,24 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
     // 初期フォーカスをButton1に設定
     UINavigationManager::GetInstance()->SetFocus(testButton1_.get());
+
+    // --------------------------------------------------
+    // UISliderElement テスト
+
+    // スライダー1: ボリューム調整風
+    testSlider1_ = std::make_unique<UISliderElement>(
+        "TestSlider1",
+        Vector2(700.0f, 400.0f),
+        Vector2(300.0f, 10.0f)  // トラックサイズ
+    );
+    testSlider1_->Initialize();
+    testSlider1_->SetRange(0.0f, 100.0f);
+    testSlider1_->SetValue(50.0f);
+    testSlider1_->SetOnValueChanged([](float value) {
+        Debug::Log("Slider Value: " + std::to_string(value));
+    });
+    testSlider1_->SetTrackColor(Vector4(0.4f, 0.4f, 0.4f, 1.0f));
+    testSlider1_->SetHandleColor(Vector4(0.2f, 0.6f, 0.9f, 1.0f));  // 青
 }
 
 void DeveScene::Update()
@@ -413,6 +431,10 @@ void DeveScene::Update()
     if (testButton4_)
         testButton4_->Update();
 
+    // UISliderElement テストの更新
+    if (testSlider1_)
+        testSlider1_->Update();
+
     // UICollisionManagerでマウス衝突判定
     Vector2 mousePos = input_->GetMousePosition();
     UICollisionManager::GetInstance()->CheckCollision(mousePos);
@@ -500,6 +522,10 @@ void DeveScene::Draw()
 
     if (testButton4_)
         testButton4_->Draw();
+
+    // UISliderElement テストの描画
+    if (testSlider1_)
+        testSlider1_->Draw();
 
     ParticleSystem::GetInstance()->DrawParticles();
 }

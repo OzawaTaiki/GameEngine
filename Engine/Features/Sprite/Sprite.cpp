@@ -54,7 +54,7 @@ void Sprite::Update()
 #endif // _DEBUG
 }
 
-void Sprite::Draw() const 
+void Sprite::Draw() const
 {
     Batch2DRenderer::GetInstance()->AddInstace(instanceData_, vertexData_, order_);
 }

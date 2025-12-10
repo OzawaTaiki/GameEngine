@@ -27,21 +27,6 @@ void UIButtonComponent::Update()
         return;
     }
 
-    // UICollisionManagerにコライダーを登録
-    if (collider_ && collider_->GetCollider())
-    {
-        auto collider = collider_->GetCollider();
-        collider->UpdateCache(owner_);
-        UICollisionManager::GetInstance()->RegisterElement(
-            collider,
-            owner_->GetOrder()
-        );
-#ifdef _DEBUG
-        collider->DrawDebug();
-#endif
-
-    }
-
     UpdateState();
 }
 

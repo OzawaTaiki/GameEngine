@@ -12,6 +12,7 @@
 #include <imgui.h>
 #endif
 #include <Debug/Debug.h>
+#include "UICollisionManager.h"
 
 UIColliderComponent::UIColliderComponent(ColliderType type)
     : colliderType_(type)
@@ -95,6 +96,10 @@ void UIColliderComponent::Update()
 
     // UIElementを直接渡してキャッシュ更新
     collider_->UpdateCache(owner_);
+    UICollisionManager::GetInstance()->RegisterElement(
+        collider_.get(),
+        owner_->GetOrder()
+    );
 
     // デバッグ描画
     if (debugDraw_)
