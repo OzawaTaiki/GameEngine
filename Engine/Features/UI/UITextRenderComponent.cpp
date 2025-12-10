@@ -27,7 +27,8 @@ void UITextRenderComponent::Update()
 void UITextRenderComponent::Draw()
 {
     TextParam param = textParam_;
-    param.position += owner_->GetWorldPosition();
+    // ワールド座標 = オーナーのワールド座標 + ローカルオフセット
+    param.position = owner_->GetWorldPosition() + textParam_.position;
 
     if (hasRect_)
     {

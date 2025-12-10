@@ -270,7 +270,11 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIRecntangleCollider.cpp" />
+    <ClCompile Include="Features\UI\UIButtonComponent.cpp" />
+    <ClCompile Include="Features\UI\UIButtonElement.cpp" />
     <ClCompile Include="Features\UI\UIElement.cpp" />
+    <ClCompile Include="Features\UI\UINavigationComponent.cpp" />
+    <ClCompile Include="Features\UI\UINavigationManager.cpp" />
     <ClCompile Include="Features\UI\UIInteractive.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -495,7 +499,11 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIQuadCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIRecntangleCollider.h" />
+    <ClInclude Include="Features\UI\UIButtonComponent.h" />
+    <ClInclude Include="Features\UI\UIButtonElement.h" />
     <ClInclude Include="Features\UI\UIComponent.h" />
+    <ClInclude Include="Features\UI\UINavigationComponent.h" />
+    <ClInclude Include="Features\UI\UINavigationManager.h" />
     <ClInclude Include="Features\UI\UIElement.h" />
     <ClInclude Include="Features\UI\UIInteractive.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
