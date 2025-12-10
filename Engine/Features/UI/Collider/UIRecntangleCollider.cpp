@@ -20,7 +20,7 @@ void UIRectangleCollider::UpdateCache(const UIElement* _uiElement)
         Vector2 size = _uiElement->GetSize();
         Vector2 pivot = _uiElement->GetPivot();
         leftTop_ = pos - pivot * size;
-        rightBottom_ = pos + size * pivot;
+        rightBottom_ = pos + size * (Vector2(1.0f, 1.0f) - pivot);
     }
     else
     {
@@ -71,9 +71,9 @@ void UIRectangleCollider::DrawDebug() const
 {
     const Vector2 LB = { leftTop_.x, rightBottom_.y };
     const Vector2 RT = { rightBottom_.x, leftTop_.y };
-
-    LineDrawer::GetInstance()->RegisterPoint(leftTop_, LB);
-    LineDrawer::GetInstance()->RegisterPoint(LB, rightBottom_);
-    LineDrawer::GetInstance()->RegisterPoint(rightBottom_, RT);
-    LineDrawer::GetInstance()->RegisterPoint(RT, leftTop_);
+    const Vector4 color = { 1,1,0,1 };
+    LineDrawer::GetInstance()->DebugDraw(leftTop_, LB, color);
+    LineDrawer::GetInstance()->DebugDraw(LB, rightBottom_, color);
+    LineDrawer::GetInstance()->DebugDraw(rightBottom_, RT, color);
+    LineDrawer::GetInstance()->DebugDraw(RT, leftTop_, color);
 }

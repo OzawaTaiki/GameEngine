@@ -23,7 +23,7 @@ void UISpriteRenderComponent::Initialize()
 }
 
 void UISpriteRenderComponent::Update()
-{
+{   
     // UIElementの位置・サイズと同期
     sprite_->translate_ = owner_->GetWorldPosition();
     sprite_->SetSize(owner_->GetSize());

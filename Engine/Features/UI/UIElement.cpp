@@ -17,6 +17,36 @@ UIElement::~UIElement()
 {
 }
 
+void UIElement::Update()
+{
+    for (auto& component : components_)
+    {
+        component->Update();
+    }
+    for (auto& child : children_)
+    {
+        child->Update();
+    }
+}
+
+void UIElement::Draw()
+{
+    if (!isVisible_)
+        return;
+
+    // 全コンポーネント描画（追加順に描画される）
+    for (auto& component : components_)
+    {
+        component->Draw();
+    }
+
+    // 全子要素描画
+    for (auto& child : children_)
+    {
+        child->Draw();
+    }
+}
+
 Vector2 UIElement::GetWorldPosition() const
 {
     if (parent_ == nullptr)
@@ -28,10 +58,11 @@ Vector2 UIElement::GetWorldPosition() const
     Vector2 parentSize = parent_->GetSize();
     // アンカーオフセットを計算
     Vector2 anchorOffset = CalculateAnchorOffset(anchor_, parentSize);
-    // 親要素のワールド座標を取得
-    Vector2 parentWorldPos = parent_->GetWorldPosition();
+    // 親要素のLTワールド座標を取得
+    Vector2 parentLTWorldPos = parent_->GetWorldPosition() - Vector2(parentSize.x * parent_->GetPivot().x,
+                                                                     parentSize.y * parent_->GetPivot().y);
     // ワールド座標を計算
-    Vector2 worldPos = parentWorldPos + anchorOffset + position_;
+    Vector2 worldPos = parentLTWorldPos + anchorOffset + position_;
     return worldPos;
 }
 

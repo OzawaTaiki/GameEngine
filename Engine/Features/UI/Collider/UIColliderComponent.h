@@ -60,7 +60,7 @@ public:
 private:
     std::unique_ptr<IUICollider> collider_;
     ColliderType colliderType_;
-    bool debugDraw_ = false;
+    bool debugDraw_ = true;
 
     /// <summary>
     /// Colliderのサイズを自動設定

@@ -30,6 +30,7 @@
 #include <Features/UI/UITextRenderComponent.h>
 #include <Features/UI/UISpriteRenderComponent.h>
 #include <Features/UI/UIButtonElement.h>
+#include <Features/UI/UISliderElement.h>
 
 
 class DeveScene : public BaseScene
@@ -97,6 +98,9 @@ private:
     std::unique_ptr<UIButtonElement> testButton2_ = nullptr;
     std::unique_ptr<UIButtonElement> testButton3_ = nullptr;
     std::unique_ptr<UIButtonElement> testButton4_ = nullptr;
+
+    // UISliderElement テスト
+    std::unique_ptr<UISliderElement> testSlider1_ = nullptr;
 
 
 

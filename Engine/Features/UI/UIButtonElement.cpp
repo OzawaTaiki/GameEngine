@@ -61,40 +61,13 @@ void UIButtonElement::Update()
 {
     UIElement::Update();
 
-    // コンポーネント更新
-    if (button_)
-        button_->Update();
-
-    if (background_)
-        background_->Update();
-
-    if (textComponent_)
-        textComponent_->Update();
-
     // 状態に応じた色更新
     OnStateChanged();
 }
 
 void UIButtonElement::Draw()
 {
-    if (!IsVisible())
-        return;
-
     UIElement::Draw();
-
-    // 背景描画
-    if (background_)
-        background_->Draw();
-
-    // テキスト描画
-    if (textComponent_)
-        textComponent_->Draw();
-
-    // 子要素の描画
-    for (const auto& child : GetChildren())
-    {
-        child->Draw();
-    }
 }
 
 void UIButtonElement::SetOnClick(std::function<void()> callback)

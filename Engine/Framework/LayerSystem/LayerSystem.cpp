@@ -139,7 +139,7 @@ void LayerSystem::SetLayer(const std::string& layerName)
     }
     else
     {
-        RTVManager::GetInstance()->DrawRenderTexture(layerName);
+        RTVManager::GetInstance()->SetRenderTexture(layerName);
     }
 
 }

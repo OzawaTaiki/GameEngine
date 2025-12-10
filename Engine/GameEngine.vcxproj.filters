@@ -771,6 +771,12 @@
     <ClCompile Include="Features\UI\UIButtonComponent.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UISliderComponent.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISliderElement.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1329,6 +1335,12 @@
       <Filter>Features\UI\New</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UINavigationManager.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderElement.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderComponent.h">
       <Filter>Features\UI\New</Filter>
     </ClInclude>
   </ItemGroup>

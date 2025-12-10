@@ -26,8 +26,8 @@ public:
     virtual ~UIElement();
 
     virtual void Initialize() {}
-    virtual void Update() {}
-    virtual void Draw() {}
+    virtual void Update();
+    virtual void Draw();
 
     //------------------
     // レイアウト
