@@ -2,6 +2,7 @@
 #include <Features/UI/UIElement.h>
 
 #include <Debug/ImGuiDebugManager.h>
+#include <Features/LineDrawer/LineDrawer.h>
 
 
 bool UIRectangleCollider::IsPointInside(const Vector2& _point) const
@@ -17,9 +18,9 @@ void UIRectangleCollider::UpdateCache(const UIElement* _uiElement)
         // UI依存モード：UIElementのパラメータから計算
         Vector2 pos = _uiElement->GetWorldPosition();
         Vector2 size = _uiElement->GetSize();
-
-        leftTop_ = pos;
-        rightBottom_ = pos + size;
+        Vector2 pivot = _uiElement->GetPivot();
+        leftTop_ = pos - pivot * size;
+        rightBottom_ = pos + size * pivot;
     }
     else
     {
@@ -64,4 +65,15 @@ void UIRectangleCollider::ImGui()
     ImGui::Text("Left Top: (%.1f, %.1f)", leftTop_.x, leftTop_.y);
     ImGui::Text("Right Bottom: (%.1f, %.1f)", rightBottom_.x, rightBottom_.y);
 #endif
+}
+
+void UIRectangleCollider::DrawDebug() const
+{
+    const Vector2 LB = { leftTop_.x, rightBottom_.y };
+    const Vector2 RT = { rightBottom_.x, leftTop_.y };
+
+    LineDrawer::GetInstance()->RegisterPoint(leftTop_, LB);
+    LineDrawer::GetInstance()->RegisterPoint(LB, rightBottom_);
+    LineDrawer::GetInstance()->RegisterPoint(rightBottom_, RT);
+    LineDrawer::GetInstance()->RegisterPoint(RT, leftTop_);
 }

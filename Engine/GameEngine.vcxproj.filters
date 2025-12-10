@@ -759,6 +759,18 @@
     <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UIButtonElement.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigationComponent.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigationManager.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIButtonComponent.cpp">
+      <Filter>Features\UI\New</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1305,6 +1317,18 @@
       <Filter>Features\UI\New</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UITextRenderComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButtonComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButtonElement.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationComponent.h">
+      <Filter>Features\UI\New</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationManager.h">
       <Filter>Features\UI\New</Filter>
     </ClInclude>
   </ItemGroup>

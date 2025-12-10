@@ -14,6 +14,8 @@
 #include <Debug/ImGuiHelper.h>
 #include  <Core/DXCommon/DXCommon.h>
 #include <Debug/Debug.h>
+#include <Features/UI/Collider/UICollisionManager.h>
+#include <Features/UI/UINavigationManager.h>
 
 
 DeveScene::~DeveScene()
@@ -208,6 +210,100 @@ void DeveScene::Initialize(SceneData* _sceneData)
     // 子要素のInitializeを呼び出す
     addedChild->Initialize();
 
+    // --------------------------------------------------
+    // UIButtonElement テスト
+
+    // ボタン1: クリックでログ出力
+    testButton1_ = std::make_unique<UIButtonElement>(
+        "TestButton1",
+        Vector2(700.0f, 100.0f),
+        Vector2(200.0f, 60.0f),
+        "Click Me!"
+    );
+    testButton1_->Initialize();
+    testButton1_->SetOnClick([]() {
+        Debug::Log("Button 1 Clicked!");
+    });
+    testButton1_->SetNormalColor(Vector4(0.2f, 0.7f, 0.2f, 1.0f));   // 緑
+    testButton1_->SetHoverColor(Vector4(0.3f, 0.9f, 0.3f, 1.0f));    // 明るい緑
+    testButton1_->SetPressedColor(Vector4(0.1f, 0.5f, 0.1f, 1.0f));  // 暗い緑
+
+    // ボタン2: クリックで色変更
+    testButton2_ = std::make_unique<UIButtonElement>(
+        "TestButton2",
+        Vector2(920.0f, 100.0f),
+        Vector2(200.0f, 60.0f),
+        "Toggle Color"
+    );
+    testButton2_->Initialize();
+    static bool colorToggle = false;
+    testButton2_->SetOnClick([this]() {
+        colorToggle = !colorToggle;
+        if (colorToggle)
+        {
+            testButton2_->SetNormalColor(Vector4(0.7f, 0.2f, 0.2f, 1.0f));  // 赤
+            Debug::Log("Button 2: Red");
+        }
+        else
+        {
+            testButton2_->SetNormalColor(Vector4(0.2f, 0.2f, 0.7f, 1.0f));  // 青
+            Debug::Log("Button 2: Blue");
+        }
+    });
+    testButton2_->SetNormalColor(Vector4(0.2f, 0.2f, 0.7f, 1.0f));   // 青
+    testButton2_->SetHoverColor(Vector4(0.4f, 0.4f, 0.9f, 1.0f));    // 明るい青
+    testButton2_->SetPressedColor(Vector4(0.1f, 0.1f, 0.5f, 1.0f));  // 暗い青
+    testButton2_->SetTextAlignment(TextAlignment::Center);
+
+    // ボタン3: 左下
+    testButton3_ = std::make_unique<UIButtonElement>(
+        "TestButton3",
+        Vector2(700.0f, 300.0f),
+        Vector2(200.0f, 60.0f),
+        "Button 3"
+    );
+    testButton3_->Initialize();
+    testButton3_->SetOnClick([]() {
+        Debug::Log("Button 3 Clicked!");
+    });
+    testButton3_->SetNormalColor(Vector4(0.7f, 0.5f, 0.2f, 1.0f));   // オレンジ
+    testButton3_->SetHoverColor(Vector4(0.9f, 0.7f, 0.3f, 1.0f));    // 明るいオレンジ
+    testButton3_->SetPressedColor(Vector4(0.5f, 0.3f, 0.1f, 1.0f));  // 暗いオレンジ
+
+    // ボタン4: 右下
+    testButton4_ = std::make_unique<UIButtonElement>(
+        "TestButton4",
+        Vector2(920.0f, 300.0f),
+        Vector2(200.0f, 60.0f),
+        "Button 4"
+    );
+    testButton4_->Initialize();
+    testButton4_->SetOnClick([]() {
+        Debug::Log("Button 4 Clicked!");
+    });
+    testButton4_->SetNormalColor(Vector4(0.7f, 0.2f, 0.7f, 1.0f));   // 紫
+    testButton4_->SetHoverColor(Vector4(0.9f, 0.4f, 0.9f, 1.0f));    // 明るい紫
+    testButton4_->SetPressedColor(Vector4(0.5f, 0.1f, 0.5f, 1.0f));  // 暗い紫
+
+    // ナビゲーション設定（2x2グリッド）
+    // Button1 (左上)
+    testButton1_->SetNavigation(NavigationDirection::Down, testButton3_.get());
+    testButton1_->SetNavigation(NavigationDirection::Right, testButton2_.get());
+
+    // Button2 (右上)
+    testButton2_->SetNavigation(NavigationDirection::Down, testButton4_.get());
+    testButton2_->SetNavigation(NavigationDirection::Left, testButton1_.get());
+
+    // Button3 (左下)
+    testButton3_->SetNavigation(NavigationDirection::Up, testButton1_.get());
+    testButton3_->SetNavigation(NavigationDirection::Right, testButton4_.get());
+
+    // Button4 (右下)
+    testButton4_->SetNavigation(NavigationDirection::Up, testButton2_.get());
+    testButton4_->SetNavigation(NavigationDirection::Left, testButton3_.get());
+
+    // 初期フォーカスをButton1に設定
+    UINavigationManager::GetInstance()->SetFocus(testButton1_.get());
 }
 
 void DeveScene::Update()
@@ -304,6 +400,26 @@ void DeveScene::Update()
         }
     }
 
+    // UIButtonElement テストの更新
+    if (testButton1_)
+        testButton1_->Update();
+
+    if (testButton2_)
+        testButton2_->Update();
+
+    if (testButton3_)
+        testButton3_->Update();
+
+    if (testButton4_)
+        testButton4_->Update();
+
+    // UICollisionManagerでマウス衝突判定
+    Vector2 mousePos = input_->GetMousePosition();
+    UICollisionManager::GetInstance()->CheckCollision(mousePos);
+
+    // UINavigationManagerで入力処理
+    UINavigationManager::GetInstance()->HandleInput();
+
     // --------------------------------
     // シーン共通更新処理
 
@@ -371,6 +487,19 @@ void DeveScene::Draw()
                 childComp->Draw();
         }
     }
+
+    // UIButtonElement テストの描画
+    if (testButton1_)
+        testButton1_->Draw();
+
+    if (testButton2_)
+        testButton2_->Draw();
+
+    if (testButton3_)
+        testButton3_->Draw();
+
+    if (testButton4_)
+        testButton4_->Draw();
 
     ParticleSystem::GetInstance()->DrawParticles();
 }

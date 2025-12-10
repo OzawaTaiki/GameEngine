@@ -73,6 +73,9 @@ void LineDrawer::Initialize()
     // 形状頂点初期化
     InitializeShapeVertices();
 
+    defaultCamera2D_.Initialize(CameraType::Orthographic);
+    cameraFor2D_ = &defaultCamera2D_;
+
     debugLineLayer = LayerSystem::CreateLayer("DebugLine", 100000);
 }
 

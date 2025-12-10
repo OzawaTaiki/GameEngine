@@ -15,6 +15,8 @@ public:
     void UpdateCache(const UIElement* _uiElement) override;
     void ImGui() override;
 
+    void DrawDebug() const override;
+
     // 独立モード用
     void SetLocalSize(const Vector2& _size) { localSize_ = _size; }
     void SetLocalOffset(const Vector2& _offset) { localOffset_ = _offset; }

@@ -141,6 +141,9 @@ private:
     const Camera* cameraFor3D_ = nullptr;
     const Camera* cameraFor2D_ = nullptr;
 
+    Camera defaultCamera2D_;
+
+
     // デフォルト色
     Vector4 color_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 
