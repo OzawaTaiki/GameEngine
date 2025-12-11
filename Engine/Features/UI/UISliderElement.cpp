@@ -18,8 +18,6 @@ void UISliderElement::Initialize()
 {
     UIElement::Initialize();
 
-    RegisterVariable("trackColor", &trackColor_);
-    RegisterVariable("handleColor", &handleColor_);
     RegisterVariable("handleHoverColor", &handleHoverColor_);
 
     // トラック作成
@@ -34,7 +32,6 @@ void UISliderElement::Initialize()
 
     // トラックのスプライト
     trackSprite_ = track_->AddComponent<UISpriteRenderComponent>(track_, "white.png");
-    trackSprite_->SetColor(trackColor_);
     trackSprite_->GetSprite()->SetAnchor(Vector2(0.0f, 0.5f));
 
     // トラックのコライダー
@@ -51,7 +48,6 @@ void UISliderElement::Initialize()
 
     // ハンドルのスプライト
     handleSprite_ = handle_->AddComponent<UISpriteRenderComponent>(handle_, "white.png");
-    handleSprite_->SetColor(handleColor_);
     handleSprite_->GetSprite()->SetAnchor(Vector2(0.5f, 0.5f));
 
     // ハンドルのコライダー
@@ -62,11 +58,6 @@ void UISliderElement::Initialize()
     slider_->SetTrack(track_);
     slider_->SetHandle(handle_);
 
-
-
-    // 色を反映
-    trackSprite_->SetColor(trackColor_);
-    handleSprite_->SetColor(handleColor_);
 }
 
 void UISliderElement::Update()

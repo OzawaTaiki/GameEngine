@@ -187,7 +187,11 @@ void UIElement::DrawImGuiInspector()
         ImGui::Checkbox("Enabled", &isEnabled_);
 
         ImGui::Text("Parent : %s", parent_ ? parent_->GetName().c_str() : "None");
-
+        ImGui::SeparatorText("Children");
+        for (auto& child : children_)
+        {
+            child->DrawImGuiInspector();
+        }
         ImGui::SeparatorText("Components");
         for (auto& component : components_)
         {
@@ -260,4 +264,7 @@ void UIElement::Save()
 {
     if (jsonBinder_)
         jsonBinder_->Save();
+
+    for (auto& child : children_)
+        child->Save();
 }
