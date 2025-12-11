@@ -11,6 +11,11 @@
 
 void UISliderComponent::Initialize()
 {
+    owner_->RegisterVariable("value", &value_);
+    owner_->RegisterVariable("minValue", &minValue_);
+    owner_->RegisterVariable("maxValue", &maxValue_);
+    owner_->RegisterVariable("isEnabled", &isEnabled_);
+
     // 初期ハンドル位置を設定
     UpdateHandlePosition();
 }

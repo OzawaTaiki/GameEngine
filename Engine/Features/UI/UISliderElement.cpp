@@ -18,6 +18,10 @@ void UISliderElement::Initialize()
 {
     UIElement::Initialize();
 
+    RegisterVariable("trackColor", &trackColor_);
+    RegisterVariable("handleColor", &handleColor_);
+    RegisterVariable("handleHoverColor", &handleHoverColor_);
+
     // トラック作成
     auto track = std::make_unique<UIElement>(GetName() + "_Track", true);
     track->SetPosition(Vector2(0.0f, 0.0f));
@@ -57,6 +61,12 @@ void UISliderElement::Initialize()
     slider_ = AddComponent<UISliderComponent>();
     slider_->SetTrack(track_);
     slider_->SetHandle(handle_);
+
+
+
+    // 色を反映
+    trackSprite_->SetColor(trackColor_);
+    handleSprite_->SetColor(handleColor_);
 }
 
 void UISliderElement::Update()

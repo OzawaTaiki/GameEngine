@@ -101,6 +101,25 @@ void from_json(const json& _j, UIColliderData& _data)
         _data.parameters = _j["parameters"];
 }
 
+void to_json(json& _j, const FontConfig& _config)
+{
+    _j = json{
+        {"fontFilePath", _config.fontFilePath},
+        {"fontSize", _config.fontSize},
+        {"atlasSize", _config.atlasSize}
+    };
+}
+
+void from_json(const json& _j, FontConfig& _config)
+{
+    if (_j.contains("fontFilePath"))
+        _config.fontFilePath = _j["fontFilePath"].get<std::string>();
+    if (_j.contains("fontSize"))
+        _config.fontSize = _j["fontSize"].get<float>();
+    if (_j.contains("atlasSize"))
+        _config.atlasSize = _j["atlasSize"].get<Vector2>();
+}
+
 // UIColliderDataからIUIColliderインスタンスを生成
 std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
 {

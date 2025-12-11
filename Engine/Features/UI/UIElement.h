@@ -1,6 +1,7 @@
 #pragma once
 #include "UIComponent.h"  // UIComponentの定義が必要
 #include <Math/Vector/Vector2.h>
+#include <Features/Json/JsonBinder.h>
 
 #include <typeinfo>
 #include <algorithm>
@@ -25,7 +26,7 @@ public:
     UIElement(const std::string& name,bool child = false);
     virtual ~UIElement();
 
-    virtual void Initialize() {}
+    virtual void Initialize();
     virtual void Update();
     virtual void Draw();
 
@@ -94,6 +95,15 @@ public:
     virtual void DrawImGuiTree();
     virtual void DrawImGuiInspector();
 
+    //------------------
+    // 保存機能（JsonBinder）
+    void InitializeJsonBinder(const std::string& directory = "Resources/Data/UI/");
+
+    template<typename T>
+    void RegisterVariable(const std::string& name, T* variablePtr);
+
+    void Save();
+
 protected:
     // 名前
     std::string name_;
@@ -104,6 +114,9 @@ protected:
 
     // Component
     std::vector<std::unique_ptr<UIComponent>> components_;
+
+    // 保存機能
+    std::unique_ptr<JsonBinder> jsonBinder_;
 
     // レイアウト
     Vector2 position_;
@@ -161,4 +174,11 @@ template<typename T>
 inline bool UIElement::HasComponent() const
 {
     return GetComponent<T>() != nullptr;
+}
+
+template<typename T>
+inline void UIElement::RegisterVariable(const std::string& name, T* variablePtr)
+{
+    if (jsonBinder_)
+        jsonBinder_->RegisterVariable(name, variablePtr);
 }

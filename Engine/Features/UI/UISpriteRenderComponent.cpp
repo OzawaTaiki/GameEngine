@@ -17,6 +17,9 @@ UISpriteRenderComponent::~UISpriteRenderComponent()
 
 void UISpriteRenderComponent::Initialize()
 {
+    owner_->RegisterVariable("texturePath", &texturePath_);
+    owner_->RegisterVariable("color", &color_);
+
     textureHandle_ = TextureManager::GetInstance()->Load(texturePath_);
 
     sprite_ = Sprite::Create("UISpriteRenderComponent_Sprite", textureHandle_, Vector2(0.5f, 0.5f));

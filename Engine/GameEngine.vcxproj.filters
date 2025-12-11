@@ -780,6 +780,12 @@
     <ClCompile Include="Features\UI\UISliderElement.cpp">
       <Filter>Features\UI\New\Element</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\UIImageElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
     <ClCompile Include="Features\UI\UINavigationManager.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
@@ -1344,6 +1350,12 @@
       <Filter>Features\UI\New\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIImageElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextElement.h">
       <Filter>Features\UI\New\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIComponent.h">

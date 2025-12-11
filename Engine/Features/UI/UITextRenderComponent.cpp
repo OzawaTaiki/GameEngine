@@ -18,6 +18,12 @@ UITextRenderComponent::~UITextRenderComponent()
 
 void UITextRenderComponent::Initialize()
 {
+    owner_->RegisterVariable("text", &text_);
+    owner_->RegisterVariable("fontConfig", &fontConfig_);
+    owner_->RegisterVariable("textParam", &textParam_);
+    owner_->RegisterVariable("clipRect", &clipRect_);
+    owner_->RegisterVariable("hasRect", &hasRect_);
+
     hasRect_ = false;
 }
 

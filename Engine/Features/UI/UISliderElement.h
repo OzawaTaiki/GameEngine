@@ -40,6 +40,11 @@ public:
     void SetHandleColor(const Vector4& color);
     void SetHandleHoverColor(const Vector4& color);
 
+    // 色取得
+    const Vector4& GetTrackColor() const { return trackColor_; }
+    const Vector4& GetHandleColor() const { return handleColor_; }
+    const Vector4& GetHandleHoverColor() const { return handleHoverColor_; }
+
     // 有効/無効
     void SetSliderEnabled(bool enabled);
 

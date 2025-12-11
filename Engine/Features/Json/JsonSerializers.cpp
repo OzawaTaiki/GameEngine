@@ -80,38 +80,62 @@ void from_json(const json& _j, Quaternion& _q)
     }
 }
 
+void to_json(json& _j, const Rect& _v)
+{
+    _j = json
+    {
+        {"leftTop" , _v.leftTop},
+        {"size", _v.size}
+    };
+}
+
+void from_json(const json& _j, Rect& _v)
+{
+    if (_j.contains("leftTop") && _j.contains("size"))
+    {
+        _v.leftTop = _j["leftTop"].get<Vector2>();
+        _v.size = _j["size"].get<Vector2>();
+    }
+    else
+    {
+        throw std::runtime_error("Invalid Rect JSON format");
+    }
+}
+
 void to_json(json& _j, const ParameterValue& _v)
 {
-    std::visit([&_j](auto&& arg) {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, int32_t>)
-        {
-            _j = json{ {"type","int"}, {"value", arg} };
-        }
-        else if constexpr (std::is_same_v<T, float>)
-        {
-            _j = json{ {"type","float"}, {"value", arg} };
-        }
-        else if constexpr (std::is_same_v<T, Vector2>)
-        {
-            _j = json{ {"type","Vector2"}, {"value", arg} };
-        }
-        else if constexpr (std::is_same_v<T, Vector3>)
-        {
-            _j = json{ {"type","Vector3"}, {"value", arg} };
-        }
-        else if constexpr (std::is_same_v<T, Vector4>)
-        {
-            _j = json{ {"type","Vector4"}, {"value", arg} };
-        }
-        else if constexpr (std::is_same_v<T, Quaternion>)
-        {
-            _j = json{ {"type","Quaternion"}, {"value", arg} };
-        }
-        else {
-            throw std::runtime_error("Invalid ParameterValue type");
-        }
-        }, _v);
+    std::visit([&_j](auto&& arg)
+               {
+                   using T = std::decay_t<decltype(arg)>;
+                   if constexpr (std::is_same_v<T, int32_t>)
+                   {
+                       _j = json{ {"type","int"}, {"value", arg} };
+                   }
+                   else if constexpr (std::is_same_v<T, float>)
+                   {
+                       _j = json{ {"type","float"}, {"value", arg} };
+                   }
+                   else if constexpr (std::is_same_v<T, Vector2>)
+                   {
+                       _j = json{ {"type","Vector2"}, {"value", arg} };
+                   }
+                   else if constexpr (std::is_same_v<T, Vector3>)
+                   {
+                       _j = json{ {"type","Vector3"}, {"value", arg} };
+                   }
+                   else if constexpr (std::is_same_v<T, Vector4>)
+                   {
+                       _j = json{ {"type","Vector4"}, {"value", arg} };
+                   }
+                   else if constexpr (std::is_same_v<T, Quaternion>)
+                   {
+                       _j = json{ {"type","Quaternion"}, {"value", arg} };
+                   }
+                   else
+                   {
+                       throw std::runtime_error("Invalid ParameterValue type");
+                   }
+               }, _v);
 }
 
 void from_json(const json& _j, ParameterValue& _v)
@@ -276,24 +300,24 @@ void to_json(json& _j, const PrimitiveType& _type)
 {
     switch (_type)
     {
-    case PrimitiveType::Plane:
-        _j = "Plane";
-        break;
-    case PrimitiveType::Triangle:
-        _j = "Triangle";
-        break;
-    case PrimitiveType::Cylinder:
-        _j = "Cylinder";
-        break;
-    case PrimitiveType::Ring:
-        _j = "Ring";
-        break;
-    case PrimitiveType::Cube:
-        _j = "Cube";
-        break;
-    default:
-        _j = "Unknown";
-        break;
+        case PrimitiveType::Plane:
+            _j = "Plane";
+            break;
+        case PrimitiveType::Triangle:
+            _j = "Triangle";
+            break;
+        case PrimitiveType::Cylinder:
+            _j = "Cylinder";
+            break;
+        case PrimitiveType::Ring:
+            _j = "Ring";
+            break;
+        case PrimitiveType::Cube:
+            _j = "Cube";
+            break;
+        default:
+            _j = "Unknown";
+            break;
     }
 }
 

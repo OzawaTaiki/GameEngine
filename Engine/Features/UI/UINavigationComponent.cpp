@@ -8,6 +8,8 @@
 void UINavigationComponent::Initialize()
 {
     // 初期化処理（現状特になし）
+    owner_->RegisterVariable("focusable", &focusable_);
+
 }
 
 void UINavigationComponent::Update()

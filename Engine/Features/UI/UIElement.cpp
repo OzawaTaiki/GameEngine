@@ -30,6 +30,11 @@ UIElement::~UIElement()
 #endif
 }
 
+void UIElement::Initialize()
+{
+    InitializeJsonBinder();
+}
+
 void UIElement::Update()
 {
     for (auto& component : components_)
@@ -188,6 +193,21 @@ void UIElement::DrawImGuiInspector()
         {
             component->DrawImGui();
         }
+
+        // 保存ボタン
+        if (jsonBinder_)
+        {
+            ImGui::SeparatorText("Save");
+            if (ImGui::Button("Save"))
+            {
+                Save();
+            }
+        }
+        else
+        {
+            ImGui::TextWrapped("JsonBinder is not initialized. Cannot save data.");
+            ImGui::TextWrapped("need to call InitializeJsonBinder() in Initialize().");
+        }
         ImGui::TreePop();
     }
     ImGui::PopID();
@@ -221,4 +241,23 @@ Vector2 UIElement::GetAnchorVector(Anchor anchor) const
         case Anchor::BottomRight:   return Vector2(1.0f, 1.0f);
         default:                    return Vector2(0.0f, 0.0f);
     };
+}
+
+void UIElement::InitializeJsonBinder(const std::string& directory)
+{
+    jsonBinder_ = std::make_unique<JsonBinder>(name_, directory);
+
+    RegisterVariable("position", &position_);
+    RegisterVariable("size", &size_);
+    RegisterVariable("pivot", &pivot_);
+    RegisterVariable("anchor", &anchor_);
+    RegisterVariable("order", &order_);
+    RegisterVariable("isVisible", &isVisible_);
+    RegisterVariable("isEnabled", &isEnabled_);
+}
+
+void UIElement::Save()
+{
+    if (jsonBinder_)
+        jsonBinder_->Save();
 }

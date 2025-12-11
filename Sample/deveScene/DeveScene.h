@@ -31,6 +31,8 @@
 #include <Features/UI/UISpriteRenderComponent.h>
 #include <Features/UI/UIButtonElement.h>
 #include <Features/UI/UISliderElement.h>
+#include <Features/UI/UIImageElement.h>
+#include <Features/UI/UITextElement.h>
 
 
 class DeveScene : public BaseScene
@@ -101,6 +103,12 @@ private:
 
     // UISliderElement テスト
     std::unique_ptr<UISliderElement> testSlider1_ = nullptr;
+
+    // UIImageElement テスト
+    std::unique_ptr<UIImageElement> testImage1_ = nullptr;
+
+    // UITextElement テスト
+    std::unique_ptr<UITextElement> testText1_ = nullptr;
 
 
 

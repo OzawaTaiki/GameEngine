@@ -315,14 +315,40 @@ void DeveScene::Initialize(SceneData* _sceneData)
         Vector2(300.0f, 10.0f)  // トラックサイズ
     );
     testSlider1_->Initialize();
-    testSlider1_->SetRange(0.0f, 100.0f);
     testSlider1_->SetValue(50.0f);
     testSlider1_->SetOnValueChanged([](float value) {
         Debug::Log("Slider Value: " + std::to_string(value));
     });
-    testSlider1_->SetTrackColor(Vector4(0.4f, 0.4f, 0.4f, 1.0f));
-    testSlider1_->SetHandleColor(Vector4(0.2f, 0.6f, 0.9f, 1.0f));  // 青
 
+    // --------------------------------------------------
+    // UIImageElement テスト
+
+    testImage1_ = std::make_unique<UIImageElement>(
+        "TestImage1",
+        Vector2(100.0f, 650.0f),
+        Vector2(128.0f, 128.0f),
+        "uvChecker.png"
+    );
+    testImage1_->Initialize();
+    testImage1_->SetColor(Vector4(1.0f, 0.5f, 0.5f, 1.0f));  // 赤みがかった色
+
+    // --------------------------------------------------
+    // UITextElement テスト
+
+    FontConfig testFontConfig;
+    testFontConfig.fontFilePath = "Resources/Fonts/NotoSansJP-Regular.ttf";
+    testFontConfig.fontSize = 28;
+
+    testText1_ = std::make_unique<UITextElement>(
+        "TestText1",
+        Vector2(250.0f, 650.0f),
+        "UITextElement Test!",
+        testFontConfig
+    );
+    testText1_->Initialize();
+    testText1_->SetColor(Vector4(0.2f, 0.8f, 0.2f, 1.0f));  // 緑色
+
+    // 注: スライダーの色設定は自動的に保存されます（UISliderElement内でJsonBinderを使用）
 }
 
 void DeveScene::Update()
@@ -435,6 +461,14 @@ void DeveScene::Update()
     if (testSlider1_)
         testSlider1_->Update();
 
+    // UIImageElement テストの更新
+    if (testImage1_)
+        testImage1_->Update();
+
+    // UITextElement テストの更新
+    if (testText1_)
+        testText1_->Update();
+
     // UICollisionManagerでマウス衝突判定
     Vector2 mousePos = input_->GetMousePosition();
     UICollisionManager::GetInstance()->CheckCollision(mousePos);
@@ -526,6 +560,14 @@ void DeveScene::Draw()
     // UISliderElement テストの描画
     if (testSlider1_)
         testSlider1_->Draw();
+
+    // UIImageElement テストの描画
+    if (testImage1_)
+        testImage1_->Draw();
+
+    // UITextElement テストの描画
+    if (testText1_)
+        testText1_->Draw();
 
     ParticleSystem::GetInstance()->DrawParticles();
 }

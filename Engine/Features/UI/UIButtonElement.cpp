@@ -23,6 +23,16 @@ void UIButtonElement::Initialize()
 {
     UIElement::Initialize();
 
+    RegisterVariable("normalColor", &normalColor_);
+    RegisterVariable("hoverColor", &hoverColor_);
+    RegisterVariable("pressedColor", &pressedColor_);
+    RegisterVariable("disabledColor", &disabledColor_);
+    RegisterVariable("focusColor", &focusColor_);
+
+    RegisterVariable("text", &text_);
+    RegisterVariable("textColor", &textColor_);
+    RegisterVariable("textAlignment", reinterpret_cast<int*>(textAlignment_));
+
     // 背景スプライト作成
     background_ = AddComponent<UISpriteRenderComponent>(this, "white.png");
     background_->SetColor(normalColor_);
@@ -56,6 +66,8 @@ void UIButtonElement::Initialize()
 
     // NavigationManagerに登録
     UINavigationManager::GetInstance()->Register(this);
+
+
 }
 
 void UIButtonElement::Update()

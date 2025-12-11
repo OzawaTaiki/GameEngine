@@ -23,6 +23,8 @@ void UIColliderComponent::Initialize()
     assert(owner_ != nullptr);
     assert(collider_ != nullptr);
 
+    owner_->RegisterVariable("colliderType", reinterpret_cast<uint32_t*>(&colliderType_));
+
     // サイズ未設定なら自動設定
     InitializeColliderSize();
 
