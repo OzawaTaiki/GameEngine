@@ -17,15 +17,17 @@ struct PSInput
 
 float4 main(PSInput input) : SV_TARGET
 {
-    // ガウシアンの重み
-    const float weights[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    const float weights[9] =
+    {
+        0.13298, 0.23227, 0.13298, 0.05618,
+        0.01468, 0.00268, 0.00033, 0.00003, 0.00000
+    };
 
     float4 result = inputTexture.Sample(linearSampler, input.uv) * weights[0];
 
-    for (int i = 1; i < 5; ++i)
+    for (int i = 1; i < 9; ++i)
     {
-        // blurRadiusで範囲を調整
-        float offset = i * blurRadius * texelSize.y;
+        float offset = i * blurRadius * texelSize.y; // Y方向！
         result += inputTexture.Sample(linearSampler, input.uv + float2(0.0, offset)) * weights[i];
         result += inputTexture.Sample(linearSampler, input.uv - float2(0.0, offset)) * weights[i];
     }

@@ -783,6 +783,9 @@
     <ClCompile Include="Features\UI\UINavigationManager.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
+    <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
+      <Filter>Features\Text</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1349,6 +1352,9 @@
     <ClInclude Include="Features\UI\UINavigationManager.h">
       <Filter>Features\UI\New</Filter>
     </ClInclude>
+    <ClInclude Include="Features\TextRenderer\Text3DRenderer.h">
+      <Filter>Features\Text</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1457,6 +1463,9 @@
       <Filter>Shaders\PostEffects\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\VerticalBlur.hlsl">
+      <Filter>Shaders\PostEffects\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Downsample.hlsl">
       <Filter>Shaders\PostEffects\Bloom</Filter>
     </FxCompile>
   </ItemGroup>

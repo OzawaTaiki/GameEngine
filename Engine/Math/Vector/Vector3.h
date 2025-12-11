@@ -27,6 +27,9 @@ struct Vector3
     // コピーコンストラクタ
     Vector3(const Vector3& _v)					:x(_v.x), y(_v.y), z(_v.z) {};
 
+    static const Vector3 zero;
+    static const Vector3 one;
+
 
     // メンバ関数
     // ベクトルの長さを返す

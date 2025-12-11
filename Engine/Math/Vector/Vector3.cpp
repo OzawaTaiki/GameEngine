@@ -3,6 +3,9 @@
 #include <Math/Quaternion/Quaternion.h>
 #include <numbers>
 
+const Vector3 Vector3::zero = Vector3(0.0f, 0.0f, 0.0f);
+const Vector3 Vector3::one = Vector3(1.0f, 1.0f, 1.0f);
+
 float Vector3::Length() const
 {
     return std::sqrtf(LengthSquared());

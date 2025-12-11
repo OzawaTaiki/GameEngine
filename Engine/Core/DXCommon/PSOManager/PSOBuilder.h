@@ -39,6 +39,7 @@ public:
     // InputLayout
     PSOBuilder& UseModelInputLayout();  // Model用InputLayoutを設定
     PSOBuilder& UseFullScreenInputLayout(); // フルスクリーン用InputLayoutを設定
+    PSOBuilder& SetInputLayout(const std::vector<D3D12_INPUT_ELEMENT_DESC>& _inputElements);
 
     // RTV/DSV Format
     PSOBuilder& SetRTVFormat(DXGI_FORMAT _format);

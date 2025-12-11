@@ -15,16 +15,16 @@ void Bloom::Initialize()
     // 中間テクスチャを作成
     RTVManager::GetInstance()->CreateRenderTarget(
         "bloom_temp0",
-        WinApp::kWindowWidth_,
-        WinApp::kWindowHeight_,
+        WinApp::kWindowWidth_>>1,
+        WinApp::kWindowHeight_>>1,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         { 0.0f,0.0f ,0.0f ,1.0f },
         false);
 
     RTVManager::GetInstance()->CreateRenderTarget(
         "bloom_temp1",
-        WinApp::kWindowWidth_,
-        WinApp::kWindowHeight_,
+        WinApp::kWindowWidth_>>1,
+        WinApp::kWindowHeight_>>1,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         { 0.0f,0.0f ,0.0f ,1.0f },
         false);
@@ -39,27 +39,30 @@ void Bloom::Apply(const std::string& input, const std::string& output)
     auto temp0 = manager->GetRenderTexture("bloom_temp0");
     auto temp1 = manager->GetRenderTexture("bloom_temp1");
 
-
-    // TODO : 入力テクスチャをダウンスケール
     // 明るい部分抽出
     temp0->ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
     ApplyBrightExtract(input, "bloom_temp0");
-    // 水平ブラー
+    // 入力テクスチャをダウンスケール
     temp0->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     temp1->ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
-    ApplyBlur("bloom_temp0", "bloom_temp1", true);
-    // 垂直ブラー
+    ApplyDownscale("bloom_temp0", "bloom_temp1");
+    // 水平ブラー
     temp0->ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
     temp1->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    ApplyBlur("bloom_temp1", "bloom_temp0", false);
-    // 合成
+    ApplyBlur("bloom_temp1", "bloom_temp0", true);
+    // 垂直ブラー
     temp0->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    ApplyCombine(input, "bloom_temp0", output);
+    temp1->ChangeRTVState(D3D12_RESOURCE_STATE_RENDER_TARGET);
+    ApplyBlur("bloom_temp0", "bloom_temp1", false);
+    // 合成
+    temp1->ChangeRTVState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    ApplyCombine(input, "bloom_temp1", output);
 }
 
 void Bloom::CreatePipelineStates()
 {
     CreateBrightExtractPso();
+    CreateDownscalePso();
     CreateHorizontalBlurPso();
     CreateVerticalBlurPso();
     CreateCombinePso();
@@ -105,6 +108,34 @@ void Bloom::CreateBrightExtractPso()
         .UseFullScreenInputLayout()
         .SetRootSignature(brightExtractSet_.rootSig.Get())
         .Build();
+}
+
+void Bloom::CreateDownscalePso()
+{
+    ShaderCompiler::GetInstance()->Register("Downscale", L"Downsample.hlsl", L"ps_6_0");
+
+    RootSignatureBuilder rootSigBuilder;
+    rootSigBuilder
+        .AddCBV(0)
+        .AddSRVTable(1, 0)
+        .AddDefaultStaticSampler(0);
+
+    downscaleSet_.rootSig = rootSigBuilder.Build();
+
+    auto builder = PSOBuilder::Create();
+
+    using Flag = PSOFlags;
+    downscaleSet_.pso =
+        builder
+        .SetBlendMode(Flag::BlendMode::Normal)
+        .SetCullMode(Flag::CullMode::None)
+        .SetDepthMode(Flag::DepthMode::Disable)
+        .SetPixelShader("Downscale")
+        .SetVertexShader("FullScreen_VS")
+        .UseFullScreenInputLayout()
+        .SetRootSignature(downscaleSet_.rootSig.Get())
+        .Build();
+
 }
 
 void Bloom::CreateHorizontalBlurPso()
@@ -197,6 +228,20 @@ void Bloom::ApplyBrightExtract(const std::string& input, const std::string& outp
     cmdList->SetGraphicsRootSignature(brightExtractSet_.rootSig.Get());
 
     cmdList->SetGraphicsRootConstantBufferView(0, constantBuffer_->GetGPUVirtualAddress());
+    uint32_t srvIndex = RTVManager::GetInstance()->GetRenderTexture(input)->GetSRVindexofRTV();
+    cmdList->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndex));
+    cmdList->DrawInstanced(3, 1, 0, 0);
+}
+
+void Bloom::ApplyDownscale(const std::string& input, const std::string& output)
+{
+    RTVManager::GetInstance()->SetRenderTexture(output);
+
+    auto cmdList = DXCommon::GetInstance()->GetCommandList();
+    cmdList->SetPipelineState(downscaleSet_.pso.Get());
+    cmdList->SetGraphicsRootSignature(downscaleSet_.rootSig.Get());
+
+    cmdList->SetGraphicsRootConstantBufferView(0, blurConstantBuffer_->GetGPUVirtualAddress());
     uint32_t srvIndex = RTVManager::GetInstance()->GetRenderTexture(input)->GetSRVindexofRTV();
     cmdList->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(srvIndex));
     cmdList->DrawInstanced(3, 1, 0, 0);
