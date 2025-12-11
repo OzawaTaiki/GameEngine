@@ -22,12 +22,12 @@ public:
     bool IsPointInside(const Vector2& _point) const override;
 
     /// <summary>
-    /// UIBaseの情報から円の中心と半径をキャッシュする
+    /// UIElementの情報から円の中心と半径をキャッシュする
     /// UI依存モード：UIのサイズの短い方の辺の半分として計算される
-    /// 独立モード：独自パラメータを使用（UIBaseは無視）
+    /// 独立モード：独自パラメータを使用（UIElementは無視）
     /// </summary>
-    /// <param name="_uiBase">親となるUIBase</param>
-    void UpdateCache(const UIBase* _uiBase) override;
+    /// <param name="_element">親となるUIElement</param>
+    void UpdateCache(const UIElement *_element) override;
 
     /// <summary>
     /// ImGuiでパラメータを表示・編集する

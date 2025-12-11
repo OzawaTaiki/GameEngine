@@ -1,5 +1,7 @@
 #include "UIEllipseCollider.h"
-#include <Features/UI/UIBase.h>
+#include <Features/UI/UIElement.h>
+
+#include <Debug/ImGuiDebugManager.h>
 
 
 bool UIEllipseCollider::IsPointInside(const Vector2& _point) const
@@ -19,22 +21,24 @@ bool UIEllipseCollider::IsPointInside(const Vector2& _point) const
     return equation <= 1.0f;
 }
 
-void UIEllipseCollider::UpdateCache(const UIBase* _uiBase)
+void UIEllipseCollider::UpdateCache(const UIElement* _uiElement)
 {
     if (transformMode_ == TransformMode::UIDependent)
     {
         // UI依存モード：UIのパラメータから計算
-        center_ = _uiBase->GetCenterPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        center_ = pos + size * 0.5f;  // 中心座標を計算
 
         // UIのサイズから各軸の半径を計算
-        Vector2 size = _uiBase->GetSize();
         radius_ = size * 0.5f;  // X軸とY軸それぞれの半径
     }
     else
     {
         // 独立モード：UIのローカル座標系で計算
-        // UI中心 + ローカルオフセット
-        center_ = _uiBase->GetCenterPos() + localOffset_;
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        center_ = pos + size * 0.5f + localOffset_;
         radius_ = independentRadius_;
     }
 }

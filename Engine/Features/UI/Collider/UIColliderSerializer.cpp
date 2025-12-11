@@ -1,8 +1,7 @@
 #include "UIColliderSerializer.h"
 #include "UICircleCollider.h"
-#include "UIRentangleCollider.h"
+#include "UIRecntangleCollider.h"
 #include "UIEllipseCollider.h"
-#include "UIParallelogramCollider.h"
 #include "UIQuadCollider.h"
 #include "UIColliderFactory.h"
 
@@ -22,9 +21,6 @@ void to_json(json& _j, const ColliderType& _type)
         break;
     case ColliderType::Ellipse:
         _j = "Ellipse";
-        break;
-    case ColliderType::Parallelogram:
-        _j = "Parallelogram";
         break;
     case ColliderType::Quad:
         _j = "Quad";
@@ -47,8 +43,6 @@ void from_json(const json& _j, ColliderType& _type)
         _type = ColliderType::Circle;
     else if (typeStr == "Ellipse")
         _type = ColliderType::Ellipse;
-    else if (typeStr == "Parallelogram")
-        _type = ColliderType::Parallelogram;
     else if (typeStr == "Quad")
         _type = ColliderType::Quad;
     else if (typeStr == "ConvexPolygon")
@@ -107,6 +101,25 @@ void from_json(const json& _j, UIColliderData& _data)
         _data.parameters = _j["parameters"];
 }
 
+void to_json(json& _j, const FontConfig& _config)
+{
+    _j = json{
+        {"fontFilePath", _config.fontFilePath},
+        {"fontSize", _config.fontSize},
+        {"atlasSize", _config.atlasSize}
+    };
+}
+
+void from_json(const json& _j, FontConfig& _config)
+{
+    if (_j.contains("fontFilePath"))
+        _config.fontFilePath = _j["fontFilePath"].get<std::string>();
+    if (_j.contains("fontSize"))
+        _config.fontSize = _j["fontSize"].get<float>();
+    if (_j.contains("atlasSize"))
+        _config.atlasSize = _j["atlasSize"].get<Vector2>();
+}
+
 // UIColliderDataからIUIColliderインスタンスを生成
 std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
 {
@@ -116,7 +129,7 @@ std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
     {
     case ColliderType::Rectangle:
     {
-        auto rect = std::make_unique<UIRentangleCollider>();
+        auto rect = std::make_unique<UIRectangleCollider>();
         if (parameters.contains("localOffset"))
             rect->SetLocalOffset(parameters["localOffset"].get<Vector2>());
         if (parameters.contains("localSize"))
@@ -142,23 +155,6 @@ std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
         // Ellipseのパラメータを設定
         // TODO: UIEllipseColliderの実装に合わせて調整
         collider = std::move(ellipse);
-        break;
-    }
-
-    case ColliderType::Parallelogram:
-    {
-        Vector2 skew = { 0.0f, 0.0f };
-        if (parameters.contains("skew"))
-            skew = parameters["skew"].get<Vector2>();
-
-        auto parallelogram = std::make_unique<UIParallelogramCollider>(skew);
-        if (parameters.contains("localOffset"))
-            parallelogram->SetLocalOffset(parameters["localOffset"].get<Vector2>());
-        if (parameters.contains("localSize"))
-            parallelogram->SetLocalSize(parameters["localSize"].get<Vector2>());
-        if (parameters.contains("localRotate"))
-            parallelogram->SetLocalRotate(parameters["localRotate"].get<float>());
-        collider = std::move(parallelogram);
         break;
     }
 
@@ -195,7 +191,7 @@ std::unique_ptr<IUICollider> UIColliderData::CreateCollider() const
 
     default:
         // デフォルトは矩形
-        collider = std::make_unique<UIRentangleCollider>();
+        collider = std::make_unique<UIRectangleCollider>();
         break;
     }
 
@@ -218,7 +214,7 @@ UIColliderData UIColliderData::FromCollider(const IUICollider* _collider, Collid
     {
     case ColliderType::Rectangle:
     {
-        auto rect = static_cast<const UIRentangleCollider*>(_collider);
+        auto rect = static_cast<const UIRectangleCollider*>(_collider);
         data.parameters = json{
             {"localOffset", rect->GetLocalOffset()},
             {"localSize", rect->GetLocalSize()}
@@ -240,18 +236,6 @@ UIColliderData UIColliderData::FromCollider(const IUICollider* _collider, Collid
     {
         // TODO: UIEllipseColliderの実装に合わせて調整
         data.parameters = json::object();
-        break;
-    }
-
-    case ColliderType::Parallelogram:
-    {
-        auto parallelogram = static_cast<const UIParallelogramCollider*>(_collider);
-        data.parameters = json{
-            {"skew", parallelogram->GetSkew()},
-            {"localOffset", parallelogram->GetLocalOffset()},
-            {"localSize", parallelogram->GetLocalSize()},
-            {"localRotate", parallelogram->GetLocalRotate()}
-        };
         break;
     }
 

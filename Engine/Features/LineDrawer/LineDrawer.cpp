@@ -73,6 +73,9 @@ void LineDrawer::Initialize()
     // 形状頂点初期化
     InitializeShapeVertices();
 
+    defaultCamera2D_.Initialize(CameraType::Orthographic);
+    cameraFor2D_ = &defaultCamera2D_;
+
     debugLineLayer = LayerSystem::CreateLayer("DebugLine", 100000);
 }
 
@@ -256,6 +259,13 @@ void LineDrawer::Draw()
 void LineDrawer::DebugDraw([[maybe_unused]] const Vector2& start, [[maybe_unused]] const Vector2& end, [[maybe_unused]] const Vector4& color)
 {
 #ifdef _DEBUG
+
+    auto commandList = DXCommon::GetInstance()->GetCommandList();
+    commandList->SetGraphicsRootSignature(rootSignature_);
+    commandList->SetPipelineState(graphicsPipelineState_);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+    TransferCameraMatrix2D();
+
     LayerID id = LayerSystem::GetCurrentLayerID();
     bool needChange = id != debugLineLayer;
 

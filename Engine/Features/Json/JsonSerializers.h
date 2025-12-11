@@ -4,10 +4,13 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Vector/Vector4.h>
 #include <Math/Quaternion/Quaternion.h>
+#include <Math/Rect/Rect.h>
 #include <Features/Animation/Sequence/SequenceEvent.h>
 #include <Features/TextRenderer/TextParam.h>
 #include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
 #include <Features/UI/Collider/UIColliderSerializer.h>
+
+#include <Features/TextRenderer/AtlasData.h>
 
 #include <json.hpp>
 
@@ -30,6 +33,9 @@ void from_json(const json& _j, Vector4& _v);
 void to_json(json& _j, const Quaternion& _v);
 void from_json(const json& _j, Quaternion& _v);
 
+// Rect
+void to_json(json& _j, const Rect& _v);
+void from_json(const json& _j, Rect& _v);
 
 /// AnimationSequence.h
 
@@ -96,3 +102,7 @@ void from_json(const json& _j, IUICollider::TransformMode& _mode);
 // UIColliderData
 void to_json(json& _j, const UIColliderData& _data);
 void from_json(const json& _j, UIColliderData& _data);
+
+// AtlasData
+void to_json(json& _j, const FontConfig& _config);
+void from_json(const json& _j, FontConfig& _config);

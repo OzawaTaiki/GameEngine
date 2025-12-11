@@ -9,7 +9,7 @@ struct TextParam
 {
     Vector2 scale = { 1.0f, 1.0f }; // スケール
     float rotate = 0.0f; // 回転角度
-    Vector2 position; // 描画位置
+    Vector2 position={ 0.0f,0.0f }; // 描画位置
 
     bool useGradient = false; // グラデーションを使用するかどうか
     Vector4 topColor = { 1, 1, 1, 1 }; // 上の色(グラデーション用)

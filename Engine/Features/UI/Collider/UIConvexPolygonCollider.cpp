@@ -1,6 +1,7 @@
 #include "UIConvexPolygonCollider.h"
-#include <Features/UI/UIBase.h>
+#include <Features/UI/UIElement.h>
 #include <Features/LineDrawer/LineDrawer.h>
+#include <Debug/ImGuiDebugManager.h>
 
 bool UIConvexPolygonCollider::IsPointInside(const Vector2& _point) const
 {
@@ -35,13 +36,15 @@ bool UIConvexPolygonCollider::IsPointInside(const Vector2& _point) const
     return true;
 }
 
-void UIConvexPolygonCollider::UpdateCache(const UIBase* _uiBase)
+void UIConvexPolygonCollider::UpdateCache(const UIElement* _uiElement)
 {
     if (transformMode_ == TransformMode::UIDependent)
     {
         // UI依存モード：UIの左上・右下座標から矩形として計算
-        Vector2 leftTop = _uiBase->GetLeftTopPos();
-        Vector2 rightBottom = _uiBase->GetRightBottomPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        Vector2 leftTop = pos;
+        Vector2 rightBottom = pos + size;
 
         worldVertices_.clear();
         const size_t defaultVertexCount = 4;
@@ -55,7 +58,9 @@ void UIConvexPolygonCollider::UpdateCache(const UIBase* _uiBase)
     else if (transformMode_ == TransformMode::Independent)
     {
         // 独立モード：UIのローカル座標系で計算
-        Vector2 uiCenter = _uiBase->GetCenterPos();
+        Vector2 pos = _uiElement->GetWorldPosition();
+        Vector2 size = _uiElement->GetSize();
+        Vector2 uiCenter = pos + size * 0.5f;
         worldVertices_.resize(localVertices_.size());
         for (size_t i = 0; i < localVertices_.size(); i++)
         {

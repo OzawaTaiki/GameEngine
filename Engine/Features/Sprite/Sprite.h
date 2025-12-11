@@ -19,7 +19,7 @@ public:
     void Initialize();
     void Initialize(uint32_t _textureHandle);
     void Update();
-    void Draw();
+    void Draw() const;
     void Draw(const Vector4& _color);
 
     // worldMat

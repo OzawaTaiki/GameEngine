@@ -1,5 +1,5 @@
 #include "UIInteractive.h"
-#include <Features/UI/Collider/UIRentangleCollider.h>
+#include <Features/UI/Collider/UIRecntangleCollider.h>
 #include <Features/UI/Collider/UIColliderFactory.h>
 
 #include <System/Input/Input.h>
@@ -9,7 +9,7 @@
 UIInteractive::UIInteractive()
 {
     // デフォルトで矩形コライダーを使用
-    collider_ = std::make_unique<UIRentangleCollider>();
+    collider_ = std::make_unique<UIRectangleCollider>();
     colliderType_ = ColliderType::Rectangle;
 }
 

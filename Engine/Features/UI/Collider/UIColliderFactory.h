@@ -34,8 +34,4 @@ public:
     /// <param name="type">Colliderタイプ</param>
     /// <returns>タイプ名</returns>
     static const char* GetTypeName(ColliderType type);
-
-private:
-    // ImGui用の一時パラメータ
-    static Vector2 tempSkew_;  // 平行四辺形のスキュー値
 };

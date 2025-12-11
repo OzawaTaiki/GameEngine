@@ -292,6 +292,15 @@
     <Filter Include="Shaders\PostEffects\Bloom">
       <UniqueIdentifier>{619d381d-9005-4970-9909-9907347eb04a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\UI\New">
+      <UniqueIdentifier>{d9111a5c-ca9e-4d49-a60c-a5a19236ae13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\New\Component">
+      <UniqueIdentifier>{e35a148f-2934-4e6e-980f-2d26a0489296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\New\Element">
+      <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -690,16 +699,13 @@
     <ClCompile Include="Features\Model\Primitive\Cube.cpp">
       <Filter>Features\Model\Primitive</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UIRentangleCollider.cpp">
+    <ClCompile Include="Features\UI\Collider\UIRecntangleCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UICircleCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp">
-      <Filter>Features\UI\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\Collider\UIParallelogramCollider.cpp">
       <Filter>Features\UI\Collider</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIColliderFactory.cpp">
@@ -746,6 +752,42 @@
     </ClCompile>
     <ClCompile Include="Features\PostEffects\Bloom.cpp">
       <Filter>Features\PosttEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIButtonComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigationComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISliderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISpriteRenderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIButtonElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISliderElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIImageElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigationManager.cpp">
+      <Filter>Features\UI\New</Filter>
     </ClCompile>
     <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
       <Filter>Features\Text</Filter>
@@ -1223,16 +1265,13 @@
     <ClInclude Include="Features\UI\Collider\Interface\IUICollider.h">
       <Filter>Features\UI\Collider\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\Collider\UIRentangleCollider.h">
+    <ClInclude Include="Features\UI\Collider\UIRecntangleCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UICircleCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h">
-      <Filter>Features\UI\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\Collider\UIParallelogramCollider.h">
       <Filter>Features\UI\Collider</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIColliderFactory.h">
@@ -1285,6 +1324,45 @@
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderWithInput.h">
       <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButtonComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Collider\UIColliderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISpriteRenderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextRenderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButtonElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIImageElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationManager.h">
+      <Filter>Features\UI\New</Filter>
     </ClInclude>
     <ClInclude Include="Features\TextRenderer\Text3DRenderer.h">
       <Filter>Features\Text</Filter>

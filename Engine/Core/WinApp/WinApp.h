@@ -23,7 +23,7 @@ public: // 静的メンバ関数
 public: // メンバ関数
     void Initilize(const wchar_t* _title = L"GameEngine",
 		uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_,
-		UINT _style = WS_OVERLAPPEDWINDOW);
+		UINT _style = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME);
 
 	void Finalize() const;
 

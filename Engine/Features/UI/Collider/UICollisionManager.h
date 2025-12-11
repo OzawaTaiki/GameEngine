@@ -19,7 +19,7 @@ private:
 
 private:
 
-    std::list < std::pair<uint16_t, IUICollider*>> colliders_;
+    std::list<std::pair<uint16_t, IUICollider*>> colliders_;
 
     bool needsSort_ = false;
 
