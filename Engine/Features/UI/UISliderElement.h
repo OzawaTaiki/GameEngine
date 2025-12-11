@@ -17,7 +17,8 @@ class UISliderElement : public UIElement
 public:
     UISliderElement(const std::string& name,
                     const Vector2& pos,
-                    const Vector2& size);
+                    const Vector2& size,
+                    bool child = false);
     ~UISliderElement() override = default;
 
     void Initialize() override;
@@ -41,6 +42,9 @@ public:
 
     // 有効/無効
     void SetSliderEnabled(bool enabled);
+
+    void DrawImGuiTree() override;
+    void DrawImGuiInspector() override;
 
 private:
     // 子要素

@@ -5,8 +5,9 @@
 
 UISliderElement::UISliderElement(const std::string& name,
                                  const Vector2& pos,
-                                 const Vector2& size)
-    : UIElement(name)
+                                 const Vector2& size,
+                                 bool child)
+    : UIElement(name, child)
 {
     SetPosition(pos);
     SetSize(size);
@@ -18,7 +19,7 @@ void UISliderElement::Initialize()
     UIElement::Initialize();
 
     // トラック作成
-    auto track = std::make_unique<UIElement>(GetName() + "_Track");
+    auto track = std::make_unique<UIElement>(GetName() + "_Track", true);
     track->SetPosition(Vector2(0.0f, 0.0f));
     track->SetSize(GetSize());
     track->SetPivot(Vector2(0.0f, 0.5f));  // 左中央基準
@@ -36,7 +37,7 @@ void UISliderElement::Initialize()
     track_->AddComponent<UIColliderComponent>(ColliderType::Rectangle);
 
     // ハンドル作成
-    auto handle = std::make_unique<UIElement>(GetName() + "_Handle");
+    auto handle = std::make_unique<UIElement>(GetName() + "_Handle",true);
     handle->SetSize(Vector2(handleWidth_, handleHeight_));
     handle->SetPivot(Vector2(0.5f, 0.5f));  // 中央基準
     handle->SetAnchor(Vector2(0.0f, 0.5f));
@@ -118,6 +119,27 @@ void UISliderElement::SetSliderEnabled(bool enabled)
     SetEnabled(enabled);
     if (slider_)
         slider_->SetEnabled(enabled);
+}
+
+void UISliderElement::DrawImGuiTree()
+{
+}
+
+void UISliderElement::DrawImGuiInspector()
+{
+#ifdef _DEBUG
+
+    ImGui::PushID(this);
+    UIElement::DrawImGuiInspector();
+    ImGui::BeginDisabled(1);
+    if (ImGui::TreeNode("UISliderElement"))
+    {
+        ImGui::TreePop();
+    }
+    ImGui::EndDisabled();
+    ImGui::PopID();
+
+#endif
 }
 
 void UISliderElement::OnStateChanged()

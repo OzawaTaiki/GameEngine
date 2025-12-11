@@ -1,6 +1,7 @@
 #include "UIElement.h"
+#include <Debug/ImGuiDebugManager.h>
 
-UIElement::UIElement(const std::string& name):
+UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
     name_(name),
     parent_(nullptr),
     position_(50.0f, 50.0f),
@@ -11,10 +12,22 @@ UIElement::UIElement(const std::string& name):
     isVisible_(true),
     isEnabled_(true)
 {
+#ifdef _DEBUG
+    if (child)
+        return;
+    ImGuiDebugManager::GetInstance()->AddDebugWindow(
+        "UIElement: " + name_,
+        [this]() { DrawImGuiInspector(); }
+    );
+#endif
+
 }
 
 UIElement::~UIElement()
 {
+#ifdef _DEBUG
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("UIElement: " + name_);
+#endif
 }
 
 void UIElement::Update()
@@ -116,10 +129,70 @@ std::unique_ptr<UIElement> UIElement::RemoveChild(UIElement* child)
 
 void UIElement::DrawImGuiTree()
 {
+#ifdef _DEBUG
+    // ツリーノードを表示（クリックで展開/折りたたみ）
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+    if (children_.empty())
+        flags |= ImGuiTreeNodeFlags_Leaf;
+
+    bool node_open = ImGui::TreeNodeEx(name_.c_str(), flags);
+
+    // クリックで選択（Inspectorに表示する対象を記録）
+    if (ImGui::IsItemClicked())
+    {
+        // TODO: 選択状態を保存（後で実装）
+    }
+
+    if (node_open)
+    {
+        // 子要素を再帰的に表示
+        for (auto& child : children_)
+        {
+            child->DrawImGuiTree();
+        }
+        ImGui::TreePop();
+    }
+#endif
 }
 
 void UIElement::DrawImGuiInspector()
 {
+#ifdef _DEBUG
+    ImGui::PushID(this);
+    if(ImGui::TreeNode("baseElement"))
+    {
+        ImGui::Text("UIElement: %s", name_.c_str());
+        ImGui::SeparatorText("Transform");
+        ImGui::Indent();
+        {
+            ImGui::DragFloat2("Position", &position_.x, 1.0f);
+            ImGui::DragFloat2("Size", &size_.x, 1.0f);
+            ImGui::DragFloat2("Pivot", &pivot_.x, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f, 0.0f, 1.0f);
+        }
+        ImGui::Unindent();
+
+        int order = order_;
+        if (ImGui::InputInt("Order", &order))
+        {
+            order_ = static_cast<uint16_t>(order);
+        }
+
+        ImGui::Checkbox("Visible", &isVisible_);
+        ImGui::Checkbox("Enabled", &isEnabled_);
+
+        ImGui::Text("Parent : %s", parent_ ? parent_->GetName().c_str() : "None");
+
+        ImGui::SeparatorText("Components");
+        for (auto& component : components_)
+        {
+            component->DrawImGui();
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+
+#endif
 }
 
 Vector2 UIElement::CalculateAnchorOffset(const Vector2& anchor, const Vector2& parentSize) const

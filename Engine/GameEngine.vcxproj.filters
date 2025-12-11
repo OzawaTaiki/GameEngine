@@ -295,6 +295,12 @@
     <Filter Include="Features\UI\New">
       <UniqueIdentifier>{d9111a5c-ca9e-4d49-a60c-a5a19236ae13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\UI\New\Component">
+      <UniqueIdentifier>{e35a148f-2934-4e6e-980f-2d26a0489296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\New\Element">
+      <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -747,34 +753,34 @@
     <ClCompile Include="Features\PostEffects\Bloom.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\UIElement.cpp">
-      <Filter>Features\UI\New</Filter>
+    <ClCompile Include="Features\UI\UIButtonComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp">
-      <Filter>Features\UI\New</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UISpriteRenderComponent.cpp">
-      <Filter>Features\UI\New</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
-      <Filter>Features\UI\New</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIButtonElement.cpp">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\New\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UINavigationComponent.cpp">
-      <Filter>Features\UI\New</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UINavigationManager.cpp">
-      <Filter>Features\UI\New</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIButtonComponent.cpp">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\New\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UISliderComponent.cpp">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UISpriteRenderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIButtonElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UISliderElement.cpp">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UINavigationManager.cpp">
       <Filter>Features\UI\New</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1310,37 +1316,37 @@
     <ClInclude Include="Features\UI\UISliderWithInput.h">
       <Filter>Features\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\UIComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIElement.h">
-      <Filter>Features\UI\New</Filter>
+    <ClInclude Include="Features\UI\UIButtonComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIColliderComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UISpriteRenderComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UITextRenderComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIButtonComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIButtonElement.h">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\New\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UINavigationComponent.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UINavigationManager.h">
-      <Filter>Features\UI\New</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UISliderElement.h">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\New\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISpriteRenderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UITextRenderComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIButtonElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UISliderElement.h">
+      <Filter>Features\UI\New\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIComponent.h">
+      <Filter>Features\UI\New\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationManager.h">
       <Filter>Features\UI\New</Filter>
     </ClInclude>
   </ItemGroup>
