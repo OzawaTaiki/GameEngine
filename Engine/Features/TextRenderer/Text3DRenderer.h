@@ -45,7 +45,7 @@ public:
     void DrawText3D(
         const std::wstring& _text,
         AtlasData* _atlas,
-        Camera* _camera,
+        const Camera* _camera,
         const Vector3& _position,
         const Vector3& _rotation = Vector3::zero,
         const Vector2& _scale = {1.0f, 1.0f},
@@ -59,7 +59,7 @@ public:
     void DrawText3D(
         const std::wstring& _text,
         AtlasData* _atlas,
-        Camera* _camera,
+        const Camera* _camera,
         const Vector3& _position,
         const Vector3& _rotation,
         const Vector2& _scale,
@@ -75,7 +75,7 @@ public:
     void DrawText3DImmediate(
         const std::wstring& _text,
         AtlasData* _atlas,
-        Camera* _camera,
+        const Camera* _camera,
         const Vector3& _position,
         const Vector3& _rotation = Vector3::zero,
         const Vector2& _scale = {1.0f, 1.0f},
@@ -89,7 +89,7 @@ public:
     void DrawText3DImmediate(
         const std::wstring& _text,
         AtlasData* _atlas,
-        Camera* _camera,
+        const Camera* _camera,
         const Vector3& _position,
         const Vector3& _rotation,
         const Vector2& _scale,
@@ -141,7 +141,7 @@ private:
         const Vector4& _topColor,
         const Vector4& _bottomColor,
         ResourceDataGroup* _res,
-        Camera* _camera
+        const Camera* _camera
     );
 
     // リソース管理
@@ -155,7 +155,7 @@ private:
     // GPU転送・描画
     void UploadVertexData(ResourceDataGroup* _res);
     void UploadMatrixData(ResourceDataGroup* _res);
-    void UpdateCameraBuffer(Camera* _camera);
+    void UpdateCameraBuffer(const Camera* _camera);
     void RenderText(ResourceDataGroup* _res);
 
     // 逐次描画用の内部関数
@@ -163,7 +163,7 @@ private:
     void DrawTextImmediate_Internal(
         const std::wstring& _text,
         AtlasData* _atlas,
-        Camera* _camera,
+        const Camera* _camera,
         const Vector3& _position,
         const Vector3& _rotation,
         const Vector2& _scale,

@@ -75,7 +75,7 @@ void Text3DRenderer::EndFrame()
 void Text3DRenderer::DrawText3D(
     const std::wstring& _text,
     AtlasData* _atlas,
-    Camera* _camera,
+    const Camera* _camera,
     const Vector3& _position,
     const Vector3& _rotation,
     const Vector2& _scale,
@@ -89,7 +89,7 @@ void Text3DRenderer::DrawText3D(
 void Text3DRenderer::DrawText3D(
     const std::wstring& _text,
     AtlasData* _atlas,
-    Camera* _camera,
+    const Camera* _camera,
     const Vector3& _position,
     const Vector3& _rotation,
     const Vector2& _scale,
@@ -104,7 +104,7 @@ void Text3DRenderer::DrawText3D(
 void Text3DRenderer::DrawText3DImmediate(
     const std::wstring& _text,
     AtlasData* _atlas,
-    Camera* _camera,
+    const Camera* _camera,
     const Vector3& _position,
     const Vector3& _rotation,
     const Vector2& _scale,
@@ -117,7 +117,7 @@ void Text3DRenderer::DrawText3DImmediate(
 void Text3DRenderer::DrawText3DImmediate(
     const std::wstring& _text,
     AtlasData* _atlas,
-    Camera* _camera,
+    const Camera* _camera,
     const Vector3& _position,
     const Vector3& _rotation,
     const Vector2& _scale,
@@ -137,7 +137,7 @@ void Text3DRenderer::DrawTextInternal(
     const Vector4& _topColor,
     const Vector4& _bottomColor,
     ResourceDataGroup* _res,
-    Camera* _camera)
+    const Camera* _camera)
 {
     if (_text.empty() || !_res || !_camera)
         return;
@@ -449,7 +449,7 @@ void Text3DRenderer::UploadMatrixData(ResourceDataGroup* _res)
     }
 }
 
-void Text3DRenderer::UpdateCameraBuffer(Camera* _camera)
+void Text3DRenderer::UpdateCameraBuffer(const Camera* _camera)
 {
     if (!_camera || !cameraBufferMap_)
         return;
@@ -530,7 +530,7 @@ void Text3DRenderer::CreateImmediateResources()
 void Text3DRenderer::DrawTextImmediate_Internal(
     const std::wstring& _text,
     AtlasData* _atlas,
-    Camera* _camera,
+    const Camera* _camera,
     const Vector3& _position,
     const Vector3& _rotation,
     const Vector2& _scale,

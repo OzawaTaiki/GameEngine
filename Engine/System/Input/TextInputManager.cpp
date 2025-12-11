@@ -1,5 +1,6 @@
 #include "TextInputManager.h"
 #include <Utility/ConvertString/ConvertString.h>
+#include <Windows.h>
 
 TextInputManager* TextInputManager::GetInstance()
 {
@@ -34,4 +35,39 @@ std::wstring TextInputManager::GetInputWText()
 void TextInputManager::Clear()
 {
     inputBuffer_.clear();
+}
+
+
+bool TextInputManager::ConvertDIKeyToChar(uint8_t dikCode, bool shift, wchar_t& outChar)
+{
+    // DIK から仮想キーコード(VK)に変換
+    UINT vkCode = MapVirtualKey(dikCode, MAPVK_VSC_TO_VK_EX);
+    if (vkCode == 0) return false;
+
+    // キーボード状態を設定
+    BYTE keyState[256] = {};
+    if (shift)
+    {
+        keyState[VK_SHIFT] = 0x80;
+    }
+
+    // Unicode文字に変換
+    wchar_t buffer[2] = {};
+    int result = ToUnicodeEx(
+        vkCode,
+        dikCode,
+        keyState,
+        buffer,
+        2,
+        0,
+        GetKeyboardLayout(0)
+    );
+
+    if (result == 1)
+    {
+        outChar = buffer[0];
+        return true;
+    }
+
+    return false;
 }
