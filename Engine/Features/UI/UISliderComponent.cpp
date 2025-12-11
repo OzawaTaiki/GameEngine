@@ -57,20 +57,26 @@ void UISliderComponent::Update()
 void UISliderComponent::DrawImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
     if (ImGui::TreeNode("UISliderComponent"))
     {
-        ImGui::Text("Value: %.3f", value_);
-        ImGui::Text("Range: [%.3f, %.3f]", minValue_, maxValue_);
-        ImGui::Checkbox("Enabled", &isEnabled_);
-        ImGui::Checkbox("Is Dragging", &isDragging_);
-
         if (ImGui::SliderFloat("Value", &value_, minValue_, maxValue_))
         {
             SetValue(value_);
         }
+        if(ImGui::DragFloatRange2("Range", &minValue_, &maxValue_, 0.1f))
+        {
+            SetRange(minValue_, maxValue_);
+        }
+        ImGui::Checkbox("Enabled", &isEnabled_);
+        ImGui::BeginDisabled(1);
+        ImGui::Checkbox("Is Dragging", &isDragging_);
+        ImGui::EndDisabled();
+
 
         ImGui::TreePop();
     }
+    ImGui::PopID();
 #endif
 }
 

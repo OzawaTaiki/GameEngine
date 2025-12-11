@@ -38,7 +38,8 @@ public:
     UIButtonElement(const std::string& name,
                     const Vector2& pos,
                     const Vector2& size,
-                    const std::string& text = "Button");
+                    const std::string& text = "Button",
+                    bool child = false);
     ~UIButtonElement() override = default;
 
     void Initialize() override;
@@ -73,6 +74,8 @@ public:
     void SetNavigation(NavigationDirection dir, UIElement* target);
     void SetFocusable(bool focusable);
     bool IsFocused() const;
+
+    void DrawImGuiInspector() override;
 
 private:
     // Component参照

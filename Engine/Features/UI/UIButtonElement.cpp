@@ -9,8 +9,9 @@
 UIButtonElement::UIButtonElement(const std::string& name,
                                  const Vector2& pos,
                                  const Vector2& size,
-                                 const std::string& text)
-    : UIElement(name)
+                                 const std::string& text,
+                                 bool child)
+    : UIElement(name, child)
     , text_(text)
 {
     SetPosition(pos);
@@ -229,4 +230,35 @@ void UIButtonElement::SetFocusable(bool focusable)
 bool UIButtonElement::IsFocused() const
 {
     return navigation_ ? navigation_->IsFocused() : false;
+}
+
+void UIButtonElement::DrawImGuiInspector()
+{
+#ifdef _DEBUG
+
+    ImGui::PushID(this);
+    UIElement::DrawImGuiInspector();
+    if (ImGui::TreeNode("UIButtonElement"))
+    {
+        // 色設定
+        ImGui::ColorEdit4("Normal Color", &normalColor_.x);
+        ImGui::ColorEdit4("Hover Color", &hoverColor_.x);
+        ImGui::ColorEdit4("Pressed Color", &pressedColor_.x);
+        ImGui::ColorEdit4("Disabled Color", &disabledColor_.x);
+        ImGui::ColorEdit4("Focus Color", &focusColor_.x);
+        // テキストアラインメント
+        const char* alignments[] = {
+            "TopLeft", "TopCenter", "TopRight",
+            "CenterLeft", "Center", "CenterRight",
+            "BottomLeft", "BottomCenter", "BottomRight"
+        };
+        int currentAlignment = static_cast<int>(textAlignment_);
+        if (ImGui::Combo("Text Alignment", &currentAlignment, alignments, IM_ARRAYSIZE(alignments)))
+        {
+            SetTextAlignment(static_cast<TextAlignment>(currentAlignment));
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+#endif
 }

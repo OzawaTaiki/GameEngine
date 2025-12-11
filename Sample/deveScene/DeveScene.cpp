@@ -322,6 +322,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
     });
     testSlider1_->SetTrackColor(Vector4(0.4f, 0.4f, 0.4f, 1.0f));
     testSlider1_->SetHandleColor(Vector4(0.2f, 0.6f, 0.9f, 1.0f));  // 青
+
 }
 
 void DeveScene::Update()
@@ -374,7 +375,6 @@ void DeveScene::Update()
         lights_->ImGui();
 
     }
-
 
 
 #endif // _DEBUG

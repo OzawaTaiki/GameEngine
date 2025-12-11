@@ -1,6 +1,7 @@
 #include "UISpriteRenderComponent.h"
 #include <Features/UI/UIElement.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Debug/ImGuiDebugManager.h>
 
 UISpriteRenderComponent::UISpriteRenderComponent(UIElement* owner, const std::string& texturePath):
     UIComponent(),
@@ -23,7 +24,7 @@ void UISpriteRenderComponent::Initialize()
 }
 
 void UISpriteRenderComponent::Update()
-{   
+{
     // UIElementの位置・サイズと同期
     sprite_->translate_ = owner_->GetWorldPosition();
     sprite_->SetSize(owner_->GetSize());
@@ -40,6 +41,27 @@ void UISpriteRenderComponent::Draw()
 
 void UISpriteRenderComponent::DrawImGui()
 {
+#ifdef _DEBUG
+
+    ImGui::PushID(this);
+    char buffer[256];
+
+    if (ImGui::TreeNode("UISpriteRenderComponent"))
+    {
+        ImGui::Text("directory: %s", "Resources/images/");
+        strcpy_s(buffer, texturePath_.c_str());
+        ImGui::InputText("Texture Path: %s", buffer, sizeof(buffer));
+        if (ImGui::Button("Load Texture"))
+        {
+            texturePath_ = std::string(buffer);
+            LoadAndSetTexture(texturePath_);
+        }
+        ImGui::ColorEdit4("Color", &color_.x);
+
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+#endif
 }
 
 void UISpriteRenderComponent::LoadAndSetTexture(const std::string& filePath)

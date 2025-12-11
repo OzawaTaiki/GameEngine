@@ -8,9 +8,7 @@
 #include <cassert>
 #include <iostream>
 
-#ifdef USE_IMGUI
-#include <imgui.h>
-#endif
+#include <Debug/ImGuiDebugManager.h>
 #include <Debug/Debug.h>
 #include "UICollisionManager.h"
 
@@ -81,13 +79,6 @@ void UIColliderComponent::InitializeColliderSize()
         break;
     }
 
-#ifdef _DEBUG
-    if (ownerSize == Vector2(0, 0))
-    {
-        std::cout << "[Warning] UIColliderComponent on '" << owner_->GetName()
-                  << "' auto-set to zero size." << std::endl;
-    }
-#endif
 }
 
 void UIColliderComponent::Update()
@@ -181,29 +172,23 @@ Vector2 UIColliderComponent::GetOffset() const
 
 void UIColliderComponent::DrawImGui()
 {
-#ifdef USE_IMGUI
-    ImGui::Text("UIColliderComponent");
+#ifdef _DEBUG
 
-    // Collider種類変更UI
-    auto newCollider = UIColliderFactory::ImGuiSelectCollider(
-        colliderType_,
-        "Collider Type"
-    );
-
-    if (newCollider)
+    ImGui::PushID(this);
+    if (ImGui::TreeNode("UIColliderComponent"))
     {
-        collider_ = std::move(newCollider);
-        InitializeColliderSize();
-    }
+        static std::string typeNames[] = {
+            "Rectangle", "Circle", "Ellipse", "Quad", "ConvexPolygon"
+        };
+        ImGui::Text("Collider Type: %s", typeNames[static_cast<int>(colliderType_)].c_str());
+        ImGui::Checkbox("Debug Draw", &debugDraw_);
 
-    // Debug Draw
-    ImGui::Checkbox("Debug Draw", &debugDraw_);
-
-    // Collider固有のImGui
-    ImGui::Separator();
-    if (collider_)
-    {
+        ImGui::TreeNode("Collider Details");
         collider_->ImGui();
+
+        ImGui::TreePop();
     }
+    ImGui::PopID();
+
 #endif
 }

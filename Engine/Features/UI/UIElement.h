@@ -22,7 +22,7 @@ enum class Anchor
 class UIElement
 {
 public:
-    UIElement(const std::string& name);
+    UIElement(const std::string& name,bool child = false);
     virtual ~UIElement();
 
     virtual void Initialize() {}
@@ -91,8 +91,8 @@ public:
 
     //------------------
     // ImGui
-    void DrawImGuiTree();
-    void DrawImGuiInspector();
+    virtual void DrawImGuiTree();
+    virtual void DrawImGuiInspector();
 
 protected:
     // 名前

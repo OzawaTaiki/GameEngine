@@ -33,21 +33,19 @@ void UIButtonComponent::Update()
 void UIButtonComponent::DrawImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
+    static std::string stateNames[] = { "Normal", "Hovered", "Pressed", "Disabled" };
     if (ImGui::TreeNode("UIButtonComponent"))
     {
-        // 状態表示
-        const char* stateNames[] = { "Normal", "Hovered", "Pressed", "Disabled" };
-        ImGui::Text("State: %s", stateNames[static_cast<int>(state_)]);
-
-        // 有効/無効トグル
         ImGui::Checkbox("Enabled", &isEnabled_);
-
-        // コールバック設定状態
-        ImGui::Text("OnClick: %s", onClick_ ? "Set" : "Not Set");
-        ImGui::Text("OnHover: %s", onHover_ ? "Set" : "Not Set");
-
+        ImGui::Text("State: %s", stateNames[static_cast<int>(state_)].c_str());
+        ImGui::BeginDisabled(1);
+        bool callback = (onClick_ != nullptr);
+        ImGui::Checkbox("has Callback", &callback);
+        ImGui::EndDisabled();
         ImGui::TreePop();
     }
+    ImGui::PopID();
 #endif
 }
 

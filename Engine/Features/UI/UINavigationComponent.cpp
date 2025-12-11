@@ -18,10 +18,13 @@ void UINavigationComponent::Update()
 void UINavigationComponent::DrawImGui()
 {
 #ifdef _DEBUG
+    ImGui::PushID(this);
     if (ImGui::TreeNode("UINavigationComponent"))
     {
         ImGui::Checkbox("Focusable", &focusable_);
+        ImGui::BeginDisabled(true);
         ImGui::Checkbox("Is Focused", &isFocused_);
+        ImGui::EndDisabled();
 
         ImGui::Separator();
         ImGui::Text("Navigation:");
@@ -34,6 +37,7 @@ void UINavigationComponent::DrawImGui()
 
         ImGui::TreePop();
     }
+    ImGui::PopID();
 #endif
 }
 
