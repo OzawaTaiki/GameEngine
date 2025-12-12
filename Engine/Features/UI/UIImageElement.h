@@ -3,6 +3,7 @@
 #include "UIElement.h"
 #include <Math/Vector/Vector2.h>
 #include <Math/Vector/Vector4.h>
+#include <Features/UVTransform/UVTransform.h>
 #include <string>
 
 class UISpriteRenderComponent;
@@ -24,6 +25,11 @@ public:
     // テクスチャ設定
     void SetTexture(const std::string& texturePath);
     const std::string& GetTexturePath() const;
+
+    UVTransform& GetUVTransform();
+
+    void SetTexture(uint32_t textureHandle);
+    uint32_t GetTextureHandle() const;
 
     // ------------------
     // 色設定

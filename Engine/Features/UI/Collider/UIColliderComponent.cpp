@@ -25,6 +25,10 @@ void UIColliderComponent::Initialize()
 
     owner_->RegisterVariable("colliderType", reinterpret_cast<uint32_t*>(&colliderType_));
 
+    UIColliderData colliderData;
+    owner_->GetVariableValue("collider", colliderData);
+    collider_ = colliderData.CreateCollider();
+
     // サイズ未設定なら自動設定
     InitializeColliderSize();
 
@@ -34,6 +38,19 @@ void UIColliderComponent::Initialize()
                            owner_->GetName(),
                            UIColliderFactory::GetTypeName(colliderType_)));
 #endif
+}
+
+void UIColliderComponent::SetCollider(std::unique_ptr<IUICollider> collider)
+{
+    assert(collider != nullptr);
+    collider_ = std::move(collider);
+}
+
+void UIColliderComponent::Save()
+{
+    UIColliderData colliderData;
+    colliderData = UIColliderData::FromCollider(collider_.get(), colliderType_);
+    owner_->SetVariableValue("collider", colliderData);
 }
 
 void UIColliderComponent::InitializeColliderSize()
@@ -183,10 +200,18 @@ void UIColliderComponent::DrawImGui()
             "Rectangle", "Circle", "Ellipse", "Quad", "ConvexPolygon"
         };
         ImGui::Text("Collider Type: %s", typeNames[static_cast<int>(colliderType_)].c_str());
+        auto newColider = UIColliderFactory::ImGuiSelectCollider(colliderType_);
+        if (newColider)
+        {
+            SetCollider(std::move(newColider));
+        }
         ImGui::Checkbox("Debug Draw", &debugDraw_);
 
-        ImGui::TreeNode("Collider Details");
-        collider_->ImGui();
+        if(ImGui::TreeNode("Collider Details"))
+        {
+            collider_->ImGui();
+            ImGui::TreePop();
+        }
 
         ImGui::TreePop();
     }

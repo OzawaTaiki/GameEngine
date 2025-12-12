@@ -26,6 +26,8 @@ public:
     void SetOwner(UIElement* owner) { owner_ = owner; }
     UIElement* GetOwner() const { return owner_; }
 
+    virtual void Save() {};
+
 protected:
 
     UIElement* owner_ = nullptr;

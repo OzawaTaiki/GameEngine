@@ -31,7 +31,7 @@ void UIButtonElement::Initialize()
 
     RegisterVariable("text", &text_);
     RegisterVariable("textColor", &textColor_);
-    RegisterVariable("textAlignment", reinterpret_cast<int*>(textAlignment_));
+    RegisterVariable("textAlignment", reinterpret_cast<int*>(&textAlignment_));
 
     // 背景スプライト作成
     background_ = AddComponent<UISpriteRenderComponent>(this, "white.png");
@@ -93,6 +93,48 @@ void UIButtonElement::SetOnHover(std::function<void()> callback)
 {
     if (button_)
         button_->SetOnHover(callback);
+}
+
+void UIButtonElement::SetOnClickDown(std::function<void()> callback)
+{
+    if (button_)
+        button_->SetOnClickDown(callback);
+}
+
+void UIButtonElement::SetOnClickUp(std::function<void()> callback)
+{
+    if (button_)
+        button_->SetOnClickUp(callback);
+}
+
+void UIButtonElement::SetOnHoverEnter(std::function<void()> callback)
+{
+    if (button_)
+        button_->SetOnHoverEnter(callback);
+}
+
+void UIButtonElement::SetOnHoverExit(std::function<void()> callback)
+{
+    if (button_)
+        button_->SetOnHoverExit(callback);
+}
+
+void UIButtonElement::SetOnHovering(std::function<void()> callback)
+{
+    if (button_)
+        button_->SetOnHovering(callback);
+}
+
+void UIButtonElement::SetOnFocusEnter(std::function<void()> callback)
+{
+    if (navigation_)
+        navigation_->SetOnFocusEnter(callback);
+}
+
+void UIButtonElement::SetOnFocusExit(std::function<void()> callback)
+{
+    if (navigation_)
+        navigation_->SetOnFocusExit(callback);
 }
 
 void UIButtonElement::SetText(const std::string& text)

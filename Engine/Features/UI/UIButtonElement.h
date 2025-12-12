@@ -50,6 +50,15 @@ public:
     void SetOnClick(std::function<void()> callback);
     void SetOnHover(std::function<void()> callback);
 
+    void SetOnClickDown(std::function<void()> callback);
+    void SetOnClickUp(std::function<void()> callback);
+    void SetOnHoverEnter(std::function<void()> callback);
+    void SetOnHoverExit(std::function<void()> callback);
+    void SetOnHovering(std::function<void()> callback);
+
+    void SetOnFocusEnter(std::function<void()> callback);
+    void SetOnFocusExit(std::function<void()> callback);
+
     // テキスト設定
     void SetText(const std::string& text);
     std::string GetText() const { return text_; }

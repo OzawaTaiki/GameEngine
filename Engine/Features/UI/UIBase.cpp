@@ -243,7 +243,7 @@ void UIBase::ImGui()
             }
 
             char buf2[255];
-            strcpy_s(buf2, textureName_.c_str());
+            strcpy_s(buf2, textureName_.c_str());   
             if (ImGui::InputText("textureName", buf2, 255))
             {
                 textureName_ = buf2;

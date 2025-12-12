@@ -142,9 +142,6 @@
     <Filter Include="Math\Matrix">
       <UniqueIdentifier>{9015C314-B17B-4A18-A451-CCCC7E9DD854A827}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\Quaternion">
-      <UniqueIdentifier>{62F5F34C-75B0-445B-8E16-CCCCA89FCB3BAD6E}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math\Random">
       <UniqueIdentifier>{C2EEAC3C-A5DE-4BA9-B5A9-CCCC5F9CF70DFC92}</UniqueIdentifier>
     </Filter>
@@ -301,6 +298,9 @@
     <Filter Include="Features\UI\New\Element">
       <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\Matrix\Quaternion">
+      <UniqueIdentifier>{62F5F34C-75B0-445B-8E16-CCCCA89FCB3BAD6E}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -454,7 +454,7 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Math\Quaternion\Quaternion.cpp">
-      <Filter>Math\Quaternion</Filter>
+      <Filter>Math\Matrix\Quaternion</Filter>
     </ClCompile>
     <ClCompile Include="Math\Random\RandomGenerator.cpp">
       <Filter>Math\Random</Filter>
@@ -981,10 +981,10 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Math\Quaternion\Quaternion.h">
-      <Filter>Math\Quaternion</Filter>
+      <Filter>Math\Matrix\Quaternion</Filter>
     </ClInclude>
     <ClInclude Include="Math\Quaternion\QuaternionTransform.h">
-      <Filter>Math\Quaternion</Filter>
+      <Filter>Math\Matrix\Quaternion</Filter>
     </ClInclude>
     <ClInclude Include="Math\Random\RandomGenerator.h">
       <Filter>Math\Random</Filter>

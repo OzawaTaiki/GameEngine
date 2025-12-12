@@ -64,43 +64,53 @@ void UIButtonComponent::UpdateState()
         return;
 
     auto* input = Input::GetInstance();
-
-    // UICollisionManagerの結果を取得
     bool isHit = collider_->GetCollider()->GetIsHit();
-
     ButtonState prevState = state_;
 
     if (isHit)
     {
-        // マウスオーバー中
-        if (input->IsMousePressed(static_cast<uint8_t>(MouseButton::Left)))
+        // Hover状態に入った瞬間
+        if (prevState == ButtonState::Normal)
         {
-            // クリック中
+            if (onHoverEnter_) onHoverEnter_();
+            if (onHover_) onHover_();  // 既存の互換性維持
+        }
+
+        // Hover中（毎フレーム）
+        if (onHovering_) onHovering_();
+
+        // マウスボタンが押された瞬間
+        if (input->IsMouseTriggered(static_cast<uint8_t>(MouseButton::Left)))
+        {
+            state_ = ButtonState::Pressed;
+            if (onClickDown_) onClickDown_();
+        }
+        // マウスボタンが押されている間
+        else if (input->IsMousePressed(static_cast<uint8_t>(MouseButton::Left)))
+        {
             state_ = ButtonState::Pressed;
         }
+        // マウスボタンが離された
         else
         {
-            // ホバー中
             state_ = ButtonState::Hovered;
-
-            // Hovered状態に入った瞬間
-            if (prevState == ButtonState::Normal && onHover_)
-            {
-                onHover_();
-            }
         }
 
-        // クリックが離された瞬間（ボタン内で）
-        if (prevState == ButtonState::Pressed &&
-            state_ == ButtonState::Hovered &&
-            onClick_)
+        // クリックが完了した瞬間（ボタン内でリリース）
+        if (prevState == ButtonState::Pressed && state_ == ButtonState::Hovered)
         {
-            onClick_();
+            if (onClickUp_) onClickUp_();
+            if (onClick_) onClick_();  // 既存の互換性維持
         }
     }
     else
     {
-        // マウスオーバーしていない
+        // Hover状態から出た瞬間
+        if (prevState == ButtonState::Hovered || prevState == ButtonState::Pressed)
+        {
+            if (onHoverExit_) onHoverExit_();
+        }
+
         state_ = ButtonState::Normal;
     }
 }

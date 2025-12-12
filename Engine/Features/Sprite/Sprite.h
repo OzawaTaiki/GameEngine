@@ -9,6 +9,7 @@
 #include <memory>
 #include <d3d12.h>
 #include <wrl.h>
+#include <Features/UVTransform/UVTransform.h>
 class Sprite
 {
 public:
@@ -28,10 +29,12 @@ public:
     float rotate_ = 0.0f;
 
 
-    //uvTrans
-    Vector2 uvTranslate_ = { 0.0f,0.0f };
-    Vector2 uvScale_ = { 1.0f,1.0f };
-    float uvRotate_ = 0.0f;
+    ////uvTrans
+    //Vector2 uvTranslate_ = { 0.0f,0.0f };
+    //Vector2 uvScale_ = { 1.0f,1.0f };
+    //float uvRotate_ = 0.0f;
+
+    UVTransform& GetUVTransform() { return uvTransform_; }
 
     static std::unique_ptr<Sprite> Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor = { 0.5f, 0.5f });
     static void StaticInitialize(uint32_t _windowWidth, uint32_t _windowWHeight);
@@ -61,6 +64,8 @@ private:
 
     void UpdateVertexData();
     void UpdateInstanceData();
+
+    UVTransform uvTransform_;
 
     uint32_t textureHandle_ = UINT32_MAX;
 

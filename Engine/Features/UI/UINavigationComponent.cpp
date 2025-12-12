@@ -78,3 +78,26 @@ UIElement* UINavigationComponent::GetNext(NavigationDirection dir) const
         return nullptr;
     }
 }
+
+void UINavigationComponent::SetFocused(bool focused)
+{
+    if (isFocused_ == focused)
+        return; // 状態変化なし
+
+    isFocused_ = focused;
+
+    if (isFocused_)
+    {
+        if (onFocusEnter_)
+        {
+            onFocusEnter_();
+        }
+    }
+    else
+    {
+        if (onFocusExit_)
+        {
+            onFocusExit_();
+        }
+    }
+}
