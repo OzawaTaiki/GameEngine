@@ -7,7 +7,7 @@ std::unique_ptr<LayerSystem> LayerSystem::instance_ = nullptr;
 
 void LayerSystem::Initialize()
 {
-    if(!instance_)
+    if (!instance_)
         instance_ = std::make_unique<LayerSystem>();
 
     instance_->layerInfos_.clear();
@@ -15,7 +15,7 @@ void LayerSystem::Initialize()
 
     RTVManager::GetInstance()->
         CreateRenderTarget("final", WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
+                           DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
 
     PSOManager::GetInstance()->CreatePSOForComposite(PSOFlags::BlendMode::PremultipliedAdd);
 
@@ -34,12 +34,25 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
         }
     }
 
-        // レイヤーのRenderTargetを作成
+    // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
         CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+                                   DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
-    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, _priority, true, nullptr,_blendmode,false,"",0,false });
+    // effectChain, finalEffectOutputを追加
+    instance_->layerInfos_.emplace(layerID, LayerInfo{
+        layerName,          // name
+        _priority,          // priority
+        true,               // enabled
+        nullptr,            // renderTarget
+        _blendmode,         // blendMode
+        false,              // hasEffect
+        {},                 // effectChain (空のvector)
+        "",                 // finalEffectOutput
+        0,                  // uavIndex
+        false               // isOutputLayer
+                                   });
+
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
@@ -57,7 +70,6 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
 
 LayerID LayerSystem::CreateOutputLayer(const std::string& layerName)
 {
-
     if (!instance_)
         Initialize();
 
@@ -72,9 +84,21 @@ LayerID LayerSystem::CreateOutputLayer(const std::string& layerName)
     // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
         CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+                                   DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
-    instance_->layerInfos_.emplace(layerID, LayerInfo{ layerName, 999, true, nullptr, PSOFlags::BlendMode::Normal,false,"",0,true });
+    instance_->layerInfos_.emplace(layerID, LayerInfo{
+        layerName,                      // name
+        999,                            // priority
+        true,                           // enabled
+        nullptr,                        // renderTarget
+        PSOFlags::BlendMode::Normal,    // blendMode
+        false,                          // hasEffect
+        {},                             // effectChain (空のvector)
+        "",                             // finalEffectOutput
+        0,                              // uavIndex
+        true                            // isOutputLayer
+                                   });
+
     instance_->layerInfos_[layerID].renderTarget = RTVManager::GetInstance()->GetRenderTexture(layerName);
 
     instance_->nameToID_[layerName] = layerID;
@@ -116,7 +140,7 @@ void LayerSystem::SetLayer(LayerID _layerID)
     {
         LayerInfo info = it->second;
         instance_->currentLayerID_ = _layerID;
-        std::string textureToUse = info.hasEffect ? info.effectOutputTexture : info.name;
+        std::string textureToUse = info.hasEffect ? info.finalEffectOutput : info.name;
 
         RTVManager::GetInstance()->SetRenderTexture(textureToUse);
     }
@@ -157,22 +181,28 @@ void LayerSystem::ApplyPostEffect(const std::string& _sourceLayerName, const std
     if (!instance_)
         Initialize();
 
-    _effect->Apply(_sourceLayerName, _targetLayerName);
-
     auto it = instance_->nameToID_.find(_sourceLayerName);
-    if (it != instance_->nameToID_.end())
+    if (it == instance_->nameToID_.end())
     {
-        LayerID sourceLayerID = it->second;
-        auto& sourceLayerInfo = instance_->layerInfos_[sourceLayerID];
+        // ソースレイヤーが存在しない場合
+        return;
+    }
 
-        // エフェクトの出力先を設定
-        sourceLayerInfo.effectOutputTexture = _targetLayerName;
-        sourceLayerInfo.hasEffect = true;
-    }
-    else
-    {
-        // TODO : ソースレイヤーが存在しない場合のエラーハンドリング
-    }
+    LayerID sourceLayerID = it->second;
+    auto& sourceLayerInfo = instance_->layerInfos_[sourceLayerID];
+
+    // エフェクトの入力を決定
+    // 既にエフェクトがある場合は、最後のエフェクトの出力を使用
+    std::string effectInput = sourceLayerInfo.hasEffect ?
+        sourceLayerInfo.finalEffectOutput : _sourceLayerName;
+
+    // エフェクトを適用
+    _effect->Apply(effectInput, _targetLayerName);
+
+    // エフェクトチェーンに追加
+    sourceLayerInfo.effectChain.push_back({ _targetLayerName });
+    sourceLayerInfo.finalEffectOutput = _targetLayerName;
+    sourceLayerInfo.hasEffect = true;
 
 }
 
@@ -192,13 +222,12 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     }
 
     std::sort(sortedLayers.begin(), sortedLayers.end(),
-        [](const auto& a, const auto& b){
-            return a.second->priority < b.second->priority;
-        });
-
+              [](const auto& a, const auto& b)
+              {
+                  return a.second->priority < b.second->priority;
+              });
 
     PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::Composite);
-
     RTVManager::GetInstance()->SetRenderTexture(_finalRendertextureName);
 
     // 全てのレイヤーを合成
@@ -206,8 +235,6 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
     {
         if (info->enabled && info->renderTarget)
         {
-            // レイヤー合成時は、加算ブレンドの場合PremultipliedAddを使用
-            // (レイヤー内で既にアルファが乗算済みのため、合成時にアルファを再度乗算しない)
             PSOFlags::BlendMode compositeBlendMode = info->blendMode;
             if (compositeBlendMode == PSOFlags::BlendMode::Add)
             {
@@ -215,12 +242,16 @@ void LayerSystem::CompositeAllLayers(const std::string& _finalRendertextureName)
             }
 
             PSOManager::GetInstance()->SetPipeLineStateObject(PSOFlags::Type::Composite | compositeBlendMode);
-            std::string textureToUse = info->hasEffect ? info->effectOutputTexture : info->name;
+
+            // エフェクトがある場合は最終出力を使用、なければ元のレイヤーを使用
+            std::string textureToUse = info->hasEffect ? info->finalEffectOutput : info->name;
 
             RTVManager::GetInstance()->DrawRenderTexture(textureToUse);
 
             // 毎フレームリセット
             info->hasEffect = false;
+            info->effectChain.clear();
+            info->finalEffectOutput.clear();
         }
     }
 }
