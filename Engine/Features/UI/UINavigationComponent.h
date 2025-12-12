@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIComponent.h"
+#include <functional>
 #include <memory>
 
 // 前方宣言
@@ -39,8 +40,12 @@ public:
     bool IsFocusable() const { return focusable_; }
 
     // フォーカス状態
-    void SetFocused(bool focused) { isFocused_ = focused; }
+    void SetFocused(bool focused);
     bool IsFocused() const { return isFocused_; }
+
+    // コールバック
+    void SetOnFocusEnter(std::function<void()> callback) { onFocusEnter_ = callback; }
+    void SetOnFocusExit(std::function<void()> callback) { onFocusExit_ = callback; }
 
 private:
     // 4方向のNavigation先（weak_ptrで循環参照を防止）
@@ -48,6 +53,10 @@ private:
     UIElement* down_ = nullptr;
     UIElement* left_ = nullptr;
     UIElement* right_ = nullptr;
+
+    // フォーカス時コールバック
+    std::function<void()> onFocusEnter_ = nullptr;
+    std::function<void()> onFocusExit_ = nullptr;
 
     bool focusable_ = true;
     bool isFocused_ = false;

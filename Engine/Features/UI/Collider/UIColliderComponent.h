@@ -56,6 +56,10 @@ public:
     /// </summary>
     IUICollider* GetCollider() { return collider_.get(); }
     const IUICollider* GetCollider() const { return collider_.get(); }
+    void SetCollider(std::unique_ptr<IUICollider> collider);
+
+
+    void Save() override;
 
 private:
     std::unique_ptr<IUICollider> collider_;

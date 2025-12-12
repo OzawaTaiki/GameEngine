@@ -90,6 +90,9 @@ public:
     template<typename T>
     bool HasComponent() const;
 
+    template<typename T>
+    void RemoveComponent();
+
     //------------------
     // ImGui
     virtual void DrawImGuiTree();
@@ -102,6 +105,11 @@ public:
     template<typename T>
     void RegisterVariable(const std::string& name, T* variablePtr);
 
+    template<typename T>
+    void GetVariableValue(const std::string& name, T& outValue) const;
+
+    template<typename T>
+    void SetVariableValue(const std::string& name, const T& value);
     void Save();
 
 protected:
@@ -177,8 +185,33 @@ inline bool UIElement::HasComponent() const
 }
 
 template<typename T>
+inline void UIElement::RemoveComponent()
+{
+    auto it = std::remove_if(components_.begin(), components_.end(),
+                             [](const std::unique_ptr<UIComponent>& component)
+                             {
+                                 return dynamic_cast<T*>(component.get()) != nullptr;
+                             });
+    components_.erase(it, components_.end());
+}
+
+template<typename T>
 inline void UIElement::RegisterVariable(const std::string& name, T* variablePtr)
 {
     if (jsonBinder_)
         jsonBinder_->RegisterVariable(name, variablePtr);
+}
+
+template<typename T>
+inline void UIElement::GetVariableValue(const std::string& name, T& outValue) const
+{
+    if (jsonBinder_)
+        jsonBinder_->GetVariableValue(name, outValue);
+}
+
+template<typename T>
+inline void UIElement::SetVariableValue(const std::string& name, const T& value)
+{
+    if (jsonBinder_)
+        jsonBinder_->SendVariable(name, value);
 }

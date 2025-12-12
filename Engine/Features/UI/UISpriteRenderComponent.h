@@ -21,11 +21,14 @@ public:
 
     // ------------------
     // テクスチャ設定
+    void SetTexture(uint32_t textureHandle);
     uint32_t GetTextureHandle() const { return textureHandle_; }
     void LoadAndSetTexture(const std::string& filePath);
     const std::string& GetTexturePath() const { return texturePath_; }
 
     Sprite* GetSprite() const { return sprite_.get(); }
+
+    UVTransform& GetUVTransform() { return sprite_->GetUVTransform(); }
 
     // ------------------
     // 色設定

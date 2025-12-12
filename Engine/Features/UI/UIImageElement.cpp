@@ -17,13 +17,8 @@ void UIImageElement::Initialize()
 {
     UIElement::Initialize();
 
-    RegisterVariable("texturePath", &texturePath_);
-    RegisterVariable("color", &color_);
-
-
     // スプライトレンダーコンポーネントを追加
     sprite_ = AddComponent<UISpriteRenderComponent>(this, texturePath_);
-    sprite_->SetColor(color_);
 }
 
 void UIImageElement::SetTexture(const std::string& texturePath)
@@ -35,9 +30,35 @@ void UIImageElement::SetTexture(const std::string& texturePath)
     }
 }
 
+void UIImageElement::SetTexture(uint32_t textureHandle)
+{
+    if (sprite_)
+    {
+        sprite_->SetTexture(textureHandle);
+    }
+}
+uint32_t UIImageElement::GetTextureHandle() const
+{
+    if (sprite_)
+    {
+        return sprite_->GetTextureHandle();
+    }
+    return 0;
+}
 const std::string& UIImageElement::GetTexturePath() const
 {
     return texturePath_;
+}
+
+UVTransform& UIImageElement::GetUVTransform()
+{
+    if (sprite_)
+    {
+        return sprite_->GetUVTransform();
+    }
+    // ダミーを返す
+    static UVTransform dummy;
+    return dummy;
 }
 
 void UIImageElement::SetColor(const Vector4& color)

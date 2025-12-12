@@ -265,6 +265,10 @@ void UIElement::Save()
     if (jsonBinder_)
         jsonBinder_->Save();
 
+    for (auto& component : components_)
+        component->Save();
+
     for (auto& child : children_)
         child->Save();
+
 }

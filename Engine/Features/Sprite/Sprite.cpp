@@ -113,13 +113,13 @@ void Sprite::SetColor(const Vector4& _color)
 
 void Sprite::SetUVSize(const Vector2& _size)
 {
-    uvScale_ = _size / defaultTextureSize_;
+    uvTransform_.SetScale(_size / defaultTextureSize_);
     isDirty_ = true;
 }
 
 void Sprite::SetLeftTop(const Vector2& _leftTop)
 {
-    uvTranslate_ = _leftTop / defaultTextureSize_;
+    uvTransform_.SetOffset(_leftTop / defaultTextureSize_);
     isDirty_ = true;
 }
 
@@ -178,10 +178,7 @@ void Sprite::UpdateInstanceData()
     Vector3 t = { translate_,0.0f };
     instanceData_.transform = MakeAffineMatrix(s, r, t);
 
-    s = { uvScale_,1.0f };
-    r = { 0.0f,0.0f ,uvRotate_ };
-    t = { uvTranslate_,0.0f };
-    instanceData_.uvTransform = MakeAffineMatrix(s, r, t);
+    instanceData_.uvTransform = uvTransform_.GetMatrix();
 
     instanceData_.color = color_;
     instanceData_.textureIndex = TextureManager::GetInstance()->GetSRVIndex(textureHandle_);
@@ -197,9 +194,12 @@ void Sprite::ImGui()
     isDirty |= ImGui::DragFloat2("Translate", &translate_.x);
     isDirty |= ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
     isDirty |= ImGui::DragFloat("Rotate", &rotate_, 0.01f);
-    isDirty |= ImGui::DragFloat2("UVTranslate", &uvTranslate_.x, 0.01f);
-    isDirty |= ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f);
-    isDirty |= ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f);
+    Vector2 uvScale = uvTransform_.GetScale();
+    Vector2 uvTranslate = uvTransform_.GetOffset();
+    float uvRotate = uvTransform_.GetRotation();
+    isDirty |= ImGui::DragFloat2("UVTranslate", &uvScale.x, 0.01f);
+    isDirty |= ImGui::DragFloat2("UVScale", &uvTranslate.x, 0.01f);
+    isDirty |= ImGui::DragFloat("UVRotate", &uvRotate, 0.01f);
     isDirty |= ImGui::ColorEdit4("Color", &color_.x);
     isDirty |= ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f);
     isDirty |= ImGui::DragFloat2("Size", &size_.x, 0.01f);
@@ -215,6 +215,9 @@ void Sprite::ImGui()
 
     if (isDirty)
     {
+        uvTransform_.SetScale(uvScale);
+        uvTransform_.SetOffset(uvTranslate);
+        uvTransform_.SetRotation(uvRotate);
         isDirty_ = true;
         isVertexDirty_ = true;
         UpdateVertexData();

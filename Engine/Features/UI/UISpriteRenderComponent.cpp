@@ -53,10 +53,12 @@ void UISpriteRenderComponent::DrawImGui()
     {
         ImGui::Text("directory: %s", "Resources/images/");
         strcpy_s(buffer, texturePath_.c_str());
-        ImGui::InputText("Texture Path: %s", buffer, sizeof(buffer));
-        if (ImGui::Button("Load Texture"))
+        if(ImGui::InputText("Texture Path: %s", buffer, sizeof(buffer)))
         {
             texturePath_ = std::string(buffer);
+        }
+        if (ImGui::Button("Load Texture"))
+        {
             LoadAndSetTexture(texturePath_);
         }
         ImGui::ColorEdit4("Color", &color_.x);
@@ -65,6 +67,12 @@ void UISpriteRenderComponent::DrawImGui()
     }
     ImGui::PopID();
 #endif
+}
+
+void UISpriteRenderComponent::SetTexture(uint32_t textureHandle)
+{
+    textureHandle_ = textureHandle;
+    sprite_->SetTextureHandle(textureHandle_);
 }
 
 void UISpriteRenderComponent::LoadAndSetTexture(const std::string& filePath)
