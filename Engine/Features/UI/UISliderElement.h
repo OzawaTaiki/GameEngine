@@ -8,7 +8,7 @@
 // 前方宣言
 class UISpriteRenderComponent;
 class UISliderComponent;
-
+class UITextRenderComponent;
 /// <summary>
 /// UIElement + UIComponent アーキテクチャで実装されたスライダーUI
 /// </summary>
@@ -55,11 +55,12 @@ private:
     // 子要素
     UIElement* track_ = nullptr;
     UIElement* handle_ = nullptr;
-
+    UIElement* value_ = nullptr;
     // Component参照
     UISpriteRenderComponent* trackSprite_ = nullptr;
     UISpriteRenderComponent* handleSprite_ = nullptr;
     UISliderComponent* slider_ = nullptr;
+    UITextRenderComponent* valueText_ = nullptr;
 
     // 色設定
     Vector4 trackColor_ = { 0.3f, 0.3f, 0.3f, 1.0f };

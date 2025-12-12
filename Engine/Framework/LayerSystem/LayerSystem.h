@@ -17,23 +17,28 @@ class PostEffectBase;
 class LayerSystem
 {
 private:
+    struct EffectInfo
+    {
+        std::string outputTexture;  // このエフェクトの出力先テクスチャ名
+    };
+
     struct LayerInfo
     {
         std::string name;
-        int32_t priority; // レイヤーの優先度
-        bool enabled; // レイヤーが有効かどうか
+        int32_t priority;
+        bool enabled;
 
         RenderTarget* renderTarget;
+        PSOFlags::BlendMode blendMode;
 
-        PSOFlags::BlendMode blendMode = PSOFlags::BlendMode::Normal; // ブレンドモード
-
-        bool hasEffect = false; // エフェクトがあるかどうか
-        std::string effectOutputTexture;
+        bool hasEffect;
+        std::vector<EffectInfo> effectChain;  // エフェクトのチェーン
+        std::string finalEffectOutput;         // 最終的な出力テクスチャ名
 
         uint32_t uavIndex;
-        bool isOutputLayer = false; // 出力レイヤーかどうか
-
+        bool isOutputLayer;
     };
+
 
 public:
     LayerSystem() = default;
@@ -58,8 +63,8 @@ public:
     static LayerID GetCurrentLayerID();
 
     static void ApplyPostEffect(const std::string& _sourceLayerName,
-        const std::string& _targetLayerName,
-        PostEffectBase* _effect);
+                                const std::string& _targetLayerName,
+                                PostEffectBase* _effect);
 
     static void CompositeAllLayers(const std::string& _finalRendertextureName = "final");
 

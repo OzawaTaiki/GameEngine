@@ -2,6 +2,7 @@
 #include <Features/UI/UISpriteRenderComponent.h>
 #include <Features/UI/UISliderComponent.h>
 #include <Features/UI/Collider/UIColliderComponent.h>
+#include "UITextRenderComponent.h"
 
 UISliderElement::UISliderElement(const std::string& name,
                                  const Vector2& pos,
@@ -53,16 +54,26 @@ void UISliderElement::Initialize()
     // ハンドルのコライダー
     handle_->AddComponent<UIColliderComponent>(ColliderType::Rectangle);
 
-    // スライダーコンポーネント追加
+    auto valueElement = std::make_unique<UIElement>(GetName() + "_Value", true);
+    valueElement->SetPosition(Vector2(10.0f, 0.0f));
+    valueElement->SetAnchor(Vector2(1.0f, 0.5f));  // 右中央
+    valueElement->SetPivot(Vector2(0.0f, 0.5f));   // 左中央基準
+    valueElement->Initialize();
+
+    value_ = AddChild(std::move(valueElement));
+    valueText_ = value_->AddComponent<UITextRenderComponent>(value_, "0");
+
+    // スライダーコンポーネント
     slider_ = AddComponent<UISliderComponent>();
     slider_->SetTrack(track_);
     slider_->SetHandle(handle_);
-
 }
 
 void UISliderElement::Update()
 {
     UIElement::Update();
+
+    valueText_->SetText(std::to_string(GetValue()));
 
     // 状態に応じた色更新
     OnStateChanged();
