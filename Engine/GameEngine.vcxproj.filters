@@ -301,6 +301,9 @@
     <Filter Include="Math\Matrix\Quaternion">
       <UniqueIdentifier>{62F5F34C-75B0-445B-8E16-CCCCA89FCB3BAD6E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\Color">
+      <UniqueIdentifier>{d7aedf97-67fd-476e-b898-1393e70b4f53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -792,6 +795,7 @@
     <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
       <Filter>Features\Text</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Color\Color.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1366,6 +1370,9 @@
     </ClInclude>
     <ClInclude Include="Features\TextRenderer\Text3DRenderer.h">
       <Filter>Features\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Color\Color.h">
+      <Filter>Math\Color</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

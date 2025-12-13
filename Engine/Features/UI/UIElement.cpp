@@ -37,6 +37,9 @@ void UIElement::Initialize()
 
 void UIElement::Update()
 {
+    if (!isEnabled_)
+        return;
+
     for (auto& component : components_)
     {
         component->Update();

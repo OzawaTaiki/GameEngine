@@ -29,7 +29,6 @@ void UIButtonElement::Initialize()
     RegisterVariable("disabledColor", &disabledColor_);
     RegisterVariable("focusColor", &focusColor_);
 
-    RegisterVariable("text", &text_);
     RegisterVariable("textColor", &textColor_);
     RegisterVariable("textAlignment", reinterpret_cast<int*>(&textAlignment_));
 
@@ -43,7 +42,7 @@ void UIButtonElement::Initialize()
     fontConfig.fontSize = 24;
 
     textComponent_ = AddComponent<UITextRenderComponent>(this, text_, fontConfig);
-
+    textComponent_->Initialize();
     // テキストパラメータ設定
     TextParam textParam;
     //textParam.position = CalculateTextPosition();
