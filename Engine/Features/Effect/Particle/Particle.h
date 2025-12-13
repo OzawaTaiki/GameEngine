@@ -18,6 +18,7 @@ public:
     void Update(float _deltaTime);
 
     bool IsAlive() const { return isAlive_; }
+    void SetAlive(bool _isAlive) { isAlive_ = _isAlive; }
 
     Matrix4x4 GetWorldMatrix() const { return matWorld_; }
 
