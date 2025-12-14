@@ -1,4 +1,5 @@
 #include "Color.h"
+#include <cmath>
 
 RGBA::RGBA(Color color)
 {
@@ -53,14 +54,14 @@ RGBA::RGBA(const HSVA& hsva)
 
 RGBA ColorConverter::ToRGBA(const HSVA& hsva)
 {
-    float h = fmod(hsva.h, 360.0f);
+    float h = std::fmod(hsva.h, 360.0f);
     if (h < 0.0f) h += 360.0f;
     float s = hsva.s;
     float v = hsva.v;
     float a = hsva.a;
 
     float c = v * s;
-    float x = c * (1 - fabs(fmod(h / 60.0f, 2) - 1));
+    float x = c * (1.0f - std::fabs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
     float m = v - c;
 
     float r1 = 0.0f, g1 = 0.0f, b1= 0.0f;
@@ -97,7 +98,7 @@ HSVA ColorConverter::ToHSVA(const RGBA& rgba)
     {
         if (max == r)
         {
-            h = 60.0f * (fmod(((g - b) / delta), 6.0f));
+            h = 60.0f * (std::fmod(((g - b) / delta), 6.0f));
         }
         else if (max == g)
         {

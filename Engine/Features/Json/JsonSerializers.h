@@ -5,10 +5,12 @@
 #include <Math/Vector/Vector4.h>
 #include <Math/Quaternion/Quaternion.h>
 #include <Math/Rect/Rect.h>
+#include <Math/Color/Color.h>
 #include <Features/Animation/Sequence/SequenceEvent.h>
 #include <Features/TextRenderer/TextParam.h>
 #include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
 #include <Features/UI/Collider/UIColliderSerializer.h>
+
 
 #include <Features/TextRenderer/AtlasData.h>
 
@@ -36,6 +38,14 @@ void from_json(const json& _j, Quaternion& _v);
 // Rect
 void to_json(json& _j, const Rect& _v);
 void from_json(const json& _j, Rect& _v);
+
+// RGBA
+void to_json(json& _j, const RGBA& _v);
+void from_json(const json& _j, RGBA& _v);
+
+// HSVA
+void to_json(json& _j, const HSVA& _v);
+void from_json(const json& _j, HSVA& _v);
 
 /// AnimationSequence.h
 
