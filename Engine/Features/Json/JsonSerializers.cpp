@@ -102,6 +102,46 @@ void from_json(const json& _j, Rect& _v)
     }
 }
 
+void to_json(json& _j, const RGBA& _v)
+{
+    _j = json{ {"r", _v.r}, {"g", _v.g}, {"b", _v.b}, {"a", _v.a} };
+}
+
+void from_json(const json& _j, RGBA& _v)
+{
+    if (_j.contains("r") && _j.contains("g") && _j.contains("b") && _j.contains("a"))
+    {
+        _v.r = _j["r"].get<float>();
+        _v.g = _j["g"].get<float>();
+        _v.b = _j["b"].get<float>();
+        _v.a = _j["a"].get<float>();
+    }
+    else
+    {
+        throw std::runtime_error("Invalid RGBA JSON format");
+    }
+}
+
+void to_json(json& _j, const HSVA& _v)
+{
+    _j = json{ {"h", _v.h}, {"s", _v.s}, {"v", _v.v}, {"a", _v.a} };
+}
+
+void from_json(const json& _j, HSVA& _v)
+{
+    if (_j.contains("h") && _j.contains("s") && _j.contains("v") && _j.contains("a"))
+    {
+        _v.h = _j["h"].get<float>();
+        _v.s = _j["s"].get<float>();
+        _v.v = _j["v"].get<float>();
+        _v.a = _j["a"].get<float>();
+    }
+    else
+    {
+        throw std::runtime_error("Invalid HSVA JSON format");
+    }
+}
+
 void to_json(json& _j, const ParameterValue& _v)
 {
     std::visit([&_j](auto&& arg)
