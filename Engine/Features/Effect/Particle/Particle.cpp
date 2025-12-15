@@ -52,6 +52,7 @@ void Particle::Update(float _deltaTime)
 
     velocity_ = direction_.Normalize() * speed_;
 
+    velocity_ += acceleration_ * _deltaTime;
     translate_ += velocity_ * _deltaTime;
 
     // 回転の更新
