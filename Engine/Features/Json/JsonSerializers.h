@@ -10,6 +10,7 @@
 #include <Features/TextRenderer/TextParam.h>
 #include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
 #include <Features/UI/Collider/UIColliderSerializer.h>
+#include <Features/Effect/ParticleInitParam.h>
 
 
 #include <Features/TextRenderer/AtlasData.h>
@@ -113,6 +114,13 @@ void from_json(const json& _j, IUICollider::TransformMode& _mode);
 void to_json(json& _j, const UIColliderData& _data);
 void from_json(const json& _j, UIColliderData& _data);
 
+/// AtlasData
+
 // AtlasData
 void to_json(json& _j, const FontConfig& _config);
 void from_json(const json& _j, FontConfig& _config);
+
+
+/// particle/ParticleInitParam.h
+void to_json(json& _j, const ParticleInitParam& _param);
+void from_json(const json& _j, ParticleInitParam& _param);

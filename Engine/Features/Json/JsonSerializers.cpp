@@ -538,3 +538,46 @@ void from_json(const json& _j, CreatedPrimitive& _primitive)
     _primitive.isSaved = _j.value("isSaved", false);
     _primitive.model = nullptr; // モデルは別途生成する必要がある
 }
+
+void to_json(json& _j, const ParticleInitParam& _v)
+{
+    _j = json{
+        {"acceleration", _v.acceleration},
+        {"color", _v.color},
+        {"direction", _v.direction},
+        {"isBillboard", _v.isBillboard},
+        {"lifeTime", _v.lifeTime},
+        {"isInfiniteLife", _v.isInfiniteLife},
+        {"position", _v.position},
+        {"rotate", _v.rotate},
+        {"rotationSpeed", _v.rotationSpeed},
+        {"size", _v.size},
+        {"speed", _v.speed}
+    };
+}
+
+void from_json(const json& _j, ParticleInitParam& _v)
+{
+    if (_j.contains("acceleration"))
+        _v.acceleration = _j["acceleration"].get<Vector3>();
+    if (_j.contains("color"))
+        _v.color = _j["color"].get<Vector4>();
+    if (_j.contains("direction"))
+        _v.direction = _j["direction"].get<Vector3>();
+    if (_j.contains("isBillboard"))
+        _v.isBillboard = _j["isBillboard"].get<std::array<bool, 3>>();
+    if (_j.contains("lifeTime"))
+        _v.lifeTime = _j["lifeTime"].get<float>();
+    if (_j.contains("isInfiniteLife"))
+        _v.isInfiniteLife = _j["isInfiniteLife"].get<bool>();
+    if (_j.contains("position"))
+        _v.position = _j["position"].get<Vector3>();
+    if (_j.contains("rotate"))
+        _v.rotate = _j["rotate"].get<Vector3>();
+    if (_j.contains("rotationSpeed"))
+        _v.rotationSpeed = _j["rotationSpeed"].get<Vector3>();
+    if (_j.contains("size"))
+        _v.size = _j["size"].get<Vector3>();
+    if (_j.contains("speed"))
+        _v.speed = _j["speed"].get<float>();
+}
