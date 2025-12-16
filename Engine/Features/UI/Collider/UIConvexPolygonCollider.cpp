@@ -59,12 +59,10 @@ void UIConvexPolygonCollider::UpdateCache(const UIElement* _uiElement)
     {
         // 独立モード：UIのローカル座標系で計算
         Vector2 pos = _uiElement->GetWorldPosition();
-        Vector2 size = _uiElement->GetSize();
-        Vector2 uiCenter = pos + size * 0.5f;
         worldVertices_.resize(localVertices_.size());
         for (size_t i = 0; i < localVertices_.size(); i++)
         {
-            worldVertices_[i] = uiCenter + localVertices_[i];
+            worldVertices_[i] = pos + localVertices_[i];
         }
     }
 }

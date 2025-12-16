@@ -112,7 +112,7 @@ void  SpectrumTextureGenerator::MakeLogRanges(float sampleRate,  float fmin, flo
         if (i1 >= fftBins) i1 = fftBins - 1;
         if (i1 < i0) i1 = i0;
 
-        Debug::Log(std::format("Range[{}] : min_{},max_{}\n", b, i0, i1));
+        //Debug::Log(std::format("Range[{}] : min_{},max_{}\n", b, i0, i1));
 
         ranges_[b] = { i0, i1 };
 

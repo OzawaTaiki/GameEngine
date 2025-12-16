@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #ifdef GetCurrentTime
 #undef GetCurrentTime
@@ -71,6 +72,8 @@ public:
     * @return デルタタイムが固定値の場合true
     */
     static bool IsDeltaTimeFixed() { return isDeltaTimeFixed_; }
+
+    static void TimeStamp(const std::string& _label = "");
 
 #ifdef _DEBUG
     static void ImGui(bool* _open);
