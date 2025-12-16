@@ -15,6 +15,7 @@ void UISliderComponent::Initialize()
     owner_->RegisterVariable("minValue", &minValue_);
     owner_->RegisterVariable("maxValue", &maxValue_);
     owner_->RegisterVariable("isEnabled", &isEnabled_);
+    owner_->RegisterVariable("Step", &step_);
 
     // 初期ハンドル位置を設定
     UpdateHandlePosition();
@@ -89,6 +90,11 @@ void UISliderComponent::SetValue(float value)
 {
     // 範囲制限
     float newValue = std::clamp(value, minValue_, maxValue_);
+    // ステップに基づいて値を調整
+    if (step_ > 0.0f)
+    {
+        newValue = std::round(newValue / step_) * step_;
+    }
 
     if (value_ != newValue)
     {
@@ -130,8 +136,13 @@ void UISliderComponent::UpdateValueFromMousePosition(const Vector2& mousePos)
     float normalizedPos = (mousePos.x - trackLeft) / (trackRight - trackLeft);
     normalizedPos = std::clamp(normalizedPos, 0.0f, 1.0f);
 
-    // 値に変換
+    // 正規化位置から値を計算
     float newValue = minValue_ + normalizedPos * (maxValue_ - minValue_);
+    // ステップに基づいて値を調整
+    if (step_ > 0.0f)
+    {
+        newValue = std::round(newValue / step_) * step_;
+    }
     SetValue(newValue);
 }
 

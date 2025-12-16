@@ -2,6 +2,9 @@
 #include <Features/UI/UISpriteRenderComponent.h>
 #include <Features/UI/UISliderComponent.h>
 #include <Features/UI/Collider/UIColliderComponent.h>
+#include <Features/UI/UINavigationComponent.h>
+#include <Features/UI/UIEditableComponent.h>
+#include <System/Input/Input.h>
 #include "UITextRenderComponent.h"
 
 UISliderElement::UISliderElement(const std::string& name,
@@ -34,12 +37,12 @@ void UISliderElement::Initialize()
     // トラックのスプライト
     trackSprite_ = track_->AddComponent<UISpriteRenderComponent>(track_, "white.png");
     trackSprite_->GetSprite()->SetAnchor(Vector2(0.0f, 0.5f));
-
+    trackColor_ = trackSprite_->GetColor();
     // トラックのコライダー
     track_->AddComponent<UIColliderComponent>(ColliderType::Rectangle);
 
     // ハンドル作成
-    auto handle = std::make_unique<UIElement>(GetName() + "_Handle",true);
+    auto handle = std::make_unique<UIElement>(GetName() + "_Handle", true);
     handle->SetSize(Vector2(handleWidth_, handleHeight_));
     handle->SetPivot(Vector2(0.5f, 0.5f));  // 中央基準
     handle->SetAnchor(Vector2(0.0f, 0.5f));
@@ -67,6 +70,41 @@ void UISliderElement::Initialize()
     slider_ = AddComponent<UISliderComponent>();
     slider_->SetTrack(track_);
     slider_->SetHandle(handle_);
+
+    // ナビゲーションコンポーネント
+    navigation_ = AddComponent<UINavigationComponent>();
+    navigation_->SetFocusable(true);
+    navigation_->SetOnFocusEnter([&]()
+                                 {
+                                     trackSprite_->SetColor(trackColor_ * 1.3f); // フォーカス時に明るくする
+                                 });
+    navigation_->SetOnFocusExit([&]()
+                                {
+                                    trackSprite_->SetColor(trackColor_);
+                                });
+
+    // 編集可能コンポーネント
+    editable_ = AddComponent<UIEditableComponent>();
+    editable_->SetOnEditStartCallback([&]()
+                                      {
+                                          handleSprite_->SetColor(handleEditColor_);
+                                      });
+    editable_->SetOnEditEndCallback([&]()
+                                    {
+                                        handleSprite_->SetColor(handleColor_);
+                                    });
+    editable_->SetOnEditingInputCallback([&](Input* input)
+                                         {
+                                             float step = slider_->GetStep();
+                                             if (input->IsKeyPressed(DIK_LEFT))
+                                             {
+                                                 SetValue(GetValue() - step);
+                                             }
+                                             else if (input->IsKeyPressed(DIK_RIGHT))
+                                             {
+                                                 SetValue(GetValue() + step);
+                                             }
+                                         });
 }
 
 void UISliderElement::Update()
@@ -99,6 +137,12 @@ void UISliderElement::SetRange(float min, float max)
 {
     if (slider_)
         slider_->SetRange(min, max);
+}
+
+void UISliderElement::SetStep(float step)
+{
+    if (slider_)
+        slider_->SetStep(step);
 }
 
 void UISliderElement::SetOnValueChanged(std::function<void(float)> callback)

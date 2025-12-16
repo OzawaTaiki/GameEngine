@@ -30,9 +30,15 @@ public:
     float GetValue() const { return value_; }
 
     // 範囲設定
+    void SetMinValue(float min) { minValue_ = min; }
+    void SetMaxValue(float max) { maxValue_ = max; }
     void SetRange(float min, float max);
     float GetMinValue() const { return minValue_; }
     float GetMaxValue() const { return maxValue_; }
+
+    // ステップ設定
+    void SetStep(float step) { step_ = step; }
+    float GetStep() const { return step_; }
 
     // コールバック設定
     void SetOnValueChanged(std::function<void(float)> callback) { onValueChanged_ = callback; }
@@ -48,6 +54,8 @@ private:
     float value_ = 0.5f;
     float minValue_ = 0.0f;
     float maxValue_ = 1.0f;
+
+    float step_ = 0.01f;
 
     bool isDragging_ = false;
     bool isEnabled_ = true;

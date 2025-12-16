@@ -9,6 +9,8 @@
 class UISpriteRenderComponent;
 class UISliderComponent;
 class UITextRenderComponent;
+class UINavigationComponent;
+class UIEditableComponent;
 /// <summary>
 /// UIElement + UIComponent アーキテクチャで実装されたスライダーUI
 /// </summary>
@@ -31,6 +33,8 @@ public:
 
     // 範囲設定
     void SetRange(float min, float max);
+
+    void SetStep(float step);
 
     // コールバック設定
     void SetOnValueChanged(std::function<void(float)> callback);
@@ -61,11 +65,14 @@ private:
     UISpriteRenderComponent* handleSprite_ = nullptr;
     UISliderComponent* slider_ = nullptr;
     UITextRenderComponent* valueText_ = nullptr;
+    UINavigationComponent* navigation_ = nullptr;
+    UIEditableComponent* editable_ = nullptr;
 
     // 色設定
     Vector4 trackColor_ = { 0.3f, 0.3f, 0.3f, 1.0f };
     Vector4 handleColor_ = { 0.8f, 0.8f, 0.8f, 1.0f };
     Vector4 handleHoverColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+    Vector4 handleEditColor_ = { 1.0f, 0.9f, 0.6f, 1.0f };
 
     // サイズ設定
     float handleWidth_ = 20.0f;
