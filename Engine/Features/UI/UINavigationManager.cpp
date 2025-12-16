@@ -4,6 +4,7 @@
 #include <Features/UI/UIButtonComponent.h>
 #include <System/Input/Input.h>
 #include <algorithm>
+#include "UIEditableComponent.h"
 
 UINavigationManager* UINavigationManager::GetInstance()
 {
@@ -54,6 +55,26 @@ void UINavigationManager::HandleInput()
     if (!navComp || !navComp->IsFocusable())
         return;
 
+    auto editableComp = currentFocus_->GetComponent<UIEditableComponent>();
+
+    if (editableComp && editableComp->IsEditing())
+    {
+        if (input->IsKeyTriggered(DIK_RETURN) ||
+            input->IsKeyTriggered(DIK_SPACE) ||
+            input->IsKeyTriggered(DIK_ESCAPE) ||
+            input->IsPadTriggered(PadButton::iPad_A) ||
+            input->IsPadTriggered(PadButton::iPad_B))
+        {
+            // 編集モード中に決定キーが押されたら編集終了
+            editableComp->SetEditing(false);
+            return;
+        }
+
+        editableComp->HandleKeyInput(input);
+        return;// 編集モード中はナビゲーションしない
+    }
+
+
     //TODO : キーの変更対応
 
     // 方向キー入力でフォーカス移動
@@ -83,7 +104,7 @@ void UINavigationManager::HandleInput()
     }
 
     // 決定キー（Enter / ゲームパッドA）で実行
-    if (input->IsKeyTriggered(DIK_RETURN)|| input->IsKeyTriggered(DIK_SPACE) || input->IsPadTriggered(PadButton::iPad_A))
+    if (input->IsKeyTriggered(DIK_RETURN) || input->IsKeyTriggered(DIK_SPACE) || input->IsPadTriggered(PadButton::iPad_A))
     {
         ExecuteCurrentElement();
     }
@@ -101,6 +122,13 @@ void UINavigationManager::SetFocus(UIElement* element)
     // 以前のフォーカスを解除
     if (currentFocus_)
     {
+        auto* editable = currentFocus_->GetComponent<UIEditableComponent>();
+        if (editable && editable->IsEditing())
+        {
+            editable->SetEditing(false);
+        }
+
+
         auto* prevNavComp = GetNavigationComponent(currentFocus_);
         if (prevNavComp)
         {
@@ -130,6 +158,14 @@ void UINavigationManager::ExecuteCurrentElement()
 {
     if (!currentFocus_)
         return;
+
+    auto* editable = currentFocus_->GetComponent<UIEditableComponent>();
+    if (editable)
+    {
+        editable->SetEditing(true);
+        return;
+    }
+
 
     // ボタンコンポーネントを持っている場合、クリック処理を実行
     auto* buttonComp = currentFocus_->GetComponent<UIButtonComponent>();

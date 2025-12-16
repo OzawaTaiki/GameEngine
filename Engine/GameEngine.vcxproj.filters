@@ -289,20 +289,17 @@
     <Filter Include="Shaders\PostEffects\Bloom">
       <UniqueIdentifier>{619d381d-9005-4970-9909-9907347eb04a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\UI\New">
-      <UniqueIdentifier>{d9111a5c-ca9e-4d49-a60c-a5a19236ae13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Features\UI\New\Component">
-      <UniqueIdentifier>{e35a148f-2934-4e6e-980f-2d26a0489296}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Features\UI\New\Element">
-      <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math\Matrix\Quaternion">
       <UniqueIdentifier>{62F5F34C-75B0-445B-8E16-CCCCA89FCB3BAD6E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Math\Color">
       <UniqueIdentifier>{d7aedf97-67fd-476e-b898-1393e70b4f53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\Component">
+      <UniqueIdentifier>{e35a148f-2934-4e6e-980f-2d26a0489296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UI\Element">
+      <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -422,15 +419,6 @@
     </ClCompile>
     <ClCompile Include="Features\Sprite\SpriteManager.cpp">
       <Filter>Features\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIBase.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIButton.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UISprite.cpp">
-      <Filter>Features\UI</Filter>
     </ClCompile>
     <ClCompile Include="Features\UVTransform\SpriteSheetAnimetion.cpp">
       <Filter>Features\UVTransform</Filter>
@@ -618,12 +606,6 @@
     <ClCompile Include="Features\Model\Animation\Controller\AnimationController.cpp">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\UINavigator.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIGroup.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Json\JsonSerializers.cpp">
       <Filter>Features\Json</Filter>
     </ClCompile>
@@ -660,12 +642,6 @@
     <ClCompile Include="Features\PostEffects\GrayScale.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\UISlider.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UISelectable.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Effect\Effect\Effect.cpp">
       <Filter>Features\Effect\Effect</Filter>
     </ClCompile>
@@ -686,12 +662,6 @@
     </ClCompile>
     <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp">
       <Filter>Features\AudioSpectrum</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIInteractive.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UIText.cpp">
-      <Filter>Features\UI</Filter>
     </ClCompile>
     <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp">
       <Filter>Features\AudioSpectrum</Filter>
@@ -723,9 +693,6 @@
     <ClCompile Include="Math\Rect\Rect.cpp">
       <Filter>Math\Rect</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\UITextBox.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
     <ClCompile Include="System\Input\TextInputManager.cpp">
       <Filter>System\Input</Filter>
     </ClCompile>
@@ -750,52 +717,50 @@
     <ClCompile Include="Core\DXCommon\RootSignatureBuilder\RootSignatureBuilder.cpp">
       <Filter>Core\DXCommon\PSO\RootSignatureBuilder</Filter>
     </ClCompile>
-    <ClCompile Include="Features\UI\UISliderWithInput.cpp">
-      <Filter>Features\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Features\PostEffects\Bloom.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UIButtonComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Collider\UIColliderComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UINavigationComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UISliderComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UISpriteRenderComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UITextRenderComponent.cpp">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UIButtonElement.cpp">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UIElement.cpp">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UISliderElement.cpp">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UIImageElement.cpp">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\UITextElement.cpp">
-      <Filter>Features\UI\New\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\UI\UINavigationManager.cpp">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClCompile>
     <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
       <Filter>Features\Text</Filter>
     </ClCompile>
     <ClCompile Include="Math\Color\Color.cpp" />
+    <ClCompile Include="Features\UI\UINavigationManager.cpp">
+      <Filter>Features\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\UI\UIEditableComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -944,15 +909,6 @@
     </ClInclude>
     <ClInclude Include="Features\Sprite\SpriteManager.h">
       <Filter>Features\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIBase.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIButton.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UISprite.h">
-      <Filter>Features\UI</Filter>
     </ClInclude>
     <ClInclude Include="Features\UVTransform\IUVAnimation.h">
       <Filter>Features\UVTransform</Filter>
@@ -1173,12 +1129,6 @@
     <ClInclude Include="Features\Model\Animation\Controller\AnimationController.h">
       <Filter>Features\Model\Animation\Controller</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\UINavigator.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIGroup.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Json\VariableHolder.h">
       <Filter>Features\Json</Filter>
     </ClInclude>
@@ -1224,12 +1174,6 @@
     <ClInclude Include="System\Audio\VoiceCallback.h">
       <Filter>System\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\UISlider.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UISelectable.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Effect\Effect\Effect.h">
       <Filter>Features\Effect\Effect</Filter>
     </ClInclude>
@@ -1253,12 +1197,6 @@
     </ClInclude>
     <ClInclude Include="Features\AudioSpectrum\SpectrumTextureGenerator.h">
       <Filter>Features\AudioSpectrum</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIInteractive.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UIText.h">
-      <Filter>Features\UI</Filter>
     </ClInclude>
     <ClInclude Include="Framework\Batch2DRenderer.h">
       <Filter>Framework</Filter>
@@ -1293,9 +1231,6 @@
     <ClInclude Include="Math\Rect\Rect.h">
       <Filter>Math\Rect</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\UITextBox.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
     <ClInclude Include="System\Input\TextInputManager.h">
       <Filter>System\Input</Filter>
     </ClInclude>
@@ -1326,53 +1261,53 @@
     <ClInclude Include="Features\PostEffects\Bloom.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
-    <ClInclude Include="Features\UI\UISliderWithInput.h">
-      <Filter>Features\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Features\UI\UIButtonComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\Collider\UIColliderComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UINavigationComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UISpriteRenderComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UITextRenderComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIButtonElement.h">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIElement.h">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UISliderElement.h">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIImageElement.h">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UITextElement.h">
-      <Filter>Features\UI\New\Element</Filter>
+      <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="Features\UI\UIComponent.h">
-      <Filter>Features\UI\New\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\UI\UINavigationManager.h">
-      <Filter>Features\UI\New</Filter>
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
     <ClInclude Include="Features\TextRenderer\Text3DRenderer.h">
       <Filter>Features\Text</Filter>
     </ClInclude>
     <ClInclude Include="Math\Color\Color.h">
       <Filter>Math\Color</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UINavigationManager.h">
+      <Filter>Features\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\UIEditableComponent.h">
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
