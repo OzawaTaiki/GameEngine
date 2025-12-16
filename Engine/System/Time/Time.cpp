@@ -1,6 +1,7 @@
 #include <System/Time/Time.h>
 #include <Debug/ImGuiDebugManager.h>
 #include <chrono>
+#include <Debug/Debug.h>
 
 double  Time::deltaTime_                = 1.0f / 60.0f;
 double  Time::totalTime_                = 0.0f;
@@ -20,7 +21,7 @@ void Time::Initialize()
     prevTime_ = 0.0f;
     currentTime_ = 0.0f;
     framerate_ = 60.0f;
-    updateInterval_ = 1.0f;
+    updateInterval_ = 0.0f;
     defaultFramerate_ = 60.0f;
     isDeltaTimeFixed_ = true;
     frameCount_ = 0;
@@ -41,7 +42,8 @@ void Time::Update()
         ++frameCount_;
         return;
     }
-
+    if (updateInterval_ == 0.0f)
+        frameCount_ = 1;
     // デルタタイムを更新
     if (isDeltaTimeFixed_)
         deltaTime_ = 1.0f / defaultFramerate_;
@@ -72,6 +74,16 @@ double Time::GetCurrentTime()
     return static_cast<float>(duration.count()) / 1000.0f;
 }
 
+void Time::TimeStamp(const std::string& _label)
+{
+    auto now = std::chrono::steady_clock::now();
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>(
+        now.time_since_epoch()
+    ).count();
+
+    Debug::Log(_label + std::format(" TimeStamp(us): {}\n", us));
+
+}
 #ifdef _DEBUG
 void Time::ImGui(bool* _open)
 {

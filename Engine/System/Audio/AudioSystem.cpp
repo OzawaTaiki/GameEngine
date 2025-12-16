@@ -2,6 +2,7 @@
 
 #include <System/Audio/SoundInstance.h>
 #include <Debug/Debug.h>
+#include <chrono>
 
 AudioSystem* AudioSystem::GetInstance()
 {
@@ -41,6 +42,8 @@ void AudioSystem::Finalize()
 
 std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
 {
+    auto begin = std::chrono::system_clock::now();
+
     HRESULT hr = S_OK;
 
     Debug::Log("Loading sound file: " + _filename);
@@ -118,6 +121,9 @@ std::shared_ptr<SoundInstance> AudioSystem::Load(const std::string& _filename)
     auto soundInstance = CreateSoundInstance(*waveFormat, std::move(mediaData), _filename);
 
     CoTaskMemFree(waveFormat);
+
+    auto end = std::chrono::system_clock::now();
+    Debug::Log(std::format("Sound Load Time: {} ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()));
 
     return soundInstance;
 

@@ -3,6 +3,7 @@
 #include <Debug/ImGuiDebugManager.h>
 
 #include <cassert>
+#include <Debug/Debug.h>
 
 SceneManager* SceneManager::GetInstance()
 {
@@ -65,6 +66,8 @@ void SceneManager::Update()
         if (transition_->IsEnd())
         {
             isTransition_ = false;
+            auto timeStamp = std::chrono::system_clock::now();
+            Debug::Log(std::format("Transition End TimePoint: {}\n", timeStamp.time_since_epoch().count()));
         }
     }
 }
@@ -139,6 +142,8 @@ void SceneManager::ChangeScene()
         }
     }
 
+    auto timeStamp = std::chrono::system_clock::now();
+    Debug::Log(std::format("Scene Change TimePoint: {}\n", timeStamp.time_since_epoch().count()));
 
     instance->currentScene_.reset();
 
@@ -146,6 +151,11 @@ void SceneManager::ChangeScene()
     instance->currentScene_->Initialize(instance->sceneData_.get());
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
+
+    auto endTimeStamp = std::chrono::system_clock::now();
+    Debug::Log(std::format("Scene Initialized TimePoint: {}\n", endTimeStamp.time_since_epoch().count()));
+    Debug::Log(std::format("Scene Change Duration: {} ms\n",
+                           std::chrono::duration_cast<std::chrono::milliseconds>(endTimeStamp - timeStamp).count()));
 
 }
 
