@@ -16,7 +16,7 @@ public:
     /// </summary>
     /// <param name="type">Colliderの種類</param>
     UIColliderComponent(ColliderType type = ColliderType::Rectangle);
-    ~UIColliderComponent() override = default;
+    ~UIColliderComponent() override;
 
     void Initialize() override;
     void Update() override;

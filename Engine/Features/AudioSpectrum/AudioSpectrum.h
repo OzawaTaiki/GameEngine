@@ -24,11 +24,12 @@ public:
 
 
     static void Butterfly2(std::complex<float>& _x0, std::complex<float>& _x1);
-    static void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1, std::complex<float>& _x2, std::complex<float>& _x3);
+    static void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1,
+                           std::complex<float>& _x2, std::complex<float>& _x3);
     static void Butterfly8(std::array<std::complex<float>, 8>& _x);
 
     // 高速フーリエ変換
-    static void FFT(const std::vector<float>& _input, std::vector<std::complex<float>>& _output);
+    static void FFT(const std::vector<float>& in, std::vector<std::complex<float>>& out);
 
     std::vector<float> GetSpectrumAtTime(float _time);
 

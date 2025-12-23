@@ -18,6 +18,11 @@ UIColliderComponent::UIColliderComponent(ColliderType type)
     collider_ = UIColliderFactory::Create(type);
 }
 
+UIColliderComponent::~UIColliderComponent()
+{
+    UICollisionManager::GetInstance()->UnregisterElement(collider_.get());
+}
+
 void UIColliderComponent::Initialize()
 {
     assert(owner_ != nullptr);
