@@ -202,8 +202,8 @@ void AudioSpectrum::FFT(const std::vector<float>& in, std::vector<std::complex<f
 
 #else
     // 再帰的にFFTを実行
-    //RecursiveFFT(_output);
-    IterativeFFT(_output);
+    //RecursiveFFT(out);
+    IterativeFFT(out);
 #endif // _DEBUG
 
 
