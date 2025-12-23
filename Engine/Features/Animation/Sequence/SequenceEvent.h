@@ -13,7 +13,16 @@
 #include <cstdint>
 #include <typeindex>
 
-using ParameterValue = std::variant<int32_t, float, Vector2, Vector3, Vector4, Quaternion>;
+using ParameterValue =
+
+std::variant<
+    int32_t,
+    float,
+    Vector2,
+    Vector3,
+    Vector4,
+    Quaternion
+>;
 
 class JsonBinder;
 class SequenceEvent
