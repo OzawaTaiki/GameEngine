@@ -316,6 +316,74 @@ void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
     }
 }
 
+std::vector<float> AudioSpectrum::GetAmplitudesInRange(float minHz, float maxHz)
+{
+    std::vector<float> result;
+
+    // サンプリングレート44100Hz, FFTサイズ2048の場合
+    // 各ビンの周波数 = (index * 44100) / 2048
+    size_t fftSize = cashedSpectrum_.size() * 2; // FFTサイズはスペクトラムの2倍
+
+    for (size_t i = 0; i < fftSize; ++i)
+    {
+        float frequency = (i * sampleRate_) / fftSize;
+        if (frequency < minHz)
+            continue;
+        else if (frequency > maxHz)
+            break;
+
+        result.push_back(cashedSpectrum_[i]); // 振幅値
+    }
+    return result;
+
+
+}
+
+void AudioSpectrum::GetAmplitudesInRange(size_t begin, size_t end, std::vector<float>& out)
+{
+    if (begin >= cashedSpectrum_.size() || end > cashedSpectrum_.size() || begin >= end)
+    {
+        return;
+    }
+
+    const size_t rangeSize = end - begin;
+
+    // サイズが足りない場合のみresize
+    if (out.size() < rangeSize)
+    {
+        out.resize(rangeSize);
+    }
+
+    // イテレータを使った高速コピー
+    //std::copy(
+    //    cashedSpectrum_.begin() + begin,
+    //    cashedSpectrum_.begin() + end,
+    //    out.begin()
+    //);
+    std::memcpy(out.data(), &cashedSpectrum_[begin], rangeSize * sizeof(float));
+}
+
+void AudioSpectrum::GetSpectrumIndexRange(float minHz, float maxHz, size_t& outBeginIndex, size_t& outEndIndex) const
+{
+    size_t fftSize = cashedSpectrum_.size() * 2; // FFTサイズはスペクトラムの2倍
+
+    outBeginIndex = 0;
+    outEndIndex = 0;
+    for (size_t i = 0; i < fftSize; ++i)
+    {
+        float frequency = (i * sampleRate_) / fftSize;
+        if (frequency < minHz)
+        {
+            outBeginIndex = i;
+        }
+        else if (frequency > maxHz)
+        {
+            outEndIndex = i;
+            break;
+        }
+    }
+}
+
 std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
 {
     std::vector<float> segment(1024, 0.0f);  // ゼロで初期化

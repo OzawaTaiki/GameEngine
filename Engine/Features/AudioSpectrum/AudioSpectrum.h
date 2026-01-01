@@ -36,9 +36,9 @@ public:
     // 入出力のラウンドトリップテスト
     void RoundTripTest(const std::vector<float>& _input);
 
-
     void SetAudioData(const std::vector<float>& _audioData) { audioData_ = _audioData; }
     void SetSampleRate(float _sampleRate) { sampleRate_ = _sampleRate; }
+    float GetSampleRate() const { return sampleRate_; }
 
 
     // 再帰的FFT
@@ -46,6 +46,11 @@ public:
 
     // 反復的FFT
     static void IterativeFFT(std::vector<std::complex<float>>& _x);
+
+
+    std::vector<float> GetAmplitudesInRange(float minHz, float maxHz);
+    void GetAmplitudesInRange(size_t begin, size_t end, std::vector<float>& out);
+    void GetSpectrumIndexRange(float minHz, float maxHz, size_t& outBeginIndex, size_t& outEndIndex) const;
 
 private:
 
