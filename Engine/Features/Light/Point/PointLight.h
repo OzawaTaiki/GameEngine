@@ -44,6 +44,7 @@ public:
     void SetIsHalf(bool isHalf) { data_.isHalf = isHalf ? 1 : 0; }
     void SetCastShadow(bool castShadow) { data_.castShadow = castShadow ? 1 : 0; }
     void SetShadowFactor(float shadowFactor) { data_.shadowFactor = shadowFactor; }
+    void SetOffset(const Vector3& off) { offset = off; }
 
     void UpdateViewProjections();
 
@@ -53,6 +54,7 @@ public:
 
 private:
     PointLight data_ = {};
+    Vector3 offset = { 0.0f, 0.0f, 0.0f };
     std::vector<uint32_t> shadowMapHandles_;
 
     // キューブマップ各面のビュー行列計算ヘルパー
