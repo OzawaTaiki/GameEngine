@@ -1,6 +1,6 @@
 #include "UITextRenderComponent.h"
 
-#include <Features/UI/UIElement.h>
+#include <Features/UI/Element/UIElement.h>
 #include <Debug/ImGuiDebugManager.h>
 
 UITextRenderComponent::UITextRenderComponent(UIElement* owner, const std::string& text, const FontConfig& fontConfig):

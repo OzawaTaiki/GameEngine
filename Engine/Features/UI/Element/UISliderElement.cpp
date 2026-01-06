@@ -1,11 +1,11 @@
 #include "UISliderElement.h"
-#include <Features/UI/UISpriteRenderComponent.h>
-#include <Features/UI/UISliderComponent.h>
-#include <Features/UI/Collider/UIColliderComponent.h>
-#include <Features/UI/UINavigationComponent.h>
-#include <Features/UI/UIEditableComponent.h>
+#include <Features/UI/Component/UISpriteRenderComponent.h>
+#include <Features/UI/Component/UISliderComponent.h>
+#include <Features/UI/Component/UIColliderComponent.h>
+#include <Features/UI/Component/UINavigationComponent.h>
+#include <Features/UI/Component/UIEditableComponent.h>
+#include <Features/UI/Component/UITextRenderComponent.h>
 #include <System/Input/Input.h>
-#include "UITextRenderComponent.h"
 
 UISliderElement::UISliderElement(const std::string& name,
                                  const Vector2& pos,

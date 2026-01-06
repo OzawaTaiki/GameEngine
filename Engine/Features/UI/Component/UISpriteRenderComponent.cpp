@@ -1,5 +1,5 @@
 #include "UISpriteRenderComponent.h"
-#include <Features/UI/UIElement.h>
+#include <Features/UI/Element/UIElement.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImGuiDebugManager.h>
 

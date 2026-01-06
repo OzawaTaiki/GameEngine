@@ -1,5 +1,5 @@
 #pragma once
-#include <Features/UI/UIComponent.h>
+#include <Features/UI/Component/UIComponent.h>
 #include <Features/UI/Collider/Interface/IUICollider.h>
 #include <Features/UI/Collider/UIColliderFactory.h>
 #include <memory>
