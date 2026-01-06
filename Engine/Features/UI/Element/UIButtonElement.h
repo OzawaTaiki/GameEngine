@@ -1,7 +1,7 @@
 #pragma once
 
 #include "UIElement.h"
-#include "UINavigationComponent.h"
+#include "../Component/UINavigationComponent.h"
 #include <Math/Vector/Vector4.h>
 #include <functional>
 #include <string>

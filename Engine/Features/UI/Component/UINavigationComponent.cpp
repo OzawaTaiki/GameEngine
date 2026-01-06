@@ -1,5 +1,5 @@
 #include "UINavigationComponent.h"
-#include <Features/UI/UIElement.h>
+#include <Features/UI/Element/UIElement.h>
 
 #ifdef _DEBUG
 #include <Debug/ImGuiDebugManager.h>

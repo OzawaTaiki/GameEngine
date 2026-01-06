@@ -1,10 +1,10 @@
 #include "UINavigationManager.h"
-#include <Features/UI/UIElement.h>
-#include <Features/UI/UINavigationComponent.h>
-#include <Features/UI/UIButtonComponent.h>
+#include <Features/UI/Element/UIElement.h>
+#include <Features/UI/Component/UINavigationComponent.h>
+#include <Features/UI/Component/UIButtonComponent.h>
+#include <Features/UI/Component/UIEditableComponent.h>
 #include <System/Input/Input.h>
 #include <algorithm>
-#include "UIEditableComponent.h"
 
 UINavigationManager* UINavigationManager::GetInstance()
 {
