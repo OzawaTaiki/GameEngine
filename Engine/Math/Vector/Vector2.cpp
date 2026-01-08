@@ -86,5 +86,6 @@ float Vector2::Cross(const Vector2& _v) const
 Vector2 Vector2::Normalize() const
 {
     float length = Length();
+    if (length == 0.0f)return Vector2::zero;
     return { x / length,y / length };
 }
