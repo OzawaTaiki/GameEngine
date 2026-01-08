@@ -34,6 +34,9 @@ public:
     //Vector2 uvScale_ = { 1.0f,1.0f };
     //float uvRotate_ = 0.0f;
 
+    std::vector<Batch2DRenderer::VertexData>& GetVertexData() { return vertexData_; }
+    void SetVertexDataDirty() { isVertexDirty_ = true; }
+
     UVTransform& GetUVTransform() { return uvTransform_; }
 
     static std::unique_ptr<Sprite> Create(const std::string& _name, uint32_t _textureHandle, const Vector2& _anchor = { 0.5f, 0.5f });
