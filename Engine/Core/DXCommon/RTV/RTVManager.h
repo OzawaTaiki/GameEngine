@@ -32,7 +32,12 @@ public:
 
     void SetSwapChainRenderTexture(IDXGISwapChain4* _swapChain);
 
-    uint32_t CreateRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat,const Vector4& _clearColor,bool _createDSV);
+    uint32_t CreateRenderTarget(std::string _name,
+                                uint32_t _width, uint32_t _height,
+                                DXGI_FORMAT _colorFormat,const Vector4& _clearColor,bool _createDSV,
+                                // 同名が存在した場合上書きするかどうか
+                                bool _override = false
+    );
 
     RenderTarget* GetRenderTexture(std::string _name) { return renderTargets_[textureMap_[_name]].get(); }
     RenderTarget* GetRenderTexture(uint32_t _index) { return renderTargets_[_index].get(); }
