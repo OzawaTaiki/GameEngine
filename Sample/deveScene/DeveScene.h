@@ -24,15 +24,13 @@
 #include <Features/Model/SkyBox.h>
 
 #include <Features/TextRenderer/TextGenerator.h>
-#include <Features/UI/UIGroup.h>
 
-#include <Features/UI/UIElement.h>
-#include <Features/UI/UITextRenderComponent.h>
-#include <Features/UI/UISpriteRenderComponent.h>
-#include <Features/UI/UIButtonElement.h>
-#include <Features/UI/UISliderElement.h>
-#include <Features/UI/UIImageElement.h>
-#include <Features/UI/UITextElement.h>
+#include <Features/UI/Element/UIButtonElement.h>
+#include <Features/UI/Element/UISliderElement.h>
+#include <Features/UI/Element/UIImageElement.h>
+#include <Features/UI/Element/UITextElement.h>
+
+
 
 
 class DeveScene : public BaseScene
@@ -87,8 +85,6 @@ private:
     std::shared_ptr<VoiceInstance> voiceInstance_ = nullptr;
 
     std::unique_ptr<SkyBox> skyBox_ = nullptr;
-
-    std::unique_ptr<UIGroup> uiGroup_ = nullptr;
 
     // UIRenderComponent テスト
     std::unique_ptr<UIElement> testTextElement_ = nullptr;
