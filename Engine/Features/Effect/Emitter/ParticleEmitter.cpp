@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <cstring>
 
-#ifdef _DEBUG
-// 静的メンバの定義
 
 namespace Engine {
-
+#ifdef _DEBUG
 int ParticleEmitter::s_nextID_ = 0;
-#endif
+
+#endif // _DEBUG
+
 
 bool ParticleEmitter::Initialize(const std::string& _name)
 {

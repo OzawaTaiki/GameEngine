@@ -11,11 +11,12 @@
 #include <list>
 #include <algorithm>
 
+namespace Engine
+{
+
+
 #ifdef _DEBUG
 
-
-
-namespace Engine {
 
 void ImGuiTool::GradientEditor(const char* _label, std::list<std::pair<float, Vector4>>& _colors)
 {
