@@ -2,6 +2,9 @@
 
 #include <Features/Model/Primitive/Primitive.h>
 
+
+namespace Engine {
+
 enum class RingUVMode
 {
     Radial, // 放射状UV 角度方向にU，半径方向にV
@@ -56,4 +59,4 @@ private:
 
 };
 
-
+} // namespace Engine

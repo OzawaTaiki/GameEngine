@@ -10,6 +10,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <Features/UVTransform/UVTransform.h>
+
+namespace Engine {
+
 class Sprite
 {
 public:
@@ -89,3 +92,5 @@ private:
     bool isDirty_ = true;
 
 };
+
+} // namespace Engine

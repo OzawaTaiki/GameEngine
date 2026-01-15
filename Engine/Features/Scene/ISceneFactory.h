@@ -8,6 +8,9 @@
 /// <summary>
 /// シーンファクトリ インタフェース
 /// </summary>
+
+namespace Engine {
+
 class ISceneFactory
 {
 public:
@@ -17,3 +20,5 @@ public:
 
     virtual std::string ShowDebugWindow() = 0;
 };
+
+} // namespace Engine

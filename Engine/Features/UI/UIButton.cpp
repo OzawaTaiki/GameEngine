@@ -3,6 +3,9 @@
 #include <Debug/ImGuiManager.h>
 #include <Utility/ConvertString/ConvertString.h>
 
+
+namespace Engine {
+
 UIButton::UIButton()
 {
 }
@@ -220,3 +223,5 @@ void UIButton::CraeteUIText(const std::wstring& _text, const FontConfig& _config
 
     AddChild(text_);
 }
+
+} // namespace Engine

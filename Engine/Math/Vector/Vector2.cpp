@@ -1,5 +1,7 @@
 #include <Math/Vector/Vector2.h>
 
+namespace Engine {
+
 const Vector2 Vector2::zero = Vector2(0.0f, 0.0f);
 const Vector2 Vector2::one = Vector2(1.0f, 1.0f);
 
@@ -88,3 +90,5 @@ Vector2 Vector2::Normalize() const
     float length = Length();
     return { x / length,y / length };
 }
+
+} // namespace Engine

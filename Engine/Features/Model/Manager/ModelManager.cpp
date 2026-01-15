@@ -6,6 +6,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <cassert>
 
+
+namespace Engine {
+
 ModelManager* ModelManager::GetInstance()
 {
     static ModelManager instance;
@@ -225,3 +228,5 @@ ModelManager::~ModelManager()
 #endif // _DEBUG
 
 }
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include <Core/DXCommon/RTV/RTVManager.h>
 #include <Core/WinApp/WinApp.h>
 
+
+namespace Engine {
+
 std::unique_ptr<LayerSystem> LayerSystem::instance_ = nullptr;
 
 void LayerSystem::Initialize()
@@ -284,3 +287,5 @@ void LayerSystem::Finalize()
         instance_.reset();
     }
 }
+
+} // namespace Engine

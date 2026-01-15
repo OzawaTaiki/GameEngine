@@ -6,6 +6,9 @@
 #include <Features/UI/UINavigationManager.h>
 #include <Features/UI/Collider/UIColliderComponent.h>
 
+
+namespace Engine {
+
 UIButtonElement::UIButtonElement(const std::string& name,
                                  const Vector2& pos,
                                  const Vector2& size,
@@ -315,3 +318,5 @@ void UIButtonElement::DrawImGuiInspector()
     ImGui::PopID();
 #endif
 }
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 #include <Math/Vector/Vector2.h>
 
 // 前方宣言
+
+namespace Engine {
+
 class UIElement;  // UIBase → UIElement
 
 /// <summary>
@@ -69,3 +72,5 @@ protected:
     TransformMode transformMode_ = TransformMode::UIDependent;
     bool isHit_ = false;
 };
+
+} // namespace Engine

@@ -16,6 +16,9 @@
 #include <array>
 
 
+
+namespace Engine {
+
 enum class PadButton
 {
 	iPad_Up		= XINPUT_GAMEPAD_DPAD_UP,			// ↑
@@ -164,3 +167,5 @@ private:
 #endif // _DEBUG
 
 };
+
+} // namespace Engine

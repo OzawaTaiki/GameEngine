@@ -1,6 +1,9 @@
 #include "UIText.h"
 #include <Utility/ConvertString/ConvertString.h>
 
+
+namespace Engine {
+
 void UIText::Initialize(const std::string& _label, const std::wstring& _text, const FontConfig& _config, bool _registerDebugWindow)
 {
     UIBase::Initialize(_label, _registerDebugWindow);
@@ -69,3 +72,5 @@ void UIText::ImGuiContent()
 
 #endif // _DEBUG
 }
+
+} // namespace Engine

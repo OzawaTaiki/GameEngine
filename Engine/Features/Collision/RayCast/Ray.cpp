@@ -4,6 +4,9 @@
 #include <Math/Vector/VectorFunction.h>
 
 
+
+namespace Engine {
+
 Ray Ray::CreateFromStartAndEnd(const Vector3& _start, const Vector3& _end)
 {
     Ray ray;
@@ -61,3 +64,4 @@ Ray Ray::CreateFromMouseCursor(const Camera& _camera, const Vector2& _mousePos, 
 
 }
 
+} // namespace Engine

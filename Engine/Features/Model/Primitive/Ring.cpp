@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <numbers>
 
+
+namespace Engine {
+
 Ring::Ring(float _innerRadius, float _outerRadius) :
     innerRadius_(_innerRadius),
     outerRadius_(_outerRadius),
@@ -178,3 +181,5 @@ void Ring::NormalizeRadius()
         outerRadius_ = innerRadius_;
     }
 }
+
+} // namespace Engine

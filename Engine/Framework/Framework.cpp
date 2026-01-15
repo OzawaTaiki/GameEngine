@@ -17,6 +17,9 @@
 
 
 
+
+namespace Engine {
+
 void Framework::Run()
 {
     Initialize(L"");
@@ -174,3 +177,4 @@ void Framework::Finalize()
     winApp_->Finalize();
 }
 
+} // namespace Engine

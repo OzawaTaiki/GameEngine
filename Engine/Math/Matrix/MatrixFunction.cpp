@@ -4,6 +4,9 @@
 #include <cmath>
 
 
+
+namespace Engine {
+
 Matrix4x4  Add(const Matrix4x4& _m1, const Matrix4x4& _m2)
 {
     Matrix4x4 result;
@@ -569,3 +572,5 @@ Matrix4x4 operator*(const Matrix4x4& _mat1, const Matrix4x4& _mat2)
 {
     return Matrix4x4(Multiply(_mat1, _mat2));
 }
+
+} // namespace Engine

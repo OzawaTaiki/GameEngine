@@ -8,6 +8,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 class RenderTarget;
 
 
@@ -138,3 +141,5 @@ private:
     DrawData cashedDrawData_{};
 
 };
+
+} // namespace Engine

@@ -4,6 +4,9 @@
 #include <wrl/client.h>
 #include <memory>
 
+
+namespace Engine {
+
 enum class CommandListType {
     Graphics,
     Compute,
@@ -49,3 +52,5 @@ private:
     CommandListType type_;
     bool isRecording_ = false;
 };
+
+} // namespace Engine

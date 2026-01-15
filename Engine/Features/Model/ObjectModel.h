@@ -6,6 +6,9 @@
 #include <Features/Camera/Camera/Camera.h>
 #include <Features/Model/Animation/Controller/AnimationController.h>
 
+
+namespace Engine {
+
 class ObjectModel
 {
 public:
@@ -96,3 +99,5 @@ private:
     char filePathBuffer_[128];
 
 };
+
+} // namespace Engine

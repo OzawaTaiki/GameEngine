@@ -8,6 +8,9 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+
+namespace Engine {
+
 enum class CameraType
 {
     Perspective,
@@ -115,4 +118,4 @@ private:
     Matrix4x4 LoolAt(const Vector3& _eye, const Vector3& _at, const Vector3& _up);
 };
 
-
+} // namespace Engine

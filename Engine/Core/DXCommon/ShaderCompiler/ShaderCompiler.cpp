@@ -5,6 +5,9 @@
 #include <format>
 
 
+
+namespace Engine {
+
 ShaderCompiler* ShaderCompiler::GetInstance() {
     static ShaderCompiler instance;
     return &instance;
@@ -172,3 +175,5 @@ void ShaderCompiler::ClearCache() {
     cache_.clear();
     Debug::Log("Shader cache cleared\n");
 }
+
+} // namespace Engine

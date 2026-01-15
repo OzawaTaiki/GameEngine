@@ -14,6 +14,9 @@
 #include <string>
 
 
+
+namespace Engine {
+
 class UIGroup
 {
 public:
@@ -92,3 +95,5 @@ private:
 
     std::vector<std::shared_ptr<UIBase>> uiElements_; // UI要素のコンテナ
 };
+
+} // namespace Engine

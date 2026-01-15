@@ -21,6 +21,9 @@ using json = nlohmann::json;
 
 
 // Vector2
+
+namespace Engine {
+
 void to_json(json& _j, const Vector2& _v);
 void from_json(const json& _j, Vector2& _v);
 
@@ -124,3 +127,5 @@ void from_json(const json& _j, FontConfig& _config);
 /// particle/ParticleInitParam.h
 void to_json(json& _j, const ParticleInitParam& _param);
 void from_json(const json& _j, ParticleInitParam& _param);
+
+} // namespace Engine

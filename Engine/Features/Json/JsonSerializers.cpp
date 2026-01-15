@@ -3,6 +3,9 @@
 
 #include <Utility/StringUtils/StringUitls.h>
 
+
+namespace Engine {
+
 void to_json(json& _j, const Vector2& _v)
 {
     _j = json{ {"x", _v.x}, {"y", _v.y} };
@@ -581,3 +584,5 @@ void from_json(const json& _j, ParticleInitParam& _v)
     if (_j.contains("speed"))
         _v.speed = _j["speed"].get<float>();
 }
+
+} // namespace Engine

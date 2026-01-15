@@ -2,6 +2,9 @@
 
 #include <Features/Effect/Particle/Particle.h>
 
+
+namespace Engine {
+
 class ParticleModifier
 {
 public:
@@ -22,3 +25,5 @@ private:
 
 
 };
+
+} // namespace Engine

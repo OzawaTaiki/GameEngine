@@ -9,6 +9,9 @@
 
 #ifdef _DEBUG
 
+
+namespace Engine {
+
 class AnimationSequence;
 
 namespace ImGuiTool
@@ -46,3 +49,5 @@ namespace ImGuiTool
 }
 
 #endif // _DEBUG
+
+} // namespace Engine

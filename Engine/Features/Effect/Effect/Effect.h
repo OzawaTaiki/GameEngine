@@ -13,6 +13,9 @@
 #include <functional>
 #include <unordered_map>
 
+
+namespace Engine {
+
 class Effect
 {
 public:
@@ -200,3 +203,5 @@ private:
     void DebugDrawEmitters();
 #endif
 };
+
+} // namespace Engine

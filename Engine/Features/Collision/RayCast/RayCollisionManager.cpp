@@ -4,6 +4,9 @@
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 RayCollisionManager* RayCollisionManager::GetInstance()
 {
     static RayCollisionManager instance;
@@ -359,3 +362,5 @@ bool RayCollisionManager::RayCastCapsule(const Ray& _ray, CapsuleCollider* _coll
 
     return true;
 }
+
+} // namespace Engine

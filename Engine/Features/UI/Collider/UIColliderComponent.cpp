@@ -12,6 +12,9 @@
 #include <Debug/Debug.h>
 #include "UICollisionManager.h"
 
+
+namespace Engine {
+
 UIColliderComponent::UIColliderComponent(ColliderType type)
     : colliderType_(type)
 {
@@ -219,3 +222,5 @@ void UIColliderComponent::DrawImGui()
 
 #endif
 }
+
+} // namespace Engine

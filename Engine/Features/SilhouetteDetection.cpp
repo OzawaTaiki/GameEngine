@@ -5,6 +5,9 @@
 #include <Debug/Debug.h>
 #include <d3dx12.h>
 
+
+namespace Engine {
+
 Microsoft::WRL::ComPtr<ID3D12PipelineState> SilhouetteDetection::edgeDetectionPSO_ = nullptr;
 Microsoft::WRL::ComPtr<ID3D12PipelineState> SilhouetteDetection::silhouetteEdgePSO_ = nullptr;
 Microsoft::WRL::ComPtr<ID3D12RootSignature> SilhouetteDetection::rootSignature_ = nullptr;
@@ -354,3 +357,5 @@ void SilhouetteDetection::CreateResources()
 
 
 }
+
+} // namespace Engine

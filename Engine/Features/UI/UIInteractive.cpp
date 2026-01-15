@@ -6,6 +6,9 @@
 #include "Collider/UICollisionManager.h"
 
 
+
+namespace Engine {
+
 UIInteractive::UIInteractive()
 {
     // デフォルトで矩形コライダーを使用
@@ -200,3 +203,5 @@ void UIInteractive::OnMouseUp()
 {
     // 派生クラスでオーバーライド可能
 }
+
+} // namespace Engine

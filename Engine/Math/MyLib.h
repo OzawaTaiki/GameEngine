@@ -8,6 +8,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <math.h>
+
+namespace Engine {
+
 Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
 
 /// <summary>
@@ -27,3 +30,5 @@ Quaternion Lerp(const Quaternion& _q1, const Quaternion& _q2, float _t);
 
 // カラーコードからVector4へ
 Vector4 ColorCodeToVector4(uint32_t _colorCode);
+
+} // namespace Engine

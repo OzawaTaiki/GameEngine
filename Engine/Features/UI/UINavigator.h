@@ -4,6 +4,9 @@
 #include <map>
 #include <vector>
 
+
+namespace Engine {
+
 enum class UIAction
 {
     NavigateUp,
@@ -63,3 +66,5 @@ private:
 
     Vector2 previousMousePosition_ = { 0.0f, 0.0f }; // 前回のマウス位置
 };
+
+} // namespace Engine

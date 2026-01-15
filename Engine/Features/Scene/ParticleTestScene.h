@@ -68,3 +68,8 @@
 //    void ImGui();
 //#endif // _DEBUG
 //};
+
+
+namespace Engine {
+
+} // namespace Engine

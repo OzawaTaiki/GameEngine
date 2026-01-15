@@ -5,6 +5,9 @@
 #include <Features/UI/UISlider.h>
 #include <algorithm>
 
+
+namespace Engine {
+
 void UIGroup::Initialize()
 {
     // ナビゲーターの初期化
@@ -259,3 +262,5 @@ void UIGroup::SetupGridNavigation(const std::vector<std::vector<UISelectable*>>&
         }
     }
 }
+
+} // namespace Engine

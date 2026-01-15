@@ -6,6 +6,9 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 std::unique_ptr<ColorMask> ColorMask::instance_ = nullptr;
 
 
@@ -239,3 +242,5 @@ void ColorMask::CreateConstantBuffer()
     constantBufferMap_->monoTexUVTransform = Matrix4x4::Identity();
     constantBufferMap_->colorTexUVTransform = Matrix4x4::Identity();
 }
+
+} // namespace Engine

@@ -5,6 +5,9 @@
 
 #include <Debug/ImGuiManager.h>
 
+
+namespace Engine {
+
 struct TextParam
 {
     Vector2 scale = { 1.0f, 1.0f }; // スケール
@@ -54,3 +57,5 @@ struct TextParam
     }
 #endif // _DEBUG
 };
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 #include <Debug/Debug.h>
 #include <System/Input/Input.h>
 
+
+namespace Engine {
+
 namespace
 {
 Vector4 initDefaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -258,3 +261,5 @@ void UISelectable::ProcessNavigation()
         }
     }
 }
+
+} // namespace Engine

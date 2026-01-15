@@ -10,6 +10,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 class DXCommon;
 
 class RTVManager
@@ -113,3 +116,5 @@ private:
 
 
 };
+
+} // namespace Engine

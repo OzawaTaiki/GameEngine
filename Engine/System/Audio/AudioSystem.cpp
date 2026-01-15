@@ -4,6 +4,9 @@
 #include <Debug/Debug.h>
 #include <chrono>
 
+
+namespace Engine {
+
 AudioSystem* AudioSystem::GetInstance()
 {
     static AudioSystem instance;
@@ -166,4 +169,4 @@ AudioSystem::~AudioSystem()
     Finalize();
 }
 
-
+} // namespace Engine

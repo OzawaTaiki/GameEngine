@@ -4,6 +4,9 @@
 
 #include <functional>
 #include <string>
+
+namespace Engine {
+
 class Easing
 {
 public:
@@ -100,3 +103,5 @@ private:
 
 
 };
+
+} // namespace Engine

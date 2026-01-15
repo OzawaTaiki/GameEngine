@@ -3,6 +3,9 @@
 #include "UISelectable.h"
 #include <Features/TextRenderer/TextGenerator.h>
 #include <Features/UI/UIText.h>
+
+namespace Engine {
+
 enum class PadButton;
 
 class UIButton final : public UISelectable
@@ -81,3 +84,5 @@ private:
     Vector4 backgroundColor_ = { 0.8f, 0.8f, 0.8f, 1.0f };
     //Vector4 textColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 };
+
+} // namespace Engine

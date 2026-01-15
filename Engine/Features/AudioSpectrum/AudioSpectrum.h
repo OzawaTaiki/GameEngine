@@ -4,6 +4,9 @@
 #include <array>
 #include <complex>
 
+
+namespace Engine {
+
 class AudioSpectrum
 {
 public:
@@ -67,3 +70,5 @@ private:
     float sampleRate_ = 44100.0f; // サンプリングレート
 
 };
+
+} // namespace Engine

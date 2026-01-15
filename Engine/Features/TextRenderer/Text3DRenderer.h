@@ -20,6 +20,9 @@
 #undef DrawText
 #endif // DrawText
 
+
+namespace Engine {
+
 class Text3DRenderer
 {
 public:
@@ -205,3 +208,5 @@ private:
     Text3DRenderer(Text3DRenderer&&) = delete;
     Text3DRenderer& operator=(Text3DRenderer&&) = delete;
 };
+
+} // namespace Engine

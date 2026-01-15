@@ -15,6 +15,9 @@
 
 #include <d3d12.h>
 
+
+namespace Engine {
+
 struct ParticleRenderSettings
 {
     PSOFlags::BlendMode blendMode = PSOFlags::BlendMode::Add;
@@ -144,3 +147,5 @@ private:
 
 
 };
+
+} // namespace Engine

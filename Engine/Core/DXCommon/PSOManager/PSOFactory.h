@@ -6,6 +6,9 @@
 #include <wrl.h>
 #include <dxcapi.h>
 
+
+namespace Engine {
+
 class DXCommon;
 
 class PSOFactory {
@@ -53,3 +56,5 @@ private:
 
     DXCommon* dxCommon_ = nullptr;
 };
+
+} // namespace Engine

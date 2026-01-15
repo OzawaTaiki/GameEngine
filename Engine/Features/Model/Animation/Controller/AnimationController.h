@@ -11,6 +11,9 @@
 #include <utility>
 
 
+
+namespace Engine {
+
 class Model;
 class AnimationController
 {
@@ -70,3 +73,5 @@ private:
     std::unique_ptr<SkinningCS> skinningCS_ = nullptr;
 
 };
+
+} // namespace Engine

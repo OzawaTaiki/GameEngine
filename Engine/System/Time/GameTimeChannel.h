@@ -2,6 +2,9 @@
 
 #include <System/Time/Time.h>
 
+
+namespace Engine {
+
 class GameTimeChannel
 {
 public:
@@ -29,3 +32,5 @@ private:
     bool isPaused_ = false;
     float hitStopTime_ = 0.0f;
 };
+
+} // namespace Engine

@@ -4,6 +4,9 @@
 #include <Features/UI/UISlider.h>
 #include <Features/UI/UITextBox.h>
 
+
+namespace Engine {
+
 class UISliderWithInput : public UISelectable
 {
 public:
@@ -74,3 +77,5 @@ private:
     std::shared_ptr<UISlider> slider_; // スライダー
     std::shared_ptr<UITextBox> inputBox_;// 入力ボックス
 };
+
+} // namespace Engine

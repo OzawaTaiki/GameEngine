@@ -4,6 +4,9 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 void Dissolve::Initialize()
 {
     thresholdBuffer_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ThresholdBuffer));
@@ -164,3 +167,5 @@ void Dissolve::CreatePSOForDissolve()
     PSOManager::GetInstance()->RegisterPSO("Dissolve", pipelineState.Get());
     PSOManager::GetInstance()->RegisterRootSignature("Dissolve", rootSignature.Get());
 }
+
+} // namespace Engine

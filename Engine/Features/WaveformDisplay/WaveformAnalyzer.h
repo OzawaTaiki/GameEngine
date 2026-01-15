@@ -6,6 +6,9 @@
 #include <cstdint>
 
 
+
+namespace Engine {
+
 struct WaveformDara
 {
     std::vector<float> rmsValues; // RMS値の配列
@@ -107,3 +110,5 @@ private:
 
 
 };
+
+} // namespace Engine

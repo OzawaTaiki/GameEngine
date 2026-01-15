@@ -11,6 +11,9 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+
+namespace Engine {
+
 struct ColorMaskData
 {
     Matrix4x4 monoTexUVTransform;
@@ -63,3 +66,5 @@ private:
 
 
 };
+
+} // namespace Engine

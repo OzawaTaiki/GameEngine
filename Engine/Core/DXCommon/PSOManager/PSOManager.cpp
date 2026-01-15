@@ -4,6 +4,9 @@
 #include <Utility/ConvertString/ConvertString.h>
 #include <cassert>
 
+
+namespace Engine {
+
 PSOManager* PSOManager::GetInstance()
 
 {
@@ -2129,3 +2132,5 @@ D3D12_DEPTH_STENCIL_DESC PSOManager::GetDepthStencilDesc(PSOFlags _flag)
 
     return depthStencilDesc;
 }
+
+} // namespace Engine

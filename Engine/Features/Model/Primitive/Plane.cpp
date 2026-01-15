@@ -5,6 +5,9 @@
 #include <Math/Matrix/MatrixFunction.h>
 
 // z+向き板 いらんかも //TODO
+
+namespace Engine {
+
 std::array<Vector3, 4> Plane::defaultVertices_ = {
    Vector3( 1.0f,  1.0f ,0.0f),
    Vector3(-1.0f,  1.0f ,0.0f),
@@ -84,3 +87,5 @@ std::array<Vector3, 4> Plane::CalculateVertices()
 
     return vertices;
 }
+
+} // namespace Engine

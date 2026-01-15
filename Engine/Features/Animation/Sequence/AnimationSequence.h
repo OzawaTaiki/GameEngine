@@ -8,6 +8,9 @@
 #include <list>
 #include <memory>
 
+
+namespace Engine {
+
 class AnimationSequence
 {
 public:
@@ -103,3 +106,5 @@ private:
 
 
 };
+
+} // namespace Engine

@@ -14,6 +14,9 @@
 #include <functional>
 
 
+
+namespace Engine {
+
 class DXCommon;
 class Mesh;
 // 1modelの全メッシュをまとめて持つクラス
@@ -105,3 +108,5 @@ private:
     std::map<std::string, size_t> nameToIndexMap_; // メッシュ名からインデックスへのマップ
     std::map<size_t, std::string> indexToNameMap_; // インデックスからメッシュ名へのマップ
 };
+
+} // namespace Engine

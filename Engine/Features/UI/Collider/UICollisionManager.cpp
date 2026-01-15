@@ -1,6 +1,9 @@
 #include "UICollisionManager.h"
 #include <algorithm>
 
+
+namespace Engine {
+
 UICollisionManager* UICollisionManager::GetInstance()
 {
     static UICollisionManager instance;
@@ -56,3 +59,5 @@ void UICollisionManager::SortCollidersIfNeeded()
                     });
 
 }
+
+} // namespace Engine

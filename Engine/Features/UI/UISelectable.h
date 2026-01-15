@@ -4,6 +4,9 @@
 
 #include <vector>
 
+
+namespace Engine {
+
 enum class Direction
 {
     Up,
@@ -100,3 +103,5 @@ protected:
     Vector4 focusedColor_   = { 1.0f,1.0f,0.8f,1.0f }; // フォーカスカラー
 
 };
+
+} // namespace Engine

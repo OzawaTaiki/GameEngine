@@ -1,6 +1,9 @@
 #include "RenderTexture.h"
 
 
+
+namespace Engine {
+
 RenderTarget::RenderTarget() :
     renderTextureResource_(nullptr),
     srvIndexofRTV_(0),
@@ -284,3 +287,5 @@ void RenderTarget::Clear(ID3D12GraphicsCommandList* _cmdList)
     _cmdList->ClearRenderTargetView(rtvHandle_, clearValue_, 0, nullptr);
 
 }
+
+} // namespace Engine

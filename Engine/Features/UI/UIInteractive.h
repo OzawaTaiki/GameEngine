@@ -5,6 +5,9 @@
 #include <functional>
 #include <memory>
 
+
+namespace Engine {
+
 class IUICollider;
 
 // 入力機能を持つUI基底クラス
@@ -61,3 +64,5 @@ protected:
     std::function<void()> onHoveringCallback_   = nullptr;
     std::function<void()> onHoverExitCallback_  = nullptr;
 };
+
+} // namespace Engine

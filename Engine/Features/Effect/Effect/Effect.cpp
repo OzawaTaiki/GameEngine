@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <chrono>
 
+
+namespace Engine {
+
 Effect::~Effect()
 {
     ClearEmitters();
@@ -850,3 +853,5 @@ void Effect::DebugDrawEmitters()
 }
 
 #endif // _DEBUG
+
+} // namespace Engine

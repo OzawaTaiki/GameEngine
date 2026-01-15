@@ -2,6 +2,9 @@
 
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 VoiceInstance::VoiceInstance(IXAudio2SourceVoice* _sourceVoice, float _volume, float _sampleRate, float _startTime) :
     sourceVoice_(_sourceVoice),
     volume_(_volume),
@@ -150,3 +153,4 @@ void VoiceInstance::CheckHRESULT() const
     }
 }
 
+} // namespace Engine

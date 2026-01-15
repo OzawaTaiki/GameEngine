@@ -7,6 +7,9 @@
 /// <summary>
 /// イベントタイプのIDを管理するシングルトンクラス
 /// </summary>
+
+namespace Engine {
+
 class EventTypeRegistry
 {
 public:
@@ -22,4 +25,4 @@ private:
     std::map<std::string, uint32_t> eventTypes_;
 };
 
-
+} // namespace Engine

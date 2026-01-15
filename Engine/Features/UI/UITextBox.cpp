@@ -5,6 +5,9 @@
 #include <System/Input/Input.h>
 #include <System/Time/Time.h>
 
+
+namespace Engine {
+
 namespace
 {
 Vector2 padding = { 10.0f, 3.0f };
@@ -454,3 +457,5 @@ std::string UITextBox::GetInputTextTypeString() const
             return "Unknown";
     }
 }
+
+} // namespace Engine

@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <Utility/ConvertString/ConvertString.h>
 
+
+namespace Engine {
+
 namespace
 {
 
@@ -385,3 +388,5 @@ void UISlider::UpdateValueText()
 {
     valueText_->SetText(std::format(L"{:.2f}", value_).c_str());
 }
+
+} // namespace Engine

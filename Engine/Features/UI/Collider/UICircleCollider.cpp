@@ -3,6 +3,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <Features/LineDrawer/LineDrawer.h>
 
+
+namespace Engine {
+
 bool UICircleCollider::IsPointInside(const Vector2& _point) const
 {
     Vector2 diff = _point - center_;
@@ -68,3 +71,5 @@ void UICircleCollider::DrawDebug() const
 {
     LineDrawer::GetInstance()->DebugDrawCircle(center_, radius_);
 }
+
+} // namespace Engine

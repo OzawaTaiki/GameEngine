@@ -3,6 +3,9 @@
 #include <assimp/scene.h>
 
 
+
+namespace Engine {
+
 void Node::ReadNode(const aiNode* _node)
 {
 
@@ -24,3 +27,4 @@ void Node::ReadNode(const aiNode* _node)
     }
 }
 
+} // namespace Engine

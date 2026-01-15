@@ -1,5 +1,8 @@
 #pragma once
 
+
+namespace Engine {
+
 class ISceneTransition
 {
 public:
@@ -17,3 +20,5 @@ public:
 
 
 };
+
+} // namespace Engine

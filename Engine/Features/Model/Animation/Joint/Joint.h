@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <optional>
 
+
+namespace Engine {
+
 class Node;
 class Joint
 {
@@ -45,3 +48,5 @@ private:
 
     bool openTree_ = false;
 };
+
+} // namespace Engine

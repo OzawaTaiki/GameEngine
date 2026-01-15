@@ -1,5 +1,8 @@
 #include "UISprite.h"
 
+
+namespace Engine {
+
 void UISprite::Initialize(const std::string& _label)
 {
     UIBase::Initialize(_label, true);
@@ -29,3 +32,5 @@ void UISprite::Draw()
 
     UIBase::Draw();
 }
+
+} // namespace Engine

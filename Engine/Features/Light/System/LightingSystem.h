@@ -5,6 +5,9 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+
+namespace Engine {
+
 class LightingSystem
 {
 public:
@@ -57,3 +60,5 @@ private: // コピー禁止
     LightingSystem& operator=(LightingSystem&&) = delete;
 
 };
+
+} // namespace Engine

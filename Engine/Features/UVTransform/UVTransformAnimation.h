@@ -4,6 +4,9 @@
 
 #include <Math/Vector/Vector2.h>
 
+
+namespace Engine {
+
 class UVTransformAnimation : public IUVAnimation
 {
 public:
@@ -110,3 +113,4 @@ private:
     float  rotationSpeed_ = 0.0f;
 };
 
+} // namespace Engine

@@ -1,5 +1,8 @@
 #include "Time_MT.h"
 
+
+namespace Engine {
+
 Time_MT* Time_MT::GetInstance()
 {
     static Time_MT instance;
@@ -121,3 +124,5 @@ Time_MT::Time_MT():
     isDeltaTimeFixed_(false)
 {
 }
+
+} // namespace Engine

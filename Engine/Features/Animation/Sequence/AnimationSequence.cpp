@@ -1,6 +1,9 @@
 #include "AnimationSequence.h"
 
 
+
+namespace Engine {
+
 AnimationSequence::AnimationSequence(const std::string& _label) :
     label_(_label),
     currentTime_(0.0f),
@@ -156,3 +159,5 @@ std::list<SequenceEvent*> AnimationSequence::GetSequenceEvents()
     }
     return sequenceEvents;
 }
+
+} // namespace Engine

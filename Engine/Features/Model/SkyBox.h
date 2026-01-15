@@ -2,6 +2,9 @@
 
 #include <Features/Model/ObjectModel.h>
 
+
+namespace Engine {
+
 class Camera;
 
 class SkyBox
@@ -46,3 +49,5 @@ private:
     bool useQuaternion_ = false;
 
 };
+
+} // namespace Engine

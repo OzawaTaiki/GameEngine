@@ -4,6 +4,9 @@
 #include <Features/Json/JsonBinder.h>
 #include <stdexcept>
 
+
+namespace Engine {
+
 SequenceEvent::SequenceEvent(const std::string& _label, JsonBinder* _jsonBinder) :
     label_(_label),
     isSelect_(false),
@@ -403,3 +406,5 @@ template Vector2 SequenceEvent::CalculateValueAtTime<Vector2>(float) const;
 template Vector3 SequenceEvent::CalculateValueAtTime<Vector3>(float) const;
 template Vector4 SequenceEvent::CalculateValueAtTime<Vector4>(float) const;
 template Quaternion SequenceEvent::CalculateValueAtTime<Quaternion>(float) const;
+
+} // namespace Engine

@@ -1,6 +1,9 @@
 #include "UITextElement.h"
 #include "UITextRenderComponent.h"
 
+
+namespace Engine {
+
 UITextElement::UITextElement(
     const std::string& name,
     const Vector2& position,
@@ -89,3 +92,5 @@ Vector4 UITextElement::GetColor() const
     }
     return Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 }
+
+} // namespace Engine

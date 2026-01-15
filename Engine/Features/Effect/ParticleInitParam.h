@@ -9,6 +9,9 @@
 #include <functional>
 #include <array>
 
+
+namespace Engine {
+
 struct ParticleInitParam
 {
     // 有効時間
@@ -46,3 +49,4 @@ struct ParticleInitParam
     // 分割してアニメーション あるいはランダム
 };
 
+} // namespace Engine

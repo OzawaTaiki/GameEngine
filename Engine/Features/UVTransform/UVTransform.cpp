@@ -2,6 +2,9 @@
 
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 UVTransform::UVTransform():
     uOffset_(0.0f),
     vOffset_(0.0f),
@@ -23,3 +26,5 @@ Matrix4x4 UVTransform::GetMatrix() const
 
     return mat;
 }
+
+} // namespace Engine

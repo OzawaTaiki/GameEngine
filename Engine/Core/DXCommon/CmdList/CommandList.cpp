@@ -2,6 +2,9 @@
 #include <cassert>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 CommandList::CommandList(ID3D12Device* device, CommandListType type) : type_(type)
 {
     HRESULT hr;
@@ -129,3 +132,5 @@ void CommandList::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_ST
 
     commandList_->ResourceBarrier(1, &barrier);
 }
+
+} // namespace Engine

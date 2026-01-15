@@ -4,6 +4,9 @@
 #include <numbers>
 
 
+
+namespace Engine {
+
 constexpr float pi_f = std::numbers::pi_v<float>;
 
 const char* Easing::easingFuncs[] = {
@@ -392,3 +395,5 @@ int Easing::SelectEasingFunc(int _funcNum)
 #endif // _DEBUG
     return _funcNum;
 }
+
+} // namespace Engine

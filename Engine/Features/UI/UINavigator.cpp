@@ -2,6 +2,9 @@
 #include <System/Input/Input.h>
 #include <algorithm>
 
+
+namespace Engine {
+
 UINavigator::KeyConfig UINavigator::keyConfig_ =
 {
     {UIAction::NavigateUp,      {DIK_UP, DIK_W, static_cast<int32_t>(PadButton::iPad_Up)}},
@@ -174,3 +177,5 @@ void UINavigator::ChangeFocus(UISelectable* _element)
             currentFocused_->SetFocused(true);
     }
 }
+
+} // namespace Engine

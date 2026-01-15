@@ -12,6 +12,9 @@
 /// 頂点の順序は時計回りまたは反時計回りで指定する
 /// ※凸形状でない場合，判定が正しく動作しない可能性あり
 /// </remarks>
+
+namespace Engine {
+
  class UIConvexPolygonCollider : public IUICollider
 {
 public:
@@ -68,3 +71,5 @@ private:
     std::vector<Vector2> localVertices_;   // ローカル座標系での頂点リスト
     std::vector<Vector2> worldVertices_;   // ワールド座標系での頂点リスト
  };
+
+} // namespace Engine

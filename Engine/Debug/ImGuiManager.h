@@ -3,6 +3,9 @@
 #include <imgui.h>
 #endif // _DEBUG
 
+
+namespace Engine {
+
 class SRVManager;
 class ImGuiManager
 {
@@ -20,3 +23,5 @@ private:
 #endif // _DEBUG
 
 };
+
+} // namespace Engine

@@ -6,6 +6,9 @@
 #include <string>
 
 // 前方宣言
+
+namespace Engine {
+
 class UISpriteRenderComponent;
 class UISliderComponent;
 class UITextRenderComponent;
@@ -81,3 +84,5 @@ private:
     // 状態に応じた色変更
     void OnStateChanged();
 };
+
+} // namespace Engine

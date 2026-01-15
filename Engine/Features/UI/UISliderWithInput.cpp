@@ -1,5 +1,8 @@
 #include "UISliderWithInput.h"
 
+
+namespace Engine {
+
 namespace
 {
 struct DefaultBaseParam
@@ -147,3 +150,5 @@ void UISliderWithInput::OnConfirmedInputBox()
         }
     }
 }
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include <chrono>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 double  Time::deltaTime_                = 1.0f / 60.0f;
 double  Time::totalTime_                = 0.0f;
 double  Time::prevTime_                 = 0.0f;
@@ -97,3 +100,5 @@ void Time::ImGui(bool* _open)
     ImGui::End();
 }
 #endif // _DEBUG
+
+} // namespace Engine

@@ -5,6 +5,9 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+
+namespace Engine {
+
 class PostEffectBase
 {
 public:
@@ -32,3 +35,5 @@ protected:
     void* constantBufferData_ = nullptr; // 定数バッファのデータポインタ
 
 };
+
+} // namespace Engine

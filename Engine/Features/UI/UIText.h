@@ -3,6 +3,9 @@
 #include <Features/UI/UIBase.h>
 #include <Features/TextRenderer/TextGenerator.h>
 
+
+namespace Engine {
+
 class UIText : public UIBase
 {
 public:
@@ -29,3 +32,5 @@ protected:
     TextParam textParam_;
     FontConfig fontConfig_;
 };
+
+} // namespace Engine

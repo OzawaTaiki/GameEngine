@@ -5,6 +5,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 class DXCommon;
 class SRVManager
 {
@@ -45,3 +48,5 @@ private:
 
 
 };
+
+} // namespace Engine

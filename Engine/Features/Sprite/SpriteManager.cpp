@@ -2,6 +2,9 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <cassert>
 
+
+namespace Engine {
+
 SpriteManager* SpriteManager::GetInstance()
 {
     static SpriteManager instance;
@@ -34,3 +37,5 @@ void SpriteManager::PreDraw()
     commandList->SetGraphicsRootSignature(rootSignature_);
     commandList->SetPipelineState(graphicsPipelineState_);
 }
+
+} // namespace Engine

@@ -5,6 +5,9 @@
 
 #include <functional>
 
+
+namespace Engine {
+
 class UIGroup;
 class UISlider final : public UISelectable
 {
@@ -103,3 +106,5 @@ protected:
     bool isDraggingHandle_ = false;   // ドラッグ中かどうか
 
 };
+
+} // namespace Engine

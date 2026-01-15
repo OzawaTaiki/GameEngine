@@ -5,6 +5,8 @@
 #include <string>
 #endif // _DEBUG
 
+namespace Engine {
+
 class Quaternion;
 
 struct Vector3
@@ -83,9 +85,11 @@ struct Vector3
 #endif // _DEBUG
 };
 
+} // namespace Engine
+
 template <>
-struct std::hash<Vector3> {
-    size_t operator()(const Vector3& v) const {
+struct std::hash<Engine::Vector3> {
+    size_t operator()(const Engine::Vector3& v) const {
         size_t h1 = std::hash<float>{}(v.x);
         size_t h2 = std::hash<float>{}(v.y);
         size_t h3 = std::hash<float>{}(v.z);

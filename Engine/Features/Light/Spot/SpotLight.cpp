@@ -4,6 +4,9 @@
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 SpotLightComponent::SpotLightComponent()
 {
     data_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -126,3 +129,5 @@ Matrix4x4 SpotLightComponent::LookAt(const Vector3& eye, const Vector3& at, cons
 
     return result;
 }
+
+} // namespace Engine

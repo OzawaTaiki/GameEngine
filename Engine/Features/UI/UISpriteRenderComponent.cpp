@@ -3,6 +3,9 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 UISpriteRenderComponent::UISpriteRenderComponent(UIElement* owner, const std::string& texturePath):
     UIComponent(),
     texturePath_(texturePath)
@@ -80,3 +83,5 @@ void UISpriteRenderComponent::LoadAndSetTexture(const std::string& filePath)
     textureHandle_ = TextureManager::GetInstance()->Load(filePath);
     sprite_->SetTextureHandle(textureHandle_);
 }
+
+} // namespace Engine

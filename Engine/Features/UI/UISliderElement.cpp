@@ -7,6 +7,9 @@
 #include <System/Input/Input.h>
 #include "UITextRenderComponent.h"
 
+
+namespace Engine {
+
 UISliderElement::UISliderElement(const std::string& name,
                                  const Vector2& pos,
                                  const Vector2& size,
@@ -203,3 +206,5 @@ void UISliderElement::OnStateChanged()
     // TODO: ハンドルのHover状態を検出して色を変更
     // 現状は基本色を使用
 }
+
+} // namespace Engine

@@ -9,6 +9,9 @@
 #include "UIConvexPolygonCollider.h"
 
 // ColliderTypeのJSON変換
+
+namespace Engine {
+
 void to_json(json& _j, const ColliderType& _type)
 {
     switch (_type)
@@ -272,3 +275,5 @@ UIColliderData UIColliderData::FromCollider(const IUICollider* _collider, Collid
 
     return data;
 }
+
+} // namespace Engine

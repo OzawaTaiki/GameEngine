@@ -6,6 +6,9 @@
 #include <string>
 #include <algorithm>
 
+
+namespace Engine {
+
 struct UVRange
 {
     float uMin = 0.0f;
@@ -42,3 +45,4 @@ protected:
     UVRange uvRange_;
 };
 
+} // namespace Engine

@@ -9,6 +9,7 @@
 #include <string>
 #endif // _DEBUG
 
+namespace Engine {
 
 class Quaternion
 {
@@ -62,3 +63,5 @@ public:
 #endif // _DEBUG
 
 };
+
+} // namespace Engine

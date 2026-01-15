@@ -9,6 +9,9 @@
 #include <vector>
 
 
+
+namespace Engine {
+
 class PSOBuilder
 {
 public:
@@ -70,3 +73,5 @@ private:
     void ApplyDefaults();  // デフォルト値設定
     void Validate();       // エラーチェック
 };
+
+} // namespace Engine

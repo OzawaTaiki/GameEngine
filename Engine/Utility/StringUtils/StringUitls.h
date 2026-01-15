@@ -2,6 +2,9 @@
 
 #include <string>
 
+
+namespace Engine {
+
 namespace StringUtils
 {
     /// <summary>
@@ -86,3 +89,5 @@ namespace StringUtils
     bool Contains(const std::string& _str, const std::string& _subStr);
 
 } // namespace StringUtils
+
+} // namespace Engine

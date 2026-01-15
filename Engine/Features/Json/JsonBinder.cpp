@@ -1,5 +1,8 @@
 #include <Features/Json/JsonBinder.h>
 
+
+namespace Engine {
+
 JsonBinder::JsonBinder(const std::string& _name, const std::string& _directioy)
 {
     groupName_ = _name;
@@ -21,3 +24,5 @@ void JsonBinder::Save()
 
     JsonFileIO::Save(groupName_ + ".json", folderPath_, jsonData_);
 }
+
+} // namespace Engine

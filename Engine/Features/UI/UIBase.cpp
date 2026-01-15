@@ -5,6 +5,9 @@
 #include <Debug/ImGuiManager.h>
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 namespace
 {
 Vector2 defaultPosition = { 100.0f, 100.0f };
@@ -298,3 +301,4 @@ void UIBase::UpdateSelf()
     sprite_->uvRotate_ = uvTransform_.GetRotation();
 }
 
+} // namespace Engine

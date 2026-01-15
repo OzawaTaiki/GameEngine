@@ -5,6 +5,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 class DXCommon;
 class SilhouetteDetection
 {
@@ -99,3 +102,5 @@ private:
     Vector3* lightDirection_;
 
 };
+
+} // namespace Engine

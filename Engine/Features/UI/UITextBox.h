@@ -4,6 +4,9 @@
 #include <Features/UI/UISelectable.h>
 #include <Math/Rect/Rect.h>
 
+
+namespace Engine {
+
 enum class InputTextType
 {
     Text,       // 全ての文字
@@ -218,3 +221,5 @@ inline void UITextBox::SetValue(T _value)
     confirmedText_ = formattedText;
     cursor_ = pendingText_.length();
 }
+
+} // namespace Engine

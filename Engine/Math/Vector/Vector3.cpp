@@ -3,6 +3,8 @@
 #include <Math/Quaternion/Quaternion.h>
 #include <numbers>
 
+namespace Engine {
+
 const Vector3 Vector3::zero = Vector3(0.0f, 0.0f, 0.0f);
 const Vector3 Vector3::one = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -202,3 +204,5 @@ void Vector3::ShowData(const std::string& _label, bool _newWindow) const
         ImGui::End();
 }
 #endif // _DEBUG
+
+} // namespace Engine

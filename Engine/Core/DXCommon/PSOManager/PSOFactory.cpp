@@ -5,6 +5,9 @@
 #include <d3dcompiler.h>
 #include <cassert>
 
+
+namespace Engine {
+
 PSOFactory* PSOFactory::GetInstance()
 {
     static PSOFactory instance;
@@ -148,3 +151,5 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC PSOFactory::CreateDefaultSpriteDesc(
 
     return desc;
 }
+
+} // namespace Engine

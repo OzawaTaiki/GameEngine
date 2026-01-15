@@ -2,6 +2,8 @@
 
 #include <numbers>
 
+namespace Engine {
+
 inline namespace MathConstants {
 
     // ========================================
@@ -84,3 +86,5 @@ inline namespace MathConstants {
     constexpr float kLn10 = std::numbers::ln10_v<float>;
 
 } // inline namespace MathConstants
+
+} // namespace Engine

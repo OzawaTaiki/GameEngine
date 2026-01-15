@@ -2,6 +2,9 @@
 
 #include <Features/UVTransform/UVTransform.h>
 
+
+namespace Engine {
+
 UVTransformAnimation::UVTransformAnimation():
     transforms_(),
     duration_(1.0f),
@@ -121,3 +124,5 @@ float UVTransformAnimation::GetProgress() const
 {
     return currentTime_ / duration_;
 }
+
+} // namespace Engine

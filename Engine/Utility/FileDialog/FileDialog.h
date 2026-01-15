@@ -18,6 +18,9 @@
 #undef CreateFile // WindowsのCreateFileマクロを無効化
 #endif // CreateFile
 
+
+namespace Engine {
+
 class FileFilterBuilder
 {
 public:
@@ -77,3 +80,5 @@ public:
 
 
 };
+
+} // namespace Engine

@@ -9,6 +9,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #endif
 
+
+namespace Engine {
+
 void UISliderComponent::Initialize()
 {
     owner_->RegisterVariable("value", &value_);
@@ -192,3 +195,5 @@ bool UISliderComponent::IsMouseOverTrack(const Vector2& mousePos) const
 
     return collider->GetCollider()->IsPointInside(mousePos);
 }
+
+} // namespace Engine

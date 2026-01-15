@@ -10,6 +10,9 @@ using json = nlohmann::json;
 /// UIColliderのシリアライゼーション用データ構造体
 /// JSONとの相互変換に使用
 /// </summary>
+
+namespace Engine {
+
 struct UIColliderData
 {
     ColliderType type = ColliderType::Rectangle;
@@ -42,3 +45,5 @@ void from_json(const json& _j, IUICollider::TransformMode& _mode);
 // UIColliderDataのJSON変換
 void to_json(json& _j, const UIColliderData& _data);
 void from_json(const json& _j, UIColliderData& _data);
+
+} // namespace Engine

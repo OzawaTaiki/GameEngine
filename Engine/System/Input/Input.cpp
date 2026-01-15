@@ -5,6 +5,9 @@
 #include <cassert>
 #include <algorithm>
 
+
+namespace Engine {
+
 Input* Input::GetInstance()
 {
     static Input instace;
@@ -401,3 +404,5 @@ void Input::ImGui(bool* _open)
     ImGui::End();
 }
 #endif // _DEBUG
+
+} // namespace Engine

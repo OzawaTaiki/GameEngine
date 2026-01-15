@@ -4,6 +4,9 @@
 #include <Math/Matrix/Matrix4x4.h>
 
 #include <limits>
+
+namespace Engine {
+
 class Camera;
 class Ray
 {
@@ -49,3 +52,5 @@ private:
     Vector3 direction_; // レイの方向
     float length_;
 };
+
+} // namespace Engine

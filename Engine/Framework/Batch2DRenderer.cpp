@@ -8,6 +8,9 @@
 #include <Framework/LayerSystem/LayerSystem.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 Batch2DRenderer* Batch2DRenderer::GetInstance()
 {
     static Batch2DRenderer instance;
@@ -353,3 +356,5 @@ void Batch2DRenderer::BuildDrawCommands()
     }
     drawCommands_.push_back(currentCommand);
 }
+
+} // namespace Engine

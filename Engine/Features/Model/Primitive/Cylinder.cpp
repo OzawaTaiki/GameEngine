@@ -7,6 +7,9 @@
 #include <Features/Light/System/LightingSystem.h>
 
 
+
+namespace Engine {
+
 Cylinder::Cylinder(float _topRadius, float _bottomRadius, float _height) :
     topRadius_(_topRadius),
     bottomRadius_(_bottomRadius),
@@ -139,3 +142,5 @@ void Cylinder::NormalizeRadius()
         bottomRadius_ = 0.0f;
     }
 }
+
+} // namespace Engine

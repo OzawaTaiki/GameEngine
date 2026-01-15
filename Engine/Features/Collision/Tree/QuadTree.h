@@ -7,6 +7,9 @@
 #include <memory>
 #include "Cell.h"
 
+
+namespace Engine {
+
 struct MortonResult
 {
     int32_t mortonNumber;
@@ -43,3 +46,5 @@ private:
     std::vector<Cell*> cells_;
     uint32_t cellCount_ = 0;
 };
+
+} // namespace Engine

@@ -7,6 +7,9 @@
 #include <string>
 #include <cstdint>
 
+
+namespace Engine {
+
 class UISpriteRenderComponent : public UIComponent
 {
 public:
@@ -43,3 +46,5 @@ private:
 
     uint32_t textureHandle_ = 0;
 };
+
+} // namespace Engine

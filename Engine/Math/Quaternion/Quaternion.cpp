@@ -1,6 +1,9 @@
 #include <Math/Quaternion/Quaternion.h>
 #include <cmath>
 
+
+namespace Engine {
+
 #ifdef _DEBUG
 #include <imgui.h>
 #endif // _DEBUG
@@ -211,3 +214,5 @@ void Quaternion::ShowData(const std::string& _label, bool _newWindow ) const
         ImGui::End();
 }
 #endif // _DEBUG
+
+} // namespace Engine

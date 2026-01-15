@@ -9,6 +9,9 @@
 #include <list>
 
 // 各クラスでインスタンスをもつ
+
+namespace Engine {
+
 class JsonBinder
 {
 public:
@@ -63,3 +66,5 @@ inline void JsonBinder::SendVariable(const std::string& _variableName, const T& 
 {
     jsonData_[groupName_][_variableName] = _var; // 変数の値をjsonに設定
 }
+
+} // namespace Engine

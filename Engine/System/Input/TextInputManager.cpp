@@ -2,6 +2,9 @@
 #include <Utility/ConvertString/ConvertString.h>
 #include <Windows.h>
 
+
+namespace Engine {
+
 TextInputManager* TextInputManager::GetInstance()
 {
     static TextInputManager instance;
@@ -71,3 +74,5 @@ bool TextInputManager::ConvertDIKeyToChar(uint8_t dikCode, bool shift, wchar_t& 
 
     return false;
 }
+
+} // namespace Engine

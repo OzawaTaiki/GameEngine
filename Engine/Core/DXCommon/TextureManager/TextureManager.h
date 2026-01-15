@@ -11,6 +11,9 @@
 #include <optional>
 
 
+
+namespace Engine {
+
 class SRVManager;
 class DXCommon;
 class TextureManager
@@ -62,3 +65,5 @@ private:
     void ImGui(bool* _open);
 
 };
+
+} // namespace Engine

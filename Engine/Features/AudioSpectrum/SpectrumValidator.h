@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <iostream>
 
+
+namespace Engine {
+
 namespace SpectrumTest
 {
 void Test();
@@ -43,3 +46,5 @@ public:
     // 和音の時間変化
     static std::vector<float> GenerateChordProgression(int _sampleRate, float _totalDuration);
 };
+
+} // namespace Engine

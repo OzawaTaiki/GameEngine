@@ -6,6 +6,9 @@
 
 #include <string>
 
+
+namespace Engine {
+
 class GameEvent
 {
 
@@ -29,3 +32,5 @@ private:
     uint32_t eventTypeID_ = 0;
     EventData* data_ = nullptr;
 };
+
+} // namespace Engine

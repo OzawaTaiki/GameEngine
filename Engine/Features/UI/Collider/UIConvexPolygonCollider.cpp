@@ -3,6 +3,9 @@
 #include <Features/LineDrawer/LineDrawer.h>
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 bool UIConvexPolygonCollider::IsPointInside(const Vector2& _point) const
 {
 
@@ -153,3 +156,5 @@ void UIConvexPolygonCollider::DrawDebug() const
         lineDrawer->DebugDraw(start, end, Vector4(0, 1, 0, 1)); // 緑色
     }
 }
+
+} // namespace Engine

@@ -7,6 +7,9 @@
 #include <Features/Effect/ParticleInitParam.h>
 #include <Features/Camera/Camera/Camera.h>
 
+
+namespace Engine {
+
 class Particle
 {
 public:
@@ -90,3 +93,5 @@ private:
 
 
 };
+
+} // namespace Engine

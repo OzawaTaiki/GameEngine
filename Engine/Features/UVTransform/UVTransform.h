@@ -3,6 +3,9 @@
 #include <Math/Vector/Vector2.h>
 #include <Math/Matrix/Matrix4x4.h>
 
+
+namespace Engine {
+
 class UVTransform
 {
 public:
@@ -46,3 +49,5 @@ private:
 
 
 };
+
+} // namespace Engine

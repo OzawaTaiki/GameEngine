@@ -4,6 +4,8 @@
 
 #include <json.hpp>
 
+namespace Engine {
+
 struct Vector4
 {
 	float x, y, z, w;
@@ -39,10 +41,11 @@ struct Vector4
 	}
 };
 
+} // namespace Engine
 
 template <>
-struct std::hash<Vector4> {
-    size_t operator()(const Vector4& v) const {
+struct std::hash<Engine::Vector4> {
+    size_t operator()(const Engine::Vector4& v) const {
         size_t h1 = std::hash<float>{}(v.x);
         size_t h2 = std::hash<float>{}(v.y);
         size_t h3 = std::hash<float>{}(v.z);

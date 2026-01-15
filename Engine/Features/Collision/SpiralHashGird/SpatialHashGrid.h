@@ -7,6 +7,9 @@
 #include <unordered_map>
 #include <vector>
 
+
+namespace Engine {
+
 class SpatialHashGrid
 {
 public:
@@ -36,3 +39,5 @@ private:
 
 
 };
+
+} // namespace Engine

@@ -1,6 +1,9 @@
 #include "Color.h"
 #include <cmath>
 
+
+namespace Engine {
+
 RGBA::RGBA(Color color)
 {
     *this = RGBA(color, 1.0f);
@@ -129,3 +132,5 @@ HSVA::HSVA(Color color, float alpha)
 {
     *this = ColorConverter::ToHSVA(RGBA(color, alpha));
 }
+
+} // namespace Engine

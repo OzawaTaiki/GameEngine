@@ -4,6 +4,9 @@
 
 #include <memory>
 
+
+namespace Engine {
+
 class DebugCamera
 {
 public:
@@ -23,3 +26,5 @@ private:
 
 
 };
+
+} // namespace Engine

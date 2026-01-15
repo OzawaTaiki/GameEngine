@@ -4,6 +4,9 @@
 
 #include <Features/PostEffects/PostEffectBase.h>
 
+
+namespace Engine {
+
 struct VignetteData
 {
     Vector4 color = { 0.0f, 0.0f, 0.0f, 1.0f }; // ビネットの色
@@ -37,3 +40,5 @@ private:
 
     VignetteData* data_ = nullptr; // ビネットデータへのポインタ
 };
+
+} // namespace Engine

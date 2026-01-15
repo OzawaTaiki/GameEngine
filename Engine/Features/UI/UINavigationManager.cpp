@@ -6,6 +6,9 @@
 #include <algorithm>
 #include "UIEditableComponent.h"
 
+
+namespace Engine {
+
 UINavigationManager* UINavigationManager::GetInstance()
 {
     static UINavigationManager instance;
@@ -182,3 +185,5 @@ UINavigationComponent* UINavigationManager::GetNavigationComponent(UIElement* el
 
     return element->GetComponent<UINavigationComponent>();
 }
+
+} // namespace Engine

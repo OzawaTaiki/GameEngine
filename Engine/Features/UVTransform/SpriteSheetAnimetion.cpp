@@ -2,6 +2,9 @@
 
 #include <Features/UVTransform/UVTransform.h>
 
+
+namespace Engine {
+
 SpriteSheetAnimation::SpriteSheetAnimation() :
     transforms_(),
     duration_(1.0f),
@@ -157,3 +160,5 @@ void SpriteSheetAnimation::SetSwitchSpeed(float _switchSpeed)
 {
     switchSpeed_ = _switchSpeed;
 }
+
+} // namespace Engine

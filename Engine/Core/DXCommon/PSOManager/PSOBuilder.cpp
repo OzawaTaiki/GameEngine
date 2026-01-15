@@ -3,6 +3,9 @@
 #include "PSOFactory.h"
 #include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 
+
+namespace Engine {
+
 PSOBuilder::PSOBuilder()
     : hasVertexShader_(false)
     , hasPixelShader_(false)
@@ -203,3 +206,5 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOBuilder::BuildAndRegister(const s
     PSOManager::GetInstance()->RegisterRootSignature(_name, rootSignature_);
     return pso;
 }
+
+} // namespace Engine

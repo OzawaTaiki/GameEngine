@@ -3,6 +3,9 @@
 #include <Features/Collision/Collider/Collider.h>
 
 // 衝突判定を行うクラス
+
+namespace Engine {
+
 class CollisionDetector
 {
 public:
@@ -61,3 +64,5 @@ private:
     static float GetBoundingSphereRadius(Collider* _collider);
 
 };
+
+} // namespace Engine

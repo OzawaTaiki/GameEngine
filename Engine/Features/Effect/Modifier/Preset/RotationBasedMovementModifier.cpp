@@ -2,6 +2,9 @@
 
 #include <Math/Vector/VectorFunction.h>
 
+
+namespace Engine {
+
 void RotationBasedMovementModifier::Apply(Particle* particle, [[maybe_unused]] float deltaTime)
 {
 
@@ -16,3 +19,5 @@ void RotationBasedMovementModifier::Apply(Particle* particle, [[maybe_unused]] f
     particle->SetDirection(rotVector.Normalize());
 
 }
+
+} // namespace Engine

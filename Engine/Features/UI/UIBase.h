@@ -13,6 +13,9 @@
 
 
 // 描画 トランスフォーム ラベルを持った基底クラス
+
+namespace Engine {
+
 class  UIBase
 {
 public:
@@ -129,3 +132,5 @@ protected:
     UIBase* parent_ = nullptr; // 親UI要素
     std::vector<std::shared_ptr<UIBase>> children_; // 子UI要素
 };
+
+} // namespace Engine

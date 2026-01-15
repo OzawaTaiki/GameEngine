@@ -2,6 +2,8 @@
 
 #include <Math/Vector/Vector2.h>
 
+namespace Engine {
+
 /// <summary>
 /// 左上の角とサイズで定義される軸に沿った長方形
 /// </summary>
@@ -76,3 +78,5 @@ struct Rect
     // サイズ
     Vector2 size;
 };
+
+} // namespace Engine

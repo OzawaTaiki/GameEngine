@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <map>
 
+
+namespace Engine {
+
 struct GlyphInfo
 {
     float u0, v0, u1, v1;      // UV座標
@@ -110,3 +113,5 @@ private:
     float fontLineGap_; // 行間
 
 };
+
+} // namespace Engine

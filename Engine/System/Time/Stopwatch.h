@@ -3,6 +3,9 @@
 #include <System/Time/GameTime.h>
 
 
+
+namespace Engine {
+
 class Stopwatch
 {
 public:
@@ -55,3 +58,5 @@ private:
     bool isRunning_;            // 計測中かどうか
 
 };
+
+} // namespace Engine

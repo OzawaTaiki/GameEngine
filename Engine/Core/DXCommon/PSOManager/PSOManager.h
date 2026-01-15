@@ -12,6 +12,9 @@
 #include <optional>
 #include <stdexcept>
 
+
+namespace Engine {
+
 class DXCommon;
 class PSOManager
 {
@@ -90,3 +93,5 @@ private:
     PSOManager(const PSOManager&) = delete;
     PSOManager& operator=(const PSOManager&) = delete;
 };
+
+} // namespace Engine

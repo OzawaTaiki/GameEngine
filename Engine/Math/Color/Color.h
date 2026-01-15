@@ -3,6 +3,8 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Vector/Vector4.h>
 
+namespace Engine {
+
 enum class Color
 {
     White,
@@ -66,3 +68,5 @@ struct HSVA
 
     float h, s, v, a; // 色相、彩度、明度、アルファ
 };
+
+} // namespace Engine

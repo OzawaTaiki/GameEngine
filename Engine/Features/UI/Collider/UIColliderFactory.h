@@ -7,6 +7,9 @@
 /// UIColliderの生成を行うファクトリクラス
 /// ImGuiでのColliderタイプ選択UIも提供
 /// </summary>
+
+namespace Engine {
+
 class UIColliderFactory
 {
 public:
@@ -35,3 +38,5 @@ public:
     /// <returns>タイプ名</returns>
     static const char* GetTypeName(ColliderType type);
 };
+
+} // namespace Engine

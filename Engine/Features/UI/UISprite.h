@@ -3,6 +3,9 @@
 #include "UIBase.h"
 #include "UIText.h"
 
+
+namespace Engine {
+
 class UISprite final : public UIBase
 {
 public:
@@ -21,3 +24,5 @@ private:
 
     std::shared_ptr<UIText> textUI_ = nullptr;
 };
+
+} // namespace Engine

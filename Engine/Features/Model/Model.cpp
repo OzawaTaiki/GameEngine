@@ -15,6 +15,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+
+namespace Engine {
+
 const std::string Model::defaultDirpath_ = "Resources/models/";
 
 
@@ -545,3 +548,5 @@ void Model::LoadNode(const aiScene* _scene)
 
     node_.ReadNode(_scene->mRootNode);
 }
+
+} // namespace Engine

@@ -18,6 +18,9 @@
 /// レイヤーシステム対応のライン描画クラス
 /// 登録時に自動的に現在のレイヤーを取得し、レイヤーごとに描画を分離
 /// </summary>
+
+namespace Engine {
+
 class LineDrawer
 {
 public:
@@ -188,3 +191,5 @@ private:
     std::vector<uint32_t> sphereIndices_;
     const float kDivision = 8;
 };
+
+} // namespace Engine

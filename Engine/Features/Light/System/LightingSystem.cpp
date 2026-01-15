@@ -3,6 +3,9 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/RTV/RTVManager.h>
 
+
+namespace Engine {
+
 LightingSystem* LightingSystem::GetInstance()
 {
     static LightingSystem instance;
@@ -157,3 +160,5 @@ void LightingSystem::SetShadowMapSize(uint32_t _size)
         }
     }
 }
+
+} // namespace Engine
