@@ -13,6 +13,9 @@
 #include <memory>
 #include <vector>
 
+
+namespace Engine {
+
 class LightGroup
 {
 public:
@@ -84,4 +87,4 @@ private:
     static uint32_t shadowMapSize_;
 };
 
-
+} // namespace Engine

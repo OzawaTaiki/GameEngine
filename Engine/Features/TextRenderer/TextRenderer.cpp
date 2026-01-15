@@ -9,6 +9,9 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Framework/Batch2DRenderer.h>
 
+
+namespace Engine {
+
 TextRenderer* TextRenderer::GetInstance()
 {
     static TextRenderer instance;
@@ -574,3 +577,5 @@ void TextRenderer::RenderText(ResourceDataGroup* _res)
     UINT vertexCount = static_cast<UINT>(_res->vertices_.size());
     cmdList_->DrawInstanced(vertexCount, 1, 0, 0);
 }
+
+} // namespace Engine

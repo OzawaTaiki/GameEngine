@@ -13,6 +13,9 @@
 
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 DepthBasedOutLine::~DepthBasedOutLine()
 {
     camera_ = nullptr;
@@ -271,3 +274,5 @@ void DepthBasedOutLineData::ImGui()
 #endif // _DEBUG
 
 }
+
+} // namespace Engine

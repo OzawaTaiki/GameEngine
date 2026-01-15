@@ -8,6 +8,9 @@
 /// <summary>
 /// 連番画像を使用したアニメーションを制御するクラス
 /// </summary>
+
+namespace Engine {
+
 class SpriteSheetAnimation : public IUVAnimation
 {
 public:
@@ -133,3 +136,5 @@ private:
     Vector2 sheetSize_ = {};
 
 };
+
+} // namespace Engine

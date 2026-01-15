@@ -4,6 +4,9 @@
 #include <memory>
 #include <string>
 
+
+namespace Engine {
+
 class IParticleMoifierFactory
 {
 public:
@@ -12,3 +15,5 @@ public:
     virtual std::unique_ptr<ParticleModifier> CreateModifier(const std::string& _name) = 0;
 
 };
+
+} // namespace Engine

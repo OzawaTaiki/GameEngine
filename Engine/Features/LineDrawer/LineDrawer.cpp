@@ -5,6 +5,9 @@
 #include <cassert>
 #include <numbers>
 
+
+namespace Engine {
+
 namespace
 {
 LayerID debugLineLayer = 0;
@@ -481,3 +484,5 @@ void LineDrawer::InitializeShapeVertices()
         }
     }
 }
+
+} // namespace Engine

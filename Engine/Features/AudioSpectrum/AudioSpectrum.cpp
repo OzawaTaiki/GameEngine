@@ -7,6 +7,9 @@
 #include <numeric>
 #include <chrono>
 
+
+namespace Engine {
+
 AudioSpectrum::AudioSpectrum(size_t windowSize)
 {
     // ウィンドウサイズを2のべき乗に調整
@@ -483,3 +486,5 @@ void AudioSpectrum::RoundTripTest(const std::vector<float>& _input)
     }
 
 }
+
+} // namespace Engine

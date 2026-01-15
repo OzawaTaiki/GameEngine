@@ -8,6 +8,9 @@
 #include <sstream>
 
 
+
+namespace Engine {
+
 JsonFileIO::JsonFileIO()
 {
 }
@@ -72,3 +75,5 @@ void JsonFileIO::Save(const std::string& _filepath, const std::string& _director
 
     Debug::Log("Save Success \n");
 }
+
+} // namespace Engine

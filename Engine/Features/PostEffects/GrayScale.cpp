@@ -9,6 +9,9 @@
 #include <Framework/LayerSystem/LayerSystem.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 void GrayScale::Initialize()
 {
     CreateConstantBuffer(sizeof(GrayScaleData));
@@ -172,3 +175,5 @@ void GrayScale::UpdateData()
         UpdateConstantBuffer(data_, sizeof(GrayScaleData));
     }
 }
+
+} // namespace Engine

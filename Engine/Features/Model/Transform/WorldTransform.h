@@ -8,6 +8,9 @@
 #include <wrl.h>
 #include <initializer_list>
 
+
+namespace Engine {
+
 class WorldTransform
 {
 public:
@@ -57,3 +60,5 @@ private:
     DataForGPU* constMap_;
 
 };
+
+} // namespace Engine

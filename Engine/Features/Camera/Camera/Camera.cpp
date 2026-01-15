@@ -8,6 +8,9 @@
 #include <Debug/ImGuiDebugManager.h>
 
 
+
+namespace Engine {
+
 void Camera::Initialize(CameraType _cameraType, const Vector2& _winSize)
 {
     cameraType_ = _cameraType;
@@ -203,3 +206,5 @@ Matrix4x4 Camera::LoolAt(const Vector3& _eye, const Vector3& _at, const Vector3&
 
     return result;
 }
+
+} // namespace Engine

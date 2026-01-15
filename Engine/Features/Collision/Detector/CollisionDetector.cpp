@@ -3,6 +3,9 @@
 #include <Math/Vector/VectorFunction.h>
 
 
+
+namespace Engine {
+
 bool CollisionDetector::DetectCollision(Collider* _colliderA, Collider* _colliderB, ColliderInfo& _info)
 {
     // nullチェック
@@ -1157,3 +1160,5 @@ float CollisionDetector::GetBoundingSphereRadius(Collider* _collider)
         return 0.0f;
     }
 }
+
+} // namespace Engine

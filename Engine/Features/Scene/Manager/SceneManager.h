@@ -10,6 +10,9 @@
 #include <queue>
 
 
+
+namespace Engine {
+
 class SceneManager
 {
 public:
@@ -82,3 +85,5 @@ private:
     SceneManager& operator=(SceneManager&&) = delete;
 
 };
+
+} // namespace Engine

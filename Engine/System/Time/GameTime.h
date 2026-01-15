@@ -5,6 +5,9 @@
 #include <map>
 #include <string>
 
+
+namespace Engine {
+
 class Time;
 class GameTime
 {
@@ -56,3 +59,5 @@ public:
 
 
 };
+
+} // namespace Engine

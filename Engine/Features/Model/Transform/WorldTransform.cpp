@@ -3,6 +3,9 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 void WorldTransform::Initialize()
 {
     resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(DataForGPU));
@@ -97,3 +100,5 @@ void WorldTransform::QueueCommand(ID3D12GraphicsCommandList* _cmdList, UINT _ind
 {
     _cmdList->SetGraphicsRootConstantBufferView(_index, resource_->GetGPUVirtualAddress());
 }
+
+} // namespace Engine

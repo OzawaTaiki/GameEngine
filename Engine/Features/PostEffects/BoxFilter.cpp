@@ -13,6 +13,9 @@
 #include <cassert>
 #include <dxcapi.h>
 
+
+namespace Engine {
+
 void BoxFilter::Initialize()
 {
     CreateConstantBuffer(sizeof(BoxFilterData));
@@ -172,3 +175,5 @@ void BoxFilter::CreatePipelineState()
     // PSOを生成
     hr = DXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
 }
+
+} // namespace Engine

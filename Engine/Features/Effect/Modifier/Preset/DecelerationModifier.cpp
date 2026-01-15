@@ -1,5 +1,8 @@
 #include "DecelerationModifier.h"
 
+
+namespace Engine {
+
 float DecelerationModifier::deceleration_ = 2.0f; // 初期値
 
 void DecelerationModifier::Apply(Particle* _particle, float _deltaTime)
@@ -11,3 +14,5 @@ void DecelerationModifier::Apply(Particle* _particle, float _deltaTime)
     speed *= (1.0f - deceleration_ * _deltaTime);
     _particle->SetSpeed(speed);
 }
+
+} // namespace Engine

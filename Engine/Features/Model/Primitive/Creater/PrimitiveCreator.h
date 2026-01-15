@@ -16,6 +16,9 @@
 /// <summary>
 /// プリミティブの種類
 /// </summary>
+
+namespace Engine {
+
 enum class PrimitiveType
 {
     Plane,
@@ -175,3 +178,5 @@ private:
     // UI状態
     int selectedPrimitiveIndex_;
 };
+
+} // namespace Engine

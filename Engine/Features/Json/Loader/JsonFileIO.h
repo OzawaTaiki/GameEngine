@@ -12,6 +12,9 @@
 
 using json = nlohmann::json;
 
+
+namespace Engine {
+
 class JsonFileIO {
 
 public:
@@ -36,3 +39,5 @@ public:
 private:
     static std::string defaultDirectory;
 };
+
+} // namespace Engine

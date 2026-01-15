@@ -4,6 +4,8 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Quaternion/Quaternion.h>
 
+namespace Engine {
+
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
@@ -32,3 +34,5 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& _axis, float _angle);
 Matrix4x4 DirectionToDirection(const Vector3& _from, const Vector3& _to);
 
 Matrix4x4 operator* (const Matrix4x4& _mat1, const Matrix4x4& _mat2);
+
+} // namespace Engine

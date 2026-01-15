@@ -5,6 +5,9 @@
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 Model* Triangle::Generate(const std::string& _name)
 {
     CalculateNormal();
@@ -80,3 +83,5 @@ void Triangle::CalculateNormal()
 {
     normal_ = normal_.Normalize();
 }
+
+} // namespace Engine

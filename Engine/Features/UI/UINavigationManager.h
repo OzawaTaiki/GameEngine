@@ -3,6 +3,9 @@
 #include <vector>
 
 // 前方宣言
+
+namespace Engine {
+
 class UIElement;
 class UINavigationComponent;
 
@@ -41,3 +44,5 @@ private:
     // ヘルパー関数
     UINavigationComponent* GetNavigationComponent(UIElement* element) const;
 };
+
+} // namespace Engine

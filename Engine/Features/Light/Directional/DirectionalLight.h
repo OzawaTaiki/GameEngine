@@ -2,6 +2,9 @@
 
 #include <Features/Light/Light.h>
 
+
+namespace Engine {
+
 struct DirectionalLight
 {
     Matrix4x4 viewProjection = Matrix4x4::Identity();
@@ -50,3 +53,5 @@ private:
 
     Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };
+
+} // namespace Engine

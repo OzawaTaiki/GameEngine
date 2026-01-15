@@ -2,6 +2,9 @@
 
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 DirectionalLightComponent::DirectionalLightComponent()
 {
     data_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -75,3 +78,5 @@ Matrix4x4 DirectionalLightComponent::LookAt(const Vector3& _eye, const Vector3& 
     return result;
 
 }
+
+} // namespace Engine

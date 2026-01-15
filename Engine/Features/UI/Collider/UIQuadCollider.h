@@ -9,6 +9,9 @@
 /// 独立モード：4頂点を個別に設定可能（UIローカル座標系）
 /// 外積判定により凸四角形として判定する
 /// </summary>
+
+namespace Engine {
+
 class UIQuadCollider : public IUICollider
 {
 public:
@@ -68,3 +71,5 @@ private:
         { -50,  50 }   // 左上
     };
 };
+
+} // namespace Engine

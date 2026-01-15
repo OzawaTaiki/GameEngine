@@ -2,6 +2,9 @@
 
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 const uint32_t SRVManager::kMaxIndex_ = 1024;
 
 SRVManager* SRVManager::GetInstance()
@@ -147,3 +150,5 @@ void SRVManager::SetComputeSRV(uint32_t _index, uint32_t _slot)
     auto handle = GetGPUSRVDescriptorHandle(_index);
     dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(_slot, handle);
 }
+
+} // namespace Engine

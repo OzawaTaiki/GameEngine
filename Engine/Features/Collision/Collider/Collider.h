@@ -15,6 +15,9 @@
 #include <cassert>
 #include <mutex>
 
+
+namespace Engine {
+
 class Collider;
 
 enum class CollisionState
@@ -419,3 +422,5 @@ private:
     Vector3 direction_; // カプセルの向き
     Vector3 localPivot_; // カプセルの基準点
 };
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include <Features/Json/Loader/JsonFileIO.h>
 #include <Utility/ConvertString/ConvertString.h>
 
+
+namespace Engine {
+
 EngineConfig EngineSettings::default_ = {
     L"GameEngine", // windowTitle
     1280,          // windowWidth
@@ -44,3 +47,5 @@ void EngineSettings::Save(const std::string& filePath)
 
     JsonFileIO::Save(filePath, "", data);
 }
+
+} // namespace Engine

@@ -2,7 +2,7 @@
 
 #include <Framework/Framework.h>
 
-class SampleFramework : public Framework
+class SampleFramework : public Engine::Framework
 {
 public:
     SampleFramework() = default;

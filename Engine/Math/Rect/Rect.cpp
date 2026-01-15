@@ -1,5 +1,8 @@
 #include "Rect.h"
 
+
+namespace Engine {
+
 Rect Rect::FromPoints(const Vector2& leftTop, const Vector2& rightBottom)
 {
     return Rect(leftTop, rightBottom - leftTop);
@@ -35,3 +38,5 @@ bool Rect::Contains(const Vector2& point) const
     return (point.x >= leftTop.x) && (point.x <= leftTop.x + size.x) &&
             (point.y >= leftTop.y) && (point.y <= leftTop.y + size.y);
 }
+
+} // namespace Engine

@@ -1,5 +1,8 @@
 #include "AlphaOverLifetime.h"
 
+
+namespace Engine {
+
 Easing::EasingFunc AlphaOverLifetime::easingType_ = Easing::EasingFunc::EaseOutExpo;
 
 void AlphaOverLifetime::Apply(Particle* _particle, [[maybe_unused]] float _deltaTime)
@@ -20,3 +23,5 @@ void AlphaOverLifetime::Apply(Particle* _particle, [[maybe_unused]] float _delta
 
     _particle->SetColor(color);
 }
+
+} // namespace Engine

@@ -9,6 +9,9 @@
 #include <dxcapi.h>
 
 
+
+namespace Engine {
+
 SkinningCS::SkinningCS(ID3D12PipelineState* _computePipeline, ID3D12RootSignature* _rootSignature)
     : computePipeline_(_computePipeline), rootSignature_(_rootSignature)
 {
@@ -116,3 +119,5 @@ void SkinningCS::CreateInfoResource(uint32_t _vertexNum)
     skinnedInformationResources_->Map(0, nullptr, reinterpret_cast<void**>(&vertexNum_));
     *vertexNum_ = _vertexNum;
 }
+
+} // namespace Engine

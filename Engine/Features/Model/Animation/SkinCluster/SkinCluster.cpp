@@ -10,6 +10,9 @@
 
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 void SkinCluster::CreateResources(uint32_t _jointsSize, uint32_t _vertexSize, const std::map<std::string, int32_t>& _jointMap)
 {
     paletteResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(WellForGPU) * _jointsSize);
@@ -96,3 +99,4 @@ void SkinCluster::QueueCommand(ID3D12GraphicsCommandList* _commandList) const
     _commandList->SetGraphicsRootDescriptorTable(6, paletteSrvHandle_.second);
 }
 
+} // namespace Engine

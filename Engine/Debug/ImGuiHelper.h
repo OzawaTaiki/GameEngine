@@ -6,6 +6,9 @@
 
 #include <list>
 
+
+namespace Engine {
+
 class AnimationSequence;
 namespace ImGuiHelper
 {
@@ -67,3 +70,5 @@ namespace ImGuiHelper
 
 
 }
+
+} // namespace Engine

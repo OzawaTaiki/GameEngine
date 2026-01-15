@@ -4,6 +4,9 @@
 
 // interface
 
+
+namespace Engine {
+
 class iEventListener
 {
 public:
@@ -15,3 +18,5 @@ public:
     /// <param name="event">イベント</param>
     virtual void OnEvent(const GameEvent& _event) = 0;
 };
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include "UIComponent.h"
 #include <functional>
 
+
+namespace Engine {
+
 enum class ButtonState
 {
     Normal,
@@ -59,3 +62,5 @@ private:
     std::function<void()> onHover_;
 
 };
+
+} // namespace Engine

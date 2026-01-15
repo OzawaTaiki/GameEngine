@@ -11,6 +11,8 @@
 
 #include <Features/Model/Primitive/Builder/PrimitiveBuilder.h>
 
+using namespace Engine;
+
 void SampleFramework::Initialize(const std::wstring& _winTitle)
 {
     Framework::Initialize(L"GameEngine");

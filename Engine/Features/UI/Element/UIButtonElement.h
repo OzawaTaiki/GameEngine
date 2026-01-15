@@ -7,6 +7,9 @@
 #include <string>
 
 // 前方宣言
+
+namespace Engine {
+
 class UISpriteRenderComponent;
 class UITextRenderComponent;
 class UIButtonComponent;
@@ -115,3 +118,5 @@ private:
     Vector2 CalculateTextPosition() const;
     Vector2 CalculateTextPivot() const;
 };
+
+} // namespace Engine

@@ -20,11 +20,15 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+struct aiScene;
+struct aiMesh;
+
+namespace Engine {
+
 class Camera;
 class WorldTransform;
 class ObjectColor;
-struct aiScene;
-struct aiMesh;
 class Model
 {
 public:
@@ -87,3 +91,5 @@ private:
 
 
 };
+
+} // namespace Engine

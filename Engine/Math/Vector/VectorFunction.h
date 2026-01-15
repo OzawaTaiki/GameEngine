@@ -3,7 +3,7 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Matrix/Matrix4x4.h>
 
-
+namespace Engine {
 
 Vector3 Add(const Vector3& _v1, const Vector3& _v2);
 Vector3 Subtract(const Vector3& _v1, const Vector3& _v2);
@@ -17,3 +17,5 @@ Vector3 Transform(const Vector3& _vector, const Matrix4x4& _matrix);
 Vector3 TransformNormal(const Vector3& _v, const Matrix4x4& _m);
 float Distance(const Vector3& v1, const Vector3& v2);
 float DistanceXZ(const Vector3& v1, const Vector3& v2);
+
+} // namespace Engine

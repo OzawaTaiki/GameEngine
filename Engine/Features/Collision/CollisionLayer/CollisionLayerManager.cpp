@@ -2,6 +2,9 @@
 
 #include <Features/Json/JsonBinder.h>
 
+
+namespace Engine {
+
 CollisionLayerManager* CollisionLayerManager::GetInstance()
 {
     static CollisionLayerManager instance;
@@ -64,3 +67,5 @@ CollisionLayerManager::~CollisionLayerManager()
 
     jsonBinder_.reset();
 }
+
+} // namespace Engine

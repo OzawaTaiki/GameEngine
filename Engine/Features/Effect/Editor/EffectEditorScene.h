@@ -16,6 +16,9 @@
 #include <unordered_map>
 #include <Features/Sprite/Sprite.h>
 
+
+namespace Engine {
+
 class EffectEditorScene : public BaseScene
 {
 public:
@@ -188,3 +191,5 @@ private:
     void ShowContextHelp(const std::string& _topic);
 #endif
 };
+
+} // namespace Engine

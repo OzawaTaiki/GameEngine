@@ -6,6 +6,9 @@
 
 #include <string>
 
+
+namespace Engine {
+
 class UITextRenderComponent : public UIComponent
 {
 public:
@@ -50,3 +53,5 @@ private:
 
     TextParam textParam_;
 };
+
+} // namespace Engine

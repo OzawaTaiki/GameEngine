@@ -9,6 +9,9 @@
 #include <fstream>
 #include <cassert>
 
+
+namespace Engine {
+
 void ModelAnimation::Initialize()
 {
     animetionTimer_ = 0.0f;
@@ -391,3 +394,4 @@ Quaternion ModelAnimation::CalculateValue_Step(const AnimationCurve<Quaternion>&
     return (*_curve.keyframes.rbegin()).value;
 }
 
+} // namespace Engine

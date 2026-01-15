@@ -7,6 +7,9 @@
 #include <cassert>
 
 
+
+namespace Engine {
+
 FontCache* FontCache::GetInstance()
 {
     static FontCache instance;
@@ -55,3 +58,5 @@ AtlasData* FontCache::GetAtlasData(const std::string& _fontFilePath, float _font
     return atlasPtr;
 
 }
+
+} // namespace Engine

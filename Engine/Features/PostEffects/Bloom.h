@@ -4,6 +4,9 @@
 
 #include <Math/Vector/Vector2.h>
 
+
+namespace Engine {
+
 struct BloomConstantBufferData
 {
     float threshold = 1.0f;      // ブルームの閾値     標準値1.0f
@@ -76,3 +79,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> blurConstantBuffer_; // ブルームブラー用定数バッファ
 
 };
+
+} // namespace Engine

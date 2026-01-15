@@ -12,6 +12,9 @@
 #include <iterator>
 
 
+
+namespace Engine {
+
 class Cell;
 
 class ObjectForTree
@@ -96,3 +99,5 @@ public:
 private:
     std::list<std::shared_ptr<ObjectForTree >> data_;
 };
+
+} // namespace Engine

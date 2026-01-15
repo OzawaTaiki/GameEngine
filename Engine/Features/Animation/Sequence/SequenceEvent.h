@@ -13,16 +13,10 @@
 #include <cstdint>
 #include <typeindex>
 
-using ParameterValue =
+using ParameterValue = std::variant<int32_t, float, Engine::Vector2, Engine::Vector3, Engine::Vector4, Engine::Quaternion>;
 
-std::variant<
-    int32_t,
-    float,
-    Vector2,
-    Vector3,
-    Vector4,
-    Quaternion
->;
+
+namespace Engine {
 
 class JsonBinder;
 class SequenceEvent
@@ -127,3 +121,5 @@ private:
 
 public:
 };
+
+} // namespace Engine

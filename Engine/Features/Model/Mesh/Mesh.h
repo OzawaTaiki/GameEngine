@@ -12,6 +12,9 @@
 #include <functional>
 
 
+
+namespace Engine {
+
 struct VertexData
 {
     Vector4 position;
@@ -90,3 +93,5 @@ private:
     void Map();
 
 };
+
+} // namespace Engine

@@ -5,6 +5,9 @@
 
 #include <json.hpp>
 
+
+namespace Engine {
+
 class VariableHolder
 {
 public:
@@ -28,3 +31,5 @@ private:
     // void* を json に復元
     std::function< nlohmann::json(void*)> saver_;
 };
+
+} // namespace Engine

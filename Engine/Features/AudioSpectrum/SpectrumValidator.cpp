@@ -2,6 +2,9 @@
 #include <Debug/Debug.h>
 #include <chrono>
 
+
+namespace Engine {
+
 const float M_PI = 3.14159265358979323846f;
 
 bool SpectrumValidator::HasPeakAt(const std::vector<float>& _spectrum, float _targetFreq, float _tolerance)
@@ -247,3 +250,5 @@ void SpectrumTest::Test()
 
 
 }
+
+} // namespace Engine

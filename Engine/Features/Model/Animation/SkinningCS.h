@@ -10,6 +10,9 @@
 #include <cstdint>
 #include <limits>
 
+
+namespace Engine {
+
 class DXCommon;
 class SRVManager;
 
@@ -62,3 +65,5 @@ private:
 
 
 };
+
+} // namespace Engine

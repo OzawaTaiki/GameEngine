@@ -2,6 +2,9 @@
 
 #include <Features/Model/Primitive/Primitive.h>
 
+
+namespace Engine {
+
 class Cylinder : public Primitive
 {
 public:
@@ -59,3 +62,5 @@ private:
 
 
 };
+
+} // namespace Engine

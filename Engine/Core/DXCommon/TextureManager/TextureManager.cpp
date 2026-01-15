@@ -8,6 +8,9 @@
 #include <cassert>
 
 
+
+namespace Engine {
+
 TextureManager* TextureManager::GetInstance()
 {
     static TextureManager instance;
@@ -320,3 +323,5 @@ void TextureManager::ImGui([[maybe_unused]] bool* _open)
     ImGui::End();
 #endif // _DEBUG
 }
+
+} // namespace Engine

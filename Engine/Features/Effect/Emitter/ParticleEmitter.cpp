@@ -8,6 +8,9 @@
 
 #ifdef _DEBUG
 // 静的メンバの定義
+
+namespace Engine {
+
 int ParticleEmitter::s_nextID_ = 0;
 #endif
 
@@ -1052,3 +1055,5 @@ void ParticleEmitter::DebugWindowForModifier()
 }
 
 #endif // _DEBUG
+
+} // namespace Engine

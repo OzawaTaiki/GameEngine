@@ -10,6 +10,9 @@
 #include <cstdint>
 
 #include <wrl.h>
+
+namespace Engine {
+
 class WinApp;
 
 class DXCommon
@@ -128,3 +131,5 @@ private:
 	const DXCommon& operator=(const DXCommon&) = delete;
 
 };
+
+} // namespace Engine

@@ -5,6 +5,8 @@
 #include <Math/Vector/Vector4.h>
 #include <random>
 
+namespace Engine {
+
 class RandomGenerator {
 public:
     static RandomGenerator* GetInstance() { static RandomGenerator instance; return &instance; };
@@ -27,3 +29,5 @@ private:
     // 乱数生成エンジン
     std::mt19937 engine;
 };
+
+} // namespace Engine

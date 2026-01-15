@@ -3,6 +3,9 @@
 #include <Features/UI/Element/UIElement.h>
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 UITextRenderComponent::UITextRenderComponent(UIElement* owner, const std::string& text, const FontConfig& fontConfig):
     UIComponent(),
     text_(text),
@@ -102,3 +105,4 @@ void UITextRenderComponent::SetClipRect(const Rect& rect)
     hasRect_ = true;
 }
 
+} // namespace Engine

@@ -6,6 +6,9 @@
 #include <vector>
 
 struct aiNode;
+
+namespace Engine {
+
 class Node
 {
 public:
@@ -24,3 +27,5 @@ private:
     Matrix4x4 localMatrix_;
 
 };
+
+} // namespace Engine

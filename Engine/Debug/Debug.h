@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+
+namespace Engine {
+
 namespace Debug {
 	void Log(const std::string& message);
 
@@ -31,3 +34,5 @@ namespace Debug {
 #define LOG_ERROR(msg) \
     Debug::Log(std::string(__FILE__) + "(" + std::to_string(__LINE__) + ") " + \
                __FUNCTION__ + ": " + msg)
+
+} // namespace Engine

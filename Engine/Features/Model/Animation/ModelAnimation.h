@@ -12,6 +12,9 @@
 
 struct aiAnimation;
 
+namespace Engine {
+
+
 class Joint;
 class ModelAnimation
 {
@@ -114,3 +117,5 @@ private:
     Quaternion CalculateValue_Step(const AnimationCurve<Quaternion>& _curve, float _time);
 
 };
+
+} // namespace Engine

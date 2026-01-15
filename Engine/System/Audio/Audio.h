@@ -13,6 +13,9 @@
 
 
 
+
+namespace Engine {
+
 class Audio
 {
 
@@ -69,3 +72,5 @@ private:
     std::vector<SoundData> sounds_;
     std::map<uint32_t, IXAudio2SourceVoice*> sourceVoice_;
 };
+
+} // namespace Engine

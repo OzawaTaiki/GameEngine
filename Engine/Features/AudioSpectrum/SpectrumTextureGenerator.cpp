@@ -7,6 +7,9 @@
 #include <Debug/Debug.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
+
+namespace Engine {
+
 const size_t SpectrumTextureGenerator::kMaxSpectrumDataCount = 1024;
 const float SpectrumTextureGenerator::kDefaultWidth = 14.0f;// w1024 64本描画すると仮定
 const float SpectrumTextureGenerator::kDefaultMargin = 2.0f;// w1024 64本描画すると仮定
@@ -304,3 +307,5 @@ void SpectrumTextureGenerator::CreatePipelineState()
     hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState_));
     assert(SUCCEEDED(hr));
 }
+
+} // namespace Engine

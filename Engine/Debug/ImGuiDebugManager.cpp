@@ -3,6 +3,9 @@
 #include <System/input/Input.h>
 #include <Debug/ImguITools.h>
 
+
+namespace Engine {
+
 ImGuiDebugManager* ImGuiDebugManager::GetInstance()
 {
     static ImGuiDebugManager instance;
@@ -434,3 +437,5 @@ void ImGuiDebugManager::TabFlagsWindow()
     }
 #endif // _DEBUG
 }
+
+} // namespace Engine

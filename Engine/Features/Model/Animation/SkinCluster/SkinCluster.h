@@ -13,6 +13,10 @@
 
 
 
+
+struct aiBone;
+namespace Engine {
+
 struct VertexWeightData
 {
     float Weight;
@@ -37,7 +41,6 @@ struct WellForGPU
 };
 
 class Joint;
-struct aiBone;
 class SkinCluster
 {
 
@@ -73,3 +76,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource_;
     std::span<WellForGPU> mappedPalette_;
 };
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 
 #include <Features/PostEffects/PostEffectBase.h>
 
+
+namespace Engine {
+
 struct GrayScaleData
 {
     float intensity = 1.0f; // グレースケールの強度
@@ -32,3 +35,5 @@ private:
 
 
 };
+
+} // namespace Engine

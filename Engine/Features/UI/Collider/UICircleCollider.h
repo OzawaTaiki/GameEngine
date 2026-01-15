@@ -8,6 +8,9 @@
 /// UI依存モード：UIのサイズから自動的に半径を計算する（短い方の辺の半分）
 /// 独立モード：独自に設定された中心と半径を使用
 /// </summary>
+
+namespace Engine {
+
 class UICircleCollider : public IUICollider
 {
 public:
@@ -69,3 +72,5 @@ private:
     Vector2 localOffset_ = { 0, 0 };        // UI中心からのオフセット
     float independentRadius_ = 100.0f;      // 独立モードでの半径
 };
+
+} // namespace Engine

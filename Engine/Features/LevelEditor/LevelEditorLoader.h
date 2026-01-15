@@ -9,6 +9,9 @@
 #include <map>
 
 
+
+namespace Engine {
+
 struct ColliderPrams
 {
     std::string type = "box"; // デフォルトはボックスコライダー
@@ -54,3 +57,5 @@ private:
 
 
 };
+
+} // namespace Engine

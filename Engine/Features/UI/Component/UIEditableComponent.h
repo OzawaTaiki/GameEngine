@@ -3,6 +3,9 @@
 #include "UIComponent.h"
 #include <functional>
 
+
+namespace Engine {
+
 class Input;
 
 /// <summary>
@@ -44,3 +47,5 @@ private:
     std::function<void(Input*)> onEditingInput_ = nullptr;
 
 };
+
+} // namespace Engine

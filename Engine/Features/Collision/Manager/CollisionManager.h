@@ -7,6 +7,9 @@
 #include <unordered_map>
 #include <functional>
 
+
+namespace Engine {
+
 class CollisionManager
 {
 public:
@@ -106,3 +109,5 @@ private:
     CollisionManager(const CollisionManager&) = delete;
     CollisionManager& operator=(const CollisionManager&) = delete;
 };
+
+} // namespace Engine

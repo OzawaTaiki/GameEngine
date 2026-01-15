@@ -9,6 +9,9 @@
 #include <Framework/LayerSystem/LayerSystem.h>
 #include <Core/WinApp/WinApp.h>
 
+
+namespace Engine {
+
 EffectEditorScene::~EffectEditorScene()
 {
 #ifdef _DEBUG
@@ -1355,3 +1358,5 @@ void EffectEditorScene::ShowTooltip(const std::string& _text)
 }
 
 #endif // _DEBUG
+
+} // namespace Engine

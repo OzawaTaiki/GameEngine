@@ -12,6 +12,9 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+
+namespace Engine {
+
 class SpriteManager
 {
 public:
@@ -40,3 +43,5 @@ private:
 
 
 };
+
+} // namespace Engine

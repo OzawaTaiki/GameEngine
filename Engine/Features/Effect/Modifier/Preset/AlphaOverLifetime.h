@@ -5,6 +5,9 @@
 
 #include <Math/Easing.h>
 
+
+namespace Engine {
+
 class AlphaOverLifetime : public ParticleModifier
 {
 public:
@@ -20,3 +23,5 @@ private:
     static Easing::EasingFunc easingType_; // イージングタイプ
 
 };
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include <cassert>
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 RootSignatureBuilder::RootSignatureBuilder()
 {
     flags_ = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -153,3 +156,5 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> RootSignatureBuilder::Build()
 
     return std::move(rootSignature);
 }
+
+} // namespace Engine

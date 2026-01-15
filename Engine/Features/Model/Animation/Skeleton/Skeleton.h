@@ -5,6 +5,9 @@
 #include <map>
 #include <string>
 
+
+namespace Engine {
+
 class Node;
 class Skeleton
 {
@@ -37,3 +40,5 @@ private:
 
 
 };
+
+} // namespace Engine

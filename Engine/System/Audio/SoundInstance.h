@@ -8,6 +8,9 @@
 #include <System/Audio/VoiceInstance.h>
 #include <System/Audio/VoiceCallback.h>
 
+
+namespace Engine {
+
 class AudioSystem;
 
 class SoundInstance
@@ -60,3 +63,5 @@ private:
 
 
 };
+
+} // namespace Engine

@@ -1,5 +1,8 @@
 #include <System/Time/GameTimeChannel.h>
 
+
+namespace Engine {
+
 GameTimeChannel::GameTimeChannel():
     deltaTime_(1.0f / 60.0f),
     gameSpeed_(1.0f),
@@ -37,3 +40,5 @@ void GameTimeChannel::Update(double _deltaTime)
         deltaTime_ = _deltaTime * gameSpeed_;
     }
 }
+
+} // namespace Engine

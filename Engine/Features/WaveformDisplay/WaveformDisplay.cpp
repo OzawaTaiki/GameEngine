@@ -10,6 +10,9 @@
 
 #include <numbers>
 
+
+namespace Engine {
+
 float WaveformDisplay::waveformTimeWindow_ = 5.0f;
 
 void WaveformDisplay::Initialize(const SoundInstance* _soundInstance, const WaveformBounds& _bounds, const Matrix4x4& _matVP)
@@ -407,3 +410,5 @@ void WaveformDisplay::CreateVertexBuffer()
     vertexBufferView_.SizeInBytes = sizeof(Vector2) * kMaxVertices_;
     vertexBufferView_.StrideInBytes = sizeof(Vector2);
 }
+
+} // namespace Engine

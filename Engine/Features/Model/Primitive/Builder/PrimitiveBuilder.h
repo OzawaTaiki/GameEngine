@@ -8,6 +8,9 @@
 /// <summary>
 /// ビルド時にプリミティブファイルを読み込んでModelManagerに登録するクラス
 /// </summary>
+
+namespace Engine {
+
 class PrimitiveBuilder
 {
 public:
@@ -34,3 +37,5 @@ private:
     /// </summary>
     static Model* CreateModelFromJson(const json& j);
 };
+
+} // namespace Engine

@@ -6,6 +6,9 @@
 #include <functional>
 
 // 前方宣言
+
+namespace Engine {
+
 class UIElement;
 
 /// <summary>
@@ -68,3 +71,5 @@ private:
     bool IsMouseOverHandle(const Vector2& mousePos) const;
     bool IsMouseOverTrack(const Vector2& mousePos) const;
 };
+
+} // namespace Engine

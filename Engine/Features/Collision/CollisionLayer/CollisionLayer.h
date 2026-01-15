@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <cstdint>
 
+
+namespace Engine {
+
 class JsonBinder;
 class CollisionLayer
 {
@@ -47,3 +50,5 @@ private:
     uint32_t layerMask_ = 0;
 
 };
+
+} // namespace Engine

@@ -3,6 +3,9 @@
 #include <Features/UI/Element/UIElement.h>
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 bool UIQuadCollider::IsPointInside(const Vector2& _point) const
 {
     // 外積判定（点が4つの辺の内側にあるかチェック）
@@ -130,3 +133,5 @@ Vector2 UIQuadCollider::GetLocalCorner(int _index) const
     }
     return Vector2();
 }
+
+} // namespace Engine

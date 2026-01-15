@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <numbers>
 
+
+namespace Engine {
+
 void ImGuiHelper::DrawRightPentagon(const ImVec2& _center, const ImVec2& _inscribedRect, float _angle, ImU32 _color)
 {
 
@@ -530,3 +533,5 @@ void ImGuiHelper::DrawTitleBar(const char* _text)
 
     ImGui::SetCursorPos(ImVec2(10, titleBarsize.y + 10));
 }
+
+} // namespace Engine

@@ -4,6 +4,9 @@
 
 #include <Core/DXCommon/RTV/RTVManager.h>
 
+
+namespace Engine {
+
 PointLightComponent::PointLightComponent()
 {
     data_.color = { 1,1,1,1 };
@@ -128,3 +131,5 @@ Matrix4x4 PointLightComponent::LookAt(const Vector3& eye, const Vector3& at, con
 
     return result;
 }
+
+} // namespace Engine

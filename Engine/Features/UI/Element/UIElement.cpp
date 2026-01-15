@@ -1,6 +1,9 @@
 #include "UIElement.h"
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
     name_(name),
     parent_(nullptr),
@@ -275,3 +278,5 @@ void UIElement::Save()
         child->Save();
 
 }
+
+} // namespace Engine

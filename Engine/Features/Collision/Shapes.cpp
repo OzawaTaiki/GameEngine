@@ -3,6 +3,9 @@
 #include <Math/Vector/VectorFunction.h>
 
 
+
+namespace Engine {
+
 void OBB::Calculate(const Matrix4x4& _worldMat)
 {
     worldMat = _worldMat;
@@ -131,3 +134,5 @@ void AABB::CalculateVertices()
     vertices[7] = Vector3(min.x, min.y, min.z);
 
 }
+
+} // namespace Engine

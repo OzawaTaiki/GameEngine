@@ -8,6 +8,9 @@
 #include <Debug/Debug.h>
 #include <filesystem>
 
+
+namespace Engine {
+
 void PrimitiveBuilder::BuildAndRegisterAll(const std::string& directory)
 {
     if (!std::filesystem::exists(directory))
@@ -153,3 +156,5 @@ Model* PrimitiveBuilder::CreateModelFromJson(const json& j)
         return nullptr;
     }
 }
+
+} // namespace Engine

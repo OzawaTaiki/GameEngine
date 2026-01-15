@@ -3,6 +3,9 @@
 #include <functional>
 
 // 前方宣言
+
+namespace Engine {
+
 class UVTransform;
 
 // UVアニメーションのインターフェース
@@ -74,3 +77,5 @@ public:
     /// <returns></returns>
     virtual float GetProgress() const = 0;
 };
+
+} // namespace Engine

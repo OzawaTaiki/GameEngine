@@ -5,6 +5,9 @@
 #include <Math/Vector/Vector3.h>
 #include <Math/Matrix/Matrix4x4.h>
 
+
+namespace Engine {
+
 struct DepthBasedOutLineData
 {
     Matrix4x4 inverseViewProjectionMatrix; // カメラの逆射影行列
@@ -48,3 +51,5 @@ private:
 
     DepthBasedOutLineData* data_ = nullptr; // データへのポインタ
 };
+
+} // namespace Engine

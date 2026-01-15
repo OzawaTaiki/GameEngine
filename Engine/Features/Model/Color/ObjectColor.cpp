@@ -1,6 +1,9 @@
 #include <Features/Model/Color/ObjectColor.h>
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 void ObjectColor::Initialize()
 {
     resource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(ConstantBufferData));
@@ -17,3 +20,5 @@ void ObjectColor::QueueCommand(ID3D12GraphicsCommandList* _commandList,UINT _ind
 {
     _commandList->SetGraphicsRootConstantBufferView(_index, resource_->GetGPUVirtualAddress());
 }
+
+} // namespace Engine

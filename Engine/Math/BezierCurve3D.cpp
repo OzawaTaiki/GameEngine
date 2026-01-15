@@ -4,6 +4,9 @@
 #include <Debug/ImGuiDebugManager.h>
 
 // デフォルトコンストラクタ
+
+namespace Engine {
+
 BezierCurve3D::BezierCurve3D(const std::string& _name)
     : resolution_(100)  // デフォルトの解像度を100に設定
     , isCacheValid_(false)
@@ -824,3 +827,5 @@ void BezierCurve3D::ImGui()
 
 #endif // _DEBUG
 }
+
+} // namespace Engine

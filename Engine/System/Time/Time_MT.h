@@ -7,6 +7,9 @@
 #include <mutex>
 
 
+
+namespace Engine {
+
 class Time_MT
 {
 public:
@@ -99,3 +102,5 @@ public:
     Time_MT(Time_MT&&) = delete;
     Time_MT& operator=(Time_MT&&) = delete;
 };
+
+} // namespace Engine

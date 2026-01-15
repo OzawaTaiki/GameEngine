@@ -8,6 +8,9 @@
 /// UI依存モード：UIのサイズから自動的にX軸とY軸の半径を計算する
 /// 独立モード：独自に設定された中心と半径を使用
 /// </summary>
+
+namespace Engine {
+
 class UIEllipseCollider : public IUICollider
 {
 public:
@@ -68,3 +71,5 @@ private:
     Vector2 localOffset_ = { 0, 0 };            // UI中心からのオフセット
     Vector2 independentRadius_ = { 100, 50 };   // 独立モードでのX軸とY軸の半径
 };
+
+} // namespace Engine

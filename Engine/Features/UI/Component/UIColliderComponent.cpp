@@ -13,6 +13,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 UIColliderComponent::UIColliderComponent(ColliderType type)
     : colliderType_(type)
 {
@@ -225,3 +228,5 @@ void UIColliderComponent::DrawImGui()
 
 #endif
 }
+
+} // namespace Engine

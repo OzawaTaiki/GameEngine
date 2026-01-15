@@ -4,6 +4,9 @@
 
 #include <functional>
 
+
+namespace Engine {
+
 class VoiceCallBack : public IXAudio2VoiceCallback
 {
 public:
@@ -103,3 +106,5 @@ private:
 - メモリ管理（new/delete）はユーザー側で適切に行う
 
 */
+
+} // namespace Engine

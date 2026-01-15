@@ -4,6 +4,9 @@
 #include <string>
 
 
+
+namespace Engine {
+
 class TextInputManager
 {
 public:
@@ -41,3 +44,5 @@ private:// シングルトンパターン
     TextInputManager& operator=(const TextInputManager&) = delete;
 
 };
+
+} // namespace Engine

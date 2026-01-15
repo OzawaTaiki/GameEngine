@@ -4,6 +4,8 @@
 #include "deveScene/DeveScene.h"
 #include <Features/Effect/Editor/EffectEditorScene.h>
 
+using namespace Engine;
+
 std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& _name)
 {
     if (_name == "Sample")

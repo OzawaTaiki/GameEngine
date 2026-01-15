@@ -1,5 +1,8 @@
 #include "Cube.h"
 
+
+namespace Engine {
+
 namespace
 {
 std::array<Vector3, 8> defaultVertices_ = {
@@ -81,3 +84,5 @@ std::array<Vector3, 8> Cube::CalculateVertices() const
 
     return vertices;
 }
+
+} // namespace Engine
