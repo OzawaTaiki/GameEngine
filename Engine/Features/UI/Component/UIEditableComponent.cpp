@@ -2,6 +2,8 @@
 #include <Debug/Debug.h>
 #include <Features/UI/Element/UIElement.h>
 
+namespace Engine {
+
 UIEditableComponent::UIEditableComponent():
     isEditing_(false),
     wasEditing_(false),
@@ -42,3 +44,5 @@ void UIEditableComponent::HandleKeyInput(Input* input)
         onEditingInput_(input);
     }
 }
+
+} // namespace Engine

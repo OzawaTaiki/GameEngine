@@ -3,6 +3,8 @@
 #include <Features/Effect/Modifier/Preset/DecelerationModifier.h>
 #include <Features/Effect/Modifier/Preset/AlphaOverLifetime.h>
 
+using namespace Engine;
+
 std::unique_ptr<ParticleModifier> ParticleModifierFactory::CreateModifier(const std::string& _name)
 {
     if (_name == "DecelerationModifier")

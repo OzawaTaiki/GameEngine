@@ -24,13 +24,13 @@
 #include <Features/Model/SkyBox.h>
 
 
-class SampleScene : public BaseScene
+class SampleScene : public Engine::BaseScene
 {
 public:
 
      ~SampleScene() override;
 
-    void Initialize(SceneData* _sceneData) override;
+    void Initialize(Engine::SceneData* _sceneData) override;
     void Update() override;
     void Draw() override;
     void DrawShadow() override;
@@ -40,44 +40,44 @@ private:
     // シーン関連 基本セット
 
     // カメラ
-    Camera SceneCamera_ = {};
+    Engine::Camera SceneCamera_ = {};
 
     // デバッグカメラ
-    DebugCamera debugCamera_ = {};
+    Engine::DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 
     // ライン描画
-    LineDrawer* lineDrawer_ = nullptr;
+    Engine::LineDrawer* lineDrawer_ = nullptr;
     // 入力
-    Input* input_ = nullptr;
+    Engine::Input* input_ = nullptr;
     // パーティクル
-    ParticleSystem* particleManager_ = nullptr;
+    Engine::ParticleSystem* particleManager_ = nullptr;
     // ライト
-    std::shared_ptr<LightGroup> lights_;
+    std::shared_ptr<Engine::LightGroup> lights_;
 
 
     //------------------------------
     // シーン固有
 
 
-    std::unique_ptr<ObjectModel> human_= nullptr;
-    std::unique_ptr<ObjectModel> human2_= nullptr;
-    std::unique_ptr<ObjectModel> weapon_ = nullptr;
-    std::unique_ptr<ObjectModel> ground_ = nullptr;
+    std::unique_ptr<Engine::ObjectModel> human_= nullptr;
+    std::unique_ptr<Engine::ObjectModel> human2_= nullptr;
+    std::unique_ptr<Engine::ObjectModel> weapon_ = nullptr;
+    std::unique_ptr<Engine::ObjectModel> ground_ = nullptr;
 
     uint32_t groundTextureHandle_ = 0;
 
-    Vector4 drawColor_ = { 1,1,1,1 }; // 描画色
+    Engine::Vector4 drawColor_ = { 1,1,1,1 }; // 描画色
 
-    std::unique_ptr <Sprite> sprite_ = nullptr;
+    std::unique_ptr<Engine::Sprite> sprite_ = nullptr;
 
 
-    std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
+    std::unique_ptr<Engine::ParticleEmitter> emitter_ = nullptr;
 
-    std::shared_ptr<SoundInstance> soundInstance_ = nullptr;
-    std::shared_ptr<VoiceInstance> voiceInstance_ = nullptr;
+    std::shared_ptr<Engine::SoundInstance> soundInstance_ = nullptr;
+    std::shared_ptr<Engine::VoiceInstance> voiceInstance_ = nullptr;
 
-    std::unique_ptr<SkyBox> skyBox_ = nullptr;
+    std::unique_ptr<Engine::SkyBox> skyBox_ = nullptr;
 
 
 #ifdef _DEBUG
