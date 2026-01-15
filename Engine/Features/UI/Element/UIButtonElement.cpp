@@ -1,10 +1,10 @@
 #include "UIButtonElement.h"
-#include <Features/UI/UISpriteRenderComponent.h>
-#include <Features/UI/UITextRenderComponent.h>
-#include <Features/UI/UIButtonComponent.h>
-#include <Features/UI/UINavigationComponent.h>
+#include <Features/UI/Component/UISpriteRenderComponent.h>
+#include <Features/UI/Component/UITextRenderComponent.h>
+#include <Features/UI/Component/UIButtonComponent.h>
+#include <Features/UI/Component/UINavigationComponent.h>
 #include <Features/UI/UINavigationManager.h>
-#include <Features/UI/Collider/UIColliderComponent.h>
+#include <Features/UI/Component/UIColliderComponent.h>
 
 
 namespace Engine {

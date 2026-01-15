@@ -145,28 +145,45 @@ void Sprite::UpdateVertexData()
 
     Vector2 size = defaultTextureSize_;
 
+    float left   = -anchor_.x * size.x;
+    float right  = (1.0f - anchor_.x) * size.x;
+    float bottom = -anchor_.y * size.y;
+    float top    = (1.0f - anchor_.y) * size.y;
+
+    const Vector4 white{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+    // 左上
     vertexData_[0] = {
-        .position ={-anchor_.x * size.x ,(1.0f - anchor_.y) * size.y ,0.0f,1.0f },
-        .texCoord = { 0.0f,1.0f },
-        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+        .position = { left, top, 0.0f, 1.0f },
+        .texCoord = { 0.0f, 1.0f },
+        .color = white
     };
+
+    // 左下
     vertexData_[1] = {
-        .position ={-anchor_.x * size.x ,-anchor_.y * size.y ,0.0f,1.0f },
-        .texCoord = { 0.0f,0.0f },
-        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+        .position = { left, bottom, 0.0f, 1.0f },
+        .texCoord = { 0.0f, 0.0f },
+        .color = white
     };
+
+    // 右上
     vertexData_[2] = {
-        .position ={(1.0f - anchor_.x) * size.x ,(1.0f - anchor_.y) * size.y ,0.0f,1.0f },
-        .texCoord = { 1.0f,1.0f },
-        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+        .position = { right, top, 0.0f, 1.0f },
+        .texCoord = { 1.0f, 1.0f },
+        .color = white
     };
-    vertexData_[3] = vertexData_[1];
+
+    vertexData_[3] = vertexData_[1]; // 左下
+
+    // 右下
     vertexData_[4] = {
-        .position ={(1.0f - anchor_.x) * size.x ,-anchor_.y * size.y ,0.0f,1.0f },
-        .texCoord = { 1.0f,0.0f },
-        .color = Vector4(1.0f,1.0f,1.0f,1.0f)
+        .position = { right, bottom, 0.0f, 1.0f },
+        .texCoord = { 1.0f, 0.0f },
+        .color = white
     };
-    vertexData_[5] = vertexData_[2];
+
+    vertexData_[5] = vertexData_[2]; // 右上
+
 
     isVertexDirty_ = false;
 }

@@ -27,20 +27,21 @@ public:
 
 
     static void Butterfly2(std::complex<float>& _x0, std::complex<float>& _x1);
-    static void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1, std::complex<float>& _x2, std::complex<float>& _x3);
+    static void Butterfly4(std::complex<float>& _x0, std::complex<float>& _x1,
+                           std::complex<float>& _x2, std::complex<float>& _x3);
     static void Butterfly8(std::array<std::complex<float>, 8>& _x);
 
     // 高速フーリエ変換
-    static void FFT(const std::vector<float>& _input, std::vector<std::complex<float>>& _output);
+    static void FFT(const std::vector<float>& in, std::vector<std::complex<float>>& out);
 
     std::vector<float> GetSpectrumAtTime(float _time);
 
     // 入出力のラウンドトリップテスト
     void RoundTripTest(const std::vector<float>& _input);
 
-
     void SetAudioData(const std::vector<float>& _audioData) { audioData_ = _audioData; }
     void SetSampleRate(float _sampleRate) { sampleRate_ = _sampleRate; }
+    float GetSampleRate() const { return sampleRate_; }
 
 
     // 再帰的FFT
@@ -48,6 +49,11 @@ public:
 
     // 反復的FFT
     static void IterativeFFT(std::vector<std::complex<float>>& _x);
+
+
+    std::vector<float> GetAmplitudesInRange(float minHz, float maxHz);
+    void GetAmplitudesInRange(size_t begin, size_t end, std::vector<float>& out);
+    void GetSpectrumIndexRange(float minHz, float maxHz, size_t& outBeginIndex, size_t& outEndIndex) const;
 
 private:
 

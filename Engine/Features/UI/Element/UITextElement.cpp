@@ -1,5 +1,5 @@
 #include "UITextElement.h"
-#include "UITextRenderComponent.h"
+#include "../Component/UITextRenderComponent.h"
 
 
 namespace Engine {

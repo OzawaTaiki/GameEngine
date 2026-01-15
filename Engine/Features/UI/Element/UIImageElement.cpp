@@ -1,5 +1,5 @@
 #include "UIImageElement.h"
-#include "UISpriteRenderComponent.h"
+#include "../Component/UISpriteRenderComponent.h"
 
 
 namespace Engine {

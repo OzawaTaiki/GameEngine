@@ -177,6 +177,7 @@ void SpectrumTextureGenerator::CreateBuffers(const Vector4& _backColor)
         textureHeight_,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         _backColor,
+        false,
         false
     );
 

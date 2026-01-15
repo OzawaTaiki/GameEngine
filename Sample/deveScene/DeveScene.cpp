@@ -18,6 +18,9 @@
 #include <Features/UI/UINavigationManager.h>
 
 
+#include <Features/UI/Component/UITextRenderComponent.h>
+#include <Features/UI/Component/UISpriteRenderComponent.h>
+
 DeveScene::~DeveScene()
 {
 }

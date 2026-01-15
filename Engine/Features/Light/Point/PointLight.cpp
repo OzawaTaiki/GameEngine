@@ -22,7 +22,7 @@ PointLightComponent::PointLightComponent()
 void PointLightComponent::Update()
 {
     if (parent_) {
-        data_.position = *parent_;
+        data_.position = *parent_ + offset;
     }
 }
 

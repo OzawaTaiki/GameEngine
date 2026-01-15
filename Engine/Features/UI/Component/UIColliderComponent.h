@@ -1,5 +1,5 @@
 #pragma once
-#include <Features/UI/UIComponent.h>
+#include <Features/UI/Component/UIComponent.h>
 #include <Features/UI/Collider/Interface/IUICollider.h>
 #include <Features/UI/Collider/UIColliderFactory.h>
 #include <memory>
@@ -19,7 +19,7 @@ public:
     /// </summary>
     /// <param name="type">Colliderの種類</param>
     UIColliderComponent(ColliderType type = ColliderType::Rectangle);
-    ~UIColliderComponent() override = default;
+    ~UIColliderComponent() override;
 
     void Initialize() override;
     void Update() override;

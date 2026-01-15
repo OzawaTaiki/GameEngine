@@ -6,7 +6,7 @@
 
 namespace Engine {
 
-const uint32_t RTVManager::kMaxRTVIndex_ = 64;
+const uint32_t RTVManager::kMaxRTVIndex_ = 256;
 const uint32_t RTVManager::kMaxDSVIndex_ = 64;
 uint32_t RTVManager::winWidth_ = 0;
 uint32_t RTVManager::winHeight_ = 0;
@@ -145,14 +145,22 @@ void RTVManager::SetSwapChainRenderTexture(IDXGISwapChain4* _swapChain)
     commandList->RSSetScissorRects(1, &scissorRect_);
 }
 
-uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV)
+uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV, bool _override)
 {
-    uint32_t rtvIndex = AllocateRTVIndex();
 
     auto it = textureMap_.find(_name);
 
+    if (it != textureMap_.end())
+    {
+        // 上書きしない設定の場合は既存のRTVインデックスを返す
+        if (!_override)
+            return it->second;
+    }
+
     int32_t num = 1;
     std::string name = _name;
+
+
     // 同名が存在する場合
     while (it != textureMap_.end())
     {
@@ -160,6 +168,7 @@ uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint
         it = textureMap_.find(name);
         ++num;
     }
+    uint32_t rtvIndex = AllocateRTVIndex();
 
     auto rtvResource = CreateRenderTextureResource(_width, _height, rtvIndex, _colorFormat, _clearColor);
     rtvResource->SetName((L"RenderTarget_" + std::wstring(name.begin(), name.end())).c_str());

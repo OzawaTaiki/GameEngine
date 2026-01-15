@@ -1,8 +1,11 @@
 #include "AudioSpectrum.h"
 
+#include <Debug/ImGuiDebugManager.h>
+
 #include <numbers>
 #include <Debug/Debug.h>
 #include <numeric>
+#include <chrono>
 
 
 namespace Engine {
@@ -146,12 +149,12 @@ void AudioSpectrum::Butterfly8(std::array<std::complex<float>, 8>& _x)
 
 }
 
-void AudioSpectrum::FFT(const std::vector<float>& _input, std::vector<std::complex<float>>& _output)
+void AudioSpectrum::FFT(const std::vector<float>& in, std::vector<std::complex<float>>& out)
 {
-    size_t N = _input.size();
+    size_t N = in.size();
     if (N == 0)
     {
-        _output.clear();
+        out.clear();
         return;
     }
     // 入力サイズが2のべき乗でない場合は確保する
@@ -162,24 +165,64 @@ void AudioSpectrum::FFT(const std::vector<float>& _input, std::vector<std::compl
         throw std::runtime_error("Input size too large for FFT");
     }
 
-    _output.resize(paddedSize);
+    out.resize(paddedSize);
 
     // 入力データを複素数配列にコピー
+    // 窓関数を適用
     for (size_t i = 0; i < N; ++i)
     {
         float windowValue = HanningWindowValue(N, i);
-        _output[i] = std::complex<float>(_input[i] * windowValue, 0.0f); // 窓関数を適用
+        out[i] = std::complex<float>(in[i] * windowValue, 0.0f);
     }
 
     // 残りの要素をゼロで埋める
-    for (size_t i = N; i < _output.size(); ++i)
+    for (size_t i = N; i < out.size(); ++i)
     {
-        _output[i] = std::complex<float>(0.0f, 0.0f);
+        out[i] = std::complex<float>(0.0f, 0.0f);
     }
 
+#ifdef _DEBUG
+
+    static int ftMode = 0; //0: Recursive FFT, 1: Iterative FFT
+    auto startTime = std::chrono::high_resolution_clock::now();
+    if (ImGuiDebugManager::GetInstance()->Begin("Fourier Transform"))
+    {
+        ImGui::RadioButton("Recursive FFT", &ftMode, 0);
+        ImGui::RadioButton("Iterative FFT", &ftMode, 1);
+        ImGui::End();
+    }
+
+    else if (ftMode == 0)
+    {
+        // 再帰的にFFTを実行
+        RecursiveFFT(out);
+    }
+    else if (ftMode == 1)
+    {
+        // 反復的にFFTを実行
+        IterativeFFT(out);
+    }
+
+#else
     // 再帰的にFFTを実行
-    //RecursiveFFT(_output);
-    IterativeFFT(_output);
+    //RecursiveFFT(out);
+    IterativeFFT(out);
+#endif // _DEBUG
+
+
+
+#ifdef _DEBUG
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+    if (ImGuiDebugManager::GetInstance()->Begin("Fourier Transform"))
+    {
+        // 実行時間
+        ImGui::Text("Execution Time: %lld microseconds", duration);
+
+        ImGui::End();
+    }
+#endif // _DEBUG
+
 
 }
 
@@ -272,6 +315,74 @@ void AudioSpectrum::IterativeFFT(std::vector<std::complex<float>>& _x)
 
                 w *= wM;
             }
+        }
+    }
+}
+
+std::vector<float> AudioSpectrum::GetAmplitudesInRange(float minHz, float maxHz)
+{
+    std::vector<float> result;
+
+    // サンプリングレート44100Hz, FFTサイズ2048の場合
+    // 各ビンの周波数 = (index * 44100) / 2048
+    size_t fftSize = cashedSpectrum_.size() * 2; // FFTサイズはスペクトラムの2倍
+
+    for (size_t i = 0; i < fftSize; ++i)
+    {
+        float frequency = (i * sampleRate_) / fftSize;
+        if (frequency < minHz)
+            continue;
+        else if (frequency > maxHz)
+            break;
+
+        result.push_back(cashedSpectrum_[i]); // 振幅値
+    }
+    return result;
+
+
+}
+
+void AudioSpectrum::GetAmplitudesInRange(size_t begin, size_t end, std::vector<float>& out)
+{
+    if (begin >= cashedSpectrum_.size() || end > cashedSpectrum_.size() || begin >= end)
+    {
+        return;
+    }
+
+    const size_t rangeSize = end - begin;
+
+    // サイズが足りない場合のみresize
+    if (out.size() < rangeSize)
+    {
+        out.resize(rangeSize);
+    }
+
+    // イテレータを使った高速コピー
+    //std::copy(
+    //    cashedSpectrum_.begin() + begin,
+    //    cashedSpectrum_.begin() + end,
+    //    out.begin()
+    //);
+    std::memcpy(out.data(), &cashedSpectrum_[begin], rangeSize * sizeof(float));
+}
+
+void AudioSpectrum::GetSpectrumIndexRange(float minHz, float maxHz, size_t& outBeginIndex, size_t& outEndIndex) const
+{
+    size_t fftSize = cashedSpectrum_.size() * 2; // FFTサイズはスペクトラムの2倍
+
+    outBeginIndex = 0;
+    outEndIndex = 0;
+    for (size_t i = 0; i < fftSize; ++i)
+    {
+        float frequency = (i * sampleRate_) / fftSize;
+        if (frequency < minHz)
+        {
+            outBeginIndex = i;
+        }
+        else if (frequency > maxHz)
+        {
+            outEndIndex = i;
+            break;
         }
     }
 }

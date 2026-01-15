@@ -1,16 +1,17 @@
 #include "UIColliderComponent.h"
-#include <Features/UI/UIElement.h>
+#include <Features/UI/Element/UIElement.h>
 #include <Features/UI/Collider/UIRecntangleCollider.h>
 #include <Features/UI/Collider/UICircleCollider.h>
 #include <Features/UI/Collider/UIEllipseCollider.h>
 #include <Features/UI/Collider/UIQuadCollider.h>
 #include <Features/UI/Collider/UIConvexPolygonCollider.h>
+#include <Features/UI/Collider/UICollisionManager.h>
+
 #include <cassert>
 #include <iostream>
 
 #include <Debug/ImGuiDebugManager.h>
 #include <Debug/Debug.h>
-#include "UICollisionManager.h"
 
 
 namespace Engine {
@@ -19,6 +20,11 @@ UIColliderComponent::UIColliderComponent(ColliderType type)
     : colliderType_(type)
 {
     collider_ = UIColliderFactory::Create(type);
+}
+
+UIColliderComponent::~UIColliderComponent()
+{
+    UICollisionManager::GetInstance()->UnregisterElement(collider_.get());
 }
 
 void UIColliderComponent::Initialize()

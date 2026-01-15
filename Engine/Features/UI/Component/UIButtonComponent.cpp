@@ -1,7 +1,7 @@
 #include "UIButtonComponent.h"
-#include <Features/UI/Collider/UIColliderComponent.h>
+#include <Features/UI/Component/UIColliderComponent.h>
 #include <Features/UI/Collider/UICollisionManager.h>
-#include <Features/UI/UIElement.h>
+#include <Features/UI/Element/UIElement.h>
 #include <System/Input/Input.h>
 
 #ifdef _DEBUG

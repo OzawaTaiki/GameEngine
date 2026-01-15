@@ -1,5 +1,5 @@
 #pragma once
-#include "UIComponent.h"  // UIComponentの定義が必要
+#include <Features/UI/Component/UIComponent.h>
 #include <Math/Vector/Vector2.h>
 #include <Features/Json/JsonBinder.h>
 
