@@ -1311,6 +1311,9 @@
     <ClInclude Include="Features\UI\Element\UITextElement.h">
       <Filter>Features\UI\Element</Filter>
     </ClInclude>
+    <ClInclude Include="Features\Json\JsonUtils.h">
+      <Filter>Features\Json</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">

@@ -45,6 +45,7 @@ public:
     /// <returns> サンプルレート(Hz)</returns>
     float GetSampleRate() const { return sampleRate_; }
 
+
 private:
 
     //std::vector<float> ConvertToFloatSamples(const BYTE* _pBuffer, unsigned int _bufferSize, const WAVEFORMATEX& _wfex, float _startSeconds = 0.0f, float _durationSeconds = 0.0f) const;
