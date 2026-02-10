@@ -107,8 +107,7 @@ uint32_t TextureManager::LoadTexture(const std::string& _filepath)
 
 	textures_[index].srvIndex = srvIndex;
 
-    std::string ext = _filepath.substr(_filepath.find_last_of(".") + 1);
-	if (ext == "dds")
+	if (metadata.IsCubemap())
     {
         srvManager_->CreateSRVForCubemap(srvIndex, textures_[index].resource.Get(), metadata.format);
     }

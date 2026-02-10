@@ -14,6 +14,7 @@
 #include <memory>
 
 #include <Features/Sprite/Sprite.h>
+#include <Features/UI/Element/UIImageElement.h>
 #include <Features/Model/ObjectModel.h>
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
@@ -79,6 +80,7 @@ private:
 
     std::unique_ptr<Engine::SkyBox> skyBox_ = nullptr;
 
+    std::unique_ptr<Engine::UIImageElement> uiImage_ = nullptr;
 
 #ifdef _DEBUG
     void ImGui();

@@ -126,6 +126,8 @@ void SampleScene::Initialize(SceneData* _sceneData)
     skyBox_->Initialize(30.0f);
     skyBox_->SetTexture("rosendal_plains_2_2k.dds");
 
+    uiImage_ = std::make_unique<UIImageElement>("image", Vector2(300, 200), Vector2(200, 200),"ddsTest/testTexture.dds");
+    uiImage_->Initialize();
 
 }
 
@@ -198,6 +200,7 @@ void SampleScene::Update()
     ground_->Update();
     weapon_->Update();
 
+    uiImage_->Update();
 
 
     // --------------------------------
@@ -239,10 +242,13 @@ void SampleScene::Draw()
 
     weapon_->Draw(&SceneCamera_, drawColor_);
 
+
     // Sprite用のPSO等をセット
     Sprite::PreDraw();
     // スプライトの描画
     sprite_->Draw();
+
+    uiImage_->Draw();
 
 
     ParticleSystem::GetInstance()->DrawParticles();
