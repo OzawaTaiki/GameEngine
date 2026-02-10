@@ -1,7 +1,7 @@
 #include "SceneFactory.h"
 
-#include "SampleScene.h"
-#include "deveScene/DeveScene.h"
+#include <Scene/SampleScene.h>
+#include <Scene/DeveScene.h>
 #include <Features/Effect/Editor/EffectEditorScene.h>
 
 using namespace Engine;

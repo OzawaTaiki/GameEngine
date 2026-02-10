@@ -1,11 +1,9 @@
 #include "SampleFramework.h"
 
-#include "SampleScene.h"
-#include <Features/Scene/ParticleTestScene.h>
-#include "SceneFactory.h"
+#include <SceneFactory.h>
+#include <ParticleModifierFactory/ParticleModifierFactory.h>
 
 #include <System/Time/Time_MT.h>
-#include "ParticleModifierFactory.h"
 
 #include <Framework/LayerSystem/LayerSystem.h>
 

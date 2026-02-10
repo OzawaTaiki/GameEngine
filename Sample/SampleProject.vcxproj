@@ -58,8 +58,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -81,8 +80,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -96,12 +94,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="deveScene\DeveScene.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ParticleModifierFactory.cpp" />
-    <ClCompile Include="SampleFramework.cpp" />
-    <ClCompile Include="SampleScene.cpp" />
-    <ClCompile Include="SceneFactory.cpp" />
+    <ClCompile Include="Source\appFramework\SampleFramework.cpp" />
+    <ClCompile Include="Source\ParticleModifierFactory\ParticleModifierFactory.cpp" />
+    <ClCompile Include="Source\SceneFactory.cpp" />
+    <ClCompile Include="Source\Scene\DeveScene.cpp" />
+    <ClCompile Include="Source\Scene\SampleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -112,16 +110,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="deveScene\DeveScene.h" />
-    <ClInclude Include="ParticleModifierFactory.h" />
-    <ClInclude Include="SampleFramework.h" />
-    <ClInclude Include="SampleScene.h" />
-    <ClInclude Include="SceneFactory.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine\GameEngine.vcxproj">
       <Project>{9fb9cd27-3069-43a4-90e8-44bc0a21d5da}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\appFramework\SampleFramework.h" />
+    <ClInclude Include="Source\ParticleModifierFactory\ParticleModifierFactory.h" />
+    <ClInclude Include="Source\SceneFactory.h" />
+    <ClInclude Include="Source\Scene\DeveScene.h" />
+    <ClInclude Include="Source\Scene\SampleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

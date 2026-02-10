@@ -30,43 +30,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SampleScene.cpp">
-      <Filter>Essential\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneFactory.cpp">
-      <Filter>Essential\SceneFactory</Filter>
-    </ClCompile>
-    <ClCompile Include="SampleFramework.cpp">
-      <Filter>Essential\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleModifierFactory.cpp">
+    <ClCompile Include="Source\ParticleModifierFactory\ParticleModifierFactory.cpp">
       <Filter>Essential\ParticleModifierFactory</Filter>
     </ClCompile>
-    <ClCompile Include="deveScene\DeveScene.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Source\Scene\DeveScene.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\SampleScene.cpp">
+      <Filter>Essential\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneFactory.cpp">
+      <Filter>Essential\SceneFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\appFramework\SampleFramework.cpp">
+      <Filter>Essential\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SampleScene.h">
-      <Filter>Essential\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneFactory.h">
-      <Filter>Essential\SceneFactory</Filter>
-    </ClInclude>
-    <ClInclude Include="SampleFramework.h">
-      <Filter>Essential\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleModifierFactory.h">
+    <ClInclude Include="Source\ParticleModifierFactory\ParticleModifierFactory.h">
       <Filter>Essential\ParticleModifierFactory</Filter>
     </ClInclude>
-    <ClInclude Include="deveScene\DeveScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Source\Scene\DeveScene.h">
+      <Filter>Essential\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\SampleScene.h">
+      <Filter>Essential\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneFactory.h">
+      <Filter>Essential\SceneFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\appFramework\SampleFramework.h">
+      <Filter>Essential\Framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
