@@ -66,6 +66,13 @@ PSOBuilder& PSOBuilder::SetPixelShader(const std::string& _name)
     return *this;
 }
 
+PSOBuilder& PSOBuilder::SetGeometryShader(const std::string& _name)
+{
+    gsBlob_ = ShaderCompiler::GetInstance()->Get(_name);
+    desc_.GS = { gsBlob_->GetBufferPointer(), gsBlob_->GetBufferSize() };
+    return *this;
+}
+
 PSOBuilder& PSOBuilder::SetFlags(PSOFlags _flags)
 {
     desc_.BlendState = PSOFactory::CreateBlendDesc(_flags.GetBlendMode());
@@ -147,6 +154,49 @@ PSOBuilder& PSOBuilder::UseModelInputLayout()
 
 PSOBuilder& PSOBuilder::UseFullScreenInputLayout()
 {
+    // FullScreen.VS.hlslはSV_VertexIDのみ使用し頂点入力がないため空のInputLayout
+    desc_.InputLayout.pInputElementDescs = nullptr;
+    desc_.InputLayout.NumElements = 0;
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::UseLineDrawerInputLayout()
+{
+    static D3D12_INPUT_ELEMENT_DESC inputElements[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+    };
+    desc_.InputLayout.pInputElementDescs = inputElements;
+    desc_.InputLayout.NumElements = _countof(inputElements);
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::UseParticleInputLayout()
+{
+    static D3D12_INPUT_ELEMENT_DESC inputElements[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+    };
+    desc_.InputLayout.pInputElementDescs = inputElements;
+    desc_.InputLayout.NumElements = _countof(inputElements);
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::UseTextInputLayout()
+{
+    static D3D12_INPUT_ELEMENT_DESC inputElements[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+    };
+    desc_.InputLayout.pInputElementDescs = inputElements;
+    desc_.InputLayout.NumElements = _countof(inputElements);
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::UseSpriteInputLayout()
+{
     static D3D12_INPUT_ELEMENT_DESC inputElements[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -160,6 +210,12 @@ PSOBuilder& PSOBuilder::SetInputLayout(const std::vector<D3D12_INPUT_ELEMENT_DES
 {
     desc_.InputLayout.pInputElementDescs = _inputElements.data();
     desc_.InputLayout.NumElements = static_cast<UINT>(_inputElements.size());
+    return *this;
+}
+
+PSOBuilder& PSOBuilder::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE _type)
+{
+    desc_.PrimitiveTopologyType = _type;
     return *this;
 }
 

@@ -18,6 +18,7 @@ public:
     PSOBuilder& SetShaders(const std::string& _vsName, const std::string& _psName);
     PSOBuilder& SetVertexShader(const std::string& _name);
     PSOBuilder& SetPixelShader(const std::string& _name);
+    PSOBuilder& SetGeometryShader(const std::string& _name);
 
     // PSOFlags から一括設定
     PSOBuilder& SetFlags(PSOFlags _flags);
@@ -39,7 +40,14 @@ public:
     // InputLayout
     PSOBuilder& UseModelInputLayout();  // Model用InputLayoutを設定
     PSOBuilder& UseFullScreenInputLayout(); // フルスクリーン用InputLayoutを設定
+    PSOBuilder& UseLineDrawerInputLayout(); // LineDrawer用InputLayoutを設定
+    PSOBuilder& UseParticleInputLayout(); // Particle用InputLayoutを設定
+    PSOBuilder& UseTextInputLayout(); // Text3DRenderer用InputLayoutを設定
+    PSOBuilder& UseSpriteInputLayout(); // Sprite用InputLayoutを設定
     PSOBuilder& SetInputLayout(const std::vector<D3D12_INPUT_ELEMENT_DESC>& _inputElements);
+
+    // Topology
+    PSOBuilder& SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE _type);
 
     // RTV/DSV Format
     PSOBuilder& SetRTVFormat(DXGI_FORMAT _format);
@@ -60,6 +68,7 @@ private:
 
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob_;
     Microsoft::WRL::ComPtr<IDxcBlob> psBlob_;
+    Microsoft::WRL::ComPtr<IDxcBlob> gsBlob_;
 
     ID3D12RootSignature* rootSignature_ = nullptr;
 
