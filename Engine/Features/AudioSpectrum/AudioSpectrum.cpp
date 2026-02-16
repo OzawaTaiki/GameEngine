@@ -180,7 +180,7 @@ void AudioSpectrum::FFT(const std::vector<float>& in, std::vector<std::complex<f
 
 #ifdef _DEBUG
 
-    static int ftMode = 0; //0: Recursive FFT, 1: Iterative FFT
+    static int ftMode = 1; //0: Recursive FFT, 1: Iterative FFT
     auto startTime = std::chrono::high_resolution_clock::now();
     if (ImGuiDebugManager::GetInstance()->Begin("Fourier Transform"))
     {
