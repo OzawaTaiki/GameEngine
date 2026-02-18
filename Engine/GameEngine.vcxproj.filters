@@ -763,6 +763,9 @@
     <ClCompile Include="Features\UI\Element\UITextElement.cpp">
       <Filter>Features\UI\Element</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\AudioEffect.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1310,6 +1313,9 @@
     </ClInclude>
     <ClInclude Include="Features\UI\Element\UITextElement.h">
       <Filter>Features\UI\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioEffect.h">
+      <Filter>System\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
