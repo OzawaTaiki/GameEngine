@@ -7,9 +7,92 @@
 #include <cstring>
 
 #ifdef _DEBUG
-// 静的メンバの定義
 int ParticleEmitter::s_nextID_ = 0;
 #endif
+
+namespace
+{
+#ifdef _DEBUG
+// 静的メンバの定義
+
+// Range<float>用ImGuiエディタ
+void ImGuiRangeEditor(const char* _label, Range<float>& _range, float _step = 0.01f, float _min = 0.0f, float _max = 0.0f)
+{
+    ImGui::PushID(_label);
+    int mode = _range.isRandom ? 0 : 1;
+    ImGui::RadioButton("Random", &mode, 0);
+    ImGui::RadioButton("Fixed", &mode, 1);
+    _range.isRandom = (mode == 0);
+
+    if (_range.isRandom)
+    {
+        ImGui::DragFloat("Min", &_range.minV, _step, _min, _max);
+        ImGui::DragFloat("Max", &_range.maxV, _step, _min, _max);
+    }
+    else
+    {
+        ImGui::DragFloat(_label, &_range.value, _step, _min, _max);
+    }
+    ImGui::PopID();
+    ImGui::Separator();
+}
+
+// Range<Vector3>用ImGuiエディタ
+void ImGuiRangeEditor(const char* _label, Range<Vector3>& _range, float _step = 0.01f)
+{
+    ImGui::PushID(_label);
+    int mode = _range.isRandom ? 0 : 1;
+    ImGui::RadioButton("Random", &mode, 0);
+    ImGui::RadioButton("Fixed", &mode, 1);
+    _range.isRandom = (mode == 0);
+
+    if (_range.isRandom)
+    {
+        ImGui::DragFloat3("Min", &_range.minV.x, _step);
+        ImGui::DragFloat3("Max", &_range.maxV.x, _step);
+    }
+    else
+    {
+        ImGui::DragFloat3(_label, &_range.value.x, _step);
+    }
+    ImGui::PopID();
+    ImGui::Separator();
+}
+
+// Range<Vector3>用ColorEdit版
+void ImGuiRangeColorEditor(const char* _label, Range<Vector3>& _range)
+{
+    ImGui::PushID(_label);
+    int mode = _range.isRandom ? 0 : 1;
+    ImGui::RadioButton("Random", &mode, 0);
+    ImGui::RadioButton("Fixed", &mode, 1);
+    _range.isRandom = (mode == 0);
+
+    if (_range.isRandom)
+    {
+        ImGui::ColorEdit3("Min", &_range.minV.x);
+        ImGui::ColorEdit3("Max", &_range.maxV.x);
+    }
+    else
+    {
+        ImGui::ColorEdit3(_label, &_range.value.x);
+    }
+    ImGui::PopID();
+}
+#endif // _DEBUG (helpers)
+
+// JsonBinder に Range<T> を一括登録
+template<typename T>
+void RegisterRange(JsonBinder* _binder, const char* _prefix, Range<T>& _range)
+{
+    std::string prefix(_prefix);
+    _binder->RegisterVariable(prefix + "_Random", &_range.isRandom);
+    _binder->RegisterVariable(prefix + "_Min", &_range.minV);
+    _binder->RegisterVariable(prefix + "_Max", &_range.maxV);
+    _binder->RegisterVariable(prefix + "_Value", &_range.value);
+}
+
+} // namespace
 
 bool ParticleEmitter::Initialize(const std::string& _name)
 {
@@ -133,40 +216,40 @@ void ParticleEmitter::GenerateParticles()
 
         switch (shape_)
         {
-        case EmitterShape::Box:
-        {
-            Vector3 randomPos = RandomGenerator::GetInstance()->GetRandValue({ 0,0,0 }, boxSize_);
-            randomPos -= boxSize_ / 2.0f; // 中心を基準にする
-            Vector3 inner = initParams_.boxInnerSize.GetValue();
+            case EmitterShape::Box:
+            {
+                Vector3 randomPos = RandomGenerator::GetInstance()->GetRandValue({ 0,0,0 }, boxSize_);
+                randomPos -= boxSize_ / 2.0f; // 中心を基準にする
+                Vector3 inner = initParams_.boxInnerSize.GetValue();
 
-            // X軸: 内径より内側なら外側に押し出す
-            if (std::abs(randomPos.x) < inner.x)
-                randomPos.x = (randomPos.x < 0) ? -inner.x : inner.x;
+                // X軸: 内径より内側なら外側に押し出す
+                if (std::abs(randomPos.x) < inner.x)
+                    randomPos.x = (randomPos.x < 0) ? -inner.x : inner.x;
 
-            // Y軸: 内径より内側なら外側に押し出す
-            if (std::abs(randomPos.y) < inner.y)
-                randomPos.y = (randomPos.y < 0) ? -inner.y : inner.y;
+                // Y軸: 内径より内側なら外側に押し出す
+                if (std::abs(randomPos.y) < inner.y)
+                    randomPos.y = (randomPos.y < 0) ? -inner.y : inner.y;
 
-            // Z軸: 内径より内側なら外側に押し出す
-            if (std::abs(randomPos.z) < inner.z)
-                randomPos.z = (randomPos.z < 0) ? -inner.z : inner.z;
+                // Z軸: 内径より内側なら外側に押し出す
+                if (std::abs(randomPos.z) < inner.z)
+                    randomPos.z = (randomPos.z < 0) ? -inner.z : inner.z;
 
-            initParam.position = randomPos;
+                initParam.position = randomPos;
 
-            break;
-        }
-        case EmitterShape::Sphere:
-        {
-            float sphereOffset = RandomGenerator::GetInstance()->GetRandValue(initParams_.sphereOffset.GetValue(), sphereRadius_);
+                break;
+            }
+            case EmitterShape::Sphere:
+            {
+                float sphereOffset = RandomGenerator::GetInstance()->GetRandValue(initParams_.sphereOffset.GetValue(), sphereRadius_);
 
-            float rad = RandomGenerator::GetInstance()->GetUniformAngle();
-            initParam.position.x = std::cosf(rad) * sphereOffset;
-            initParam.position.y = RandomGenerator::GetInstance()->GetRandValue(-sphereOffset, sphereOffset);
-            initParam.position.z = std::sinf(rad) * sphereOffset;
-            break;
-        }
-        default:
-            break;
+                float rad = RandomGenerator::GetInstance()->GetUniformAngle();
+                initParam.position.x = std::cosf(rad) * sphereOffset;
+                initParam.position.y = RandomGenerator::GetInstance()->GetRandValue(-sphereOffset, sphereOffset);
+                initParam.position.z = std::sinf(rad) * sphereOffset;
+                break;
+            }
+            default:
+                break;
         }
         initParam.position = Transform(initParam.position, emitterTransform);
 
@@ -269,9 +352,10 @@ void ParticleEmitter::SetTimeChannel(const std::string& _channel)
 bool ParticleEmitter::HasModifier(std::string_view _modifierName) const
 {
     return std::find_if(initParams_.modifiers.begin(), initParams_.modifiers.end(),
-        [_modifierName](const std::string& _modifier) {
-            return _modifier == _modifierName;
-        }) != initParams_.modifiers.end();
+                        [_modifierName](const std::string& _modifier)
+                        {
+                            return _modifier == _modifierName;
+                        }) != initParams_.modifiers.end();
 }
 
 bool ParticleEmitter::SaveToFile() const
@@ -352,9 +436,10 @@ void ParticleEmitter::AddModifier(const std::string& _modifierName)
 bool ParticleEmitter::RemoveModifier(std::string_view _modifierName)
 {
     auto it = std::find_if(initParams_.modifiers.begin(), initParams_.modifiers.end(),
-        [_modifierName](const std::string& _modifier) {
-            return _modifier == _modifierName;
-        });
+                           [_modifierName](const std::string& _modifier)
+                           {
+                               return _modifier == _modifierName;
+                           });
 
     if (it != initParams_.modifiers.end())
     {
@@ -396,62 +481,23 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("billboard_y", &initParams_.billboard[1]);
     jsonBinder_->RegisterVariable("billboard_z", &initParams_.billboard[2]);
 
-    jsonBinder_->RegisterVariable("BoxOffset_Random", &initParams_.boxInnerSize.isRandom);
-    jsonBinder_->RegisterVariable("BoxOffset_Min", &initParams_.boxInnerSize.minV);
-    jsonBinder_->RegisterVariable("BoxOffset_Max", &initParams_.boxInnerSize.maxV);
-    jsonBinder_->RegisterVariable("BoxOffset_Value", &initParams_.boxInnerSize.value);
-
-    jsonBinder_->RegisterVariable("SphereOffset_Random", &initParams_.sphereOffset.isRandom);
-    jsonBinder_->RegisterVariable("SphereOffset_Min", &initParams_.sphereOffset.minV);
-    jsonBinder_->RegisterVariable("SphereOffset_Max", &initParams_.sphereOffset.maxV);
-    jsonBinder_->RegisterVariable("SphereOffset_Value", &initParams_.sphereOffset.value);
+    RegisterRange(jsonBinder_.get(), "BoxOffset", initParams_.boxInnerSize);
+    RegisterRange(jsonBinder_.get(), "SphereOffset", initParams_.sphereOffset);
 
     jsonBinder_->RegisterVariable("direction_Type", reinterpret_cast<uint32_t*>(&initParams_.directionType));
-    jsonBinder_->RegisterVariable("direction_Min", &initParams_.direction.minV);
-    jsonBinder_->RegisterVariable("direction_Max", &initParams_.direction.maxV);
-    jsonBinder_->RegisterVariable("direction_Value", &initParams_.direction.value);
-    jsonBinder_->RegisterVariable("direction_Random", &initParams_.direction.isRandom);
+    RegisterRange(jsonBinder_.get(), "direction", initParams_.direction);
 
-    jsonBinder_->RegisterVariable("speed_Random", &initParams_.speed.isRandom);
-    jsonBinder_->RegisterVariable("speed_Min", &initParams_.speed.minV);
-    jsonBinder_->RegisterVariable("speed_Max", &initParams_.speed.maxV);
-    jsonBinder_->RegisterVariable("speed_Value", &initParams_.speed.value);
-
-    jsonBinder_->RegisterVariable("deceleration_Random", &initParams_.deceleration.isRandom);
-    jsonBinder_->RegisterVariable("deceleration_Min", &initParams_.deceleration.minV);
-    jsonBinder_->RegisterVariable("deceleration_Max", &initParams_.deceleration.maxV);
-    jsonBinder_->RegisterVariable("deceleration_Value", &initParams_.deceleration.value);
+    RegisterRange(jsonBinder_.get(), "speed", initParams_.speed);
+    RegisterRange(jsonBinder_.get(), "deceleration", initParams_.deceleration);
 
     jsonBinder_->RegisterVariable("lifeTime_Type", reinterpret_cast<uint32_t*>(&initParams_.lifeTimeType));
-    jsonBinder_->RegisterVariable("lifeTime_Min", &initParams_.lifeTime.minV);
-    jsonBinder_->RegisterVariable("lifeTime_Max", &initParams_.lifeTime.maxV);
-    jsonBinder_->RegisterVariable("lifeTime_Value", &initParams_.lifeTime.value);
-    jsonBinder_->RegisterVariable("lifeTime_Random", &initParams_.lifeTime.isRandom);
+    RegisterRange(jsonBinder_.get(), "lifeTime", initParams_.lifeTime);
 
-    jsonBinder_->RegisterVariable("size_Random", &initParams_.size.isRandom);
-    jsonBinder_->RegisterVariable("size_Min", &initParams_.size.minV);
-    jsonBinder_->RegisterVariable("size_Max", &initParams_.size.maxV);
-    jsonBinder_->RegisterVariable("size_Value", &initParams_.size.value);
-
-    jsonBinder_->RegisterVariable("rotation_Random", &initParams_.rotation.isRandom);
-    jsonBinder_->RegisterVariable("rotation_Min", &initParams_.rotation.minV);
-    jsonBinder_->RegisterVariable("rotation_Max", &initParams_.rotation.maxV);
-    jsonBinder_->RegisterVariable("rotation_Value", &initParams_.rotation.value);
-
-    jsonBinder_->RegisterVariable("rotationSpeed_Random", &initParams_.rotationSpeed.isRandom);
-    jsonBinder_->RegisterVariable("rotationSpeed_Min", &initParams_.rotationSpeed.minV);
-    jsonBinder_->RegisterVariable("rotationSpeed_Max", &initParams_.rotationSpeed.maxV);
-    jsonBinder_->RegisterVariable("rotationSpeed_Value", &initParams_.rotationSpeed.value);
-
-    jsonBinder_->RegisterVariable("RGB_Random", &initParams_.colorRGB.isRandom);
-    jsonBinder_->RegisterVariable("RGB_Min", &initParams_.colorRGB.minV);
-    jsonBinder_->RegisterVariable("RGB_Max", &initParams_.colorRGB.maxV);
-    jsonBinder_->RegisterVariable("RGB_Value", &initParams_.colorRGB.value);
-
-    jsonBinder_->RegisterVariable("alpha_Random", &initParams_.colorA.isRandom);
-    jsonBinder_->RegisterVariable("alpha_Min", &initParams_.colorA.minV);
-    jsonBinder_->RegisterVariable("alpha_Max", &initParams_.colorA.maxV);
-    jsonBinder_->RegisterVariable("alpha_Value", &initParams_.colorA.value);
+    RegisterRange(jsonBinder_.get(), "size", initParams_.size);
+    RegisterRange(jsonBinder_.get(), "rotation", initParams_.rotation);
+    RegisterRange(jsonBinder_.get(), "rotationSpeed", initParams_.rotationSpeed);
+    RegisterRange(jsonBinder_.get(), "RGB", initParams_.colorRGB);
+    RegisterRange(jsonBinder_.get(), "alpha", initParams_.colorA);
 
     jsonBinder_->RegisterVariable("texturePath", &initParams_.textureName);
 
@@ -490,47 +536,42 @@ bool ParticleEmitter::ValidateSettings() const
 #ifdef _DEBUG
 void ParticleEmitter::ShowDebugWindow()
 {
-    // 一意なIDを使用してウィンドウを識別
     ImGui::PushID(this);
     {
-        ImGui::PushID("emitter");
         if (ImGui::Button("Emit"))
             GenerateParticles();
-
         ImGui::SameLine();
+        if (ImGui::Button("Save") && jsonBinder_)
+            jsonBinder_->Save();
 
-        if (ImGui::Button("Save"))
+        ShowEmitterSettings();
+        ShowParticleInitParams();
+    }
+    ImGui::PopID();
+}
+
+void ParticleEmitter::ShowEmitterSettings()
+{
+    ImGui::PushID("emitter");
+    if (ImGui::CollapsingHeader("Emitter Settings"))
+    {
+        ImGui::Text("Emitter Name");
+        ImGui::BeginDisabled();
+        ImGui::InputText("##EmitterName", nameBuf_, sizeof(nameBuf_));
+        ImGui::EndDisabled();
+        ImGui::Separator();
+
+        if (ImGui::TreeNode("Emitter Shape"))
         {
-            if (jsonBinder_)
-                jsonBinder_->Save();
-        }
+            int currentShape = static_cast<int>(shape_);
+            if (ImGui::RadioButton("Box", &currentShape, static_cast<int>(EmitterShape::Box)))
+                shape_ = EmitterShape::Box;
+            if (ImGui::RadioButton("Sphere", &currentShape, static_cast<int>(EmitterShape::Sphere)))
+                shape_ = EmitterShape::Sphere;
+            ImGui::TreePop();
 
-        if (ImGui::CollapsingHeader("Emitter Settings"))
-        {
-            ImGui::Text("Emitter Name");
-
-            // 読み取り専用の名前表示
-            ImGui::BeginDisabled();
-            ImGui::InputText("##EmitterName", nameBuf_, sizeof(nameBuf_));
-            ImGui::EndDisabled();
-
-            ImGui::Separator();
-
-            if (ImGui::TreeNode("Emitter Shape"))
+            switch (shape_)
             {
-                // 安全なenum処理
-                int currentShape = static_cast<int>(shape_);
-
-                if (ImGui::RadioButton("Box", &currentShape, static_cast<int>(EmitterShape::Box)))
-                    shape_ = EmitterShape::Box;
-
-                if (ImGui::RadioButton("Sphere", &currentShape, static_cast<int>(EmitterShape::Sphere)))
-                    shape_ = EmitterShape::Sphere;
-
-                ImGui::TreePop();
-
-                switch (shape_)
-                {
                 case EmitterShape::Box:
                     ImGui::DragFloat3("Box size", &boxSize_.x, 0.01f, 0.01f, 100.0f);
                     break;
@@ -539,270 +580,168 @@ void ParticleEmitter::ShowDebugWindow()
                     break;
                 default:
                     break;
-                }
-            }
-
-            if (ImGui::TreeNode("Position"))
-            {
-                ImGui::DragFloat3("Position", &position_.x, 0.01f);
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Emit Settings"))
-            {
-                // 安全な整数入力
-                int emitCount = static_cast<int>(emitCount_);
-                if (ImGui::InputInt("Emit count", &emitCount))
-                {
-                    emitCount_ = static_cast<uint32_t>(std::max(1, emitCount));
-                }
-
-                int emitPerSecond = static_cast<int>(emitPerSecond_);
-                if (ImGui::InputInt("Emit per second", &emitPerSecond))
-                {
-                    emitPerSecond_ = static_cast<uint32_t>(std::max(1, emitPerSecond));
-                }
-
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Time"))
-            {
-                ImGui::DragFloat("Delay Time", &delayTime_, 0.01f, 0.0f, 100.0f);
-                ImGui::DragFloat("Life Time", &lifeTime, 0.01f, 0.0f, 100.0f);
-                ImGui::Checkbox("Loop", &isLoop_);
-
-                ImGui::TreePop();
-            }
-
-            if (parentTransform_ != nullptr)
-            {
-                if (ImGui::TreeNode("Emitter Offset"))
-                {
-                    ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
-                    ImGui::TreePop();
-                }
             }
         }
-        ImGui::PopID();
 
-        ImGui::PushID("initParams");
-        if (ImGui::CollapsingHeader("Particle Init Params"))
+        if (ImGui::TreeNode("Position"))
         {
-            if (ImGui::TreeNode("Use Model"))
+            ImGui::DragFloat3("Position", &position_.x, 0.01f);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Emit Settings"))
+        {
+            int emitCount = static_cast<int>(emitCount_);
+            if (ImGui::InputInt("Emit count", &emitCount))
+                emitCount_ = static_cast<uint32_t>(std::max(1, emitCount));
+
+            int emitPerSecond = static_cast<int>(emitPerSecond_);
+            if (ImGui::InputInt("Emit per second", &emitPerSecond))
+                emitPerSecond_ = static_cast<uint32_t>(std::max(1, emitPerSecond));
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Time"))
+        {
+            ImGui::DragFloat("Delay Time", &delayTime_, 0.01f, 0.0f, 100.0f);
+            ImGui::DragFloat("Life Time", &lifeTime, 0.01f, 0.0f, 100.0f);
+            ImGui::Checkbox("Loop", &isLoop_);
+            ImGui::TreePop();
+        }
+
+        if (parentTransform_ != nullptr)
+        {
+            if (ImGui::TreeNode("Emitter Offset"))
             {
-                ImGui::Text("ModelPath");
-                ImGui::InputText("##ModelPath", modelPath_, sizeof(modelPath_));
-
-                if (ImGui::Button("Apply##ModelPath"))
-                {
-                    LoadModel(modelPath_);
-                    memset(modelName_, 0, sizeof(modelName_));
-                }
-
-                ImGui::Separator();
-                ImGui::Text("ModelName");
-                ImGui::InputText("##ModelName", modelName_, sizeof(modelName_));
-
-                if (ImGui::Button("Apply##ModelName"))
-                {
-                    Model* model = ModelManager::GetInstance()->FindSameModel(modelName_);
-                    if (model != nullptr)
-                    {
-                        useModelName_ = modelName_;
-                        memset(modelPath_, 0, sizeof(modelPath_));
-                    }
-                    else
-                    {
-                        ImGui::Text("Error: Model not found");
-                    }
-                }
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Use Texture"))
-            {
-                ImGui::Text("TextureRoot");
-                ImGui::InputText("##TextureRoot", textureRoot_, sizeof(textureRoot_));
-
-                ImGui::Text("TexturePath");
-                ImGui::InputText("##TexturePath", texturePath_, sizeof(texturePath_));
-
-                if (ImGui::Button("Apply##TexturePath"))
-                {
-                    LoadTexture(texturePath_);
-                }
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Billboard"))
-            {
-                ImGui::Text("Billboard");
-
-                // 安全な配列アクセス
-                if (initParams_.billboard.size() >= 3)
-                {
-                    ImGui::Checkbox("X", &initParams_.billboard[0]);
-                    ImGui::SameLine();
-                    ImGui::Checkbox("Y", &initParams_.billboard[1]);
-                    ImGui::SameLine();
-                    ImGui::Checkbox("Z", &initParams_.billboard[2]);
-                }
-                ImGui::TreePop();
-            }
-
-            // RenderSetting
-            if (ImGui::TreeNode("Render Setting"))
-            {
-                ImGui::Text("Blend Mode");
-
-                // 安全なenum処理
-                int currentBlendMode = static_cast<int>(blendMode_);
-
-                if (ImGui::RadioButton("Normal", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Normal)))
-                    blendMode_ = PSOFlags::BlendMode::Normal;
-                if (ImGui::RadioButton("Add", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Add)))
-                    blendMode_ = PSOFlags::BlendMode::Add;
-                if (ImGui::RadioButton("Sub", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Sub)))
-                    blendMode_ = PSOFlags::BlendMode::Sub;
-                if (ImGui::RadioButton("Mul", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Multiply)))
-                    blendMode_ = PSOFlags::BlendMode::Multiply;
-                if (ImGui::RadioButton("Screen", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Screen)))
-                    blendMode_ = PSOFlags::BlendMode::Screen;
-
-                ImGui::Separator();
-                ImGui::Checkbox("Cull Back", &cullBack_);
-
-                ImGui::TreePop();
-            }
-
-            // 各設定関数の呼び出し
-            if (ImGui::TreeNode("Life Time"))
-            {
-                DebugWindowForLifeTime();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Position"))
-            {
-                DebugWindowForPosition();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Size"))
-            {
-                DebugWindowForSize();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Direction"))
-            {
-                DebugWindowForDirection();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Speed"))
-            {
-                DebugWindowForSpeed();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Rotation"))
-            {
-                DebugWindowForRotation();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Deceleration"))
-            {
-                DebugWindowForDeceleration();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Color"))
-            {
-                DebugWindowForColor();
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Modifiers"))
-            {
-                DebugWindowForModifier();
+                ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
                 ImGui::TreePop();
             }
         }
-        ImGui::PopID();
     }
-    ImGui::PopID(); // Pop ID for this emitter
+    ImGui::PopID();
+}
+
+void ParticleEmitter::ShowParticleInitParams()
+{
+    ImGui::PushID("initParams");
+    if (ImGui::CollapsingHeader("Particle Init Params"))
+    {
+        if (ImGui::TreeNode("Use Model"))
+        {
+            ImGui::Text("ModelPath");
+            ImGui::InputText("##ModelPath", modelPath_, sizeof(modelPath_));
+            if (ImGui::Button("Apply##ModelPath"))
+            {
+                LoadModel(modelPath_);
+                memset(modelName_, 0, sizeof(modelName_));
+            }
+
+            ImGui::Separator();
+            ImGui::Text("ModelName");
+            ImGui::InputText("##ModelName", modelName_, sizeof(modelName_));
+            if (ImGui::Button("Apply##ModelName"))
+            {
+                Model* model = ModelManager::GetInstance()->FindSameModel(modelName_);
+                if (model != nullptr)
+                {
+                    useModelName_ = modelName_;
+                    memset(modelPath_, 0, sizeof(modelPath_));
+                }
+                else
+                {
+                    ImGui::Text("Error: Model not found");
+                }
+            }
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Use Texture"))
+        {
+            ImGui::Text("TextureRoot");
+            ImGui::InputText("##TextureRoot", textureRoot_, sizeof(textureRoot_));
+            ImGui::Text("TexturePath");
+            ImGui::InputText("##TexturePath", texturePath_, sizeof(texturePath_));
+            if (ImGui::Button("Apply##TexturePath"))
+                LoadTexture(texturePath_);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Billboard"))
+        {
+            if (initParams_.billboard.size() >= 3)
+            {
+                ImGui::Checkbox("X", &initParams_.billboard[0]);
+                ImGui::SameLine();
+                ImGui::Checkbox("Y", &initParams_.billboard[1]);
+                ImGui::SameLine();
+                ImGui::Checkbox("Z", &initParams_.billboard[2]);
+            }
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Render Setting"))
+        {
+            ImGui::Text("Blend Mode");
+            int currentBlendMode = static_cast<int>(blendMode_);
+            if (ImGui::RadioButton("Normal", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Normal)))
+                blendMode_ = PSOFlags::BlendMode::Normal;
+            if (ImGui::RadioButton("Add", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Add)))
+                blendMode_ = PSOFlags::BlendMode::Add;
+            if (ImGui::RadioButton("Sub", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Sub)))
+                blendMode_ = PSOFlags::BlendMode::Sub;
+            if (ImGui::RadioButton("Mul", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Multiply)))
+                blendMode_ = PSOFlags::BlendMode::Multiply;
+            if (ImGui::RadioButton("Screen", &currentBlendMode, static_cast<int>(PSOFlags::BlendMode::Screen)))
+                blendMode_ = PSOFlags::BlendMode::Screen;
+            ImGui::Separator();
+            ImGui::Checkbox("Cull Back", &cullBack_);
+            ImGui::TreePop();
+        }
+
+        // 各パラメータ設定
+        struct { const char* label; void (ParticleEmitter::* func)(); } params[] = {
+            { "Life Time", &ParticleEmitter::DebugWindowForLifeTime },
+            { "Position", &ParticleEmitter::DebugWindowForPosition },
+            { "Size", &ParticleEmitter::DebugWindowForSize },
+            { "Direction", &ParticleEmitter::DebugWindowForDirection },
+            { "Speed", &ParticleEmitter::DebugWindowForSpeed },
+            { "Rotation", &ParticleEmitter::DebugWindowForRotation },
+            { "Deceleration", &ParticleEmitter::DebugWindowForDeceleration },
+            { "Color", &ParticleEmitter::DebugWindowForColor },
+            { "Modifiers", &ParticleEmitter::DebugWindowForModifier },
+        };
+        for (auto& [label, func] : params)
+        {
+            if (ImGui::TreeNode(label))
+            {
+                (this->*func)();
+                ImGui::TreePop();
+            }
+        }
+    }
+    ImGui::PopID();
 }
 
 // デバッグウィンドウ関数の実装
 void ParticleEmitter::DebugWindowForSize()
 {
-    auto& sizeParams = initParams_.size;
-
-    int imSize = static_cast<int>(!sizeParams.isRandom);
-
-    ImGui::RadioButton("Random", &imSize, 0);
-    ImGui::RadioButton("Fixed", &imSize, 1);
-
-    sizeParams.isRandom = (imSize == 0);
-
-    if (sizeParams.isRandom)
-    {
-        ImGui::DragFloat3("Min", &sizeParams.minV.x, 0.01f);
-        ImGui::DragFloat3("Max", &sizeParams.maxV.x, 0.01f);
-    }
-    else
-    {
-        ImGui::DragFloat3("Size", &sizeParams.value.x, 0.01f);
-    }
-    ImGui::Separator();
+    ImGuiRangeEditor("Size", initParams_.size);
 }
 
 void ParticleEmitter::DebugWindowForPosition()
 {
     switch (shape_)
     {
-    case EmitterShape::Box:
-    {
-        auto& boxOffset = initParams_.boxInnerSize;
-
-        int imBoxOffset = static_cast<int>(!boxOffset.isRandom);
-
-        ImGui::RadioButton("Random", &imBoxOffset, 0);
-        ImGui::RadioButton("Fixed", &imBoxOffset, 1);
-
-        boxOffset.isRandom = (imBoxOffset == 0);
-
-        if (boxOffset.isRandom)
-        {
-            ImGui::DragFloat3("Min", &boxOffset.minV.x, 0.01f);
-            ImGui::DragFloat3("Max", &boxOffset.maxV.x, 0.01f);
-        }
-        else
-        {
-            ImGui::DragFloat3("Box Inner Size", &boxOffset.value.x, 0.01f);
-        }
-        break;
+        case EmitterShape::Box:
+            ImGuiRangeEditor("Box Inner Size", initParams_.boxInnerSize);
+            break;
+        case EmitterShape::Sphere:
+            ImGuiRangeEditor("Sphere Inner Size", initParams_.sphereOffset);
+            break;
+        default:
+            break;
     }
-    case EmitterShape::Sphere:
-    {
-        auto& sphereOffset = initParams_.sphereOffset;
-        int imSphereOffset = static_cast<int>(!sphereOffset.isRandom);
-
-        ImGui::RadioButton("Random", &imSphereOffset, 0);
-        ImGui::RadioButton("Fixed", &imSphereOffset, 1);
-
-        sphereOffset.isRandom = (imSphereOffset == 0);
-
-        if (sphereOffset.isRandom)
-        {
-            ImGui::DragFloat("Min", &sphereOffset.minV, 0.01f);
-            ImGui::DragFloat("Max", &sphereOffset.maxV, 0.01f);
-        }
-        else
-        {
-            ImGui::DragFloat("Sphere Inner Size", &sphereOffset.value, 0.01f);
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    ImGui::Separator();
 }
 
 void ParticleEmitter::DebugWindowForDirection()
@@ -843,90 +782,19 @@ void ParticleEmitter::DebugWindowForDirection()
 
 void ParticleEmitter::DebugWindowForSpeed()
 {
-    auto& speed = initParams_.speed;
-
-    int imSpeed = speed.isRandom ? 0 : 1;
-    ImGui::RadioButton("Random", &imSpeed, 0);
-    ImGui::RadioButton("Fixed", &imSpeed, 1);
-
-    speed.isRandom = (imSpeed == 0);
-
-    if (speed.isRandom)
-    {
-        ImGui::DragFloat("Min", &speed.minV, 0.01f);
-        ImGui::DragFloat("Max", &speed.maxV, 0.01f);
-    }
-    else
-    {
-        ImGui::DragFloat("Speed", &speed.value, 0.01f);
-    }
-    ImGui::Separator();
+    ImGuiRangeEditor("Speed", initParams_.speed);
 }
 
 void ParticleEmitter::DebugWindowForRotation()
 {
-    auto& rotation = initParams_.rotation;
-    int imRotation = static_cast<int>(!rotation.isRandom);
-
-    ImGui::Separator();
-
-    ImGui::RadioButton("Random##rot", &imRotation, 0);
-    ImGui::RadioButton("Fixed##rot", &imRotation, 1);
-
-    rotation.isRandom = (imRotation == 0);
-
-    if (rotation.isRandom)
-    {
-        ImGui::DragFloat3("Min##rot", &rotation.minV.x, 0.01f);
-        ImGui::DragFloat3("Max##rot", &rotation.maxV.x, 0.01f);
-    }
-    else
-    {
-        ImGui::DragFloat3("Rotation##rot", &rotation.value.x, 0.01f);
-    }
-
+    ImGuiRangeEditor("Rotation", initParams_.rotation);
     ImGui::SeparatorText("Rotation Speed");
-
-    auto& rotationSpeed = initParams_.rotationSpeed;
-    int imRotationSpeed = static_cast<int>(!rotationSpeed.isRandom);
-
-    ImGui::RadioButton("Random##rotSpeed", &imRotationSpeed, 0);
-    ImGui::RadioButton("Fixed##rotSpeed", &imRotationSpeed, 1);
-
-    rotationSpeed.isRandom = (imRotationSpeed == 0);
-
-    if (rotationSpeed.isRandom)
-    {
-        ImGui::DragFloat3("Min##rotSpeed", &rotationSpeed.minV.x, 0.01f);
-        ImGui::DragFloat3("Max##rotSpeed", &rotationSpeed.maxV.x, 0.01f);
-    }
-    else
-    {
-        ImGui::DragFloat3("Rotation Speed##rotSpeed", &rotationSpeed.value.x, 0.01f);
-    }
-
-    ImGui::Separator();
+    ImGuiRangeEditor("Rotation Speed", initParams_.rotationSpeed);
 }
 
 void ParticleEmitter::DebugWindowForDeceleration()
 {
-    auto& deceleration = initParams_.deceleration;
-    int imDece = static_cast<int>(!deceleration.isRandom);
-    ImGui::RadioButton("Random", &imDece, 0);
-    ImGui::RadioButton("Fixed", &imDece, 1);
-
-    deceleration.isRandom = (imDece == 0);
-
-    if (deceleration.isRandom)
-    {
-        ImGui::DragFloat("Min", &deceleration.minV, 0.01f);
-        ImGui::DragFloat("Max", &deceleration.maxV, 0.01f);
-    }
-    else
-    {
-        ImGui::DragFloat("Deceleration", &deceleration.value, 0.01f);
-    }
-    ImGui::Separator();
+    ImGuiRangeEditor("Deceleration", initParams_.deceleration);
 }
 
 void ParticleEmitter::DebugWindowForLifeTime()
@@ -966,47 +834,14 @@ void ParticleEmitter::DebugWindowForColor()
 {
     if (ImGui::TreeNode("Color RGB"))
     {
-        auto& color = initParams_.colorRGB;
-        int colorPtr = color.isRandom ? 0 : 1;
-        ImGui::RadioButton("Random", &colorPtr, 0);
-        ImGui::RadioButton("Fixed", &colorPtr, 1);
-
-        color.isRandom = (colorPtr == 0);
-
-        if (color.isRandom)
-        {
-            ImGui::ColorEdit3("Min", &color.minV.x);
-            ImGui::ColorEdit3("Max", &color.maxV.x);
-        }
-        else
-        {
-            ImGui::ColorEdit3("Color", &color.value.x);
-        }
+        ImGuiRangeColorEditor("Color", initParams_.colorRGB);
         ImGui::TreePop();
     }
     if (ImGui::TreeNode("Color Alpha"))
     {
-        auto& alpha = initParams_.colorA;
-
-        int imAlpha = alpha.isRandom ? 0 : 1;
-
-        ImGui::RadioButton("Random", &imAlpha, 0);
-        ImGui::RadioButton("Fixed", &imAlpha, 1);
-
-        alpha.isRandom = (imAlpha == 0);
-
-        if (alpha.isRandom)
-        {
-            ImGui::DragFloat("Min", &alpha.minV, 0.01f);
-            ImGui::DragFloat("Max", &alpha.maxV, 0.01f);
-        }
-        else
-        {
-            ImGui::DragFloat("Alpha", &alpha.value, 0.01f, 0.0f, 1.0f);
-        }
+        ImGuiRangeEditor("Alpha", initParams_.colorA, 0.01f, 0.0f, 1.0f);
         ImGui::TreePop();
     }
-    ImGui::Separator();
 }
 
 void ParticleEmitter::DebugWindowForModifier()
