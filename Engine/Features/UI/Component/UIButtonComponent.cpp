@@ -103,7 +103,7 @@ void UIButtonComponent::UpdateState()
         if (prevState == ButtonState::Pressed && state_ == ButtonState::Hovered)
         {
             if (onClickUp_) onClickUp_();
-            if (onClick_) onClick_();  // 既存の互換性維持
+            else if (onClick_) onClick_();  // 既存の互換性維持
         }
     }
     else

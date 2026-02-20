@@ -165,6 +165,8 @@ public:
 
 #ifdef _DEBUG
     void ShowDebugWindow();
+    void ShowEmitterSettings();
+    void ShowParticleInitParams();
 #endif
 
 private:

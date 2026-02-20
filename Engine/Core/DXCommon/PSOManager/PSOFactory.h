@@ -27,6 +27,16 @@ public:
         const D3D12_ROOT_SIGNATURE_DESC& _desc
     );
 
+    // 各タイプ別のRootSignature作成
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateModelRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateSpriteRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateParticleRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateOffScreenRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateSkyBoxRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateShadowMapRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreatePLShadowMapRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateTextRootSignature();
+
     // ヘルパー: 頻出設定を簡単に作成
     static D3D12_BLEND_DESC CreateBlendDesc(PSOFlags::BlendMode _mode);
     static D3D12_RASTERIZER_DESC CreateRasterizerDesc(PSOFlags::CullMode _mode);

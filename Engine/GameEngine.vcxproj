@@ -394,6 +394,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Event\GameEvent.h" />
     <ClInclude Include="Features\Json\JsonBinder.h" />
     <ClInclude Include="Features\Json\JsonSerializers.h" />
+    <ClInclude Include="Features\Json\JsonUtils.h" />
     <ClInclude Include="Features\Json\Loader\JsonFileIO.h" />
     <ClInclude Include="Features\Json\VariableHolder.h" />
     <ClInclude Include="Features\LevelEditor\LevelEditorLoader.h" />

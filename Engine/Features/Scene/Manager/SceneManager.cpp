@@ -18,10 +18,11 @@ SceneManager::SceneManager()
     : sceneFactory_(nullptr),
     currentSceneName_("empty"),
     nextSceneName_("empty"),
-    isTransition_(false)
+    isTransition_(false),
+    enableTransition_(true)
 {
 #ifdef _DEBUG
-    ImGuiDebugManager::GetInstance()->RegisterMenuItem("SceneManager", [this](bool* _open) {ImGui(_open); });
+    ImGuiDebugManager::GetInstance()->RegisterMenuItem("SceneManager", [this](bool* _open) { ImGui(_open); });
 #endif // _DEBUG
 
 }
@@ -57,7 +58,7 @@ void SceneManager::Update()
 
     currentScene_->Update();
 
-    if(!transitionQueue_.empty())
+    if (!transitionQueue_.empty())
     {
         SetTransition(std::move(transitionQueue_.front()));
         transitionQueue_.pop();
@@ -119,7 +120,7 @@ void SceneManager::ReserveScene(const std::string& _name, std::unique_ptr<SceneD
 
     instance->sceneData_ = std::move(_sceneData);
 
-    if (instance->transition_ != nullptr)
+    if (instance->enableTransition_ && instance->transition_ != nullptr)
     {
         instance->transition_->Start();
         instance->isTransition_ = true;
@@ -137,7 +138,7 @@ void SceneManager::ChangeScene()
         return;
     }
 
-    if (instance->transition_ != nullptr)
+    if (instance->enableTransition_ && instance->transition_ != nullptr)
     {
         if (!instance->transition_->CanSwitch())
         {
@@ -154,6 +155,9 @@ void SceneManager::ChangeScene()
     instance->currentScene_->Initialize(instance->sceneData_.get());
     instance->currentSceneName_ = instance->nextSceneName_;
     instance->nextSceneName_ = "empty";
+
+    // トランジションを自動で有効化する
+    instance->enableTransition_ = true;
 
     auto endTimeStamp = std::chrono::system_clock::now();
     Debug::Log(std::format("Scene Initialized TimePoint: {}\n", endTimeStamp.time_since_epoch().count()));
@@ -190,6 +194,7 @@ void SceneManager::ImGui(bool* _open)
 
         ImGui::Text("-----Transition-----");
         ImGui::Text("Transitioning : %s", isTransition_ ? "true" : "false");
+        ImGui::Text("Enable Transition : %s", enableTransition_ ? "true" : "false");
     }
     ImGui::End();
 }

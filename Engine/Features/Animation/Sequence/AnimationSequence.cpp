@@ -28,7 +28,7 @@ void AnimationSequence::Initialize(const std::string& _filepath)
     if (!_filepath.empty())
     {
 
-        jsonBinder_ = std::make_unique<JsonBinder>(label_,_filepath);
+        jsonBinder_ = std::make_unique<JsonBinder>(label_, _filepath);
         jsonBinder_->RegisterVariable("SequenceSize", &sequenceSize_);
         jsonBinder_->RegisterVariable("IsLooping", &isLooping_);
         jsonBinder_->RegisterVariable("MaxPlayTime", &maxPlayTime_);
@@ -46,7 +46,10 @@ void AnimationSequence::Initialize(const std::string& _filepath)
 void AnimationSequence::Update(float _deltaTime)
 {
     currentTime_ += _deltaTime;
-    currentTime_ = std::clamp(currentTime_, 0.0f, maxPlayTime_);
+    if (isLooping_)
+        currentTime_ = std::fmod(currentTime_, maxPlayTime_);
+    else
+        currentTime_ = std::clamp(currentTime_, 0.0f, maxPlayTime_);
     for (auto& sequenceEvent : sequenceEvents_)
     {
         sequenceEvent.second->Update(currentTime_);
@@ -140,7 +143,7 @@ void AnimationSequence::DeleteMarkedSequenceEvent()
 
 void AnimationSequence::MarkEventForDeletion(const std::string& _label)
 {
-    if(sequenceEvents_.contains(_label))
+    if (sequenceEvents_.contains(_label))
         sequenceEvents_.erase(_label);
 
 }
