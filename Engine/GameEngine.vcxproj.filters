@@ -766,6 +766,7 @@
     <ClCompile Include="System\Audio\AudioEffect.cpp">
       <Filter>System\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\SubmixVoice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1315,6 +1316,9 @@
       <Filter>Features\UI\Element</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\AudioEffect.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SubmixVoice.h">
       <Filter>System\Audio</Filter>
     </ClInclude>
   </ItemGroup>
