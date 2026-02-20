@@ -2,6 +2,9 @@
 
 #include <Features/Model/Primitive/Primitive.h>
 
+
+namespace Engine {
+
 class Triangle : public Primitive
 {
 public:
@@ -55,3 +58,5 @@ private:
 
 
 };
+
+} // namespace Engine

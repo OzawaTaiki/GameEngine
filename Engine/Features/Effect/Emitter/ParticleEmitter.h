@@ -15,6 +15,9 @@
 #include <vector>
 
 // Range構造体 - テンプレート化
+
+namespace Engine {
+
 template<typename T>
 struct Range {
     bool isRandom = false;
@@ -243,3 +246,5 @@ private:
     void DebugWindowForModifier();
 #endif
 };
+
+} // namespace Engine

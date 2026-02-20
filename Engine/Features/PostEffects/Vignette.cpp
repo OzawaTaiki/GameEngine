@@ -7,6 +7,9 @@
 #include <Framework/LayerSystem/LayerSystem.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 void Vignette::Initialize()
 {
     CreateConstantBuffer(sizeof(VignetteData));
@@ -176,3 +179,5 @@ void Vignette::DataUpdate()
     }
 
 }
+
+} // namespace Engine

@@ -6,6 +6,9 @@
 #include <memory>
 #include <map>
 
+
+namespace Engine {
+
 static std::string NormalizeKey(const std::string& s) {
     if (s.empty()) return s;
     std::string result = s;
@@ -46,3 +49,5 @@ private:
     CollisionLayerManager& operator=(const CollisionLayerManager&) = delete;
 
 };
+
+} // namespace Engine

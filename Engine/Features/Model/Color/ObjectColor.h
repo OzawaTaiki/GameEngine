@@ -6,6 +6,9 @@
 #include <wrl.h>
 
 
+
+namespace Engine {
+
 class ObjectColor
 {
 public:
@@ -31,3 +34,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     ConstantBufferData* constMap_ = nullptr;
 };
+
+} // namespace Engine

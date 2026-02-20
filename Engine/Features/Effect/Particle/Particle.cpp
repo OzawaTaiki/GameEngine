@@ -4,6 +4,9 @@
 
 #include <algorithm>
 
+
+namespace Engine {
+
 void Particle::Initialize(const ParticleInitParam& _param)
 {
     parameter_ = _param;
@@ -80,3 +83,5 @@ void Particle::ShowDebugWindow()
     ImGui::PopID();
 #endif // _DEBUG
 }
+
+} // namespace Engine

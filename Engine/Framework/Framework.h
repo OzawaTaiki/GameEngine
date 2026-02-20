@@ -17,6 +17,9 @@
 #include <Features/TextRenderer/FontCache.h>
 #include <Framework/Batch2DRenderer.h>
 
+
+namespace Engine {
+
 class Framework
 {
 public:
@@ -66,3 +69,5 @@ protected:
 
 
 };
+
+} // namespace Engine

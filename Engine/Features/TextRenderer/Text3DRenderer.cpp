@@ -6,6 +6,9 @@
 #include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 namespace
 {
 constexpr float kPixelToWorldScale = 0.01f; // ピクセルからワールド単位への変換スケール
@@ -643,3 +646,5 @@ void Text3DRenderer::DrawTextImmediate_Internal(
     UINT vertexCount = static_cast<UINT>(tempVertices.size());
     cmdList_->DrawInstanced(vertexCount, 1, 0, 0);
 }
+
+} // namespace Engine

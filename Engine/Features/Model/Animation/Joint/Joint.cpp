@@ -5,6 +5,9 @@
 #include <Features/LineDrawer/LineDrawer.h>
 #include <Math/Vector/VectorFunction.h>
 
+
+namespace Engine {
+
 void Joint::Initialize()
 {
 }
@@ -95,3 +98,5 @@ void Joint::ImGui(std::unordered_map<std::string, int32_t>& _map, int32_t indent
 
 }
 #endif // _DEBUG
+
+} // namespace Engine

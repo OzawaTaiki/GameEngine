@@ -5,6 +5,9 @@
 #include <memory>
 
 // 前方宣言
+
+namespace Engine {
+
 class UIElement;
 
 /// <summary>
@@ -61,3 +64,5 @@ private:
     bool focusable_ = true;
     bool isFocused_ = false;
 };
+
+} // namespace Engine

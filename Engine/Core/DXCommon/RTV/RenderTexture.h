@@ -10,6 +10,9 @@
 #include <cstdint>
 
 
+
+namespace Engine {
+
 class RenderTarget
 {
 public:
@@ -89,3 +92,5 @@ private:
 
     bool needClear_ = true; // レンダーターゲットをクリアする必要があるか
 };
+
+} // namespace Engine

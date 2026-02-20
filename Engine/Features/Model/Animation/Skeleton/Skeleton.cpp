@@ -1,6 +1,9 @@
 #include <Features/Model/Animation/Skeleton/Skeleton.h>
 #include <Features/Model/Animation/Node/Node.h>
 
+
+namespace Engine {
+
 void Skeleton::Update()
 {
     for (Joint& joint : joints_)
@@ -68,3 +71,5 @@ void Skeleton::Show(Joint& _joint, uint32_t _indent)
 
 }
 #endif // _DEBUG
+
+} // namespace Engine

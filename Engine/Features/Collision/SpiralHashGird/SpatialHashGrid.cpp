@@ -4,6 +4,9 @@
 #include <array>
 #include <Features/LineDrawer/LineDrawer.h>
 
+
+namespace Engine {
+
 void SpatialHashGrid::AddCollider(Collider* _collider)
 {
     std::array<int32_t, 4> cellIndices = GetCellIndices(_collider);
@@ -144,3 +147,5 @@ std::array<int32_t, 4> SpatialHashGrid::GetCellIndices(const AABB& _aabb) const
 
     return { minX, maxX, minY, maxY };
 }
+
+} // namespace Engine

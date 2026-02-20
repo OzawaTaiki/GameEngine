@@ -9,6 +9,9 @@
 #include <Debug/Debug.h>
 
 
+
+namespace Engine {
+
 ObjectModel::ObjectModel(const std::string& _name)
 {
     name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
@@ -565,3 +568,5 @@ void ObjectModel::InitializeCommon()
         materials_.push_back(std::move(copyMaterial));
     }
 }
+
+} // namespace Engine

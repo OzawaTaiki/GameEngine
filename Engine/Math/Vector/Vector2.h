@@ -1,6 +1,8 @@
 #pragma once
 #include <functional>
 
+namespace Engine {
+
 struct Vector2
 {
 	float x, y;
@@ -33,9 +35,11 @@ struct Vector2
 
 };
 
+} // namespace Engine
+
 template <>
-struct std::hash<Vector2> {
-    size_t operator()(const Vector2& v) const {
+struct std::hash<Engine::Vector2> {
+    size_t operator()(const Engine::Vector2& v) const {
         size_t h1 = std::hash<float>{}(v.x);
         size_t h2 = std::hash<float>{}(v.y);
         return h1 ^ (h2 << 1);

@@ -10,6 +10,9 @@
 #include <vector>
 #include <list>
 
+
+namespace Engine {
+
 class ImGuiDebugManager
 {
 public:
@@ -101,3 +104,5 @@ private:
 
 
 };
+
+} // namespace Engine

@@ -1,6 +1,9 @@
 #include "UIImageElement.h"
 #include "../Component/UISpriteRenderComponent.h"
 
+
+namespace Engine {
+
 UIImageElement::UIImageElement(
     const std::string& name,
     const Vector2& position,
@@ -74,3 +77,5 @@ const Vector4& UIImageElement::GetColor() const
 {
     return color_;
 }
+
+} // namespace Engine

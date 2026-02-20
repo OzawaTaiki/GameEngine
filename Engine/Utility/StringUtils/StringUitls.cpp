@@ -1,5 +1,8 @@
 #include "StringUitls.h"
 
+
+namespace Engine {
+
 std::string StringUtils::GetAfter(const std::string& _str, char _delimiter)
 {
     size_t pos = _str.find(_delimiter);
@@ -95,3 +98,4 @@ bool StringUtils::Contains(const std::string& _str, const std::string& _subStr)
     return _str.find(_subStr) != std::string::npos; // _subStrが_strに含まれているかどうかを確認
 }
 
+} // namespace Engine

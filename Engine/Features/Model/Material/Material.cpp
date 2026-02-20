@@ -4,6 +4,9 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 
 #include <assimp/material.h>
+
+namespace Engine {
+
 Material::Material(const Material& _other)
     : uvTransform_(_other.uvTransform_)
     , deffuseColor_(_other.deffuseColor_)
@@ -151,3 +154,5 @@ void Material::Imgui()
     ImGui::PopID();
 #endif // _DEBUG
 }
+
+} // namespace Engine

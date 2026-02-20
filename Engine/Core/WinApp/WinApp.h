@@ -4,6 +4,9 @@
 
 #include <Math/Vector/Vector2.h>
 
+
+namespace Engine {
+
 class WinApp
 {
 public: //静的メンバ変数
@@ -38,3 +41,5 @@ private: // メンバ変数
 	// ウィンドウハンドル
 	HWND hwnd_ = nullptr;
 };
+
+} // namespace Engine

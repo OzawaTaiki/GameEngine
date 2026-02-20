@@ -6,6 +6,9 @@
 #include <array>
 #include <algorithm>
 
+
+namespace Engine {
+
 struct Sphere
 {
     float radius;
@@ -101,3 +104,5 @@ private:
 
     void CalculateVertices();
 };
+
+} // namespace Engine

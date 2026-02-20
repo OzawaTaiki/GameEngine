@@ -8,7 +8,7 @@
 
 #include <Math/Vector/Vector3.h>
 
-
+namespace Engine {
 
 struct Matrix4x4
 {
@@ -34,3 +34,5 @@ struct Matrix4x4
 
 
 };
+
+} // namespace Engine

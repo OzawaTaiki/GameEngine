@@ -6,6 +6,9 @@
 #include <Debug/Debug.h>
 
 
+
+namespace Engine {
+
 std::vector<float> WaveformAnalyzer::ExtractRawWaveformMaxMin(const SoundInstance* _soundInstance, float _displayWidth, float _displayDuration)
 {
     AudioSystem* audioSystem = AudioSystem::GetInstance();
@@ -258,3 +261,5 @@ float WaveformAnalyzer::CompressionRateToWindowSize(float _compressionRate)
 
     return windowMs;
 }
+
+} // namespace Engine

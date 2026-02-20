@@ -6,6 +6,9 @@
 
 #include <vector>
 
+
+namespace Engine {
+
 struct PointLight
 {
     Vector4 color = { 1, 1, 1, 1 };     // ライトの色
@@ -61,3 +64,5 @@ private:
     void CalculateCubemapViewProjections();
     Matrix4x4 LookAt(const Vector3& eye, const Vector3& at, const Vector3& up);
 };
+
+} // namespace Engine

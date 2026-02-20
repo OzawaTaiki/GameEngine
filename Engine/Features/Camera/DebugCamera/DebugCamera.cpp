@@ -4,6 +4,9 @@
 #include <Math/Vector/VectorFunction.h>
 #include <Math/Matrix/MatrixFunction.h>
 
+
+namespace Engine {
+
 void DebugCamera::Initialize()
 {
 }
@@ -38,3 +41,5 @@ void DebugCamera::Update()
 void DebugCamera::GetViewProjection() const
 {
 }
+
+} // namespace Engine

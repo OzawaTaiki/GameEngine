@@ -4,6 +4,9 @@
 #include <Features/Collision/CollisionLayer/CollisionLayerManager.h>
 #include <algorithm>
 
+
+namespace Engine {
+
 CollisionManager* CollisionManager::GetInstance()
 {
     static CollisionManager instance;
@@ -404,3 +407,5 @@ CollisionManager::CollisionManager()
     ImGuiDebugManager::GetInstance()->RegisterMenuItem("CollisionManager", [this](bool* _open) { ImGui(_open); });
 #endif // DEBUG
 }
+
+} // namespace Engine

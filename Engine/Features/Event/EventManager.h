@@ -6,6 +6,9 @@
 #include <map>
 #include <vector>
 
+
+namespace Engine {
+
 class EventManager
 {
 public:
@@ -26,3 +29,5 @@ private:
 
 
 };
+
+} // namespace Engine

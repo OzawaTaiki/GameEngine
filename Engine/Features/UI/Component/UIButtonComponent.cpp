@@ -8,6 +8,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #endif
 
+
+namespace Engine {
+
 void UIButtonComponent::Initialize()
 {
     // ColliderComponentを取得、なければ自動追加
@@ -125,3 +128,5 @@ void UIButtonComponent::Execute()
         onClick_();
     }
 }
+
+} // namespace Engine

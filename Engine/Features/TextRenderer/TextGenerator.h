@@ -10,6 +10,9 @@
 #endif // DrawText
 
 
+
+namespace Engine {
+
 class TextRenderer;
 class TextGenerator
 {
@@ -43,3 +46,5 @@ private:
     AtlasData* atlasData_ = {};
 
 };
+
+} // namespace Engine

@@ -11,6 +11,10 @@
 #include <list>
 #include <algorithm>
 
+namespace Engine
+{
+
+
 #ifdef _DEBUG
 
 
@@ -709,3 +713,5 @@ void ImGuiTool::TimeLine(const char* _label, AnimationSequence* _sequence)
 
 
 #endif // _DEBUG
+
+} // namespace Engine

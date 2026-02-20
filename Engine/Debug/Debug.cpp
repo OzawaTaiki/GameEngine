@@ -1,6 +1,9 @@
 #include <Debug/Debug.h>
 #include <Windows.h>
 
+
+namespace Engine {
+
 namespace Debug {
 
 	void Log(const std::string& message)
@@ -13,3 +16,4 @@ namespace Debug {
 	}
 }
 
+} // namespace Engine

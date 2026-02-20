@@ -8,6 +8,9 @@
 
 #include <array>
 
+
+namespace Engine {
+
 class Plane : public Primitive
 {
 public:
@@ -61,3 +64,5 @@ private:
 
 
 };
+
+} // namespace Engine

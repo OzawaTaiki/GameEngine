@@ -24,24 +24,22 @@
 #include <Features/Model/SkyBox.h>
 
 #include <Features/TextRenderer/TextGenerator.h>
-#include <Features/UI/UIGroup.h>
 
-#include <Features/UI/UIElement.h>
-#include <Features/UI/UITextRenderComponent.h>
-#include <Features/UI/UISpriteRenderComponent.h>
-#include <Features/UI/UIButtonElement.h>
-#include <Features/UI/UISliderElement.h>
-#include <Features/UI/UIImageElement.h>
-#include <Features/UI/UITextElement.h>
+#include <Features/UI/Element/UIButtonElement.h>
+#include <Features/UI/Element/UISliderElement.h>
+#include <Features/UI/Element/UIImageElement.h>
+#include <Features/UI/Element/UITextElement.h>
 
 
-class DeveScene : public BaseScene
+
+
+class DeveScene : public Engine::BaseScene
 {
 public:
 
     ~DeveScene() override;
 
-    void Initialize(SceneData* _sceneData) override;
+    void Initialize(Engine::SceneData* _sceneData) override;
     void Update() override;
     void Draw() override;
     void DrawShadow() override;
@@ -51,64 +49,62 @@ private:
     // シーン関連 基本セット
 
     // カメラ
-    Camera SceneCamera_ = {};
+    Engine::Camera SceneCamera_ = {};
 
     // デバッグカメラ
-    DebugCamera debugCamera_ = {};
+    Engine::DebugCamera debugCamera_ = {};
     bool enableDebugCamera_ = false;
 
     // ライン描画
-    LineDrawer* lineDrawer_ = nullptr;
+    Engine::LineDrawer* lineDrawer_ = nullptr;
     // 入力
-    Input* input_ = nullptr;
+    Engine::Input* input_ = nullptr;
     // パーティクル
-    ParticleSystem* particleManager_ = nullptr;
+    Engine::ParticleSystem* particleManager_ = nullptr;
     // ライト
-    std::shared_ptr<LightGroup> lights_;
+    std::shared_ptr<Engine::LightGroup> lights_;
 
-    TextGenerator text_;
+    Engine::TextGenerator text_;
 
     //------------------------------
     // シーン固有
 
 
-    std::unique_ptr<ObjectModel> ground_ = nullptr;
+    std::unique_ptr<Engine::ObjectModel> ground_ = nullptr;
 
     uint32_t groundTextureHandle_ = 0;
 
-    Vector4 drawColor_ = { 1,1,1,1 }; // 描画色
+    Engine::Vector4 drawColor_ = { 1,1,1,1 }; // 描画色
 
-    std::unique_ptr <Sprite> sprite_ = nullptr;
+    std::unique_ptr<Engine::Sprite> sprite_ = nullptr;
 
 
-    std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
+    std::unique_ptr<Engine::ParticleEmitter> emitter_ = nullptr;
 
-    std::shared_ptr<SoundInstance> soundInstance_ = nullptr;
-    std::shared_ptr<VoiceInstance> voiceInstance_ = nullptr;
+    std::shared_ptr<Engine::SoundInstance> soundInstance_ = nullptr;
+    std::shared_ptr<Engine::VoiceInstance> voiceInstance_ = nullptr;
 
-    std::unique_ptr<SkyBox> skyBox_ = nullptr;
-
-    std::unique_ptr<UIGroup> uiGroup_ = nullptr;
+    std::unique_ptr<Engine::SkyBox> skyBox_ = nullptr;
 
     // UIRenderComponent テスト
-    std::unique_ptr<UIElement> testTextElement_ = nullptr;
-    std::unique_ptr<UIElement> testSpriteElement_ = nullptr;
-    std::unique_ptr<UIElement> testBackgroundElement_ = nullptr;
+    std::unique_ptr<Engine::UIElement> testTextElement_ = nullptr;
+    std::unique_ptr<Engine::UIElement> testSpriteElement_ = nullptr;
+    std::unique_ptr<Engine::UIElement> testBackgroundElement_ = nullptr;
 
     // UIButtonElement テスト
-    std::unique_ptr<UIButtonElement> testButton1_ = nullptr;
-    std::unique_ptr<UIButtonElement> testButton2_ = nullptr;
-    std::unique_ptr<UIButtonElement> testButton3_ = nullptr;
-    std::unique_ptr<UIButtonElement> testButton4_ = nullptr;
+    std::unique_ptr<Engine::UIButtonElement> testButton1_ = nullptr;
+    std::unique_ptr<Engine::UIButtonElement> testButton2_ = nullptr;
+    std::unique_ptr<Engine::UIButtonElement> testButton3_ = nullptr;
+    std::unique_ptr<Engine::UIButtonElement> testButton4_ = nullptr;
 
     // UISliderElement テスト
-    std::unique_ptr<UISliderElement> testSlider1_ = nullptr;
+    std::unique_ptr<Engine::UISliderElement> testSlider1_ = nullptr;
 
     // UIImageElement テスト
-    std::unique_ptr<UIImageElement> testImage1_ = nullptr;
+    std::unique_ptr<Engine::UIImageElement> testImage1_ = nullptr;
 
     // UITextElement テスト
-    std::unique_ptr<UITextElement> testText1_ = nullptr;
+    std::unique_ptr<Engine::UITextElement> testText1_ = nullptr;
 
 
 

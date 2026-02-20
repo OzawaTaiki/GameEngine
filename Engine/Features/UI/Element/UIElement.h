@@ -10,6 +10,9 @@
 #include <memory>
 
 // 前方宣言
+
+namespace Engine {
+
 class UIComponent;
 
 // Anchor定義
@@ -215,3 +218,5 @@ inline void UIElement::SetVariableValue(const std::string& name, const T& value)
     if (jsonBinder_)
         jsonBinder_->SendVariable(name, value);
 }
+
+} // namespace Engine

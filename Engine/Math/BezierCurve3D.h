@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <string>
 
-
+namespace Engine {
 
 class BezierCurve3D{
 public:
@@ -115,3 +115,5 @@ private:
 
     std::unique_ptr<JsonBinder> jsonBinder_ = nullptr;
 };
+
+} // namespace Engine

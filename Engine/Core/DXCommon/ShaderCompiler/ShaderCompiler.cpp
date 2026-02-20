@@ -4,9 +4,13 @@
 #include <cassert>
 #include <format>
 
-ShaderCompiler *ShaderCompiler::GetInstance() {
-  static ShaderCompiler instance;
-  return &instance;
+
+
+namespace Engine {
+
+ShaderCompiler* ShaderCompiler::GetInstance() {
+    static ShaderCompiler instance;
+    return &instance;
 }
 
 void ShaderCompiler::Initialize() {
@@ -174,3 +178,5 @@ void ShaderCompiler::ClearCache() {
   cache_.clear();
   Debug::Log("Shader cache cleared\n");
 }
+
+} // namespace Engine

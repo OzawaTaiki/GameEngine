@@ -5,6 +5,9 @@
 #include <cassert>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 SceneManager* SceneManager::GetInstance()
 {
     static SceneManager instance;
@@ -213,3 +216,5 @@ void SceneManager::ImGui(bool* _open)
     ImGui::Text("Frametate: %.3f fps", GameTime::GetInstance()->GetFramerate());
     ImGui::Text("DeltaTime: %4.2f ms", GameTime::GetInstance()->GetDeltaTime() * 1000.0);
 */
+
+} // namespace Engine

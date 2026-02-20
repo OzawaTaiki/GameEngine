@@ -6,6 +6,9 @@
 #include <Features/UVTransform/UVTransform.h>
 #include <string>
 
+
+namespace Engine {
+
 class UISpriteRenderComponent;
 
 class UIImageElement : public UIElement
@@ -41,3 +44,5 @@ private:
     std::string texturePath_;
     Vector4 color_ = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 };
+
+} // namespace Engine

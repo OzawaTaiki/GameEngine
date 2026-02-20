@@ -7,6 +7,9 @@
 #include <string>
 
 
+
+namespace Engine {
+
 class Light
 {
 public:
@@ -30,3 +33,5 @@ protected:
 
 
 };
+
+} // namespace Engine

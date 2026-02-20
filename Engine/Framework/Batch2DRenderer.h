@@ -7,6 +7,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 class Batch2DRenderer
 {
 public:
@@ -122,3 +125,5 @@ private:
     std::vector<uint32_t> sortIndices_;
     std::vector<DrawCommand> drawCommands_;
 };
+
+} // namespace Engine

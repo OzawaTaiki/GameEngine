@@ -2,6 +2,9 @@
 
 #include <Features/Scene/SceneData.h>
 
+
+namespace Engine {
+
 class BaseScene
 {
 public:
@@ -17,3 +20,5 @@ protected:
 
 
 };
+
+} // namespace Engine

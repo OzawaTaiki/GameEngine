@@ -2,6 +2,9 @@
 
 #include <Features/Model/Model.h>
 
+
+namespace Engine {
+
 AnimationController::AnimationController(Model* _model) :
     model_(_model),
     skeleton_(),
@@ -152,3 +155,5 @@ void AnimationController::ImGui()
 
 #endif // _DEBUG
 }
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 
 #include <xaudio2.h>
 
+
+namespace Engine {
+
 class VoiceInstance
 {
 public:
@@ -120,3 +123,5 @@ private:
     HRESULT hr_ = S_OK;
 
 };
+
+} // namespace Engine

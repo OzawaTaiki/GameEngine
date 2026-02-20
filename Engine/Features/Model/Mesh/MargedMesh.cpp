@@ -2,6 +2,9 @@
 
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 void MargedMesh::Initialize(const std::vector<std::unique_ptr<Mesh>>& _meshes)
 {
     dxCommon_ = DXCommon::GetInstance();
@@ -168,3 +171,5 @@ void MargedMesh::Map()
     localIndexResource_->Map(0, nullptr, reinterpret_cast<void**>(&localIConstMap_));
     absIndexResource_->Map(0, nullptr, reinterpret_cast<void**>(&absIConstMap_));
 }
+
+} // namespace Engine

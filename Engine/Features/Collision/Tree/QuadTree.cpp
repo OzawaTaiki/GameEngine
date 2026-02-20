@@ -7,6 +7,9 @@
 #include <cmath>
 #include <list>
 
+
+namespace Engine {
+
 QuadTree::~QuadTree()
 {
     for (auto& cell : cells_)
@@ -216,3 +219,5 @@ void QuadTree::CreateCell(uint32_t _index)
         if (_index >= cellCount_) break;
     }
 }
+
+} // namespace Engine

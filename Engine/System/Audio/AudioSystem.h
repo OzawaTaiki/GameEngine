@@ -23,6 +23,9 @@
 #pragma comment(lib, "mfuuid.lib")
 
 
+
+namespace Engine {
+
 class SoundInstance;
 
 class AudioSystem
@@ -102,3 +105,5 @@ private:
     AudioSystem(const AudioSystem&) = delete;
     AudioSystem& operator=(const AudioSystem&) = delete;
 };
+
+} // namespace Engine

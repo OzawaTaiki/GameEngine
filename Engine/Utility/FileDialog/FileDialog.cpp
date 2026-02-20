@@ -1,6 +1,9 @@
 #include "FileDialog.h"
 
 
+
+namespace Engine {
+
 std::map<FileFilterBuilder::FilterType, std::pair<std::string, std::string>>
 FileFilterBuilder::filterMap = {
     { FilterType::AllFiles, { "All Files (*.*)", "*.*" } },
@@ -274,3 +277,5 @@ std::string FileDialog::SaveFileAs(const std::string& _filter, const std::string
     static const std::string emptyResult;
     return emptyResult; // ファイル保存がキャンセルされた場合は空の文字列を返す
 }
+
+} // namespace Engine

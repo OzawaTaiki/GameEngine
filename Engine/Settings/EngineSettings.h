@@ -6,6 +6,9 @@
 /// <summary>
 /// エンジン設定データ構造体。
 /// </summary>
+
+namespace Engine {
+
 struct EngineConfig
 {
     std::wstring windowTitle = L"GameEngine"; // ウィンドウタイトル
@@ -37,3 +40,5 @@ public:
     /// <param name="filePath">保存先ファイルパス（デフォルト値あり）</param>
     static void Save(const std::string& filePath = "Resources/Engine/engine_config.json");
 };
+
+} // namespace Engine

@@ -13,6 +13,9 @@
 #include <unordered_map>
 #include <map>
 
+
+namespace Engine {
+
 class DXCommon;
 class SRVManager;
 class FontCache
@@ -47,3 +50,5 @@ private:
     FontCache& operator=(const FontCache&) = delete;
 
 };
+
+} // namespace Engine

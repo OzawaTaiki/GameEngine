@@ -7,9 +7,14 @@
 #include <Utility/ConvertString/ConvertString.h>
 #include <cassert>
 
-PSOManager *PSOManager::GetInstance() {
-  static PSOManager instance;
-  return &instance;
+
+namespace Engine {
+
+PSOManager* PSOManager::GetInstance()
+
+{
+    static PSOManager instance;
+    return &instance;
 }
 
 void PSOManager::Initialize() {

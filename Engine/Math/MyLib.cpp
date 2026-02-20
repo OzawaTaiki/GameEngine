@@ -3,6 +3,9 @@
 #include <numbers>
 #include <limits>
 
+
+namespace Engine {
+
 Quaternion Slerp(const Quaternion& _q1, const Quaternion& _q2, float _t)
 {
     Quaternion q0 = _q1;
@@ -67,3 +70,5 @@ Vector4 ColorCodeToVector4(uint32_t _colorCode)
 
     return Vector4(r, g, b, a);
 }
+
+} // namespace Engine

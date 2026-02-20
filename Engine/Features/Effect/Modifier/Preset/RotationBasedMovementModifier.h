@@ -2,6 +2,9 @@
 
 #include <Features/Effect/Modifier/ParticleModifier.h>
 
+
+namespace Engine {
+
 class RotationBasedMovementModifier : public ParticleModifier
 {
 public:
@@ -12,3 +15,5 @@ public:
     void Apply(Particle* particle, float deltaTime) override;
 
 };
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 
+
+namespace Engine {
+
 EventTypeRegistry* EventTypeRegistry::GetInstance()
 {
     static EventTypeRegistry instance;
@@ -34,3 +37,5 @@ const std::string& EventTypeRegistry::GetEventTypeName(uint32_t _eventTypeId) co
 
     throw std::runtime_error("Event type ID not found");
 }
+
+} // namespace Engine

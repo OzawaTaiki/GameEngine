@@ -2,6 +2,9 @@
 
 #include <Features/PostEffects/PostEffectBase.h>
 
+
+namespace Engine {
+
 struct BoxFilterData
 {
     int kernelSize = 5; // カーネルサイズ
@@ -31,3 +34,5 @@ private:
 
 
 };
+
+} // namespace Engine

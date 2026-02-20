@@ -4,6 +4,9 @@
 #include <Features/TextRenderer/TextRenderer.h>
 #include <Utility/ConvertString/ConvertString.h>
 
+
+namespace Engine {
+
 void TextGenerator::Initialize(const FontConfig& _config)
 {
     auto fontCache = FontCache::GetInstance();
@@ -94,3 +97,4 @@ void TextGenerator::Draw(const std::string& text, const FontConfig& conf, const 
     renderer->DrawText(wtext, atlasData, rect, param, order);
 }
 
+} // namespace Engine

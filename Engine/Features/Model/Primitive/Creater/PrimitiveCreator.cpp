@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 PrimitiveCreator::PrimitiveCreator() :
     currentType_(PrimitiveType::Plane),
     selectedPrimitiveIndex_(-1)
@@ -470,3 +473,5 @@ const char* PrimitiveCreator::PrimitiveTypeToString(PrimitiveType type)
     default: return "Unknown";
     }
 }
+
+} // namespace Engine

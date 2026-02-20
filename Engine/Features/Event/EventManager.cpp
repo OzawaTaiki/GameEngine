@@ -1,5 +1,8 @@
 #include "EventManager.h"
 
+
+namespace Engine {
+
 EventManager* EventManager::GetInstance()
 {
     static EventManager instance;
@@ -45,3 +48,5 @@ void EventManager::DispatchEvent(const GameEvent& _event)
         }
     }
 }
+
+} // namespace Engine

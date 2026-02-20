@@ -10,6 +10,9 @@
 #include <unordered_map>
 #include <array>
 
+
+namespace Engine {
+
 class ModelManager
 {
 public:
@@ -56,3 +59,5 @@ private:
     ModelManager& operator=(const ModelManager&) = delete;
 
 };
+
+} // namespace Engine

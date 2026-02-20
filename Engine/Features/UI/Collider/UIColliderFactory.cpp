@@ -7,6 +7,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #include "UIConvexPolygonCollider.h"
 
+
+namespace Engine {
+
 std::unique_ptr<IUICollider> UIColliderFactory::Create(ColliderType type)
 {
     switch (type)
@@ -90,3 +93,5 @@ std::unique_ptr<IUICollider> UIColliderFactory::ImGuiSelectCollider(
     return nullptr;
 #endif
 }
+
+} // namespace Engine

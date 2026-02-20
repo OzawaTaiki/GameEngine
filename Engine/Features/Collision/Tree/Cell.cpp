@@ -1,5 +1,8 @@
 #include "Cell.h"
 
+
+namespace Engine {
+
 std::shared_ptr<ObjectForTree> ObjectForTree::GetNextData()
 
 {
@@ -95,3 +98,5 @@ bool Cell::OnRemove(std::shared_ptr<ObjectForTree> _removeObj)
     // 削除メソッドの統一
     return RemoveData(_removeObj);
 }
+
+} // namespace Engine

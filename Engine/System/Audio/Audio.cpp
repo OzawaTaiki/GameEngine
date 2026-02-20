@@ -1,6 +1,9 @@
 #include <System/Audio/Audio.h>
 #include <cassert>
 
+
+namespace Engine {
+
 Audio* Audio::GetInstance()
 {
     static Audio instance;
@@ -197,3 +200,5 @@ void Audio::SoundStop(uint32_t _voiceHandle)
 {
     sourceVoice_[_voiceHandle]->Stop();
 }
+
+} // namespace Engine

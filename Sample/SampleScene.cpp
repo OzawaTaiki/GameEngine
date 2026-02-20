@@ -12,6 +12,7 @@
 
 #include <Debug/ImGuiManager.h>
 
+using namespace Engine;
 
 SampleScene::~SampleScene()
 {

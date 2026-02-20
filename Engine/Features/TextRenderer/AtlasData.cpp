@@ -6,6 +6,9 @@
 #include <fstream>
 #include <cassert>
 
+
+namespace Engine {
+
 void AtlasData::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList, const std::string& _fontFilePath, float _fontSize,const Vector2& _atlasSize)
 {
     if (!_device || !_cmdList)
@@ -372,3 +375,5 @@ GlyphInfo AtlasData::GenerateGlyph(wchar_t _character)
     stbtt_FreeBitmap(bitmap, nullptr);
     return glyph;
 }
+
+} // namespace Engine

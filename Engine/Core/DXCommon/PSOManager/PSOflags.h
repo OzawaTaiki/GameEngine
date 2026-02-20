@@ -4,6 +4,9 @@
 #include <cassert>
 
 
+
+namespace Engine {
+
 struct PSOFlags
 {
     /// enumたちの定義
@@ -233,3 +236,5 @@ constexpr PSOFlags operator|(PSOFlags::DepthMode lhs, PSOFlags rhs)
     return PSOFlags(lhs) | rhs;
 }
 #pragma endregion
+
+} // namespace Engine

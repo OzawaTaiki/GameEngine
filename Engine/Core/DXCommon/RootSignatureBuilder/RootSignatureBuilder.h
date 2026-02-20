@@ -5,6 +5,9 @@
 #include <vector>
 
 
+
+namespace Engine {
+
 class RootSignatureBuilder
 {
 public:
@@ -51,3 +54,5 @@ private:
     std::vector<std::vector<D3D12_DESCRIPTOR_RANGE>> descriptorRanges_; // Table用
     D3D12_ROOT_SIGNATURE_FLAGS flags_;
 };
+
+} // namespace Engine

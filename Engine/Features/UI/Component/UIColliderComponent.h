@@ -8,6 +8,9 @@
 /// Collider機能を提供するComponent
 /// 既存のIUIColliderをラップして使用
 /// </summary>
+
+namespace Engine {
+
 class UIColliderComponent : public UIComponent
 {
 public:
@@ -71,3 +74,5 @@ private:
     /// </summary>
     void InitializeColliderSize();
 };
+
+} // namespace Engine

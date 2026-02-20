@@ -5,6 +5,9 @@
 #include <Features/LineDrawer/LineDrawer.h>
 
 
+
+namespace Engine {
+
 bool UIRectangleCollider::IsPointInside(const Vector2& _point) const
 {
     return (_point.x >= leftTop_.x && _point.x <= rightBottom_.x &&
@@ -77,3 +80,5 @@ void UIRectangleCollider::DrawDebug() const
     LineDrawer::GetInstance()->DebugDraw(rightBottom_, RT, color);
     LineDrawer::GetInstance()->DebugDraw(RT, leftTop_, color);
 }
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 
 #include <Core/DXCommon/DXCommon.h>
 
+
+namespace Engine {
+
 void PostEffectBase::CreateConstantBuffer(size_t dataSize)
 {
     // 定数バッファのリソースを作成
@@ -37,3 +40,5 @@ void PostEffectBase::CreateConstantBufferResource(size_t dataSize, Microsoft::WR
     // 初期化
     memset(*outDataPtr, 0, dataSize);
 }
+
+} // namespace Engine

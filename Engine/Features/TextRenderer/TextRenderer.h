@@ -25,6 +25,9 @@
 #include <Math/Rect/Rect.h>
 #include <Core/WinApp/WinApp.h>
 
+
+namespace Engine {
+
 class TextRenderer
 {
 public:
@@ -147,3 +150,5 @@ private:
     TextRenderer& operator=(TextRenderer&&) = delete;
 
 };
+
+} // namespace Engine

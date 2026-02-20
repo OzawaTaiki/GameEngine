@@ -6,6 +6,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+
+namespace Engine {
+
 struct WaveformBounds
 {
     WaveformBounds() = default;
@@ -126,3 +129,5 @@ private:
     static float waveformTimeWindow_;
 
 };
+
+} // namespace Engine

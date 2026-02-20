@@ -9,6 +9,9 @@
 #include <imgui_impl_dx12.h>
 #endif // _DEBUG
 
+
+namespace Engine {
+
 void ImGuiManager::Initialize()
 {
 #ifdef _DEBUG
@@ -82,3 +85,5 @@ void ImGuiManager::Finalize()
     ImGui::DestroyContext();
 #endif // _DEBUG
 }
+
+} // namespace Engine

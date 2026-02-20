@@ -6,6 +6,9 @@
 #include <Debug/Debug.h>
 #include <cassert>
 
+
+namespace Engine {
+
 PSOFactory* PSOFactory::GetInstance()
 {
     static PSOFactory instance;
@@ -272,3 +275,5 @@ PSOFactory::CreateDepthStencilDesc(PSOFlags::DepthMode _mode)
     }
     return desc;
 }
+
+} // namespace Engine

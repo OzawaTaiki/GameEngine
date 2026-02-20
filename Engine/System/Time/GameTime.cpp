@@ -1,6 +1,9 @@
 #include <System/Time/GameTime.h>
 #include <System/Time/Time_MT.h>
 
+
+namespace Engine {
+
 GameTime* GameTime::GetInstance()
 {
     static GameTime instance;
@@ -107,3 +110,5 @@ bool GameTime::IsFixedDeltaTime()
 {
     return Time_MT::IsDeltaTimeFixed();
 }
+
+} // namespace Engine

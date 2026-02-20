@@ -2,6 +2,9 @@
 
 #include <Features/Effect/Modifier/ParticleModifier.h>
 
+
+namespace Engine {
+
 class DecelerationModifier : public ParticleModifier
 {
 public:
@@ -17,3 +20,5 @@ private:
     static float deceleration_; // 減速率
 
 };
+
+} // namespace Engine

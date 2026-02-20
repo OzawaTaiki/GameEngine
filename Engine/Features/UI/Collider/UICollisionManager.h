@@ -2,6 +2,9 @@
 
 #include <Features/UI/Collider/Interface/IUICollider.h>
 
+
+namespace Engine {
+
 class UICollisionManager
 {
 public:
@@ -30,3 +33,5 @@ private:
     UICollisionManager& operator=(const UICollisionManager&) = delete;
 
 };
+
+} // namespace Engine

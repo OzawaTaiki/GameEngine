@@ -14,6 +14,9 @@
 #include <string>
 
 struct aiMaterial;
+
+namespace Engine {
+
 class Material
 {
 public:
@@ -87,3 +90,5 @@ private:
     void LoadTexture();
 
 };
+
+} // namespace Engine

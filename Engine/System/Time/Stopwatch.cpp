@@ -2,6 +2,9 @@
 
 #include <Debug/ImGuiManager.h>
 
+
+namespace Engine {
+
 Stopwatch::Stopwatch(bool _useGameTime, const std::string& _channelName) :
     useGameTime_(_useGameTime),
     channelName_(_channelName),
@@ -77,3 +80,4 @@ void Stopwatch::ShowDebugWindow()
 #endif // _DEBUG
 }
 
+} // namespace Engine

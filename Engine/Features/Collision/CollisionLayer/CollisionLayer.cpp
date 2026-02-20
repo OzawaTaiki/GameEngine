@@ -3,6 +3,9 @@
 #include <Features/Collision/CollisionLayer/CollisionLayerManager.h>
 #include <Features/Json/JsonBinder.h>
 
+
+namespace Engine {
+
 CollisionLayer::CollisionLayer()
     : layer_(0)
     , layerMask_(0)
@@ -49,3 +52,5 @@ void CollisionLayer::RegisterLayer(JsonBinder* _jsonBinder)
     _jsonBinder->RegisterVariable("layer", &layer_);
     _jsonBinder->RegisterVariable("layerMask", &layerMask_);
 }
+
+} // namespace Engine

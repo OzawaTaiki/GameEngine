@@ -1,6 +1,9 @@
 #include "LightGroup.h"
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 uint32_t LightGroup::shadowMapSize_ = 4096;
 
 void LightGroup::Initialize()
@@ -436,3 +439,5 @@ void LightGroup::DrawSpotLightsImGui()
     }
 #endif // _DEBUG
 }
+
+} // namespace Engine

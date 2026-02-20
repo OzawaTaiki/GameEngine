@@ -3,6 +3,9 @@
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Debug/Debug.h>
 
+
+namespace Engine {
+
 const uint32_t RTVManager::kMaxRTVIndex_ = 256;
 const uint32_t RTVManager::kMaxDSVIndex_ = 64;
 uint32_t RTVManager::winWidth_ = 0;
@@ -715,3 +718,5 @@ D3D12_GPU_DESCRIPTOR_HANDLE RTVManager::GetGPURTVDescriptorHandle(uint32_t _inde
     handleGPU.ptr += (rtvDescriptorSize_ * _index);
     return handleGPU;
 }
+
+} // namespace Engine

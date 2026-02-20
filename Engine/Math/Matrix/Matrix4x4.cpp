@@ -1,6 +1,9 @@
 #include <Math/Matrix/Matrix4x4.h>
 
 
+
+namespace Engine {
+
 Vector3 Matrix4x4::GetScale() const
 {
     Vector3 scale;
@@ -75,3 +78,5 @@ void Matrix4x4::ShowData(const std::string& _label, bool _newWindow) const
         ImGui::End();
 }
 #endif // _DEBUG
+
+} // namespace Engine

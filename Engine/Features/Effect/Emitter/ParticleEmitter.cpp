@@ -6,9 +6,13 @@
 #include <algorithm>
 #include <cstring>
 
+
+namespace Engine {
 #ifdef _DEBUG
 int ParticleEmitter::s_nextID_ = 0;
-#endif
+
+#endif // _DEBUG
+
 
 namespace
 {
@@ -887,3 +891,5 @@ void ParticleEmitter::DebugWindowForModifier()
 }
 
 #endif // _DEBUG
+
+} // namespace Engine

@@ -2,6 +2,9 @@
 
 #include <numbers>
 
+
+namespace Engine {
+
 void LevelEditorLoader::Load(const std::string& _filePath)
 {
     // jsonファイルを読み込み jsonオブジェクトを取得
@@ -120,3 +123,5 @@ ObjectParameters LevelEditorLoader::GetObjectParameterFromJson(const json& obj) 
 
     return param;
 }
+
+} // namespace Engine

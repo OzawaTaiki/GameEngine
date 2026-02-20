@@ -2,6 +2,9 @@
 
 #include <Features/Model/Primitive/Primitive.h>
 
+
+namespace Engine {
+
 class Cube : public Primitive
 {
 public:
@@ -46,3 +49,5 @@ private:
     bool hasBottom_ = true;
 
 };
+
+} // namespace Engine

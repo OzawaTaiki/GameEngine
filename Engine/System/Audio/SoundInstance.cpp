@@ -6,6 +6,9 @@
 
 #include <cassert>
 
+
+namespace Engine {
+
 SoundInstance::SoundInstance(uint32_t _soundID, AudioSystem* _audioSystem,float _sampleRate) :
     soundID_(_soundID),
     audioSystem_(_audioSystem),
@@ -151,3 +154,5 @@ float SoundInstance::GetDuration() const
     }
     return 0.0f;
 }
+
+} // namespace Engine

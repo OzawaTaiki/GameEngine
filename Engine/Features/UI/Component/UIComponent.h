@@ -1,6 +1,9 @@
 #pragma once
 
 
+
+namespace Engine {
+
 class UIElement;
 
 class UIComponent
@@ -34,3 +37,5 @@ protected:
 
     bool isEnabled_ = true;
 };
+
+} // namespace Engine

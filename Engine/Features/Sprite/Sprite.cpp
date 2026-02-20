@@ -8,6 +8,9 @@
 
 #include <Debug/ImGuiDebugManager.h>
 
+
+namespace Engine {
+
 uint32_t Sprite::winWidth_ = WinApp::kWindowWidth_;
 uint32_t Sprite::winHeight_ = WinApp::kWindowHeight_;
 
@@ -244,3 +247,5 @@ void Sprite::ImGui()
     ImGui::PopID();
 #endif // _DEBUG
 }
+
+} // namespace Engine

@@ -4,6 +4,9 @@
 #include <Debug/ImGuiDebugManager.h>
 
 
+
+namespace Engine {
+
 bool UIEllipseCollider::IsPointInside(const Vector2& _point) const
 {
     // 中心からの相対座標を計算
@@ -75,3 +78,5 @@ void UIEllipseCollider::ImGui()
     ImGui::Text("Radius: (%.1f, %.1f)", radius_.x, radius_.y);
 #endif // _DEBUG
 }
+
+} // namespace Engine

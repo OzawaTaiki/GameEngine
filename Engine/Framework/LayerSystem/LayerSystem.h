@@ -13,6 +13,9 @@
 
 using LayerID = int32_t;
 
+
+namespace Engine {
+
 class PostEffectBase;
 class LayerSystem
 {
@@ -89,3 +92,5 @@ private:
     LayerSystem& operator=(const LayerSystem&) = delete;
 
 };
+
+} // namespace Engine

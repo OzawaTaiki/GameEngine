@@ -6,6 +6,9 @@
 #include <string>
 #include <unordered_map>
 
+
+namespace Engine {
+
 class ShaderCompiler {
 public:
     static ShaderCompiler* GetInstance();
@@ -68,3 +71,5 @@ private:
         const std::wstring& _dirPath
     );
 };
+
+} // namespace Engine

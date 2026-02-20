@@ -5,6 +5,9 @@
 #include <Debug/ImGuiDebugManager.h>
 #endif
 
+
+namespace Engine {
+
 void UINavigationComponent::Initialize()
 {
     // 初期化処理（現状特になし）
@@ -101,3 +104,5 @@ void UINavigationComponent::SetFocused(bool focused)
         }
     }
 }
+
+} // namespace Engine

@@ -9,6 +9,9 @@
 
 #include <numbers>
 
+
+namespace Engine {
+
 void Collider::Initialize()
 {
     if (isInitialized_)
@@ -973,3 +976,5 @@ bool AABB::Intersect(AABB _other) const
             min.z <= _other.max.z && max.z >= _other.min.z;
 
 }
+
+} // namespace Engine

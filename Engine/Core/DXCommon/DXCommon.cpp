@@ -22,6 +22,9 @@
 //#include "externals/imgui/imgui_impl_win32.h"
 
 
+
+namespace Engine {
+
 DXCommon* DXCommon::GetInstance()
 {
 	static D3DResourceLeakChecker leakcheker;
@@ -735,3 +738,5 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHea
 	handleGPU.ptr += (_descriptorSize * _index);
 	return handleGPU;
 }
+
+} // namespace Engine

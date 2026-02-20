@@ -209,3 +209,8 @@
 //    ImGui::End();
 //}
 //#endif // _DEBUG
+
+
+namespace Engine {
+
+} // namespace Engine

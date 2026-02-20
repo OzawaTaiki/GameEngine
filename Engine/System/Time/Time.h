@@ -8,6 +8,9 @@
 #endif
 
 
+
+namespace Engine {
+
 /**
  * @brief システム時間を管理するクラス
  *
@@ -91,3 +94,5 @@ private:
     static float defaultFramerate_;     ///<! デフォルトのフレームレート
 
 };
+
+} // namespace Engine

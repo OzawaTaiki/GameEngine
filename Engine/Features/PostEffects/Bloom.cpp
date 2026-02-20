@@ -7,6 +7,9 @@
 #include <Core/DXCommon/RootSignatureBuilder/RootSignatureBuilder.h>
 #include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 
+
+namespace Engine {
+
 void Bloom::Initialize()
 {
     CreatePipelineStates();
@@ -288,3 +291,4 @@ void Bloom::ApplyCombine(const std::string& input, const std::string& bloom, con
     cmdList->DrawInstanced(3, 1, 0, 0);
 }
 
+} // namespace Engine

@@ -5,6 +5,9 @@
 /// 矩形（長方形）UIコライダー
 /// 回転なしの軸平行境界ボックス（AABB）として衝突判定を行う
 /// </summary>
+
+namespace Engine {
+
 class UIRectangleCollider : public IUICollider
 {
 public:
@@ -32,3 +35,5 @@ private:
     Vector2 localOffset_ = { 0, 0 };
     Vector2 localSize_ = { 100, 100 };
 };
+
+} // namespace Engine

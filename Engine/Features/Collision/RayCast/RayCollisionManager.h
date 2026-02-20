@@ -6,6 +6,9 @@
 #include <Features/Collision/RayCast/Ray.h>
 
 // レイとの衝突結果
+
+namespace Engine {
+
 struct RayCastHit
 {
     bool hit = false;            // 衝突したかどうか
@@ -48,3 +51,5 @@ private:
 
 
 };
+
+} // namespace Engine

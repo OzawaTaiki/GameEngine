@@ -10,16 +10,18 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+// std::hashの特殊化はnamespace Engineの外に配置
 template <>
-struct std::hash<VertexData> {
-    size_t operator()(const VertexData& v) const {
-        size_t h1 = std::hash<Vector4>{}(v.position);
-        size_t h2 = std::hash<Vector2>{}(v.texcoord);
-        size_t h3 = std::hash<Vector3>{}(v.normal);
+struct std::hash<Engine::VertexData> {
+    size_t operator()(const Engine::VertexData& v) const {
+        size_t h1 = std::hash<Engine::Vector4>{}(v.position);
+        size_t h2 = std::hash<Engine::Vector2>{}(v.texcoord);
+        size_t h3 = std::hash<Engine::Vector3>{}(v.normal);
         return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
     }
 };
 
+namespace Engine {
 
 void Mesh::Initialize(const std::vector<VertexData>& _v, const std::vector<uint32_t>& _i, const std::string& _name)
 {
@@ -75,3 +77,5 @@ void Mesh::Map()
     vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vConstMap_));
     indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iConstMap_));
 };
+
+} // namespace Engine

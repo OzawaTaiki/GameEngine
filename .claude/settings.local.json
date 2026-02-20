@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(msbuild:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(python add_namespace_module.py:*)",
+      "Bash(python check_namespace_placement.py:*)"
     ],
     "deny": [],
     "ask": []

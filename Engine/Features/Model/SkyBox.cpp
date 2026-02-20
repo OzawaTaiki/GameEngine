@@ -6,6 +6,9 @@
 
 #include <Features/Camera/Camera/Camera.h>
 
+
+namespace Engine {
+
 void SkyBox::Initialize(const Vector3& _scale, bool _useQuaternion)
 {
     // PSO
@@ -133,3 +136,5 @@ void SkyBox::UpdateWorldTransform()
         isDirty_ = false;
     }
 }
+
+} // namespace Engine

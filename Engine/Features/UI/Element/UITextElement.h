@@ -6,6 +6,9 @@
 #include <Features/TextRenderer/TextGenerator.h>
 #include <string>
 
+
+namespace Engine {
+
 class UITextRenderComponent;
 
 class UITextElement : public UIElement
@@ -46,3 +49,5 @@ private:
     std::string text_;
     FontConfig fontConfig_;
 };
+
+} // namespace Engine

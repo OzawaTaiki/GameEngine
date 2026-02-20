@@ -4,6 +4,9 @@
 
 
 
+
+namespace Engine {
+
 class Dissolve
 {
 public:
@@ -56,3 +59,5 @@ private:
     Dissolve& operator=(const Dissolve&) = delete;
 
 };
+
+} // namespace Engine
