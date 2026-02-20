@@ -3,16 +3,15 @@
 #include <imgui.h>
 
 #include <Math/Vector/Vector4.h>
+#include <Features/Animation/Sequence/SequenceEvent.h>
 
 #include <list>
 #include <DirectXTex.h>
 
-#ifdef _DEBUG
-
-
 namespace Engine {
 
 #ifdef _DEBUG
+
 class AnimationSequence;
 
 namespace ImGuiTool
