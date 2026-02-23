@@ -42,6 +42,9 @@ public:
     const Vector2& GetSize() const { return size_; }
     bool HasSize() const { return size_.x > 0 && size_.y > 0; }
 
+    void SetRotation(float rotation) { rotation_ = rotation; }
+    float GetRotation() const { return rotation_; }
+
     void SetPivot(const Vector2& pivot) { pivot_ = pivot; }
     const Vector2& GetPivot() const { return pivot_; }
 
@@ -132,6 +135,7 @@ protected:
     // レイアウト
     Vector2 position_;
     Vector2 size_;
+    float rotation_; // 回転角度（ラジアン）
     Vector2 pivot_;
     Vector2 anchor_;
 

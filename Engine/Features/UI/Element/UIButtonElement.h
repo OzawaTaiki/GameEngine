@@ -71,6 +71,7 @@ public:
     void SetHoverColor(const Vector4& color) { hoverColor_ = color; }
     void SetPressedColor(const Vector4& color) { pressedColor_ = color; }
     void SetDisabledColor(const Vector4& color) { disabledColor_ = color; }
+    void SetFocusColor(const Vector4& color) { focusColor_ = color; }
 
     // テキスト色設定
     void SetTextColor(const Vector4& color);
