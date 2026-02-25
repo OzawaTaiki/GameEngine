@@ -1,6 +1,7 @@
 #include "SoundInstance.h"
 
 #include "AudioSystem.h"
+#include "SubmixVoice.h"
 
 #include <Debug/Debug.h>
 
@@ -20,7 +21,7 @@ SoundInstance::~SoundInstance()
 {
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap,  VoiceCallBack* _callback)
+std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix)
 {
     //保留
     if (!_enableOverlap) {}
@@ -29,6 +30,12 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
 
     IXAudio2* xAudio2 = audioSystem_->GetXAudio2().Get();
 
+    XAUDIO2_VOICE_SENDS* sendList = nullptr;
+    if (_submix)
+    {
+        sendList = _submix->GetSendList();
+    }
+
     IXAudio2SourceVoice* pSourceVoice = nullptr;
     hresult = xAudio2->CreateSourceVoice(
         &pSourceVoice, // Source voice
@@ -36,7 +43,7 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
         0, // Flags
         XAUDIO2_DEFAULT_FREQ_RATIO, // Frequency ratio
         _callback,// コールバック関数
-        nullptr, // Send list
+        sendList, // Send list
         nullptr // Effect chain
     );
 
@@ -87,14 +94,14 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
     return voiceInstance;
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix)
 {
-    return Play(_volume, 0.0f, _loop, _enableOverlap, _callback);
+    return Play(_volume, 0.0f, _loop, _enableOverlap, _callback, _submix);
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback)
+std::shared_ptr<VoiceInstance> SoundInstance::Play(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix)
 {
-    auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap, _callback);
+    auto voiceInstance = GenerateVoiceInstance(_volume, _startTime, _loop, _enableOverlap, _callback, _submix);
     if (voiceInstance)
     {
         voiceInstance->Play();

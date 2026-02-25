@@ -25,12 +25,25 @@ void AudioSystem::Initialize()
     hresult = xAudio2_->CreateMasteringVoice(&masterVoice_);
     CHECK_HR_VOID(hresult, "Failed to create mastering voice");
 
+    XAUDIO2_VOICE_DETAILS masterDetails{};
+    masterVoice_->GetVoiceDetails(&masterDetails);
+
+    hresult = bgmSubmix_.Initialize(xAudio2_.Get(), masterDetails.InputChannels, static_cast<float>(masterDetails.InputSampleRate));
+    CHECK_HR_VOID(hresult, "Failed to create BGM submix voice");
+
+    hresult = seSubmix_.Initialize(xAudio2_.Get(), masterDetails.InputChannels, static_cast<float>(masterDetails.InputSampleRate));
+    CHECK_HR_VOID(hresult, "Failed to create SE submix voice");
+
+
     hresult = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     CHECK_HR_VOID(hresult, "Failed to startup Media Foundation");
 }
 
 void AudioSystem::Finalize()
 {
+    bgmSubmix_.Finalize();
+    seSubmix_.Finalize();
+
     masterVoice_->DestroyVoice();
     masterVoice_ = nullptr;
     xAudio2_.Reset();

@@ -10,6 +10,7 @@
 #include <wrl.h>
 
 #include <xaudio2.h>
+#include <System/Audio/SubmixVoice.h>
 
 #pragma comment (lib,"xaudio2.lib")
 
@@ -44,6 +45,9 @@ public:
     void SetMasterVolume(float _volume);
     float GetMasterVolume() const { return masterVolume_; }
 
+    SubmixVoice* GetBGMSubmix() { return &bgmSubmix_; }
+    SubmixVoice* GetSESubmix() { return &seSubmix_; }
+
     const WAVEFORMATEX& GetSoundFormat(uint32_t _soundID) const { return sounds_[_soundID].wfex; }
     const BYTE* GetBuffer(uint32_t _soundID) const { return sounds_[_soundID].mediaData.data(); }
     size_t GetBufferSize(uint32_t _soundID) const { return sounds_[_soundID].mediaData.size(); }
@@ -58,15 +62,13 @@ private:
         std::string path;
     };
 
+    std::shared_ptr<SoundInstance> CreateSoundInstance(const WAVEFORMATEX& _wfex, std::vector<BYTE> _mediaData, const std::string& _path);
+
 private:
 
     Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
     IXAudio2MasteringVoice* masterVoice_;
 
-    //std::map <uint32_t, uint32_t> map_;
-
-    //std::vector<SoundData> sounds_;
-    //std::map<uint32_t, IXAudio2SourceVoice*> sourceVoice_;
     std::vector<SoundData> sounds_;
     std::map<std::string, uint32_t> pathToid_;
 
@@ -74,8 +76,8 @@ private:
 
     float masterVolume_ = 1.0f;
 
-
-    std::shared_ptr<SoundInstance> CreateSoundInstance(const WAVEFORMATEX& _wfex, std::vector<BYTE> _mediaData, const std::string& _path);
+    SubmixVoice bgmSubmix_;
+    SubmixVoice seSubmix_;
 
 
 private:

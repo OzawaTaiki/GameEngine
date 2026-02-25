@@ -459,9 +459,6 @@
     <ClCompile Include="Math\Vector\VectorFunction.cpp">
       <Filter>Math\Vector</Filter>
     </ClCompile>
-    <ClCompile Include="System\Audio\Audio.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
     <ClCompile Include="System\Input\Input.cpp">
       <Filter>System\Input</Filter>
     </ClCompile>
@@ -763,6 +760,12 @@
     <ClCompile Include="Features\UI\Element\UITextElement.cpp">
       <Filter>Features\UI\Element</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\AudioEffect.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\SubmixVoice.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -962,9 +965,6 @@
     </ClInclude>
     <ClInclude Include="Math\Vector\VectorFunction.h">
       <Filter>Math\Vector</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\Audio.h">
-      <Filter>System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="System\Input\Input.h">
       <Filter>System\Input</Filter>
@@ -1310,6 +1310,12 @@
     </ClInclude>
     <ClInclude Include="Features\UI\Element\UITextElement.h">
       <Filter>Features\UI\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioEffect.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SubmixVoice.h">
+      <Filter>System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Features\Json\JsonUtils.h">
       <Filter>Features\Json</Filter>
