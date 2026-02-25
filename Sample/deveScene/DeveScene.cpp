@@ -226,9 +226,10 @@ void DeveScene::Initialize(SceneData* _sceneData)
         "Click Me!"
     );
     testButton1_->Initialize();
-    testButton1_->SetOnClick([]() {
-        Debug::Log("Button 1 Clicked!");
-    });
+    testButton1_->SetOnClick([]()
+                             {
+                                 Debug::Log("Button 1 Clicked!");
+                             });
     testButton1_->SetNormalColor(Vector4(0.2f, 0.7f, 0.2f, 1.0f));   // 緑
     testButton1_->SetHoverColor(Vector4(0.3f, 0.9f, 0.3f, 1.0f));    // 明るい緑
     testButton1_->SetPressedColor(Vector4(0.1f, 0.5f, 0.1f, 1.0f));  // 暗い緑
@@ -242,19 +243,20 @@ void DeveScene::Initialize(SceneData* _sceneData)
     );
     testButton2_->Initialize();
     static bool colorToggle = false;
-    testButton2_->SetOnClick([this]() {
-        colorToggle = !colorToggle;
-        if (colorToggle)
-        {
-            testButton2_->SetNormalColor(Vector4(0.7f, 0.2f, 0.2f, 1.0f));  // 赤
-            Debug::Log("Button 2: Red");
-        }
-        else
-        {
-            testButton2_->SetNormalColor(Vector4(0.2f, 0.2f, 0.7f, 1.0f));  // 青
-            Debug::Log("Button 2: Blue");
-        }
-    });
+    testButton2_->SetOnClick([this]()
+                             {
+                                 colorToggle = !colorToggle;
+                                 if (colorToggle)
+                                 {
+                                     testButton2_->SetNormalColor(Vector4(0.7f, 0.2f, 0.2f, 1.0f));  // 赤
+                                     Debug::Log("Button 2: Red");
+                                 }
+                                 else
+                                 {
+                                     testButton2_->SetNormalColor(Vector4(0.2f, 0.2f, 0.7f, 1.0f));  // 青
+                                     Debug::Log("Button 2: Blue");
+                                 }
+                             });
     testButton2_->SetNormalColor(Vector4(0.2f, 0.2f, 0.7f, 1.0f));   // 青
     testButton2_->SetHoverColor(Vector4(0.4f, 0.4f, 0.9f, 1.0f));    // 明るい青
     testButton2_->SetPressedColor(Vector4(0.1f, 0.1f, 0.5f, 1.0f));  // 暗い青
@@ -268,9 +270,10 @@ void DeveScene::Initialize(SceneData* _sceneData)
         "Button 3"
     );
     testButton3_->Initialize();
-    testButton3_->SetOnClick([]() {
-        Debug::Log("Button 3 Clicked!");
-    });
+    testButton3_->SetOnClick([]()
+                             {
+                                 Debug::Log("Button 3 Clicked!");
+                             });
     testButton3_->SetNormalColor(Vector4(0.7f, 0.5f, 0.2f, 1.0f));   // オレンジ
     testButton3_->SetHoverColor(Vector4(0.9f, 0.7f, 0.3f, 1.0f));    // 明るいオレンジ
     testButton3_->SetPressedColor(Vector4(0.5f, 0.3f, 0.1f, 1.0f));  // 暗いオレンジ
@@ -283,9 +286,10 @@ void DeveScene::Initialize(SceneData* _sceneData)
         "Button 4"
     );
     testButton4_->Initialize();
-    testButton4_->SetOnClick([]() {
-        Debug::Log("Button 4 Clicked!");
-    });
+    testButton4_->SetOnClick([]()
+                             {
+                                 Debug::Log("Button 4 Clicked!");
+                             });
     testButton4_->SetNormalColor(Vector4(0.7f, 0.2f, 0.7f, 1.0f));   // 紫
     testButton4_->SetHoverColor(Vector4(0.9f, 0.4f, 0.9f, 1.0f));    // 明るい紫
     testButton4_->SetPressedColor(Vector4(0.5f, 0.1f, 0.5f, 1.0f));  // 暗い紫
@@ -321,9 +325,10 @@ void DeveScene::Initialize(SceneData* _sceneData)
     );
     testSlider1_->Initialize();
     testSlider1_->SetValue(50.0f);
-    testSlider1_->SetOnValueChanged([](float value) {
-        Debug::Log("Slider Value: " + std::to_string(value));
-    });
+    testSlider1_->SetOnValueChanged([](float value)
+                                    {
+                                        Debug::Log("Slider Value: " + std::to_string(value));
+                                    });
 
     // --------------------------------------------------
     // UIImageElement テスト
@@ -368,26 +373,35 @@ void DeveScene::Update()
 
 
     {
-        if(ImGuiDebugManager::GetInstance()->Begin("Engine"))
+        if (ImGuiDebugManager::GetInstance()->Begin("Engine"))
         {
             // サウンドの再生
             static float volume = 1.0f;
+            static float submixVolume = 1.0f;
             if (ImGui::Button("play Sound"))
             {
                 if (soundInstance_)
                 {
                     // 返り値で VoiceInstanceを受け取る
                     // これを使用して音量やピッチの変更ができる
-                    voiceInstance_ = soundInstance_->Play(volume);
+                    voiceInstance_ = soundInstance_->Play(volume,
+                                                          false,
+                                                          true,
+                                                          nullptr,
+                                                          AudioSystem::GetInstance()->GetSESubmix());
                 }
             }
 
-            if (ImGui::DragFloat("Volume", &volume, 0.0f, 1.0f))
+            if (ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f))
             {
                 if (voiceInstance_)
                 {
                     voiceInstance_->SetVolume(volume);
                 }
+            }
+            if (ImGui::DragFloat("Submix Volume", &submixVolume, 0.01f, 0.0f,1.0f))
+            {
+                AudioSystem::GetInstance()->GetSESubmix()->SetVolume(submixVolume);
             }
             if (ImGui::Button("Stop Sound"))
             {
