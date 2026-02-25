@@ -34,6 +34,7 @@ void UISpriteRenderComponent::Update()
     // UIElementの位置・サイズと同期
     sprite_->translate_ = owner_->GetWorldPosition();
     sprite_->SetSize(owner_->GetSize());
+    sprite_->rotate_ = owner_->GetRotation();
 
     sprite_->SetOrder(owner_->GetOrder());
     sprite_->SetColor(color_);

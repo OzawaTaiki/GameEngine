@@ -3,15 +3,15 @@
 #include <imgui.h>
 
 #include <Math/Vector/Vector4.h>
+#include <Features/Animation/Sequence/SequenceEvent.h>
 
 #include <list>
 #include <DirectXTex.h>
 
-
-
 namespace Engine {
 
 #ifdef _DEBUG
+
 class AnimationSequence;
 
 namespace ImGuiTool
@@ -28,7 +28,7 @@ namespace ImGuiTool
         constexpr float kControlPanelHeight = 60.0f;   // コントロールパネルの高さ
         constexpr float kTimeScaleHeaderHeight = 20.0f; // 時間目盛りヘッダーの高さ
         constexpr float kStatusBarHeight = 20.0f;      // ステータスバーの高さ
-
+        constexpr float kValueDisplayWidth = 150.0f;   // 値表示エリアの幅
 
         // タイムライン内の色定義
         const ImU32 kTimelineBgColor = IM_COL32(40, 40, 40, 255);
@@ -40,8 +40,22 @@ namespace ImGuiTool
         const ImU32 kKeyframeColor = IM_COL32(255, 255, 255, 255);
         const ImU32 kKeyframeColorSelected = IM_COL32(255, 80, 80, 255);
         const ImU32 kKeyframeColorHover = IM_COL32(255, 180, 100, 255);
-
     }
+
+    struct TimelineState
+    {
+        float currentTime = 0.0f;
+        float maxTime = 10.0f;
+        float viewStart = 0.0f;
+        float viewEnd = 10.0f;
+        float timeScale = TimeLineConstants::kTimeScale;
+        bool showSnapping = true;
+        float snappingInterval = 0.1f;
+        bool isPlaying = false;
+        bool isDragging = false;
+        SequenceEvent::KeyFrame* draggingKeyFrame = nullptr;
+        float trackIndex = 0.0f;
+    };
 
     void GradientEditor(const char* _label, std::list<std::pair<float, Vector4>>& _colors);
 

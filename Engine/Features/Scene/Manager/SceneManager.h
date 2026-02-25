@@ -31,6 +31,9 @@ public:
     // シーンの遷移を設定
     void SetTransition(std::unique_ptr<ISceneTransition> _transition);
 
+    // transitionの有効化設定
+    void EnableTransition(bool _enable) { enableTransition_ = _enable; }
+
     // シーンファクトリの設定
     void SetSceneFactory(std::unique_ptr<ISceneFactory> _sceneFactory);
 
@@ -53,6 +56,9 @@ private:
 
     // シーンの遷移
     std::unique_ptr<ISceneTransition> transition_ = nullptr;
+
+    // transitionを無効化するためのフラグ
+    bool enableTransition_ = true;
 
     // シーン間の受け渡しデータ
     std::unique_ptr<SceneData> sceneData_ = nullptr;

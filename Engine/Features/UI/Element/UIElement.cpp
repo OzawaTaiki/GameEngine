@@ -9,6 +9,7 @@ UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
     parent_(nullptr),
     position_(50.0f, 50.0f),
     size_(100.0f, 50.0f),
+    rotation_(0.0f),
     pivot_(0.5f, 0.5f),
     anchor_(0.5f, 0.5f),
     order_(0),
@@ -178,6 +179,7 @@ void UIElement::DrawImGuiInspector()
         {
             ImGui::DragFloat2("Position", &position_.x, 1.0f);
             ImGui::DragFloat2("Size", &size_.x, 1.0f);
+            ImGui::DragFloat("Rotation", &rotation_, 1.0f);
             ImGui::DragFloat2("Pivot", &pivot_.x, 0.01f, 0.0f, 1.0f);
             ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f, 0.0f, 1.0f);
         }
@@ -259,6 +261,7 @@ void UIElement::InitializeJsonBinder(const std::string& directory)
 
     RegisterVariable("position", &position_);
     RegisterVariable("size", &size_);
+    RegisterVariable("rotation", &rotation_);
     RegisterVariable("pivot", &pivot_);
     RegisterVariable("anchor", &anchor_);
     RegisterVariable("order", &order_);
