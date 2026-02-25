@@ -93,9 +93,6 @@ void Framework::Initialize(const std::wstring& _winTitle)
 
     Time::Initialize();
 
-    audio_ = Audio::GetInstance();
-    audio_->Initialize();
-
     AudioSystem::GetInstance()->Initialize();
 
     gameTime_ = GameTime::GetInstance();

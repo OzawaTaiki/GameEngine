@@ -6,7 +6,7 @@
 
 using namespace Engine;
 
-void SubmixVoice::Initialize(IXAudio2* xAudio2, uint32_t inputChannels, float sampleRate, uint32_t processingStage, SubmixVoice* sendTarget)
+HRESULT SubmixVoice::Initialize(IXAudio2* xAudio2, uint32_t inputChannels, float sampleRate, uint32_t processingStage, SubmixVoice* sendTarget)
 {
     XAUDIO2_SEND_DESCRIPTOR sendDesc{};
     sendDesc.Flags = 0;
@@ -31,11 +31,21 @@ void SubmixVoice::Initialize(IXAudio2* xAudio2, uint32_t inputChannels, float sa
     {
         Debug::Log("Failed to create submix voice: " + std::to_string(hr));
         assert(false && "Failed to create submix voice");
-        return;
+        return hr;
     }
 
     effectChain_.AttachToVoice(submixVoice_);
     submixVoice_->SetVolume(volume_);
+
+    sendDesc_ = XAUDIO2_SEND_DESCRIPTOR{};
+    sendDesc_.Flags = 0;
+    sendDesc_.pOutputVoice = submixVoice_;
+
+    sendList_ = XAUDIO2_VOICE_SENDS{};
+    sendList_.SendCount = 1;
+    sendList_.pSends = &sendDesc_;
+
+    return hr;
 }
 
 void SubmixVoice::Finalize()
