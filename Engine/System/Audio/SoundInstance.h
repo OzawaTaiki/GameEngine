@@ -46,6 +46,7 @@ public:
     /// <returns> サンプルレート(Hz)</returns>
     float GetSampleRate() const { return sampleRate_; }
 
+    
 
 private:
 

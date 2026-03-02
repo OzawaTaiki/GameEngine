@@ -52,6 +52,7 @@ public:
     const BYTE* GetBuffer(uint32_t _soundID) const { return sounds_[_soundID].mediaData.data(); }
     size_t GetBufferSize(uint32_t _soundID) const { return sounds_[_soundID].mediaData.size(); }
 
+    XAUDIO2_VOICE_DETAILS GetMasterVoiceDetails();
 
 private:
 
@@ -68,6 +69,9 @@ private:
 
     Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
     IXAudio2MasteringVoice* masterVoice_;
+
+    XAUDIO2_VOICE_DETAILS masterDetails_{};
+
 
     std::vector<SoundData> sounds_;
     std::map<std::string, uint32_t> pathToid_;

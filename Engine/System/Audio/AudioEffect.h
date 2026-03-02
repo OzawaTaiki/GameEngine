@@ -19,6 +19,7 @@ public:
     uint32_t GetOutputChannel() const { return outputChannel_; }
     bool IsInitiallyEnabled() const { return initialState_; }
 
+
 public:// ムーブコンストラクタとムーブ代入演算子をデフォルトで定義
     AudioEffect(AudioEffect&&) = default;
     AudioEffect& operator=(AudioEffect&&) = default;
@@ -52,6 +53,8 @@ public:
     // Voice生成後に呼ぶ
     void AttachToVoice(IXAudio2Voice* _voice);
     void DetachFromVoice();
+
+    HRESULT ApplyChain();
 
     // ランタイム制御（AttachToVoice後に有効）
     HRESULT EnableEffect(uint32_t _index, uint32_t _operationSet = XAUDIO2_COMMIT_NOW);

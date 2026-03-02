@@ -17,6 +17,7 @@
 #include <Features/UI/Collider/UICollisionManager.h>
 #include <Features/UI/UINavigationManager.h>
 
+#include <xaudio2fx.h>
 
 #include <Features/UI/Component/UITextRenderComponent.h>
 #include <Features/UI/Component/UISpriteRenderComponent.h>
@@ -358,6 +359,29 @@ void DeveScene::Initialize(SceneData* _sceneData)
     testText1_->Initialize();
     testText1_->SetColor(Vector4(0.2f, 0.8f, 0.2f, 1.0f));  // 緑色
 
+    auto detals =  AudioSystem::GetInstance()->GetMasterVoiceDetails();
+    Debug::Log("Master Voice Details - Channels: " + std::to_string(detals.InputChannels) + ", SampleRate: " + std::to_string(detals.InputSampleRate));
+
+    // テスト（どこかの初期化処理やキー入力で）
+    IUnknown* pReverb = nullptr;
+    XAudio2CreateReverb(&pReverb, 0);
+
+    auto& chain = AudioSystem::GetInstance()->GetSESubmix()->GetEffectChain();
+    chain.AddEffect(AudioEffect(pReverb, 2, false));
+    pReverb->Release();
+
+    HRESULT hrApply = chain.ApplyChain();
+    Debug::Log("ApplyChain: " + std::to_string(hrApply));
+
+    // プリセットを適用
+    XAUDIO2FX_REVERB_I3DL2_PARAMETERS i3dl2 = XAUDIO2FX_I3DL2_PRESET_SEWERPIPE;
+    XAUDIO2FX_REVERB_PARAMETERS params;
+    ReverbConvertI3DL2ToNative(&i3dl2, &params);
+    params.WetDryMix = 100;
+
+    HRESULT hrParam = chain.SetEffectParameters(0, &params, sizeof(params));
+    Debug::Log("SetEffectParameters: " + std::to_string(hrParam));
+
     // 注: スライダーの色設定は自動的に保存されます（UISliderElement内でJsonBinderを使用）
 }
 
@@ -378,6 +402,13 @@ void DeveScene::Update()
             // サウンドの再生
             static float volume = 1.0f;
             static float submixVolume = 1.0f;
+            static bool enableFilter = false;
+            static float cutoffHz = 500.0f;
+            static float overOneQ = 1.0f;
+            auto SESubmix = AudioSystem::GetInstance()->GetSESubmix();
+            static int filterType = LowPassFilter;
+            static bool isReverbEnabled = false;
+            const XAUDIO2_FILTER_TYPE filterTypes[] = { XAUDIO2_FILTER_TYPE::LowPassFilter, XAUDIO2_FILTER_TYPE::BandPassFilter, XAUDIO2_FILTER_TYPE::HighPassFilter };
             if (ImGui::Button("play Sound"))
             {
                 if (soundInstance_)
@@ -388,7 +419,7 @@ void DeveScene::Update()
                                                           false,
                                                           true,
                                                           nullptr,
-                                                          AudioSystem::GetInstance()->GetSESubmix());
+                                                          SESubmix);
                 }
             }
 
@@ -399,9 +430,9 @@ void DeveScene::Update()
                     voiceInstance_->SetVolume(volume);
                 }
             }
-            if (ImGui::DragFloat("Submix Volume", &submixVolume, 0.01f, 0.0f,1.0f))
+            if (ImGui::DragFloat("Submix Volume", &submixVolume, 0.01f, 0.0f, 1.0f))
             {
-                AudioSystem::GetInstance()->GetSESubmix()->SetVolume(submixVolume);
+                SESubmix->SetVolume(submixVolume);
             }
             if (ImGui::Button("Stop Sound"))
             {
@@ -411,6 +442,56 @@ void DeveScene::Update()
                     voiceInstance_ = nullptr; // VoiceInstanceを解放
                 }
             }
+            // フィルターのcombo
+            const char* filterLabels[] = { "Low Pass", "Band Pass", "High Pass" };
+            if (ImGui::Combo("Filter Type", &filterType, filterLabels, IM_ARRAYSIZE(filterLabels)))
+            {
+                if (enableFilter)
+                {
+                    SESubmix->SetFilter(filterTypes[filterType], cutoffHz, overOneQ);
+                }
+            }
+            if (ImGui::DragFloat("One Over Q", &overOneQ, 0.01f, 0.1f, 10.0f))
+            {
+                if (enableFilter)
+                {
+                    SESubmix->SetFilter(filterTypes[filterType], cutoffHz, overOneQ);
+                }
+            }
+            if (ImGui::DragFloat("Cutoff Hz", &cutoffHz, 10.0f, 10.0f, 20000.0f))
+            {
+                if (enableFilter)
+                {
+                    SESubmix->SetFilter(filterTypes[filterType], cutoffHz, overOneQ);
+                }
+            }
+            if (ImGui::Checkbox("Enable Filter", &enableFilter))
+            {
+                if (enableFilter)
+                    SESubmix->SetFilter(filterTypes[filterType], cutoffHz, overOneQ);
+            }
+            if (!enableFilter)
+            {
+                SESubmix->ClearFilter();
+            }
+
+            {
+                auto& chain = SESubmix->GetEffectChain();
+                if (ImGui::Checkbox("Enable Reverb", &isReverbEnabled))
+                {
+                    if (isReverbEnabled)
+                    {
+                        HRESULT hr = chain.EnableEffect(0);
+                        Debug::Log("EnableEffect: " + std::to_string(hr));  // 0 = S_OK
+                    }
+                    else
+                    {
+                        chain.DisableEffect(0);
+                    }
+                }
+
+            }
+
             ImGui::End();
         }
 
