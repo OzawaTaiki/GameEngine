@@ -49,6 +49,16 @@ void Engine::AudioEffectChain::DetachFromVoice()
     attachedVoice_ = nullptr;
 }
 
+HRESULT Engine::AudioEffectChain::ApplyChain()
+{
+    if (IsEmpty())
+    {
+        return attachedVoice_->SetEffectChain(nullptr);
+    }
+
+    return attachedVoice_->SetEffectChain(BuildChain());
+}
+
 HRESULT Engine::AudioEffectChain::EnableEffect(uint32_t _index, uint32_t _operationSet)
 {
     if(!attachedVoice_)

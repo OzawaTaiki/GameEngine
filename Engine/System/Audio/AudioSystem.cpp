@@ -28,10 +28,10 @@ void AudioSystem::Initialize()
     XAUDIO2_VOICE_DETAILS masterDetails{};
     masterVoice_->GetVoiceDetails(&masterDetails);
 
-    hresult = bgmSubmix_.Initialize(xAudio2_.Get(), masterDetails.InputChannels, static_cast<float>(masterDetails.InputSampleRate));
+    hresult = bgmSubmix_.Initialize(xAudio2_.Get(), 2, 48000.0f);
     CHECK_HR_VOID(hresult, "Failed to create BGM submix voice");
 
-    hresult = seSubmix_.Initialize(xAudio2_.Get(), masterDetails.InputChannels, static_cast<float>(masterDetails.InputSampleRate));
+    hresult = seSubmix_.Initialize(xAudio2_.Get(), 2, 48000.0f);
     CHECK_HR_VOID(hresult, "Failed to create SE submix voice");
 
 
@@ -175,6 +175,16 @@ std::shared_ptr<SoundInstance> AudioSystem::CreateSoundInstance(const WAVEFORMAT
 
     // サウンドインスタンスを返す
     return soundInstance;
+}
+
+XAUDIO2_VOICE_DETAILS AudioSystem::GetMasterVoiceDetails()
+{
+    if (masterVoice_)
+    {
+        masterVoice_->GetVoiceDetails(&masterDetails_);
+    }
+
+    return masterDetails_;
 }
 
 AudioSystem::~AudioSystem()

@@ -34,6 +34,9 @@ public:
     void SetVolume(float volume);
     float GetVolume() const { return volume_; }
 
+    void SetFilter(XAUDIO2_FILTER_TYPE type, float cutoffHz, float oneOverQ = 1.0f);
+    void ClearFilter();
+
     AudioEffectChain& GetEffectChain() { return effectChain_; }
 
 private:
@@ -44,7 +47,7 @@ private:
     IXAudio2SubmixVoice* submixVoice_ = nullptr;
     AudioEffectChain effectChain_ = {};
     float volume_ = 1.0f;
-
+    float sampleRate_ = 44100.0f;
 };
 
 };// namespace Engine
