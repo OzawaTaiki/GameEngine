@@ -301,6 +301,15 @@
     <Filter Include="Features\UI\Element">
       <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extarnals">
+      <UniqueIdentifier>{4641747d-e637-4c87-8bd6-f2249704a8a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extarnals\VST3SDK">
+      <UniqueIdentifier>{ed4c3fe6-4dc1-4adf-8e75-031a23fd9bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Audio\VST3">
+      <UniqueIdentifier>{592d94d6-337f-41b9-9c51-d994b793ef2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DXCommon\DXCommon.cpp">
@@ -765,6 +774,45 @@
     </ClCompile>
     <ClCompile Include="System\Audio\SubmixVoice.cpp">
       <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\connectionproxy.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\eventlist.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\hostclasses.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module_win32.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\parameterchanges.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\pluginterfacesupport.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\plugprovider.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\source\fdebug.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\source\fobject.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\source\fstring.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\source\timer.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\thread\source\flock.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
