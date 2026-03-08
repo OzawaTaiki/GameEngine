@@ -820,6 +820,9 @@
     <ClCompile Include="System\Audio\VST3\VST3Module.cpp">
       <Filter>System\Audio\VST3</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\VST3\VST3Host.cpp">
+      <Filter>System\Audio\VST3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1378,6 +1381,9 @@
       <Filter>System\Audio\VST3</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\VST3\VST3Module.h">
+      <Filter>System\Audio\VST3</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VST3\VST3Host.h">
       <Filter>System\Audio\VST3</Filter>
     </ClInclude>
   </ItemGroup>
