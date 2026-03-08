@@ -814,6 +814,9 @@
     <ClCompile Include="Externals\VST3SDK\base\thread\source\flock.cpp">
       <Filter>Extarnals\VST3SDK</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\VST3\VST3Plugin.cpp">
+      <Filter>System\Audio\VST3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1367,6 +1370,9 @@
     </ClInclude>
     <ClInclude Include="Features\Json\JsonUtils.h">
       <Filter>Features\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VST3\VST3Plugin.h">
+      <Filter>System\Audio\VST3</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
