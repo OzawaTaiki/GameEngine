@@ -817,6 +817,9 @@
     <ClCompile Include="System\Audio\VST3\VST3Plugin.cpp">
       <Filter>System\Audio\VST3</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\VST3\VST3Module.cpp">
+      <Filter>System\Audio\VST3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1372,6 +1375,9 @@
       <Filter>Features\Json</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\VST3\VST3Plugin.h">
+      <Filter>System\Audio\VST3</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VST3\VST3Module.h">
       <Filter>System\Audio\VST3</Filter>
     </ClInclude>
   </ItemGroup>

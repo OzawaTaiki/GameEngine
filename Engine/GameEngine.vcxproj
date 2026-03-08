@@ -327,6 +327,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
     <ClCompile Include="System\Audio\SubmixVoice.cpp" />
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Module.cpp" />
     <ClCompile Include="System\Audio\VST3\VST3Plugin.cpp" />
     <ClCompile Include="System\Input\Input.cpp" />
     <ClCompile Include="System\Input\TextInputManager.cpp" />
@@ -528,6 +529,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Audio\SubmixVoice.h" />
     <ClInclude Include="System\Audio\VoiceCallback.h" />
     <ClInclude Include="System\Audio\VoiceInstance.h" />
+    <ClInclude Include="System\Audio\VST3\VST3Module.h" />
     <ClInclude Include="System\Audio\VST3\VST3Plugin.h" />
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Input\TextInputManager.h" />
