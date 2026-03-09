@@ -824,6 +824,7 @@
       <Filter>System\Audio\VST3</Filter>
     </ClCompile>
     <ClCompile Include="System\Audio\VST3\VST3ParameterManager.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Effect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1392,6 +1393,9 @@
     </ClInclude>
     <ClInclude Include="System\Audio\AudioEffectBase.h">
       <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\VST3\VST3Effect.h">
+      <Filter>System\Audio\VST3</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
