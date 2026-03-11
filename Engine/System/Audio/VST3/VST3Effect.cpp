@@ -15,6 +15,11 @@ const XAPO_REGISTRATION_PROPERTIES kRegProps = {
 };
 }
 
+Engine::VST3Effect::VST3Effect(VST3Plugin* plugin)
+    : AudioEffectBase(&kRegProps), plugin_(plugin)
+{
+}
+
 HRESULT Engine::VST3Effect::Create(VST3Plugin* plugin, IUnknown** effect)
 {
     if (!plugin || !effect)
@@ -54,6 +59,9 @@ void STDMETHODCALLTYPE Engine::VST3Effect::Process(UINT32 , const XAPO_PROCESS_B
         }
     }
 
+    // outputBufをinputで初期化（in-place処理するプラグイン対策）
+    std::memcpy(outputBuf_.data(), inputBuf_.data(), frames * channels_ * sizeof(float));
+
     // VST3 processDataの構築
     std::vector<float*> inputPtrs(channels_);
     std::vector<float*> outputPtrs(channels_);
@@ -75,9 +83,27 @@ void STDMETHODCALLTYPE Engine::VST3Effect::Process(UINT32 , const XAPO_PROCESS_B
     processData_.outputs         = &outputBusBuffers_;
     processData_.symbolicSampleSize = Steinberg::Vst::kSample32;
 
+    // パラメータ変更をキューに積む（clearしてから追加）
+    paramChanges_.clearQueue();
+
+    int32_t index = 0;
+
+    for (auto& p : pendingParams_)
+    {
+        auto queue = paramChanges_.addParameterData(p.id, index);
+
+        if (queue)
+            queue->addPoint(0, p.value, index);
+    }
+
+    pendingParams_.clear();
+
+    processData_.inputParameterChanges = &paramChanges_;
+    processData_.outputParameterChanges = nullptr;
+
     plugin_->Process(processData_);
 
-    // planar -> interleved変換
+    // planar -> interleaved変換
     for (uint32_t ch = 0; ch < channels_; ++ch)
     {
         for (uint32_t i = 0; i < frames; ++i)

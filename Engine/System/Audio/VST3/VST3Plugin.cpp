@@ -1,5 +1,8 @@
 #include "VST3Plugin.h"
 
+#include <pluginterfaces/base/ibstream.h>
+#include <public.sdk/source/common/memorystream.h>
+
 /*
 memo
 classInfo : DLLの中にあるプラグインの1つを表す情報
@@ -37,7 +40,11 @@ HostApplication: ホスト名やバージョンを提供するオブジェクト
         オーディオホスト（DAWなど）からプラグインに提供されるインターフェースで、ホストの情報や機能をプラグインが利用できるようにするもの
 */
 
-bool Engine::VST3Plugin::Initialize(Steinberg::Vst::HostApplication* host, float sampleRate, int32_t maxSamplePerBlock, int32_t inputChannels, int32_t outputChannels)
+bool Engine::VST3Plugin::Initialize(const VST3::Hosting::PluginFactory& factory,
+                                    Steinberg::Vst::HostApplication* host,
+                                    float sampleRate,
+                                    int32_t maxSamplePerBlock,
+                                    int32_t inputChannels, int32_t outputChannels)
 {
     // IComponentが存在しない場合は
     // 初期化できないのでfalseを返す
@@ -57,7 +64,43 @@ bool Engine::VST3Plugin::Initialize(Steinberg::Vst::HostApplication* host, float
     if (!processor_)
         return false;
 
-    controller_ = Steinberg::FUnknownPtr<Steinberg::Vst::IEditController>(component_);
+    Steinberg::TUID controllerClassId;
+    if (component_->getControllerClassId(controllerClassId) != Steinberg::kResultOk)
+        return false;
+
+    controller_ = factory.createInstance<Steinberg::Vst::IEditController>(controllerClassId);
+    if (!controller_)
+        return false;
+
+    if (controller_->initialize(host) != Steinberg::kResultOk)
+        return false;
+
+    auto componentCP  = Steinberg::FUnknownPtr<Steinberg::Vst::IConnectionPoint>(component_);
+    auto controllerCP = Steinberg::FUnknownPtr<Steinberg::Vst::IConnectionPoint>(controller_);
+
+    if (componentCP && controllerCP)
+    {
+        componentCP->connect(controllerCP);
+        controllerCP->connect(componentCP);
+    }
+    Steinberg::MemoryStream stream;
+    if (component_->getState(&stream) == Steinberg::kResultOk)
+    {
+        stream.seek(0, Steinberg::IBStream::kIBSeekSet, nullptr);
+        controller_->setComponentState(&stream);
+    }
+
+
+    // バスのスピーカー配置を設定する
+    // これを呼ばないとプラグインが入出力を認識せず、processで何もしない場合がある
+    Steinberg::Vst::SpeakerArrangement inputArr  = (inputChannels == 2)  ? Steinberg::Vst::SpeakerArr::kStereo : Steinberg::Vst::SpeakerArr::kMono;
+    Steinberg::Vst::SpeakerArrangement outputArr = (outputChannels == 2) ? Steinberg::Vst::SpeakerArr::kStereo : Steinberg::Vst::SpeakerArr::kMono;
+    processor_->setBusArrangements(&inputArr, 1, &outputArr, 1);
+
+    // オーディオバスをアクティブにする
+    // これを呼ばないとプラグインが入出力バスを無効とみなし、processで何もしない
+    component_->activateBus(Steinberg::Vst::kAudio, Steinberg::Vst::kInput, 0, true);
+    component_->activateBus(Steinberg::Vst::kAudio, Steinberg::Vst::kOutput, 0, true);
 
     // 設定
     Steinberg::Vst::ProcessSetup setup{};
@@ -73,7 +116,9 @@ bool Engine::VST3Plugin::Initialize(Steinberg::Vst::HostApplication* host, float
     if (component_->setActive(true) != Steinberg::kResultOk)
         return false;
     // プロセッサーを処理状態にする
-    if (processor_->setProcessing(true) != Steinberg::kResultOk)
+    // kNotImplemented を返すプラグインも多いので、それも許容する
+    auto processingResult = processor_->setProcessing(true);
+    if (processingResult != Steinberg::kResultOk && processingResult != Steinberg::kNotImplemented)
         return false;
 
     isActive_ = true;
@@ -87,7 +132,26 @@ void Engine::VST3Plugin::Terminate()
 
     processor_->setProcessing(false);
     component_->setActive(false);
+
+    // 接続を切断
+    auto componentCP  = Steinberg::FUnknownPtr<Steinberg::Vst::IConnectionPoint>(component_);
+    auto controllerCP = Steinberg::FUnknownPtr<Steinberg::Vst::IConnectionPoint>(controller_);
+    if (componentCP && controllerCP)
+    {
+        componentCP->disconnect(controllerCP);
+        controllerCP->disconnect(componentCP);
+    }
+
+    // controller → component の順で終了
+    if (controller_)
+        controller_->terminate();
     component_->terminate();
+
+    // スマートポインタをリセット（DLLアンロード前に解放）
+    controller_ = nullptr;
+    processor_  = nullptr;
+    component_  = nullptr;
+
     isActive_ = false;
 }
 

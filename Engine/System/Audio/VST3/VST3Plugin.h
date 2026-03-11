@@ -22,7 +22,8 @@ public:
     bool Load(VST3::Hosting::PluginFactory factory, const VST3::Hosting::ClassInfo& classInfo);
 
     // プラグインを使える状態にする
-    bool Initialize(Steinberg::Vst::HostApplication* host, float sampleRate,
+    bool Initialize(const VST3::Hosting::PluginFactory& factory,
+                    Steinberg::Vst::HostApplication* host, float sampleRate,
                     int32_t maxSamplePerBlock, int32_t inputChannels, int32_t outputChannels);
 
     // プラグインを終了する
@@ -49,7 +50,6 @@ private:
     Steinberg::IPtr<Steinberg::Vst::IAudioProcessor> processor_ = nullptr;
     // パラメータの読み書きをおこなう人
     Steinberg::IPtr<Steinberg::Vst::IEditController> controller_ = nullptr;
-
 
     int32_t inputChannels_ = 0;
     int32_t outputChannels_ = 0;

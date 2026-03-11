@@ -19,9 +19,8 @@ std::vector<VST3::Hosting::ClassInfo> Engine::VST3Module::GetAudioEffectClasses(
     if (!module_)
         return audioEffectClasses;
 
-    auto factory = module_->getFactory();
     // DLLの中にあるプラグインのクラス情報をすべて取得する
-    for (auto& classInfo : factory.classInfos())
+    for (auto& classInfo : module_->getFactory().classInfos())
     {
         // クラス情報のカテゴリがエフェクト系プラグインのものであれば、audioEffectClassesに追加する
         if (classInfo.category() == kVstAudioEffectClass)

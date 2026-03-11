@@ -4,11 +4,18 @@
 
 #include <System/Audio/AudioEffectBase.h>
 #include <pluginterfaces/vst/ivstaudioprocessor.h>
+#include <public.sdk/source/vst/hosting/parameterchanges.h>
 
 struct __declspec(uuid("12345678-1234-1234-1234-123456789ABC")) VST3EffectTag {};
 
 namespace Engine
 {
+struct PendingParam
+{
+    Steinberg::Vst::ParamID id;
+    double value;
+};
+
 
 class VST3Plugin;
 
@@ -25,6 +32,8 @@ public:
         XAPO_PROCESS_BUFFER_PARAMETERS* output,
         BOOL isEnabled) override;
 
+    void AddPendingParam(Steinberg::Vst::ParamID id, double value) { pendingParams_.push_back({ id, value }); }
+
 private:
 
     VST3Effect(VST3Plugin* plugin);
@@ -35,6 +44,9 @@ private:
 
     std::vector<float> inputBuf_;
     std::vector<float> outputBuf_;
+
+    Steinberg::Vst::ParameterChanges paramChanges_ = {};
+    std::vector<PendingParam> pendingParams_;
 
     Steinberg::Vst::ProcessData processData_ = {};
     Steinberg::Vst::AudioBusBuffers inputBusBuffers_ = {};

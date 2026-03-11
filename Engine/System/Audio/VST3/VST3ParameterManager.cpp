@@ -1,5 +1,7 @@
 #include "VST3ParameterManager.h"
+#include "VST3Effect.h"
 #include "pluginterfaces/base/ustring.h"
+#include <Debug/Debug.h>
 
 void Engine::VST3ParameterManager::Initialize(Steinberg::Vst::IEditController* controller)
 {
@@ -36,13 +38,24 @@ double Engine::VST3ParameterManager::GetParameter(Steinberg::Vst::ParamID id) co
     if (!controller_)
         return 0.0;
 
-    return controller_->getParamNormalized(id);
+    Steinberg::Vst::ParameterInfo info;
+    if (controller_->getParameterInfo(id, info) == Steinberg::kResultOk)
+        return controller_->getParamNormalized(info.id);
+
+    return 0.0;
 }
 
 void Engine::VST3ParameterManager::SetParameter(Steinberg::Vst::ParamID id, double normalizedValue)
 {
     if (!controller_)
         return;
+    Steinberg::Vst::ParameterInfo info;
+    if (controller_->getParameterInfo(id, info) == Steinberg::kResultOk)
+        Debug::Log(std::format("SetParameter: id={},index={}, value={}\n", info.id, id, normalizedValue));
 
-    controller_->setParamNormalized(id, normalizedValue);
+    controller_->setParamNormalized(info.id, normalizedValue);
+
+    // オーディオ処理側にもパラメータ変更を通知
+    if (effect_)
+        effect_->AddPendingParam(info.id, normalizedValue);
 }

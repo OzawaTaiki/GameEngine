@@ -7,11 +7,16 @@
 namespace Engine
 {
 
+class VST3Effect;
+
 class VST3ParameterManager
 {
 public:
     // IEditControllerを設定する
     void Initialize(Steinberg::Vst::IEditController* controller);
+
+    // VST3Effectを設定する（オーディオ処理側にパラメータ変更を通知するため）
+    void SetEffect(VST3Effect* effect) { effect_ = effect; }
 
     // パラメータの数を返す
     int32_t GetParameterCount() const;
@@ -29,6 +34,7 @@ private:
     // IEditControllerはプラグインのパラメータの読み書きを行うためのインターフェース
     // 所有権はVST3Plugin
     Steinberg::Vst::IEditController* controller_ = nullptr;
+    VST3Effect* effect_ = nullptr;
 };
 
 }// namespace Engine

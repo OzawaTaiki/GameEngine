@@ -328,3 +328,12 @@ MigrationBackup/
 FodyWeavers.xsd
 /copybat.bat
 /.claude
+
+# VST3 plugin binaries (third-party)
+*.vst3
+
+# ImGui layout settings (per-developer)
+**/imgui.ini
+
+# PDB debug symbols in Externals
+[Ee]xternals/**/*.pdb

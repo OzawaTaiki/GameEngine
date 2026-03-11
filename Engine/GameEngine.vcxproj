@@ -174,7 +174,14 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Externals\VST3SDK\base\source\fobject.cpp" />
     <ClCompile Include="Externals\VST3SDK\base\source\fstring.cpp" />
     <ClCompile Include="Externals\VST3SDK\base\source\timer.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\baseiids.cpp" />
     <ClCompile Include="Externals\VST3SDK\base\thread\source\flock.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\funknown.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\coreiids.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\ustring.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\vstinitiids.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\commonstringconvert.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\utility\stringconvert.cpp" />
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\connectionproxy.cpp" />
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\eventlist.cpp" />
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\hostclasses.cpp" />
@@ -184,6 +191,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
     </ClCompile>
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\parameterchanges.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\memorystream.cpp" />
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\pluginterfacesupport.cpp" />
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\plugprovider.cpp" />
     <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp" />

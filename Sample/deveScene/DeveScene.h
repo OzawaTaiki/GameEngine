@@ -30,8 +30,12 @@
 #include <Features/UI/Element/UIImageElement.h>
 #include <Features/UI/Element/UITextElement.h>
 
+#include <System/Audio/VST3/VST3Module.h>
+#include <System/Audio/VST3/VST3ParameterManager.h>
 
-
+#include <System/Audio/VST3/VST3Host.h>
+#include <System/Audio/VST3/VST3Plugin.h>
+#include <System/Audio/VST3/VST3Effect.h>
 
 class DeveScene : public Engine::BaseScene
 {
@@ -106,7 +110,12 @@ private:
     // UITextElement テスト
     std::unique_ptr<Engine::UITextElement> testText1_ = nullptr;
 
-
+    Engine::VST3Module* vstModule_ = nullptr;
+    std::unique_ptr<Engine::VST3Plugin> vstPlugin_;
+    Engine::VST3ParameterManager vstParamMgr_;
+    Engine::AudioEffectChain vstEffectChain_;
+    std::string vstPluginPath_ = "Resources/VST3Plugins/TDR Nova.vst3";
+    bool vstInitialized_ = false;
 
 #ifdef _DEBUG
     void ImGui();

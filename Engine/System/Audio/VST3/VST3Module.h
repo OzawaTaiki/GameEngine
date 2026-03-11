@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <public.sdk/source/vst/hosting/module.h>
+#include <optional>
 
 namespace Engine
 {
@@ -28,6 +29,9 @@ public:
 
     // ClassInfoからVST3Pluginを生成する
     std::unique_ptr<VST3Plugin> CreatePlugin(const VST3::Hosting::ClassInfo& classInfo);
+
+
+    const VST3::Hosting::PluginFactory& GetFactory(){ return module_->getFactory(); }
 
 private:
     // ロードした.vst3ファイル（DLL）の管理オブジェクト
