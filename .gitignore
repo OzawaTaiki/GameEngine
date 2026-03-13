@@ -336,4 +336,12 @@ FodyWeavers.xsd
 **/imgui.ini
 
 # PDB debug symbols in Externals
-[Ee]xternals/**/*.pdb
+**/[Ee]xternals/**/*.pdb
+
+# VST3SDK (必要なものだけ残す)
+Engine/Externals/VST3SDK/*
+!Engine/Externals/VST3SDK/pluginterfaces/
+!Engine/Externals/VST3SDK/public.sdk/
+!Engine/Externals/VST3SDK/base/
+!Engine/Externals/VST3SDK/cmake/
+!Engine/Externals/VST3SDK/CMakeLists.txt
