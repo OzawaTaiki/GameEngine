@@ -63,13 +63,14 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)NOMINMAX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)NOMINMAX;_CRT_SECURE_NO_WARNINGS;
+_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(ProjectDir)externals\VST3SDK;$(projectDir)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -105,13 +106,14 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);NOMINMAX;NOMINMAXNOMINMAX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);NOMINMAX;NOMINMAXNOMINMAX;_CRT_SECURE_NO_WARNINGS;
+_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(projectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/assimp/include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\nlohmann;$(ProjectDir)externals\imgui;$(ProjectDir)externals\VST3SDK;$(projectDir)</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <Optimization>MinSpace</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -168,6 +170,30 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
     <ClCompile Include="Debug\ImGuiManager.cpp" />
     <ClCompile Include="Debug\ImguITools.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\fdebug.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\fobject.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\fstring.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\timer.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\source\baseiids.cpp" />
+    <ClCompile Include="Externals\VST3SDK\base\thread\source\flock.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\funknown.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\coreiids.cpp" />
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\ustring.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\vstinitiids.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\commonstringconvert.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\utility\stringconvert.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\connectionproxy.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\eventlist.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\hostclasses.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module_win32.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\parameterchanges.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\memorystream.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\pluginterfacesupport.cpp" />
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\plugprovider.cpp" />
     <ClCompile Include="Features\Animation\Sequence\AnimationSequence.cpp" />
     <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp" />
     <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp" />
@@ -309,6 +335,11 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
     <ClCompile Include="System\Audio\SubmixVoice.cpp" />
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Effect.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Host.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Module.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3ParameterManager.cpp" />
+    <ClCompile Include="System\Audio\VST3\VST3Plugin.cpp" />
     <ClCompile Include="System\Input\Input.cpp" />
     <ClCompile Include="System\Input\TextInputManager.cpp" />
     <ClCompile Include="System\Time\GameTime.cpp" />
@@ -504,11 +535,17 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Math\Vector\VectorFunction.h" />
     <ClInclude Include="Settings\EngineSettings.h" />
     <ClInclude Include="System\Audio\AudioEffect.h" />
+    <ClInclude Include="System\Audio\AudioEffectBase.h" />
     <ClInclude Include="System\Audio\AudioSystem.h" />
     <ClInclude Include="System\Audio\SoundInstance.h" />
     <ClInclude Include="System\Audio\SubmixVoice.h" />
     <ClInclude Include="System\Audio\VoiceCallback.h" />
     <ClInclude Include="System\Audio\VoiceInstance.h" />
+    <ClInclude Include="System\Audio\VST3\VST3Effect.h" />
+    <ClInclude Include="System\Audio\VST3\VST3Host.h" />
+    <ClInclude Include="System\Audio\VST3\VST3Module.h" />
+    <ClInclude Include="System\Audio\VST3\VST3ParameterManager.h" />
+    <ClInclude Include="System\Audio\VST3\VST3Plugin.h" />
     <ClInclude Include="System\Input\Input.h" />
     <ClInclude Include="System\Input\TextInputManager.h" />
     <ClInclude Include="System\Time\GameTime.h" />

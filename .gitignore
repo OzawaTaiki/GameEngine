@@ -327,3 +327,21 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /copybat.bat
+/.claude
+
+# VST3 plugin binaries (third-party)
+*.vst3
+
+# ImGui layout settings (per-developer)
+**/imgui.ini
+
+# PDB debug symbols in Externals
+**/[Ee]xternals/**/*.pdb
+
+# VST3SDK (必要なものだけ残す)
+Engine/Externals/VST3SDK/*
+!Engine/Externals/VST3SDK/pluginterfaces/
+!Engine/Externals/VST3SDK/public.sdk/
+!Engine/Externals/VST3SDK/base/
+!Engine/Externals/VST3SDK/cmake/
+!Engine/Externals/VST3SDK/CMakeLists.txt

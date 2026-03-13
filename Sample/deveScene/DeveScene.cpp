@@ -22,10 +22,15 @@
 #include <Features/UI/Component/UITextRenderComponent.h>
 #include <Features/UI/Component/UISpriteRenderComponent.h>
 
+
 using namespace Engine;
 
 DeveScene::~DeveScene()
 {
+    if (vstPlugin_)
+        vstPlugin_->Terminate();
+    Engine::VST3Host::GetInstance()->Finalize();
+
 }
 
 void DeveScene::Initialize(SceneData* _sceneData)
@@ -383,6 +388,10 @@ void DeveScene::Initialize(SceneData* _sceneData)
     Debug::Log("SetEffectParameters: " + std::to_string(hrParam));
 
     // 注: スライダーの色設定は自動的に保存されます（UISliderElement内でJsonBinderを使用）
+
+    Engine::VST3Host::GetInstance()->Initialize();
+
+
 }
 
 void DeveScene::Update()
@@ -495,6 +504,85 @@ void DeveScene::Update()
             ImGui::End();
         }
 
+        if (ImGuiDebugManager::GetInstance()->Begin("VST"))
+        {
+            static char buffer[MAX_PATH] = {};
+            if (ImGui::InputText("VST3 Plugin Path", buffer, MAX_PATH))
+            {
+                vstPluginPath_ = buffer;
+            }
+
+            if (ImGui::Button("Load"))
+            {
+                auto host = Engine::VST3Host::GetInstance();
+                vstModule_ = host->LoadModule(vstPluginPath_);
+                if (vstModule_)
+                {
+                    auto classes = vstModule_->GetAudioEffectClasses();
+                    if (!classes.empty())
+                    {
+                        vstPlugin_ = vstModule_->CreatePlugin(classes[0]);
+                        if (vstPlugin_)
+                        {
+                            float sr = soundInstance_ ? soundInstance_->GetSampleRate() : 48000.0f;
+                            bool initOk = vstPlugin_->Initialize(vstModule_->GetFactory(), host->GetHostApp(), sr, 4096, 2, 2);
+                            if (initOk)
+                            {
+                                vstParamMgr_.Initialize(vstPlugin_->GetController());
+                                vstInitialized_ = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (vstInitialized_ && vstPlugin_)
+            {
+                ImGui::Text("Plugin: %s", vstPlugin_->GetName().c_str());
+                int paramCount = vstParamMgr_.GetParameterCount();
+                ImGui::Text("Parameter count: %d", paramCount);
+                for (int i = 0; i < paramCount && i < 8; ++i)
+                {
+                    ImGui::Text("  [%d] %s", i, vstParamMgr_.GetParameterName(i).c_str());
+                    ImGui::SameLine();
+                    ImGui::Spacing();
+                    float value = static_cast<float>(vstParamMgr_.GetParameter(i));
+                    ImGui::PushID(i);
+                    if (ImGui::DragFloat("##value", &value, 0.01f, 0.0f, 1.0f))
+                    {
+                        vstParamMgr_.SetParameter(i, value);
+                    }
+                    ImGui::PopID();
+                }
+
+                if (ImGui::Button("Play with VST3 Effect"))
+                {
+                    if (soundInstance_)
+                    {
+                        IUnknown* xapo = nullptr;
+                        if (SUCCEEDED(Engine::VST3Effect::Create(vstPlugin_.get(), &xapo)) && xapo)
+                        {
+                            // パラメータ変更をオーディオ処理に反映するためeffectを接続
+                            vstParamMgr_.SetEffect(static_cast<Engine::VST3Effect*>(static_cast<IXAPO*>(xapo)));
+
+                            vstEffectChain_ = Engine::AudioEffectChain{};
+                            vstEffectChain_.AddEffect(Engine::AudioEffect(xapo, 2, true));
+                            xapo->Release();
+
+                            // エフェクトチェーンをCreateSourceVoice時に渡す
+                            auto* chain = vstEffectChain_.BuildChain();
+                            auto voice = soundInstance_->GenerateVoiceInstance(1.0f, 0.0f, false, true, nullptr, nullptr, chain);
+                            if (voice)
+                            {
+                                vstEffectChain_.AttachToVoice(voice->GetSourceVoice());
+                                voice->Play();
+                                voiceInstance_ = voice;
+                            }
+                        }
+                    }
+                }
+            }
+            ImGui::End();
+        }
 
 
         // light調整用

@@ -21,7 +21,7 @@ SoundInstance::~SoundInstance()
 {
 }
 
-std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix)
+std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix, const XAUDIO2_EFFECT_CHAIN* _effectChain)
 {
     //保留
     if (!_enableOverlap) {}
@@ -44,7 +44,7 @@ std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volum
         XAUDIO2_DEFAULT_FREQ_RATIO, // Frequency ratio
         _callback,// コールバック関数
         sendList, // Send list
-        nullptr // Effect chain
+        _effectChain // Effect chain
     );
 
     if (!SUCCEEDED(hresult))

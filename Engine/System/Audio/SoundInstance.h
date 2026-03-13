@@ -21,7 +21,7 @@ public:
     SoundInstance(uint32_t _soundID, AudioSystem* _audioSystem, float _sampleRate);
     ~SoundInstance();
 
-    std::shared_ptr<VoiceInstance> GenerateVoiceInstance(float _volume = 1.0f, float _startTime = 0.0f, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr, SubmixVoice* _submix = nullptr);
+    std::shared_ptr<VoiceInstance> GenerateVoiceInstance(float _volume = 1.0f, float _startTime = 0.0f, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr, SubmixVoice* _submix = nullptr, const XAUDIO2_EFFECT_CHAIN* _effectChain = nullptr);
 
     std::shared_ptr<VoiceInstance> Play(float _volume, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr, SubmixVoice* _submix = nullptr);
     std::shared_ptr<VoiceInstance> Play(float _volume, float _startTime, bool _loop = false, bool _enableOverlap = true, VoiceCallBack* _callback = nullptr, SubmixVoice* _submix = nullptr);

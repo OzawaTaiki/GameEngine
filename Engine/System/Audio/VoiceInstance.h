@@ -93,6 +93,11 @@ public:
     /// <returns>再生速度</returns>
     float GetPlaySpeed() const { return playSpeed_; }
 
+    /// <summary>
+    /// 音声ソースボイスを取得
+    /// </summary>
+    IXAudio2SourceVoice* GetSourceVoice() const { return sourceVoice_; }
+
 private:
     /// <summary>
     /// HRESULTをチェックし、エラーがあれば例外を投げる
