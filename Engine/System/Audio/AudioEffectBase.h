@@ -3,7 +3,7 @@
 #include <xapobase.h>
 #include <string>
 
-#pragma comment(lib, "xapobase.lib")
+#pragma comment(lib, "xapobase2_8.lib")
 
 namespace Engine
 {
