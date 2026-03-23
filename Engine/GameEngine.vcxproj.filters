@@ -729,7 +729,6 @@
     <ClCompile Include="Features\TextRenderer\Text3DRenderer.cpp">
       <Filter>Features\Text</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Color\Color.cpp" />
     <ClCompile Include="Features\UI\UINavigationManager.cpp">
       <Filter>Features\UI</Filter>
     </ClCompile>
@@ -828,6 +827,36 @@
     </ClCompile>
     <ClCompile Include="System\Audio\VST3\VST3ParameterManager.cpp">
       <Filter>System\Audio\VST3</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Audio\SoundEngine.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\base\source\baseiids.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Color\Color.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\commonstringconvert.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\coreiids.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\funknown.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\memorystream.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\utility\stringconvert.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\ustring.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\vstinitiids.cpp">
+      <Filter>Extarnals\VST3SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1400,6 +1429,12 @@
     </ClInclude>
     <ClInclude Include="System\Audio\VST3\VST3Effect.h">
       <Filter>System\Audio\VST3</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SoundEngine.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\SoundEventDef.h">
+      <Filter>System\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

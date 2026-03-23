@@ -23,8 +23,19 @@ SoundInstance::~SoundInstance()
 
 std::shared_ptr<VoiceInstance> SoundInstance::GenerateVoiceInstance(float _volume, float _startTime, bool _loop, bool _enableOverlap, VoiceCallBack* _callback, SubmixVoice* _submix, const XAUDIO2_EFFECT_CHAIN* _effectChain)
 {
-    //保留
-    if (!_enableOverlap) {}
+    if (!_enableOverlap)
+    {
+        // 既存の再生中ボイスをすべて停止してから新規生成する
+        for (auto& weak : voiceInstance_)
+        {
+            if (auto voice = weak.lock())
+            {
+                if (voice->IsPlaying())
+                    voice->Stop();
+            }
+        }
+        voiceInstance_.clear();
+    }
 
     HRESULT hresult = S_FALSE;
 
