@@ -11,6 +11,8 @@
 #include <Features/Model/Primitive/Creater/PrimitiveCreator.h>
 #include <Features/UI/Collider/UIColliderSerializer.h>
 #include <Features/Effect/ParticleInitParam.h>
+#include <System/Audio/SoundDef.h>
+#include <System/Audio/SoundEventDef.h>
 
 
 #include <Features/TextRenderer/AtlasData.h>
@@ -22,7 +24,8 @@ using json = nlohmann::json;
 
 // Vector2
 
-namespace Engine {
+namespace Engine
+{
 
 void to_json(json& _j, const Vector2& _v);
 void from_json(const json& _j, Vector2& _v);
@@ -127,5 +130,27 @@ void from_json(const json& _j, FontConfig& _config);
 /// particle/ParticleInitParam.h
 void to_json(json& _j, const ParticleInitParam& _param);
 void from_json(const json& _j, ParticleInitParam& _param);
+
+/// SoundDef
+void to_json(json& _j, const SoundDef& _v);
+void from_json(const json& _j, SoundDef& _v);
+
+/// SoundEventDef
+void to_json(json& _j, const SoundEventAction& _v);
+void from_json(const json& _j, SoundEventAction& _v);
+
+/// SoundEventDef
+void to_json(json& _j, const SoundEventDef& _v);
+void from_json(const json& _j, SoundEventDef& _v);
+
+/// SoundEventTypeのJSONシリアライズ
+NLOHMANN_JSON_SERIALIZE_ENUM(SoundEventType, {
+    { SoundEventType::Play, "Play" },
+    { SoundEventType::Stop, "Stop" },
+    { SoundEventType::Pause, "Pause" },
+    { SoundEventType::Resume, "Resume" },
+    { SoundEventType::SetVolume, "SetVolume" }
+                             });
+
 
 } // namespace Engine

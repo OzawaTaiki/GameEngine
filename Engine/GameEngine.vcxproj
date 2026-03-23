@@ -332,6 +332,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Settings\EngineSettings.cpp" />
     <ClCompile Include="System\Audio\AudioEffect.cpp" />
     <ClCompile Include="System\Audio\AudioSystem.cpp" />
+    <ClCompile Include="System\Audio\SoundEngine.cpp" />
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
     <ClCompile Include="System\Audio\SubmixVoice.cpp" />
     <ClCompile Include="System\Audio\VoiceInstance.cpp" />
@@ -537,6 +538,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="System\Audio\AudioEffect.h" />
     <ClInclude Include="System\Audio\AudioEffectBase.h" />
     <ClInclude Include="System\Audio\AudioSystem.h" />
+    <ClInclude Include="System\Audio\SoundEngine.h" />
+    <ClInclude Include="System\Audio\SoundEventDef.h" />
     <ClInclude Include="System\Audio\SoundInstance.h" />
     <ClInclude Include="System\Audio\SubmixVoice.h" />
     <ClInclude Include="System\Audio\VoiceCallback.h" />

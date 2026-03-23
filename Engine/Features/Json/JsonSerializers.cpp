@@ -4,7 +4,8 @@
 #include <Utility/StringUtils/StringUitls.h>
 
 
-namespace Engine {
+namespace Engine
+{
 
 void to_json(json& _j, const Vector2& _v)
 {
@@ -583,6 +584,64 @@ void from_json(const json& _j, ParticleInitParam& _v)
         _v.size = _j["size"].get<Vector3>();
     if (_j.contains("speed"))
         _v.speed = _j["speed"].get<float>();
+}
+
+/// SoundDef
+
+void to_json(json& _j, const SoundDef& _v)
+{
+    _j = json{
+        {"id",            _v.id           },
+        {"path",          _v.filePath     },
+        {"type",          _v.type         },
+        {"enableOverlap", _v.enableOverlap},
+    };
+}
+
+void from_json(const json& _j, SoundDef& _v)
+{
+    if (_j.contains("id"))
+        _v.id = _j["id"].get<std::string>();
+    if (_j.contains("path"))
+        _v.filePath = _j["path"].get<std::string>();
+    _v.type          = _j.value("type", std::string("SE"));
+    _v.enableOverlap = _j.value("enableOverlap", true);
+}
+
+void to_json(json& _j, const SoundEventAction& _v)
+{
+    _j = json{
+        {"type", _v.type},
+        {"soundId", _v.soundId},
+        {"volume", _v.volume},
+        {"loop", _v.loop}
+    };
+}
+
+void from_json(const json& _j, SoundEventAction& _v)
+{
+    if (_j.contains("type"))
+        _v.type = _j["type"].get<SoundEventType>();
+    if (_j.contains("soundId"))
+        _v.soundId = _j["soundId"].get<std::string>();
+    _v.volume = _j.value("volume", 1.0f);
+    _v.loop = _j.value("loop", false);
+}
+
+void to_json(json& _j, const SoundEventDef& _v)
+{
+    _j = json{
+        {"name", _v.name},
+        {"actions", _v.actions}
+    };
+}
+
+void from_json(const json& _j, SoundEventDef& _v)
+{
+    if (_j.contains("name"))
+        _v.name = _j["name"].get<std::string>();
+    if (_j.contains("actions"))
+        _v.actions = _j["actions"].get<std::vector<SoundEventAction>>();
 }
 
 } // namespace Engine
