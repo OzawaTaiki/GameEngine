@@ -614,7 +614,8 @@ void to_json(json& _j, const SoundEventAction& _v)
         {"type", _v.type},
         {"soundId", _v.soundId},
         {"volume", _v.volume},
-        {"loop", _v.loop}
+        {"loop", _v.loop},
+        {"effects", _v.effects}
     };
 }
 
@@ -626,6 +627,8 @@ void from_json(const json& _j, SoundEventAction& _v)
         _v.soundId = _j["soundId"].get<std::string>();
     _v.volume = _j.value("volume", 1.0f);
     _v.loop = _j.value("loop", false);
+    if (_j.contains("effects"))
+        _v.effects = _j["effects"].get<std::vector<std::string>>();
 }
 
 void to_json(json& _j, const SoundEventDef& _v)
@@ -644,4 +647,25 @@ void from_json(const json& _j, SoundEventDef& _v)
         _v.actions = _j["actions"].get<std::vector<SoundEventAction>>();
 }
 
+void to_json(json& _j, const AudioEffectDef& _v)
+{
+    _j = json{
+        {"name", _v.name},
+        {"type", _v.type},
+        {"path", _v.path},
+        {"className",_v.className}
+    };
+}
+
+void from_json(const json& _j, AudioEffectDef& _v)
+{
+    if (_j.contains("name"))
+        _v.name = _j["name"].get<std::string>();
+    if (_j.contains("type"))
+        _v.type = _j["type"].get<AudioEffectType>();
+    if (_j.contains("path"))
+        _v.path = _j["path"].get<std::string>();
+    if (_j.contains("className"))
+        _v.className = _j["className"].get<std::string>();
+}
 } // namespace Engine

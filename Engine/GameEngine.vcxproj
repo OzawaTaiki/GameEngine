@@ -331,6 +331,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Math\Vector\VectorFunction.cpp" />
     <ClCompile Include="Settings\EngineSettings.cpp" />
     <ClCompile Include="System\Audio\AudioEffect.cpp" />
+    <ClCompile Include="System\Audio\AudioEffectManager.cpp" />
     <ClCompile Include="System\Audio\AudioSystem.cpp" />
     <ClCompile Include="System\Audio\SoundEngine.cpp" />
     <ClCompile Include="System\Audio\SoundInstance.cpp" />
@@ -537,6 +538,8 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Settings\EngineSettings.h" />
     <ClInclude Include="System\Audio\AudioEffect.h" />
     <ClInclude Include="System\Audio\AudioEffectBase.h" />
+    <ClInclude Include="System\Audio\AudioEffectDef.h" />
+    <ClInclude Include="System\Audio\AudioEffectManager.h" />
     <ClInclude Include="System\Audio\AudioSystem.h" />
     <ClInclude Include="System\Audio\SoundEngine.h" />
     <ClInclude Include="System\Audio\SoundEventDef.h" />
