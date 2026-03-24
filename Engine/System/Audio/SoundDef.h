@@ -2,7 +2,8 @@
 
 #include <string>
 
-namespace Engine {
+namespace Engine
+{
 
 /// <summary>
 /// SoundEngine に登録するサウンド定義。

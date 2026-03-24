@@ -4,6 +4,7 @@
 #include <System/Audio/SoundInstance.h>
 #include <System/Audio/VoiceInstance.h>
 #include <System/Audio/SubmixVoice.h>
+#include <System/Audio/AudioEffectManager.h>
 
 #include <Features/Json/JsonSerializers.h>
 #include <Debug/Debug.h>
@@ -100,8 +101,13 @@ void SoundEngine::PostEvent(const std::string& eventName)
         switch (action.type)
         {
             case SoundEventType::Play:
-                Play(action.soundId, action.volume, action.loop);
+            {
+                if (action.effects.empty())
+                    Play(action.soundId, action.volume, action.loop);
+                else
+                    Play(action.soundId, action.effects, action.volume, action.loop);
                 break;
+            }
             case SoundEventType::Stop:
             {
                 std::vector<SoundHandle> targets;
@@ -178,6 +184,51 @@ SoundHandle SoundEngine::Play(const std::string& soundId,
         nullptr,             // コールバック
         submix,              // submix
         nullptr              // エフェクトチェーン（なし）
+    );
+
+    if (!voice)
+        return kInvalidHandle;
+
+    voice->Play();
+
+    SoundHandle handle = GenerateHandle();
+    playingSounds_[handle] = PlayingSound{ soundInstance, voice, soundId };
+    return handle;
+}
+
+SoundHandle SoundEngine::Play(const std::string& soundId,
+                              const std::vector<std::string>& effects,
+                              float volume,
+                              bool loop,
+                              float startTime)
+{
+    auto instIt = loadedInstances_.find(soundId);
+    if (instIt == loadedInstances_.end())
+        return kInvalidHandle;
+
+    auto defIt = soundDefs_.find(soundId);
+    if (defIt == soundDefs_.end())
+        return kInvalidHandle;
+
+    const SoundDef& def           = defIt->second;
+    auto& soundInstance = instIt->second;
+
+    // BGM / SE に応じて submix を選択
+    SubmixVoice* submix = (def.type == "BGM")
+        ? AudioSystem::GetInstance()->GetBGMSubmix()
+        : AudioSystem::GetInstance()->GetSESubmix();
+
+    // effects からエフェクトチェーンを構築
+    auto effectChain = AudioEffectManager::GetInstance()->BuildEffectChain(effects);
+
+    auto voice = soundInstance->GenerateVoiceInstance(
+        volume,              // 音量
+        startTime,           // 再生開始位置（秒）
+        loop,                // ループ
+        def.enableOverlap,   // 重複再生（SoundDef で指定）
+        nullptr,             // コールバック
+        submix,              // submix
+        effectChain.BuildChain()              // エフェクトチェーン
     );
 
     if (!voice)

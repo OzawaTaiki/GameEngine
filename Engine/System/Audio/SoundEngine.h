@@ -9,10 +9,12 @@
 #include <vector>
 #include <cstdint>
 
-namespace Engine {
+namespace Engine
+{
 
 class SoundInstance;
 class VoiceInstance;
+
 
 /// <summary>
 /// 再生中のサウンドを識別するハンドル型。
@@ -63,15 +65,21 @@ public:
                      bool  loop      = false,
                      float startTime = 0.0f);
 
-    void Stop  (SoundHandle handle);
+    SoundHandle Play(const std::string& soundId,
+                     const std::vector<std::string>& effects,
+                     float volume = 1.0f,
+                     bool loop = false,
+                     float startTime = 0.0f);
+
+    void Stop(SoundHandle handle);
     void StopAll();
-    void Pause (SoundHandle handle);
+    void Pause(SoundHandle handle);
     void Resume(SoundHandle handle);
     void SetVolume(SoundHandle handle, float volume);
 
-    bool  IsPlaying    (SoundHandle handle) const;
+    bool  IsPlaying(SoundHandle handle) const;
     float GetElapsedTime(SoundHandle handle) const;
-    float GetDuration  (const std::string& soundId) const;
+    float GetDuration(const std::string& soundId) const;
 
     /// <summary>
     /// 再生終了済みエントリをクリーンアップする。毎フレーム呼ぶことを推奨。

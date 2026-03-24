@@ -21,6 +21,7 @@ struct SoundEventAction
     std::string soundId; // Play の場合に使用
     float volume;       // SetVolume の場合に使用
     bool loop;          // Play の場合に使用
+    std::vector<std::string> effects;// 適用するエフェクト
 };
 
 

@@ -13,9 +13,10 @@
 #include <Features/Effect/ParticleInitParam.h>
 #include <System/Audio/SoundDef.h>
 #include <System/Audio/SoundEventDef.h>
-
-
+#include <System/Audio/AudioEffectDef.h>
 #include <Features/TextRenderer/AtlasData.h>
+
+
 
 #include <json.hpp>
 
@@ -143,6 +144,10 @@ void from_json(const json& _j, SoundEventAction& _v);
 void to_json(json& _j, const SoundEventDef& _v);
 void from_json(const json& _j, SoundEventDef& _v);
 
+/// AudioEffectDef
+void to_json(json& _j, const AudioEffectDef& _v);
+void from_json(const json& _j, AudioEffectDef& _v);
+
 /// SoundEventTypeのJSONシリアライズ
 NLOHMANN_JSON_SERIALIZE_ENUM(SoundEventType, {
     { SoundEventType::Play, "Play" },
@@ -150,6 +155,11 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SoundEventType, {
     { SoundEventType::Pause, "Pause" },
     { SoundEventType::Resume, "Resume" },
     { SoundEventType::SetVolume, "SetVolume" }
+                             });
+/// AudioEffectDef
+NLOHMANN_JSON_SERIALIZE_ENUM(AudioEffectType, {
+    { AudioEffectType::Native, "Native"},
+    { AudioEffectType::VST3,"VST3" }
                              });
 
 

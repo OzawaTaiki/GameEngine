@@ -858,6 +858,9 @@
     <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\vstinitiids.cpp">
       <Filter>Extarnals\VST3SDK</Filter>
     </ClCompile>
+    <ClCompile Include="System\Audio\AudioEffectManager.cpp">
+      <Filter>System\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1434,6 +1437,12 @@
       <Filter>System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="System\Audio\SoundEventDef.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioEffectDef.h">
+      <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Audio\AudioEffectManager.h">
       <Filter>System\Audio</Filter>
     </ClInclude>
   </ItemGroup>
