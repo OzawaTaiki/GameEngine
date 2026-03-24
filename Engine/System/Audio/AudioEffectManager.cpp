@@ -30,6 +30,14 @@ void AudioEffectManager::Initialize()
 
 void AudioEffectManager::Finalize()
 {
+    for (auto& modulePair : loadedModules_)
+    {
+        auto& plugins = modulePair.second.plugins;
+        for (auto& pluginPair : plugins)
+        {
+            pluginPair.second->plugin->Terminate();
+        }
+    }
 }
 
 void AudioEffectManager::LoadEffectData(const std::string& jsonPath)
