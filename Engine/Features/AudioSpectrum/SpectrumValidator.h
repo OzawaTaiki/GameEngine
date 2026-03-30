@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <iostream>
 
-
 namespace Engine {
 
 namespace SpectrumTest

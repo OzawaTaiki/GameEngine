@@ -861,6 +861,7 @@
     <ClCompile Include="System\Audio\AudioEffectManager.cpp">
       <Filter>System\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1444,6 +1445,9 @@
     </ClInclude>
     <ClInclude Include="System\Audio\AudioEffectManager.h">
       <Filter>System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\AudioSpectrum\FFTCS.h">
+      <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
