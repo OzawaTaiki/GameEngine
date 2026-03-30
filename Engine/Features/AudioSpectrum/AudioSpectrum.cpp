@@ -1,6 +1,7 @@
 #include "AudioSpectrum.h"
 
 #include <Debug/ImGuiDebugManager.h>
+#include <Features/AudioSpectrum/FFTCS.h>
 
 #include <numbers>
 #include <Debug/Debug.h>
@@ -14,6 +15,10 @@ AudioSpectrum::AudioSpectrum(size_t windowSize)
 {
     // ウィンドウサイズを2のべき乗に調整
     windowSize_ = GetNextPowerOf2(windowSize);
+}
+
+AudioSpectrum::~AudioSpectrum()
+{
 }
 
 // X(k) = Σ[n=0 to N-1] x(n) * e^(-i*2π*k*n/N)
@@ -192,7 +197,7 @@ void AudioSpectrum::FFT(const std::vector<float>& in, std::vector<std::complex<f
         ImGui::End();
     }
 
-    else if (ftMode == 0)
+    if (ftMode == 0)
     {
         // 再帰的にFFTを実行
         RecursiveFFT(out);
@@ -224,6 +229,14 @@ void AudioSpectrum::FFT(const std::vector<float>& in, std::vector<std::complex<f
 #endif // _DEBUG
 
 
+}
+
+void AudioSpectrum::SetFFTSize(size_t newSize)
+{
+    windowSize_ = newSize;
+    fftCS_.reset();
+    cashedTime_ = -1.0f;
+    cashedSpectrum_.clear();
 }
 
 std::vector<float> AudioSpectrum::GetSpectrumAtTime(float _time)
@@ -389,7 +402,7 @@ void AudioSpectrum::GetSpectrumIndexRange(float minHz, float maxHz, size_t& outB
 
 std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
 {
-    std::vector<float> segment(1024, 0.0f);  // ゼロで初期化
+    std::vector<float> segment(windowSize_, 0.0f);  // ゼロで初期化
 
     size_t centerIndex = static_cast<size_t>(sampleRate_ * _time);
     size_t windowHalfSize = static_cast<size_t>(windowSize_ * 0.5f);
@@ -405,27 +418,62 @@ std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
     size_t copyLength = audioEnd - audioStart;
 
     // データをコピー
-    if (copyLength > 0 && bufferOffset + copyLength <= 1024)
+    if (copyLength > 0 && bufferOffset + copyLength <= windowSize_)
     {
         std::copy(audioData_.begin() + audioStart,
                   audioData_.begin() + audioEnd,
                   segment.begin() + bufferOffset);
     }
 
-    // FFT実行
-    std::vector<std::complex<float>> fftResult;
-    FFT(segment, fftResult);
+    std::vector<float> magnitude;
 
-    // マグニチュード計算
-    std::vector<float> magnitude(fftResult.size() / 2);
-
-    // ハニング窓のゲイン補正係数 (窓関数の平均値の逆数)
-    const float windowGain = 2.0f;
-    // FFTの正規化係数
-    const float fftNorm = 1.0f / static_cast<float>(fftResult.size());
-    for (size_t i = 0; i < magnitude.size(); ++i)
+#ifdef _DEBUG
+    if (ImGuiDebugManager::GetInstance()->Begin("Fourier Transform"))
     {
-        magnitude[i] = std::abs(fftResult[i]) * windowGain * fftNorm;
+        ImGui::Checkbox("Use GPU FFT", &useGPU_);
+        ImGui::Separator();
+        if (useGPU_ && fftCS_)
+        {
+            ImGui::Text("Upload  : %llu us", fftCS_->GetUploadUs());
+            ImGui::Text("CL      : %llu us", fftCS_->GetCLUs());
+            ImGui::Text("GPU wait: %llu us", fftCS_->GetGPUUs());
+            ImGui::Text("Readback: %llu us", fftCS_->GetReadbackUs());
+            ImGui::Separator();
+            ImGui::Text("Total   : %llu us", fftCS_->GetTotalUs());
+        }
+        else if (!useGPU_)
+        {
+            ImGui::Text("Total   : %llu us", cpuTotalUs_);
+        }
+        ImGui::End();
+    }
+#endif
+
+    if (useGPU_)
+    {
+        if (!fftCS_)
+        {
+            fftCS_ = std::make_unique<FFTCS>();
+            fftCS_->Initialize(static_cast<uint32_t>(windowSize_));
+        }
+        fftCS_->Execute(segment, magnitude);
+    }
+    else
+    {
+        using clock = std::chrono::high_resolution_clock;
+        auto t0 = clock::now();
+
+        std::vector<std::complex<float>> fftResult;
+        FFT(segment, fftResult);
+
+        magnitude.resize(fftResult.size() / 2);
+        const float windowGain = 2.0f;
+        const float fftNorm    = 1.0f / static_cast<float>(fftResult.size());
+        for (size_t i = 0; i < magnitude.size(); ++i)
+            magnitude[i] = std::abs(fftResult[i]) * windowGain * fftNorm;
+
+        cpuTotalUs_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            clock::now() - t0).count();
     }
 
     return magnitude;

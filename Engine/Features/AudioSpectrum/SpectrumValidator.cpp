@@ -1,4 +1,5 @@
 #include "SpectrumValidator.h"
+#include <Features/AudioSpectrum/FFTCS.h>
 #include <Debug/Debug.h>
 #include <chrono>
 

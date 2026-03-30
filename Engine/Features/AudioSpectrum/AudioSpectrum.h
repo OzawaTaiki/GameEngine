@@ -3,9 +3,12 @@
 #include <vector>
 #include <array>
 #include <complex>
+#include <memory>
 
 
 namespace Engine {
+
+class FFTCS;
 
 class AudioSpectrum
 {
@@ -16,9 +19,7 @@ public:
     /// <param name="windowSize">FFTの窓サイズ (2のべき乗)</param>
     AudioSpectrum(size_t windowSize = 1024);
 
-    ~AudioSpectrum()= default;
-
-
+    ~AudioSpectrum();
 
     // 離散フーリエ変換
     std::vector<std::complex<float>> DFT(const std::vector<float>& _input);
@@ -41,6 +42,7 @@ public:
 
     void SetAudioData(const std::vector<float>& _audioData) { audioData_ = _audioData; }
     void SetSampleRate(float _sampleRate) { sampleRate_ = _sampleRate; }
+    void SetFFTSize(size_t newSize);
     float GetSampleRate() const { return sampleRate_; }
 
 
@@ -74,6 +76,12 @@ private:
 
     std::vector<float> audioData_; // 入力音声データ
     float sampleRate_ = 44100.0f; // サンプリングレート
+
+
+    std::unique_ptr<FFTCS> fftCS_; // GPUでのFFT計算クラスへのポインタ
+
+    bool useGPU_ = true; // true: GPU(FFTCS) / false: CPU(IterativeFFT)
+    uint64_t cpuTotalUs_ = 0; // CPU パスの計測結果
 
 };
 
