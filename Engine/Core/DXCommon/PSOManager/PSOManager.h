@@ -65,6 +65,7 @@ private:
     void CreateDefaultPSOs();
 
     void CreatePSOForModel(PSOFlags _flags);
+    void CreatePSOForInstancedModel();
     void CreatePSOForSprite(PSOFlags _flags);
     void CreatePSOForLineDrawer(PSOFlags _flags);
     void CreatePSOForParticle(PSOFlags _flags);

@@ -29,7 +29,6 @@ struct Vector4
     Vector3 xyz()const { return Vector3(x, y, z); }
 
 
-
     inline void operator =(const Vector3& _v) {
         x = _v.x;
         y = _v.y;

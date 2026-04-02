@@ -7,7 +7,8 @@
 #include <cassert>
 
 
-namespace Engine {
+namespace Engine
+{
 
 PSOFactory* PSOFactory::GetInstance()
 {
@@ -78,6 +79,23 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature>PSOFactory::CreateModelRootSignature(
         .AddDefaultStaticSampler(0)                 // gSampler (s0)
         .AddDepthComparisonStaticSampler(1)         // gShadowSampler (s1)
         .AddDefaultStaticSampler(2) // gPointLightShadowSampler (s2)
+        .Build();
+}
+
+Microsoft::WRL::ComPtr<ID3D12RootSignature> PSOFactory::CreateInstancedModelRootSignature()
+{
+    return RootSignatureBuilder()
+        .AddCBV(0, D3D12_SHADER_VISIBILITY_ALL)             // [0] Camera (VS/PS)
+        .AddSRVTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX)  // [1] InstanceData (t0, StructuredBuffer)
+        .AddCBV(1, D3D12_SHADER_VISIBILITY_PIXEL)           // [2] gMaterial (PS)
+        .AddSRVTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL)   // [3] gTexture (t0)
+        .AddCBV(3, D3D12_SHADER_VISIBILITY_ALL)             // [4] gLightGroup (VS/PS)
+        .AddSRVTable(1, 1, D3D12_SHADER_VISIBILITY_PIXEL)   // [5] gShadowMap (t1)
+        .AddSRVTable(1, 2, D3D12_SHADER_VISIBILITY_PIXEL)   // [6] gPointLightShadowMap (t2)
+        .AddSRVTable(1, 3, D3D12_SHADER_VISIBILITY_PIXEL)   // [7] gEnviromentTexture (t3)
+        .AddDefaultStaticSampler(0)                         // gSampler (s0)
+        .AddDepthComparisonStaticSampler(1)                 // gShadowSampler (s1)
+        .AddDefaultStaticSampler(2)                         // gPointLightShadowSampler (s2)
         .Build();
 }
 

@@ -9,7 +9,8 @@
 #include <chrono>
 
 
-namespace Engine {
+namespace Engine
+{
 
 AudioSpectrum::AudioSpectrum(size_t windowSize)
 {
@@ -241,8 +242,11 @@ void AudioSpectrum::SetFFTSize(size_t newSize)
 
 std::vector<float> AudioSpectrum::GetSpectrumAtTime(float _time)
 {
+#ifndef _DEBUG
+
     if (std::abs(_time - cashedTime_) < 0.01f)
         return cashedSpectrum_;
+#endif // _DEBUG
 
     auto spectrum = ComputeSpectrum(_time);
 

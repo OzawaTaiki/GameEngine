@@ -862,6 +862,9 @@
       <Filter>System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp" />
+    <ClCompile Include="Features\Model\InstancedObjectModel.cpp">
+      <Filter>Features\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -878,6 +881,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Resources\Shader\Sprite.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shader\Object3dInstanced.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -1449,6 +1455,9 @@
     <ClInclude Include="Features\AudioSpectrum\FFTCS.h">
       <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
+    <ClInclude Include="Features\Model\InstancedObjectModel.h">
+      <Filter>Features\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\FullScreen.PS.hlsl">
@@ -1561,6 +1570,12 @@
     </FxCompile>
     <FxCompile Include="Resources\Shader\Downsample.hlsl">
       <Filter>Shaders\PostEffects\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Object3dInstanced.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shader\Object3dInstanced.PS.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
