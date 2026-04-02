@@ -187,6 +187,8 @@ void PSOManager::CreateDefaultPSOs()
         factory->CreateTextRootSignature();
     rootSignatures_[static_cast<uint64_t>(PSOFlags::Type::Composite)] =
         factory->CreateOffScreenRootSignature();
+    regiterRootSignature_["InstancedModel"] =
+        factory->CreateInstancedModelRootSignature();
 
     CreatePSOForModel(PSOFlags::ForNormalModel());
     CreatePSOForModel(PSOFlags::ForAlphaModel());
@@ -200,6 +202,7 @@ void PSOManager::CreateDefaultPSOs()
     CreatePSOForDLShadowMap();
     CreatePSOForPLShadowMap();
     CreatePSOForSkyBox();
+    CreatePSOForInstancedModel();
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
@@ -211,6 +214,17 @@ void PSOManager::CreatePSOForModel(PSOFlags _flags)
         .SetRootSignature(
             rootSignatures_[static_cast<uint64_t>(PSOFlags::Type::Model)]
             .Get())
+        .UseModelInputLayout()
+        .Build();
+}
+
+void PSOManager::CreatePSOForInstancedModel()
+{
+    registerPSO_["InstancedModel"] =
+        PSOBuilder::Create()
+        .SetShaders("InstancedModel_VS", "InstancedModel_PS")
+        .SetFlags(PSOFlags::ForNormalModel())
+        .SetRootSignature(regiterRootSignature_["InstancedModel"].Get())
         .UseModelInputLayout()
         .Build();
 }

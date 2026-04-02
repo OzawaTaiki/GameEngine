@@ -22,7 +22,6 @@ struct Matrix4x4
 
 	Vector3 GetTranslate() const;
 
-
 	Matrix4x4 operator*(const Matrix4x4& _mat);
 
 	Matrix4x4& operator*=(const Matrix4x4& _mat);

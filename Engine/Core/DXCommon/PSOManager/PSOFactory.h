@@ -29,6 +29,7 @@ public:
 
     // 各タイプ別のRootSignature作成
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateModelRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateInstancedModelRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateSpriteRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateParticleRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateOffScreenRootSignature();

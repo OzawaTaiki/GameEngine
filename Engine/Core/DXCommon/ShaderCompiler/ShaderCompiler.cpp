@@ -135,6 +135,10 @@ void ShaderCompiler::RegisterCommonShaders() {
   Register("Model_VS", L"Object3d.VS.hlsl", L"vs_6_0");
   Register("Model_PS", L"Object3d.PS.hlsl", L"ps_6_0");
 
+  // モデルインスタンシング描画用
+  Register("InstancedModel_VS", L"Object3dInstanced.VS.hlsl", L"vs_6_0");
+  Register("InstancedModel_PS", L"Object3dInstanced.PS.hlsl", L"ps_6_0");
+
   // スプライト用
   Register("Sprite_VS", L"Sprite.VS.hlsl", L"vs_6_0");
   Register("Sprite_PS", L"Sprite.PS.hlsl", L"ps_6_0");
