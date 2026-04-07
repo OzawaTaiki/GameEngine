@@ -451,6 +451,9 @@ std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
         }
         ImGui::End();
     }
+
+
+
 #endif
 
     if (useGPU_)
@@ -480,6 +483,24 @@ std::vector<float> AudioSpectrum::ComputeSpectrum(float _time)
             clock::now() - t0).count();
     }
 
+
+
+    Debug::Log(std::format("===== profile : {} ==== \n", useGPU_ ? "GPU FFT" : "CPU FFT"));
+    if (useGPU_)
+    {
+        if (fftCS_)
+        {
+            Debug::Log(std::format("Upload  : {} us\n", fftCS_->GetUploadUs()));
+            Debug::Log(std::format("CL      : {} us\n", fftCS_->GetCLUs()));
+            Debug::Log(std::format("GPU wait: {} us\n", fftCS_->GetGPUUs()));
+            Debug::Log(std::format("Readback: {} us\n", fftCS_->GetReadbackUs()));
+            Debug::Log(std::format("Total   : {} us\n", fftCS_->GetTotalUs()));
+        }
+    }
+    else
+    {
+        Debug::Log(std::format("Total   : {} us\n", cpuTotalUs_));
+    }
     return magnitude;
 
 }

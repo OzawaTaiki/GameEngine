@@ -264,6 +264,9 @@ void WaveformDisplay::DrawWaveform()
 {
     // データの更新済みなので描画だけ行う
 
+    if (instanceCount_ == 0)
+        return;
+
     auto commandList = DXCommon::GetInstance()->GetCommandList();
 
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);

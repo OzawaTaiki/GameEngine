@@ -52,6 +52,7 @@ public:
     // 反復的FFT
     static void IterativeFFT(std::vector<std::complex<float>>& _x);
 
+    void SetUseGPU(bool useGPU) { useGPU_ = useGPU; }
 
     std::vector<float> GetAmplitudesInRange(float minHz, float maxHz);
     void GetAmplitudesInRange(size_t begin, size_t end, std::vector<float>& out);

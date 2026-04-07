@@ -51,9 +51,10 @@ void Engine::FFTCS::Initialize(uint32_t fftSize)
 void Engine::FFTCS::Execute(const std::vector<float>& input, std::vector<float>& magnitudeOut)
 {
     using clock = std::chrono::high_resolution_clock;
-    auto us = [](auto a, auto b) {
-        return std::chrono::duration_cast<std::chrono::microseconds>(b - a).count();
-    };
+    auto us = [](auto a, auto b)
+        {
+            return std::chrono::duration_cast<std::chrono::microseconds>(b - a).count();
+        };
     auto t0 = clock::now();
 
     // ハニング窓とビット反転を適用してアップロードバッファに書き込む
@@ -129,16 +130,13 @@ void Engine::FFTCS::Execute(const std::vector<float>& input, std::vector<float>&
         commandList_->SetComputeRoot32BitConstants(0, 4, consts, 0);
 
         // bitReversalIndex SRV
-        commandList_->SetComputeRootDescriptorTable(1,
-                                                    srvManager_->GetGPUSRVDescriptorHandle(srvBitRevIndex_));
+        commandList_->SetComputeRootDescriptorTable(1, srvManager_->GetGPUSRVDescriptorHandle(srvBitRevIndex_));
 
         // input UAV (u0)
-        commandList_->SetComputeRootDescriptorTable(2,
-                                                    srvManager_->GetGPUSRVDescriptorHandle(inputUav));
+        commandList_->SetComputeRootDescriptorTable(2, srvManager_->GetGPUSRVDescriptorHandle(inputUav));
 
         // output UAV (u1)
-        commandList_->SetComputeRootDescriptorTable(3,
-                                                    srvManager_->GetGPUSRVDescriptorHandle(outputUav));
+        commandList_->SetComputeRootDescriptorTable(3, srvManager_->GetGPUSRVDescriptorHandle(outputUav));
 
         commandList_->Dispatch(dispatchCount, 1, 1);
 
@@ -151,14 +149,12 @@ void Engine::FFTCS::Execute(const std::vector<float>& input, std::vector<float>&
     // bits_ が奇数 → bufferB_ が最終出力
     ID3D12Resource* finalBuffer = (bits_ % 2 == 0) ? bufferA_.Get() : bufferB_.Get();
 
-    barrier = transitionBarrier(finalBuffer,
-                                D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    barrier = transitionBarrier(finalBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE);
     commandList_->ResourceBarrier(1, &barrier);
 
     commandList_->CopyResource(readbackBuffer_.Get(), finalBuffer);
 
-    barrier = transitionBarrier(finalBuffer,
-                                D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    barrier = transitionBarrier(finalBuffer, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     commandList_->ResourceBarrier(1, &barrier);
 
     commandList_->Close();
