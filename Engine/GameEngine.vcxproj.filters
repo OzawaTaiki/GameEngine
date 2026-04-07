@@ -861,9 +861,11 @@
     <ClCompile Include="System\Audio\AudioEffectManager.cpp">
       <Filter>System\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp" />
     <ClCompile Include="Features\Model\InstancedObjectModel.cpp">
       <Filter>Features\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp">
+      <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
