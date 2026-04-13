@@ -15,8 +15,8 @@ public:
     virtual void Start() = 0;
     virtual void End() = 0;
 
-    virtual bool IsEnd() = 0;
-    virtual bool CanSwitch() = 0;
+    virtual bool IsEnd() const = 0;
+    virtual bool CanSwitch() const= 0;
 
 
 };
