@@ -120,7 +120,7 @@ void SceneManager::ReserveScene(const std::string& _name, std::unique_ptr<SceneD
 
     instance->sceneData_ = std::move(_sceneData);
 
-    if (instance->enableTransition_ && instance->transition_ != nullptr)
+    if (instance->enableTransition_ && !instance->isTransition_ && instance->transition_ != nullptr)
     {
         instance->transition_->Start();
         instance->isTransition_ = true;
