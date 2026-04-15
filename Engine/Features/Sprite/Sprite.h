@@ -62,6 +62,10 @@ public:
     void SetOrder(int16_t _order) { order_ = _order; }
     uint16_t GetOrder() const { return order_; }
 
+    // 親行列を設定（WorldTransform の SetParent(const Matrix4x4*) 相当）
+    // 設定後は UpdateInstanceData() で localMatrix * (*parentMatrix_) を合成する
+    void SetParent(const Matrix4x4* parentMatrix) { parentMatrix_ = parentMatrix; isDirty_ = true; }
+
     void ImGui();
 private:
 
@@ -88,6 +92,9 @@ private:
     std::vector<Batch2DRenderer::VertexData> vertexData_= {};
     Batch2DRenderer::InstanceData instanceData_ = {};
     int16_t order_ = 0;
+
+    // 親行列ポインタ（SetParent() で設定、nullptr なら単体動作）
+    const Matrix4x4* parentMatrix_ = nullptr;
 
     // 頂点データを計算する必要があるか
     bool isVertexDirty_ = true;

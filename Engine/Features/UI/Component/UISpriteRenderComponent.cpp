@@ -27,14 +27,16 @@ void UISpriteRenderComponent::Initialize()
 
     sprite_ = Sprite::Create("UISpriteRenderComponent_Sprite", textureHandle_, Vector2(0.5f, 0.5f));
     sprite_->SetColor(color_);
+
+    // UIElement の worldMatrix_ を親行列として登録（ポインタで保持）
+    sprite_->SetParent(&owner_->GetWorldMatrix());
 }
 
 void UISpriteRenderComponent::Update()
 {
-    // UIElementの位置・サイズと同期
-    sprite_->translate_ = owner_->GetWorldPosition();
+    // 位置・回転は親行列（UIElement::worldMatrix_）が担うため設定不要
+    // テクスチャスケールのみ設定する
     sprite_->SetSize(owner_->GetSize());
-    sprite_->rotate_ = owner_->GetRotation();
 
     sprite_->SetOrder(owner_->GetOrder());
     sprite_->SetColor(color_);

@@ -1,6 +1,7 @@
 #pragma once
 #include <Features/UI/Component/UIComponent.h>
 #include <Math/Vector/Vector2.h>
+#include <Math/Matrix/Matrix4x4.h>
 #include <Features/Json/JsonBinder.h>
 
 #include <typeinfo>
@@ -45,6 +46,9 @@ public:
     void SetRotation(float rotation) { rotation_ = rotation; }
     float GetRotation() const { return rotation_; }
 
+    void SetScale(const Vector2& scale) { scale_ = scale; }
+    const Vector2& GetScale() const { return scale_; }
+
     void SetPivot(const Vector2& pivot) { pivot_ = pivot; }
     const Vector2& GetPivot() const { return pivot_; }
 
@@ -68,7 +72,9 @@ public:
     const std::string& GetName() const { return name_; }
 
     //------------------
-    // ワールド座標の取得
+    // 行列更新・ワールド変換
+    void UpdateMatrix();
+    const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
     Vector2 GetWorldPosition() const;
 
     //------------------
@@ -136,8 +142,12 @@ protected:
     Vector2 position_;
     Vector2 size_;
     float rotation_; // 回転角度（ラジアン）
+    Vector2 scale_;  // スケール（デフォルト: 1, 1）
     Vector2 pivot_;
     Vector2 anchor_;
+
+    // ワールド変換行列（UpdateMatrix() で毎フレーム更新）
+    Matrix4x4 worldMatrix_ = {};
 
     uint16_t order_; // 描画順序
 
