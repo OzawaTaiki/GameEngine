@@ -198,6 +198,12 @@ void Sprite::UpdateInstanceData()
     Vector3 t = { translate_,0.0f };
     instanceData_.transform = MakeAffineMatrix(s, r, t);
 
+    // 親行列があれば右から掛ける（WorldTransform の matWorld_ *= parent_->matWorld_ 相当）
+    if (parentMatrix_ != nullptr)
+    {
+        instanceData_.transform *= *parentMatrix_;
+    }
+
     instanceData_.uvTransform = uvTransform_.GetMatrix();
 
     instanceData_.color = color_;

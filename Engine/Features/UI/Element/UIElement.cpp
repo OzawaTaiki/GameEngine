@@ -1,4 +1,5 @@
 #include "UIElement.h"
+#include <Math/Matrix/MatrixFunction.h>
 #include <Debug/ImGuiDebugManager.h>
 
 
@@ -10,11 +11,13 @@ UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
     position_(50.0f, 50.0f),
     size_(100.0f, 50.0f),
     rotation_(0.0f),
+    scale_(1.0f, 1.0f),
     pivot_(0.5f, 0.5f),
     anchor_(0.5f, 0.5f),
     order_(0),
     isVisible_(true),
-    isEnabled_(true)
+    isEnabled_(true),
+    worldMatrix_(MakeIdentity4x4())
 {
 #ifdef _DEBUG
     if (child)
@@ -41,6 +44,10 @@ void UIElement::Initialize()
 
 void UIElement::Update()
 {
+    // 親より先に行列を更新（WorldTransform::UpdateData() 相当）
+    // isEnabled に関わらず実行し、子への伝播を保証する
+    UpdateMatrix();
+
     if (!isEnabled_)
         return;
 
@@ -72,23 +79,35 @@ void UIElement::Draw()
     }
 }
 
-Vector2 UIElement::GetWorldPosition() const
+void UIElement::UpdateMatrix()
 {
+    Vector2 t;
     if (parent_ == nullptr)
     {
-        return position_;
+        t = position_;
+    }
+    else
+    {
+        // 親の pivot 基準でアンカー位置を求める（UI 固有処理）
+        Vector2 anchorOffset = (anchor_ - parent_->GetPivot()) * parent_->GetSize();
+        t = anchorOffset + position_;
     }
 
-    // 親要素のサイズを取得
-    Vector2 parentSize = parent_->GetSize();
-    // アンカーオフセットを計算
-    Vector2 anchorOffset = CalculateAnchorOffset(anchor_, parentSize);
-    // 親要素のLTワールド座標を取得
-    Vector2 parentLTWorldPos = parent_->GetWorldPosition() - Vector2(parentSize.x * parent_->GetPivot().x,
-                                                                     parentSize.y * parent_->GetPivot().y);
-    // ワールド座標を計算
-    Vector2 worldPos = parentLTWorldPos + anchorOffset + position_;
-    return worldPos;
+    Vector3 s     = { scale_.x, scale_.y, 1.0f };
+    Vector3 r     = { 0.0f, 0.0f, rotation_ };
+    Vector3 trans = { t.x, t.y, 0.0f };
+    worldMatrix_  = MakeAffineMatrix(s, r, trans);
+
+    // 親行列を右から掛ける（WorldTransform の matWorld_ *= parent_->matWorld_ 相当）
+    if (parent_ != nullptr)
+    {
+        worldMatrix_ *= parent_->worldMatrix_;
+    }
+}
+
+Vector2 UIElement::GetWorldPosition() const
+{
+    return { worldMatrix_.m[3][0], worldMatrix_.m[3][1] };
 }
 
 void UIElement::SetParent(UIElement* parent)
@@ -179,7 +198,8 @@ void UIElement::DrawImGuiInspector()
         {
             ImGui::DragFloat2("Position", &position_.x, 1.0f);
             ImGui::DragFloat2("Size", &size_.x, 1.0f);
-            ImGui::DragFloat("Rotation", &rotation_, 1.0f);
+            ImGui::DragFloat2("Scale", &scale_.x, 0.01f);
+            ImGui::DragFloat("Rotation", &rotation_, 0.01f);
             ImGui::DragFloat2("Pivot", &pivot_.x, 0.01f, 0.0f, 1.0f);
             ImGui::DragFloat2("Anchor", &anchor_.x, 0.01f, 0.0f, 1.0f);
         }
@@ -262,6 +282,7 @@ void UIElement::InitializeJsonBinder(const std::string& directory)
     RegisterVariable("position", &position_);
     RegisterVariable("size", &size_);
     RegisterVariable("rotation", &rotation_);
+    RegisterVariable("scale", &scale_);
     RegisterVariable("pivot", &pivot_);
     RegisterVariable("anchor", &anchor_);
     RegisterVariable("order", &order_);
