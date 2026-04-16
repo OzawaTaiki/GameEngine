@@ -4,6 +4,7 @@
 
 #include <d3d12.h>
 #include <wrl.h>
+#include <vector>
 
 
 namespace Engine {
@@ -20,6 +21,7 @@ public:
     void PreDraw(ID3D12GraphicsCommandList* _commandList);
 
     uint32_t Allocate();
+    void Free(uint32_t _index);
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUSRVDescriptorHandle(uint32_t _index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSRVDescriptorHandle(uint32_t _index);
 
@@ -43,6 +45,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
 
     uint32_t useIndex_ = 0;
+    std::vector<uint32_t> freeList_ = {};
     DXCommon* dxcommon_ = nullptr;
 
 

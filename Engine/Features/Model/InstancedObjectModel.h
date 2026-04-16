@@ -20,7 +20,7 @@ class InstancedObjectModel
 public:
 
     InstancedObjectModel() = default;
-    ~InstancedObjectModel() = default;
+    ~InstancedObjectModel();
 
     static constexpr uint32_t kDefaultMaxInstances = 1024;
 
@@ -51,7 +51,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceResource_;
     InstanceData* instanceMap_ = nullptr;
 
-    uint32_t srvIndex_ = 0;
+    static constexpr uint32_t kInvalidIndex = 0xFFFFFFFF;
+    uint32_t srvIndex_ = kInvalidIndex;
     D3D12_GPU_DESCRIPTOR_HANDLE srvHandle_ = {};
 
 };
