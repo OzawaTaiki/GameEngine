@@ -6,6 +6,14 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Debug/Debug.h>
 
+Engine::InstancedObjectModel::~InstancedObjectModel()
+{
+    if (srvIndex_ != kInvalidIndex)
+    {
+        SRVManager::GetInstance()->Free(srvIndex_);
+    }
+}
+
 void Engine::InstancedObjectModel::Initialize(const std::string& modelPath, uint32_t maxInstances)
 {
     model_ = Model::CreateFromFile(modelPath);

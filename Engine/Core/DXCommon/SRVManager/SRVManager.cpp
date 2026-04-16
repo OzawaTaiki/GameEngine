@@ -35,9 +35,20 @@ void SRVManager::PreDraw(ID3D12GraphicsCommandList* _commandList)
 
 uint32_t SRVManager::Allocate()
 {
+    if (!freeList_.empty())
+    {
+        uint32_t index = freeList_.back();
+        freeList_.pop_back();
+        return index;
+    }
     assert(useIndex_ < kMaxIndex_ && "SRV index overflow");
     uint32_t index = useIndex_++;
     return index;
+}
+
+void SRVManager::Free(uint32_t _index)
+{
+    freeList_.push_back(_index);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUSRVDescriptorHandle(uint32_t _index)
