@@ -298,6 +298,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\UI\Collider\UIEllipseCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIQuadCollider.cpp" />
     <ClCompile Include="Features\UI\Collider\UIRecntangleCollider.cpp" />
+    <ClCompile Include="Features\UI\Component\UIAnimationComponent.cpp" />
     <ClCompile Include="Features\UI\Component\UIButtonComponent.cpp" />
     <ClCompile Include="Features\UI\Component\UIColliderComponent.cpp" />
     <ClCompile Include="Features\UI\Component\UIEditableComponent.cpp" />
@@ -501,6 +502,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\UI\Collider\UIEllipseCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIQuadCollider.h" />
     <ClInclude Include="Features\UI\Collider\UIRecntangleCollider.h" />
+    <ClInclude Include="Features\UI\Component\UIAnimationComponent.h" />
     <ClInclude Include="Features\UI\Component\UIButtonComponent.h" />
     <ClInclude Include="Features\UI\Component\UIColliderComponent.h" />
     <ClInclude Include="Features\UI\Component\UIComponent.h" />
