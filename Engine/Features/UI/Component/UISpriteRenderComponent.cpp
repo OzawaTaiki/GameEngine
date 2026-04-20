@@ -36,8 +36,8 @@ void UISpriteRenderComponent::Update()
 {
     // 位置・回転は親行列（UIElement::worldMatrix_）が担うため設定不要
     // テクスチャスケールのみ設定する
-    sprite_->SetSize(owner_->GetSize());
 
+    sprite_->SetSize(owner_->GetSize());
     sprite_->SetOrder(owner_->GetOrder());
     sprite_->SetColor(color_);
     sprite_->Update();

@@ -58,10 +58,6 @@ public:
         {
             if (sequenceEvent.second->GetLabel() == _label)
             {
-                // keyframeが空のとき
-                if (sequenceEvent.second->GetKeyFrames().empty())
-                    return T();
-
                 return sequenceEvent.second->GetValue<T>();
             }
         }

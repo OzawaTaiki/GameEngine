@@ -38,9 +38,10 @@ void SequenceEvent::Update(float _currentTime)
 {
     DeleteMarkedKeyFrame();
 
-    // キーフレームがない場合は何もしない
+    // キーフレームがない場合は終了とみなす
     if (keyFrames_.empty())
     {
+        isEnd_ = true;
         return;
     }
 

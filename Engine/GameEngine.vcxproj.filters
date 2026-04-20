@@ -867,6 +867,7 @@
     <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp">
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
+    <ClCompile Include="Features\UI\Component\UIAnimationComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1459,6 +1460,9 @@
     </ClInclude>
     <ClInclude Include="Features\Model\InstancedObjectModel.h">
       <Filter>Features\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\UI\Component\UIAnimationComponent.h">
+      <Filter>Features\UI\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
