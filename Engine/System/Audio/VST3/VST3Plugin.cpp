@@ -80,6 +80,8 @@ bool Engine::VST3Plugin::Initialize(const VST3::Hosting::PluginFactory& factory,
 
     if (componentCP && controllerCP)
     {
+        // 双方向の接続。
+        // パラメータの変更などのイベント通知はこの接続を通じて行われる
         componentCP->connect(controllerCP);
         controllerCP->connect(componentCP);
     }

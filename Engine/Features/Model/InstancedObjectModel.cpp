@@ -23,6 +23,23 @@ void Engine::InstancedObjectModel::Initialize(const std::string& modelPath, uint
         return;
     }
 
+    InitializeBuffers(maxInstances);
+}
+
+void Engine::InstancedObjectModel::Initialize(Model* model, uint32_t maxInstances)
+{
+    model_ = model;
+    if (!model_)
+    {
+        Debug::Log("InstancedObjectModel::Initialize received null model\n");
+        return;
+    }
+
+    InitializeBuffers(maxInstances);
+}
+
+void Engine::InstancedObjectModel::InitializeBuffers(uint32_t maxInstances)
+{
     maxInstances_ = maxInstances;
 
     instanceResource_ = DXCommon::GetInstance()->CreateBufferResource(sizeof(InstanceData) * maxInstances_);

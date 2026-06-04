@@ -26,6 +26,9 @@ public:
 
     void Initialize(const std::string& modelPath, uint32_t maxInstances = kDefaultMaxInstances);
 
+    // 既存の Model*（プリミティブ生成など）からインスタンシング用に初期化する
+    void Initialize(Model* model, uint32_t maxInstances = kDefaultMaxInstances);
+
     void AddInstance(const Matrix4x4& worldMatrix, const Vector4& color = {1.0f,1.0f ,1.0f ,1.0f });
 
     void Draw(const Camera* camera);
@@ -34,6 +37,9 @@ public:
 
     uint32_t GetInstanceCount() const { return instanceCount_; }
 private:
+
+    // バッファ・SRVの確保（Initializeの共通処理）
+    void InitializeBuffers(uint32_t maxInstances);
 
     struct InstanceData
     {

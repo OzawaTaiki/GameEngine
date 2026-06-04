@@ -198,6 +198,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Features\Animation\Sequence\SequenceEvent.cpp" />
     <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp" />
     <ClCompile Include="Features\AudioSpectrum\FFTCS.cpp" />
+    <ClCompile Include="Features\AudioSpectrum\OnsetDetector.cpp" />
     <ClCompile Include="Features\AudioSpectrum\SpectrumTextureGenerator.cpp" />
     <ClCompile Include="Features\AudioSpectrum\SpectrumValidator.cpp" />
     <ClCompile Include="Features\Camera\Camera\Camera.cpp" />
@@ -387,6 +388,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Features\Animation\Sequence\SequenceEvent.h" />
     <ClInclude Include="Features\AudioSpectrum\AudioSpectrum.h" />
     <ClInclude Include="Features\AudioSpectrum\FFTCS.h" />
+    <ClInclude Include="Features\AudioSpectrum\OnsetDetector.h" />
     <ClInclude Include="Features\AudioSpectrum\SpectrumTextureGenerator.h" />
     <ClInclude Include="features\AudioSpectrum\SpectrumValidator.h" />
     <ClInclude Include="Features\Camera\Camera\Camera.h" />
