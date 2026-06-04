@@ -143,6 +143,7 @@ void ObjectModel::Draw(const Camera* _camera, const Vector4& _color)
 
 void ObjectModel::Draw(const Camera* _camera, uint32_t _textureHandle, const Vector4& _color)
 {
+
     objectColor_->SetColor(_color);
 
     auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();

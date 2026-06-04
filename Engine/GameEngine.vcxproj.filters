@@ -868,6 +868,7 @@
       <Filter>Features\AudioSpectrum</Filter>
     </ClCompile>
     <ClCompile Include="Features\UI\Component\UIAnimationComponent.cpp" />
+    <ClCompile Include="Features\AudioSpectrum\OnsetDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -1463,6 +1464,9 @@
     </ClInclude>
     <ClInclude Include="Features\UI\Component\UIAnimationComponent.h">
       <Filter>Features\UI\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\AudioSpectrum\OnsetDetector.h">
+      <Filter>Features\AudioSpectrum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

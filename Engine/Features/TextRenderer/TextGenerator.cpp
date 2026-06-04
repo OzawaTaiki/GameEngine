@@ -37,6 +37,16 @@ void TextGenerator::Draw(const std::wstring& _text, const Rect& _rect, const Tex
     renderer_->DrawText(_text, atlasData_, _rect, _param, _order);
 }
 
+void TextGenerator::DrawImmediate(const std::wstring& _text, const Vector2& _pos, const Vector4& _color)
+{
+    renderer_->DrawTextImmediate(_text, atlasData_, _pos, _color);
+}
+
+void TextGenerator::DrawImmediate(const std::wstring& _text, const TextParam& _param)
+{
+    renderer_->DrawTextImmediate(_text, atlasData_, _param);
+}
+
 // -- -----------------
 // -- 静的関数たち
 // -- -----------------

@@ -6,11 +6,14 @@
 #include <Core/DXCommon/SRVManager/SRVManager.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Core/DXCommon/PSOManager/PSOBuilder.h>
+#include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 #include <Math/Matrix/MatrixFunction.h>
 #include <Framework/Batch2DRenderer.h>
 
 
-namespace Engine {
+namespace Engine
+{
 
 TextRenderer* TextRenderer::GetInstance()
 {
@@ -48,11 +51,18 @@ void TextRenderer::Initialize(ID3D12Device* _device, ID3D12GraphicsCommandList* 
         return;
     }
     CreateProjectionMatrixBuffer();
+
+    CreateImmediateResources();
+    CreateImmediatePSO();
 }
 
 void TextRenderer::Finalize()
 {
-
+    if (immediateVertexBuffer_ && immediateVertexMap_)
+    {
+        immediateVertexBuffer_->Unmap(0, nullptr);
+        immediateVertexMap_ = nullptr;
+    }
     device_ = nullptr;
     cmdList_ = nullptr;
 }
@@ -61,10 +71,10 @@ void TextRenderer::BeginFrame()
 {
     for (auto& [textureindex, res] : resourceDataGroups_)
     {
-        // 頂点配列をクリア
         res->vertices_.clear();
         res->affineMatrices_.clear();
     }
+    immediateVertexOffset_ = 0;
 }
 
 void TextRenderer::EndFrame()
@@ -578,4 +588,170 @@ void TextRenderer::RenderText(ResourceDataGroup* _res)
     cmdList_->DrawInstanced(vertexCount, 1, 0, 0);
 }
 
+void TextRenderer::CreateImmediateResources()
+{
+    immediateVertexBuffer_ = DXCommon::GetInstance()->CreateBufferResource(
+        static_cast<uint32_t>(sizeof(TextVertex) * immediateMaxVertices_));
+    assert(immediateVertexBuffer_ && "Failed to create immediate vertex buffer");
+    immediateVertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&immediateVertexMap_));
+    immediateVBV_.BufferLocation = immediateVertexBuffer_->GetGPUVirtualAddress();
+    immediateVBV_.SizeInBytes    = static_cast<UINT>(sizeof(TextVertex) * immediateMaxVertices_);
+    immediateVBV_.StrideInBytes  = sizeof(TextVertex);
+
+    // 行列バッファはIdentity固定 (頂点にCPUでアフィン変換を事前適用するため)
+    immediateMatrixBuffer_ = DXCommon::GetInstance()->CreateBufferResource(
+        static_cast<uint32_t>(sizeof(Matrix4x4) * immediateMaxCharacters_));
+    assert(immediateMatrixBuffer_ && "Failed to create immediate matrix buffer");
+
+    Matrix4x4* matMap = nullptr;
+    immediateMatrixBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&matMap));
+    Matrix4x4 identity = Matrix4x4::Identity();
+    for (size_t i = 0; i < immediateMaxCharacters_; ++i)
+        matMap[i] = identity;
+    immediateMatrixBuffer_->Unmap(0, nullptr);
+
+    immediateSRVIndex_ = SRVManager::GetInstance()->Allocate();
+    SRVManager::GetInstance()->CreateSRVForStructureBuffer(immediateSRVIndex_,
+                                                           immediateMatrixBuffer_.Get(),
+                                                           static_cast<UINT>(immediateMaxCharacters_),
+                                                           sizeof(Matrix4x4));
+}
+
+void TextRenderer::CreateImmediatePSO()
+{
+    // TextRenderer.hlsl (2D正射影) 用シェーダーを登録
+    auto* sc = ShaderCompiler::GetInstance();
+    sc->Register("TextRenderer_VS", L"TextRenderer.hlsl", L"vs_6_0", L"VSmain");
+    sc->Register("TextRenderer_PS", L"TextRenderer.hlsl", L"ps_6_0", L"PSmain");
+
+    // ルートシグネチャはForText()共通のものを流用
+    // b0: Matrix4x4 orthoMat (CBV)
+    // t0: worldMatrices (StructuredBuffer SRV)
+    // t1: fontTexture (Texture2D SRV)
+    immediateRootSignature_ = PSOManager::GetInstance()->GetRootSignature(PSOFlags::ForText()).value_or(nullptr);
+    assert(immediateRootSignature_ && "TextRenderer immediate: root signature not found");
+
+    immediatePso_ = PSOBuilder::Create()
+        .SetShaders("TextRenderer_VS", "TextRenderer_PS")
+        .SetBlendMode(PSOFlags::BlendMode::Normal)
+        .SetCullMode(PSOFlags::CullMode::None)
+        .SetDepthMode(PSOFlags::DepthMode::Disable)
+        .UseTextInputLayout()
+        .SetRootSignature(immediateRootSignature_.Get())
+        .Build();
+    assert(immediatePso_ && "TextRenderer immediate: PSO build failed");
+}
+
+void TextRenderer::RenderTextImmediate(const std::vector<TextVertex>& _vertices, uint32_t _textureIndex)
+{
+    if (_vertices.empty() || !immediateVertexMap_)
+        return;
+    if (immediateVertexOffset_ + _vertices.size() > immediateMaxVertices_)
+        return;
+
+    // 現在のオフセット位置に頂点を書き込む
+    memcpy(immediateVertexMap_ + immediateVertexOffset_,
+           _vertices.data(),
+           sizeof(TextVertex) * _vertices.size());
+
+    cmdList_->SetPipelineState(immediatePso_.Get());
+    cmdList_->SetGraphicsRootSignature(immediateRootSignature_.Get());
+
+    cmdList_->IASetVertexBuffers(0, 1, &immediateVBV_);
+    cmdList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    // b0: 正射影行列 (Matrix4x4 のみ、TextRenderer.hlsl は orthoMat 1枚だけ参照)
+    cmdList_->SetGraphicsRootConstantBufferView(0, projectionMatrixBuffer_->GetGPUVirtualAddress());
+    // t0: Identity行列バッファ
+    cmdList_->SetGraphicsRootDescriptorTable(1, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(immediateSRVIndex_));
+    // t1: フォントテクスチャ
+    cmdList_->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUSRVDescriptorHandle(_textureIndex));
+
+    // startVertexLocation でオフセット、SV_VertexID は 0 基準なので行列はindex 0 から参照 (全Identity)
+    cmdList_->DrawInstanced(static_cast<UINT>(_vertices.size()), 1,
+                            static_cast<UINT>(immediateVertexOffset_), 0);
+
+    immediateVertexOffset_ += _vertices.size();
+}
+
+void TextRenderer::DrawTextImmediate(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, const Vector4& _color)
+{
+    TextParam param;
+    param.position    = _pos;
+    param.topColor    = _color;
+    param.bottomColor = _color;
+    DrawTextImmediate(_text, _atlas, param);
+}
+
+void TextRenderer::DrawTextImmediate(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param)
+{
+    if (_text.empty() || !_atlas || !immediateVertexMap_)
+        return;
+
+    float fontSize   = _atlas->GetFontSize();
+    float fontAscent = _atlas->GetFontAscent();
+
+    Vector2 stringArea = _atlas->GetStringAreaSize(_text, _param.scale);
+    Vector2 pivot      = { stringArea.x * _param.pivot.x, stringArea.y * _param.pivot.y };
+
+    // アフィン行列をCPUで事前構築 (行列バッファはIdentity固定のため頂点に適用)
+    Vector3 scale3D     = { _param.scale.x, _param.scale.y, 1.0f };
+    Vector3 rotate3D    = { 0.0f, 0.0f, _param.rotate };
+    Vector3 translate3D = { _param.position.x, _param.position.y, 0.0f };
+    Matrix4x4 T = MakeAffineMatrix(scale3D, rotate3D, translate3D);
+
+    // row-vector * matrix (DX 行ベクトル規約)
+    auto Transform2D = [&](float x, float y) -> std::pair<float, float>
+    {
+        float rx = x * T.m[0][0] + y * T.m[1][0] + T.m[3][0];
+        float ry = x * T.m[0][1] + y * T.m[1][1] + T.m[3][1];
+        return { rx, ry };
+    };
+
+    std::vector<TextVertex> tempVertices;
+    tempVertices.reserve(_text.size() * 6);
+
+    float currentX = 0.0f;
+    float currentY = 0.0f;
+
+    for (size_t i = 0; i < _text.size(); ++i)
+    {
+        wchar_t ch = _text[i];
+        if (ch == L'\n') { currentX = 0.0f; currentY += fontSize; continue; }
+        if (ch == L' ')  { currentX += fontSize * 0.3f; continue; }
+
+        GlyphInfo glyph = _atlas->GetGlyph(ch);
+        if (!glyph.isValid) continue;
+
+        // ローカル座標 (scale適用・pivot補正済み)
+        float lx = (currentX + glyph.bearingX) * _param.scale.x - pivot.x;
+        float ly = (fontAscent + currentY + glyph.bearingY) * _param.scale.y - pivot.y;
+        float rw = glyph.width  * _param.scale.x;
+        float rh = glyph.height * _param.scale.y;
+
+        // アフィン変換をCPU適用
+        auto [x0, y0] = Transform2D(lx,      ly);
+        auto [x1, y1] = Transform2D(lx + rw, ly);
+        auto [x2, y2] = Transform2D(lx,      ly + rh);
+        auto [x3, y3] = Transform2D(lx + rw, ly + rh);
+
+        std::array<TextVertex, 6> quad = {{
+            {{x0, y0, 0.0f, 1.0f}, {glyph.u0, glyph.v0}, _param.topColor},
+            {{x1, y1, 0.0f, 1.0f}, {glyph.u1, glyph.v0}, _param.topColor},
+            {{x2, y2, 0.0f, 1.0f}, {glyph.u0, glyph.v1}, _param.bottomColor},
+            {{x2, y2, 0.0f, 1.0f}, {glyph.u0, glyph.v1}, _param.bottomColor},
+            {{x1, y1, 0.0f, 1.0f}, {glyph.u1, glyph.v0}, _param.topColor},
+            {{x3, y3, 0.0f, 1.0f}, {glyph.u1, glyph.v1}, _param.bottomColor},
+        }};
+        tempVertices.insert(tempVertices.end(), quad.begin(), quad.end());
+
+        currentX += glyph.advance;
+        if (tempVertices.size() + 6 > immediateMaxVertices_ - immediateVertexOffset_)
+            break;
+    }
+
+    RenderTextImmediate(tempVertices, _atlas->GetFontTextureIndex());
+}
+
 } // namespace Engine
+

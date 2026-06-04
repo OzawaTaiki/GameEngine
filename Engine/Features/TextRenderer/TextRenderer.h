@@ -51,6 +51,8 @@ public:
 
     void DrawText(const std::wstring& _text, AtlasData* _atlas, const Rect& _rect, const TextParam& _param, uint16_t _order = 0);
 
+    void DrawTextImmediate(const std::wstring& _text, AtlasData* _atlas, const Vector2& _pos, const Vector4& _color = { 1,1,1,1 });
+    void DrawTextImmediate(const std::wstring& _text, AtlasData* _atlas, const TextParam& _param);
 
 private:
 
@@ -118,6 +120,10 @@ private:
     void UploadMatrixData(ResourceDataGroup* _res);
     void RenderText(ResourceDataGroup* _res);
 
+
+    void CreateImmediateResources();
+    void CreateImmediatePSO();
+    void RenderTextImmediate(const std::vector<TextVertex>& _vertices, uint32_t _textureIndex);
 private:
 
 
@@ -130,6 +136,24 @@ private:
 
     size_t maxVertices_;
     size_t maxCharacters_ = 1500; // 最大文字数
+
+
+    // 即時描画専用PSO (TextRenderer.hlsl 2D用)
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> immediatePso_;
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> immediateRootSignature_;
+
+    // 即時描画バッファ (Persistent Mapping)
+    Microsoft::WRL::ComPtr<ID3D12Resource> immediateVertexBuffer_;
+    D3D12_VERTEX_BUFFER_VIEW immediateVBV_;
+    TextVertex* immediateVertexMap_ = nullptr;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> immediateMatrixBuffer_; // Identity行列で固定
+    uint32_t immediateSRVIndex_ = UINT32_MAX;
+
+    size_t immediateMaxCharacters_ = 200;
+    size_t immediateMaxVertices_   = 200 * 6;
+    size_t immediateVertexOffset_  = 0; // フレーム内書き込みオフセット
+
 
     Matrix4x4* projectionMatrix_; // 投影行列
     Microsoft::WRL::ComPtr<ID3D12Resource> projectionMatrixBuffer_; // 投影行列のバッファ
