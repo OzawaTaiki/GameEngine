@@ -33,8 +33,8 @@ public:
     /// </summary>
     void Initialize() override;
 
-    void UpdateData(BloomConstantBufferData bloomData);
-    void UpdateData(BloomBlurConstantBufferData blurData);
+    void UpdateData(const BloomConstantBufferData &bloomData);
+    void UpdateData(const BloomBlurConstantBufferData &blurData);
 
     /// <summary>
     /// 適用処理

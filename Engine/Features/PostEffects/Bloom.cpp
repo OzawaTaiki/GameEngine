@@ -77,12 +77,12 @@ void Bloom::CreateBuffers()
     CreateConstantBufferResource(sizeof(BloomBlurConstantBufferData), blurConstantBuffer_, (void**)&bloomBlurCBData_);
 }
 
-void Bloom::UpdateData(BloomConstantBufferData bloomData)
+void Bloom::UpdateData(const BloomConstantBufferData& bloomData)
 {
     *bloomCBData_ = bloomData;
 }
 
-void Bloom::UpdateData(BloomBlurConstantBufferData blurData)
+void Bloom::UpdateData(const BloomBlurConstantBufferData& blurData) 
 {
     *bloomBlurCBData_ = blurData;
 }
