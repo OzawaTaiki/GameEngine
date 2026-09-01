@@ -1,0 +1,3 @@
+[submodule "Engine/Externals/osSound"]
+	path = Engine/Externals/ozSound
+	url = https://github.com/OzawaTaiki/ozSound.git
