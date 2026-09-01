@@ -12,6 +12,8 @@
 
 #include <Debug/ImGuiManager.h>
 
+#include <audio/ozSound.h>
+
 using namespace Engine;
 
 SampleScene::~SampleScene()
@@ -119,8 +121,15 @@ void SampleScene::Initialize(SceneData* _sceneData)
     sprite_ = Sprite::Create("uvChecker", textureHandle);
 
 
+    // ozSoundの初期化（xAudio2デバイス/マスターボイスの生成）
+    ozSound::AudioSystem::GetInstance()->Initialize();
+
     // 音声データの読み込み
-    soundInstance_ = AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
+    // ここではWAVを個別にLoadしているが、ozSound::Initialize()でサブシステムを
+    // まとめて初期化した上でozSound::LoadProject("xxx.ozproj")を使えば、
+    // sounds/events/submixes/effectsをまとめて読み込み、PostEvent等のイベント
+    // 駆動の再生もできる
+    soundInstance_ = ozSound::AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
 
     skyBox_ = std::make_unique<SkyBox>();
     skyBox_->Initialize(30.0f);

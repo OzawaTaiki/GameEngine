@@ -17,9 +17,9 @@
 #include <Features/Model/ObjectModel.h>
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
-#include <System/Audio/AudioSystem.h>
-#include <System/Audio/SoundInstance.h>
-#include <system/Audio/VoiceInstance.h>
+#include <Audio/AudioSystem.h>
+#include <Audio/SoundInstance.h>
+#include <Audio/VoiceInstance.h>
 
 #include <Features/Model/SkyBox.h>
 
@@ -74,8 +74,8 @@ private:
 
     std::unique_ptr<Engine::ParticleEmitter> emitter_ = nullptr;
 
-    std::shared_ptr<Engine::SoundInstance> soundInstance_ = nullptr;
-    std::shared_ptr<Engine::VoiceInstance> voiceInstance_ = nullptr;
+    std::shared_ptr<ozSound::SoundInstance> soundInstance_ = nullptr;
+    std::shared_ptr<ozSound::VoiceInstance> voiceInstance_ = nullptr;
 
     std::unique_ptr<Engine::SkyBox> skyBox_ = nullptr;
 

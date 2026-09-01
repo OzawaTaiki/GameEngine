@@ -29,7 +29,7 @@ DeveScene::~DeveScene()
 {
     if (vstPlugin_)
         vstPlugin_->Terminate();
-    Engine::VST3Host::GetInstance()->Finalize();
+    ozSound::VST3Host::GetInstance()->Finalize();
 
 }
 
@@ -113,8 +113,15 @@ void DeveScene::Initialize(SceneData* _sceneData)
     sprite_ = Sprite::Create("uvChecker", textureHandle);
 
 
+    // ozSoundの初期化（xAudio2デバイス/マスターボイスの生成）
+    ozSound::AudioSystem::GetInstance()->Initialize();
+
     // 音声データの読み込み
-    soundInstance_ = AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
+    // ここではWAVを個別にLoadしているが、ozSound::Initialize()でサブシステムを
+    // まとめて初期化した上でozSound::LoadProject("xxx.ozproj")を使えば、
+    // sounds/events/submixes/effectsをまとめて読み込み、PostEvent等のイベント
+    // 駆動の再生もできる
+    soundInstance_ = ozSound::AudioSystem::GetInstance()->Load("Resources/Sounds/Alarm01.wav");
 
     skyBox_ = std::make_unique<SkyBox>();
     skyBox_->Initialize(30.0f);
@@ -364,15 +371,15 @@ void DeveScene::Initialize(SceneData* _sceneData)
     testText1_->Initialize();
     testText1_->SetColor(Vector4(0.2f, 0.8f, 0.2f, 1.0f));  // 緑色
 
-    auto detals =  AudioSystem::GetInstance()->GetMasterVoiceDetails();
+    auto detals =  ozSound::AudioSystem::GetInstance()->GetMasterVoiceDetails();
     Debug::Log("Master Voice Details - Channels: " + std::to_string(detals.InputChannels) + ", SampleRate: " + std::to_string(detals.InputSampleRate));
 
     // テスト（どこかの初期化処理やキー入力で）
     IUnknown* pReverb = nullptr;
     XAudio2CreateReverb(&pReverb, 0);
 
-    auto& chain = AudioSystem::GetInstance()->GetSESubmix()->GetEffectChain();
-    chain.AddEffect(AudioEffect(pReverb, 2, false));
+    auto& chain = ozSound::AudioSystem::GetInstance()->GetSESubmix()->GetEffectChain();
+    chain.AddEffect(ozSound::AudioEffect(pReverb, 2, false));
     pReverb->Release();
 
     HRESULT hrApply = chain.ApplyChain();
@@ -389,7 +396,7 @@ void DeveScene::Initialize(SceneData* _sceneData)
 
     // 注: スライダーの色設定は自動的に保存されます（UISliderElement内でJsonBinderを使用）
 
-    Engine::VST3Host::GetInstance()->Initialize();
+    ozSound::VST3Host::GetInstance()->Initialize();
 
 
 }
@@ -414,7 +421,7 @@ void DeveScene::Update()
             static bool enableFilter = false;
             static float cutoffHz = 500.0f;
             static float overOneQ = 1.0f;
-            auto SESubmix = AudioSystem::GetInstance()->GetSESubmix();
+            auto SESubmix = ozSound::AudioSystem::GetInstance()->GetSESubmix();
             static int filterType = LowPassFilter;
             static bool isReverbEnabled = false;
             const XAUDIO2_FILTER_TYPE filterTypes[] = { XAUDIO2_FILTER_TYPE::LowPassFilter, XAUDIO2_FILTER_TYPE::BandPassFilter, XAUDIO2_FILTER_TYPE::HighPassFilter };
@@ -514,7 +521,7 @@ void DeveScene::Update()
 
             if (ImGui::Button("Load"))
             {
-                auto host = Engine::VST3Host::GetInstance();
+                auto host = ozSound::VST3Host::GetInstance();
                 vstModule_ = host->LoadModule(vstPluginPath_);
                 if (vstModule_)
                 {
@@ -559,13 +566,13 @@ void DeveScene::Update()
                     if (soundInstance_)
                     {
                         IUnknown* xapo = nullptr;
-                        if (SUCCEEDED(Engine::VST3Effect::Create(vstPlugin_.get(), &xapo)) && xapo)
+                        if (SUCCEEDED(ozSound::VST3Effect::Create(vstPlugin_.get(), &xapo)) && xapo)
                         {
                             // パラメータ変更をオーディオ処理に反映するためeffectを接続
-                            vstParamMgr_.SetEffect(static_cast<Engine::VST3Effect*>(static_cast<IXAPO*>(xapo)));
+                            vstParamMgr_.SetEffect(static_cast<ozSound::VST3Effect*>(static_cast<IXAPO*>(xapo)));
 
-                            vstEffectChain_ = Engine::AudioEffectChain{};
-                            vstEffectChain_.AddEffect(Engine::AudioEffect(xapo, 2, true));
+                            vstEffectChain_ = ozSound::AudioEffectChain{};
+                            vstEffectChain_.AddEffect(ozSound::AudioEffect(xapo, 2, true));
                             xapo->Release();
 
                             // エフェクトチェーンをCreateSourceVoice時に渡す
