@@ -190,9 +190,6 @@
     <Filter Include="Math\System">
       <UniqueIdentifier>{A7F2759B-A4A6-4D97-A98D-CCCCA54DEFA64FDD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System\Audio">
-      <UniqueIdentifier>{2ED4BE9A-FF70-477D-B2A7-CCCCC56E17244C91}</UniqueIdentifier>
-    </Filter>
     <Filter Include="System\Input">
       <UniqueIdentifier>{7E6CDDF1-8A35-4C40-8298-CCCC0EC4D13809CB}</UniqueIdentifier>
     </Filter>
@@ -300,15 +297,6 @@
     </Filter>
     <Filter Include="Features\UI\Element">
       <UniqueIdentifier>{dd855904-6a1c-450c-b713-aef9dc179ab0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Extarnals">
-      <UniqueIdentifier>{4641747d-e637-4c87-8bd6-f2249704a8a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Extarnals\VST3SDK">
-      <UniqueIdentifier>{ed4c3fe6-4dc1-4adf-8e75-031a23fd9bf5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\Audio\VST3">
-      <UniqueIdentifier>{592d94d6-337f-41b9-9c51-d994b793ef2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -570,9 +558,6 @@
     <ClCompile Include="Features\PostEffects\Dissolve.cpp">
       <Filter>Features\PosttEffects</Filter>
     </ClCompile>
-    <ClCompile Include="System\Audio\AudioSystem.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
     <ClCompile Include="Features\Model\SkyBox.cpp">
       <Filter>Features\Model</Filter>
     </ClCompile>
@@ -599,12 +584,6 @@
     </ClCompile>
     <ClCompile Include="Utility\StringUtils\StringUitls.cpp">
       <Filter>Utility\StringUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VoiceInstance.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\SoundInstance.cpp">
-      <Filter>System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Features\Model\Mesh\MargedMesh.cpp">
       <Filter>Features\Model\Mesh</Filter>
@@ -656,12 +635,6 @@
     </ClCompile>
     <ClCompile Include="Features\Model\Primitive\Creater\PrimitiveCreator.cpp">
       <Filter>Features\Model\Primitive\Creater</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\WaveformDisplay\WaveformDisplay.cpp">
-      <Filter>Features\Waveform</Filter>
-    </ClCompile>
-    <ClCompile Include="Features\WaveformDisplay\WaveformAnalyzer.cpp">
-      <Filter>Features\Waveform</Filter>
     </ClCompile>
     <ClCompile Include="Features\AudioSpectrum\AudioSpectrum.cpp">
       <Filter>Features\AudioSpectrum</Filter>
@@ -767,99 +740,6 @@
     </ClCompile>
     <ClCompile Include="Features\UI\Element\UITextElement.cpp">
       <Filter>Features\UI\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\AudioEffect.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\SubmixVoice.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\connectionproxy.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\eventlist.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\hostclasses.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\module_win32.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\parameterchanges.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\pluginterfacesupport.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\hosting\plugprovider.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\source\fdebug.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\source\fobject.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\source\fstring.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\source\timer.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\thread\source\flock.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VST3\VST3Plugin.cpp">
-      <Filter>System\Audio\VST3</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VST3\VST3Module.cpp">
-      <Filter>System\Audio\VST3</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VST3\VST3Host.cpp">
-      <Filter>System\Audio\VST3</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VST3\VST3Effect.cpp">
-      <Filter>System\Audio\VST3</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\VST3\VST3ParameterManager.cpp">
-      <Filter>System\Audio\VST3</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\SoundEngine.cpp">
-      <Filter>System\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\base\source\baseiids.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Color\Color.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\commonstringconvert.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\coreiids.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\funknown.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\common\memorystream.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\utility\stringconvert.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\pluginterfaces\base\ustring.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="Externals\VST3SDK\public.sdk\source\vst\vstinitiids.cpp">
-      <Filter>Extarnals\VST3SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="System\Audio\AudioEffectManager.cpp">
-      <Filter>System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Features\Model\InstancedObjectModel.cpp">
       <Filter>Features\Model</Filter>
@@ -1195,15 +1075,6 @@
     <ClInclude Include="Features\PostEffects\Dissolve.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
-    <ClInclude Include="System\Audio\SoundInstance.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VoiceInstance.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\AudioSystem.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Model\SkyBox.h">
       <Filter>Features\Model</Filter>
     </ClInclude>
@@ -1279,9 +1150,6 @@
     <ClInclude Include="Features\PostEffects\GrayScale.h">
       <Filter>Features\PosttEffects</Filter>
     </ClInclude>
-    <ClInclude Include="System\Audio\VoiceCallback.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Effect\Effect\Effect.h">
       <Filter>Features\Effect\Effect</Filter>
     </ClInclude>
@@ -1290,12 +1158,6 @@
     </ClInclude>
     <ClInclude Include="Features\Model\Primitive\Creater\PrimitiveCreator.h">
       <Filter>Features\Model\Primitive\Creater</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\WaveformDisplay\WaveformDisplay.h">
-      <Filter>Features\Waveform</Filter>
-    </ClInclude>
-    <ClInclude Include="Features\WaveformDisplay\WaveformAnalyzer.h">
-      <Filter>Features\Waveform</Filter>
     </ClInclude>
     <ClInclude Include="Features\AudioSpectrum\AudioSpectrum.h">
       <Filter>Features\AudioSpectrum</Filter>
@@ -1417,44 +1279,8 @@
     <ClInclude Include="Features\UI\Element\UITextElement.h">
       <Filter>Features\UI\Element</Filter>
     </ClInclude>
-    <ClInclude Include="System\Audio\AudioEffect.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\SubmixVoice.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Features\Json\JsonUtils.h">
       <Filter>Features\Json</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VST3\VST3Plugin.h">
-      <Filter>System\Audio\VST3</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VST3\VST3Module.h">
-      <Filter>System\Audio\VST3</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VST3\VST3Host.h">
-      <Filter>System\Audio\VST3</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VST3\VST3ParameterManager.h">
-      <Filter>System\Audio\VST3</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\AudioEffectBase.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\VST3\VST3Effect.h">
-      <Filter>System\Audio\VST3</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\SoundEngine.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\SoundEventDef.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\AudioEffectDef.h">
-      <Filter>System\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="System\Audio\AudioEffectManager.h">
-      <Filter>System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Features\AudioSpectrum\FFTCS.h">
       <Filter>Features\AudioSpectrum</Filter>
