@@ -8,7 +8,6 @@
 #include <Features/Sprite/Sprite.h>
 #include <Features/Model/Manager/ModelManager.h>
 #include <Features/Event/EventManager.h>
-#include <System/Audio/AudioSystem.h>
 #include <Framework/LayerSystem/LayerSystem.h>
 #include <Settings/EngineSettings.h>
 
@@ -92,8 +91,6 @@ void Framework::Initialize(const std::wstring& _winTitle)
     particleManager_->Initialize();
 
     Time::Initialize();
-
-    AudioSystem::GetInstance()->Initialize();
 
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
