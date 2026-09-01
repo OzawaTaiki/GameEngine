@@ -17,9 +17,10 @@
 #include <Features/Model/ObjectModel.h>
 #include <Features/Effect/Emitter/ParticleEmitter.h>
 
-#include <System/Audio/AudioSystem.h>
-#include <System/Audio/SoundInstance.h>
-#include <system/Audio/VoiceInstance.h>
+#include <audio/AudioSystem.h>
+#include <audio/SoundInstance.h>
+#include <audio/VoiceInstance.h>
+#include <audio/AudioEffect.h>
 
 #include <Features/Model/SkyBox.h>
 
@@ -30,12 +31,12 @@
 #include <Features/UI/Element/UIImageElement.h>
 #include <Features/UI/Element/UITextElement.h>
 
-#include <System/Audio/VST3/VST3Module.h>
-#include <System/Audio/VST3/VST3ParameterManager.h>
+#include <audio/VST3/VST3Module.h>
+#include <audio/VST3/VST3ParameterManager.h>
 
-#include <System/Audio/VST3/VST3Host.h>
-#include <System/Audio/VST3/VST3Plugin.h>
-#include <System/Audio/VST3/VST3Effect.h>
+#include <audio/VST3/VST3Host.h>
+#include <audio/VST3/VST3Plugin.h>
+#include <audio/VST3/VST3Effect.h>
 
 class DeveScene : public Engine::BaseScene
 {
@@ -85,8 +86,8 @@ private:
 
     std::unique_ptr<Engine::ParticleEmitter> emitter_ = nullptr;
 
-    std::shared_ptr<Engine::SoundInstance> soundInstance_ = nullptr;
-    std::shared_ptr<Engine::VoiceInstance> voiceInstance_ = nullptr;
+    std::shared_ptr<ozSound::SoundInstance> soundInstance_ = nullptr;
+    std::shared_ptr<ozSound::VoiceInstance> voiceInstance_ = nullptr;
 
     std::unique_ptr<Engine::SkyBox> skyBox_ = nullptr;
 
@@ -110,10 +111,10 @@ private:
     // UITextElement テスト
     std::unique_ptr<Engine::UITextElement> testText1_ = nullptr;
 
-    Engine::VST3Module* vstModule_ = nullptr;
-    std::unique_ptr<Engine::VST3Plugin> vstPlugin_;
-    Engine::VST3ParameterManager vstParamMgr_;
-    Engine::AudioEffectChain vstEffectChain_;
+    ozSound::VST3Module* vstModule_ = nullptr;
+    std::unique_ptr<ozSound::VST3Plugin> vstPlugin_;
+    ozSound::VST3ParameterManager vstParamMgr_;
+    ozSound::AudioEffectChain vstEffectChain_;
     std::string vstPluginPath_ = "Resources/VST3Plugins/TDR Nova.vst3";
     bool vstInitialized_ = false;
 

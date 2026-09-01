@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameEngine", "..\Engine\Gam
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "..\Engine\Externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ozSound", "..\Engine\Externals\ozSound\ozSound.vcxproj", "{E899B6BB-07E7-4CF5-9173-AE7C1632F74B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -33,6 +35,10 @@ Global
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x64.Build.0 = Debug|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.ActiveCfg = Release|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.Build.0 = Release|x64
+		{E899B6BB-07E7-4CF5-9173-AE7C1632F74B}.Debug|x64.ActiveCfg = Debug|x64
+		{E899B6BB-07E7-4CF5-9173-AE7C1632F74B}.Debug|x64.Build.0 = Debug|x64
+		{E899B6BB-07E7-4CF5-9173-AE7C1632F74B}.Release|x64.ActiveCfg = Release|x64
+		{E899B6BB-07E7-4CF5-9173-AE7C1632F74B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
