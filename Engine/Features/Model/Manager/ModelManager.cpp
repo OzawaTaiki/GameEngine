@@ -84,6 +84,21 @@ Model* ModelManager::Create(const std::string& _name)
     return models_[name].get();
 }
 
+void ModelManager::Destroy(Model* _model)
+{
+    if (!_model)
+        return;
+
+    for (auto it = models_.begin(); it != models_.end(); ++it)
+    {
+        if (it->second.get() == _model)
+        {
+            models_.erase(it);
+            return;
+        }
+    }
+}
+
 void ModelManager::ImGui([[maybe_unused]]bool* _open)
 {
 #ifdef _DEBUG

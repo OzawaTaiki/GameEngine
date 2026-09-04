@@ -29,6 +29,10 @@ public:
 
     Model* FindSameModel(const std::string& _name);
     Model* Create(const std::string& _name);
+
+    // 動的生成した Model を解放する。ポインタで一致するエントリを models_ から取り除く。
+    // 手続き生成メッシュ（CloudMesher など）を作り直すときに呼ぶ
+    void Destroy(Model* _model);
 public:
 
     void ImGui(bool* _open);
