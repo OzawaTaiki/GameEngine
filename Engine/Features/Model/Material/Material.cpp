@@ -15,6 +15,7 @@ Material::Material(const Material& _other)
     , enableLighting_(_other.enableLighting_)
     , envScale_(_other.envScale_)
     , enableEnvironment_(_other.enableEnvironment_)
+    , specularStrength_(_other.specularStrength_)
     , name_(_other.name_)
     , texturePath_(_other.texturePath_)
     , textureHandle_(_other.textureHandle_)
@@ -42,6 +43,7 @@ void Material::Initialize(const std::string& _texturepath)
 
 
 	shiness_ = 40.0f;
+    specularStrength_ = 0.3f;
 
 	enableLighting_ = true;
 
@@ -51,7 +53,7 @@ void Material::Initialize(const std::string& _texturepath)
     LoadTexture();
 
 }
- 
+
 void Material::LoadTexture()
 {
 	if (texturePath_ == "")
@@ -71,6 +73,7 @@ void Material::TransferData()
     constMap_->hasTexture = hasTexture_ ? 1 : 0;
     constMap_->envScale = envScale_;
     constMap_->enableEnvironment = enableEnvironment_ ? 1 : 0;
+    constMap_->specularStrength = specularStrength_;
 }
 
 void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index)
@@ -118,7 +121,6 @@ void Material::AnalyzeMaterial(const aiMaterial* _material)
     {
         shiness_ = 40.0f; // デフォルトのシニアス値
     }
-
 	if (_material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
 		hasTexture_ = true;
 	else
@@ -132,6 +134,7 @@ void Material::Imgui()
 
     ImGui::ColorEdit4("Diffuse Color", &deffuseColor_.x);
     ImGui::DragFloat("Shininess", &shiness_, 0.1f, 0.0f, 100.0f);
+    ImGui::DragFloat("Specular", &specularStrength_, 0.01f, 0.0f, 1.0f);
     ImGui::Checkbox("Enable Lighting", &enableLighting_);
     ImGui::Checkbox("Enable Environment", &enableEnvironment_);
     ImGui::DragFloat("Environment Scale", &envScale_, 0.01f, 0.0f, 10.0f);
