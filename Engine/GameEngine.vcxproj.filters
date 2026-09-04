@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Core">
@@ -322,6 +322,21 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="Debug\ImGuiManager.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\GameViewportWindow.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\DebugConsole.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\DebugStats.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\EditorLayout.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\EditorWindowManager.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="Features\Camera\Camera\Camera.cpp">
@@ -794,6 +809,21 @@
       <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="Debug\ImGuiManager.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\GameViewportWindow.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\DebugConsole.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\DebugStats.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\EditorLayout.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\EditorWindowManager.h">
       <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="Features\Camera\Camera\Camera.h">

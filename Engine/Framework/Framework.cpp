@@ -12,6 +12,7 @@
 #include <Settings/EngineSettings.h>
 
 #include <Debug/ImGuiDebugManager.h>
+#include <Debug/GameViewportWindow.h>
 #include <Features/Model/Primitive/Builder/PrimitiveBuilder.h>
 
 
@@ -115,6 +116,10 @@ void Framework::Initialize(const std::wstring& _winTitle)
 
     sceneManager_ = SceneManager::GetInstance();
 
+#ifdef _DEBUG
+    GameViewportWindow::GetInstance()->Initialize("default");
+#endif // _DEBUG
+
     Time_MT::GetInstance()->Initialize();
 
     //LayerSystem::Initialize();
@@ -148,6 +153,9 @@ void Framework::PreDraw()
 void Framework::PostDraw()
 {
 #ifdef _DEBUG
+    // ゲーム画面をウィンドウ内に表示する(スワップチェイン設定後・ImGui描画前)
+    GameViewportWindow::GetInstance()->Show();
+
     ImGuiDebugManager::GetInstance()->ShowDebugWindow();
 #endif // _DEBUG
 

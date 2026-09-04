@@ -146,6 +146,20 @@ float Input::GetMouseWheel() const
 
 Vector2 Input::GetMousePosition() const
 {
+    Vector2 result = GetMousePositionRaw();
+
+    // ビューポート表示中はゲーム解像度での座標に換算する
+    if (viewportSize_.x > 0.0f && viewportSize_.y > 0.0f)
+    {
+        result.x = (result.x - viewportPos_.x) * (WinApp::kWindowSize_.x / viewportSize_.x);
+        result.y = (result.y - viewportPos_.y) * (WinApp::kWindowSize_.y / viewportSize_.y);
+    }
+
+    return result;
+}
+
+Vector2 Input::GetMousePositionRaw() const
+{
     POINT mousePos;
     GetCursorPos(&mousePos);
 
@@ -156,6 +170,36 @@ Vector2 Input::GetMousePosition() const
     result.y = static_cast<float>(mousePos.y);
 
     return result;
+}
+
+bool Input::IsMouseInViewport() const
+{
+    const Vector2 raw = GetMousePositionRaw();
+
+    Vector2 pos = viewportPos_;
+    Vector2 size = viewportSize_;
+
+    // 未設定のときはクライアント領域全体をビューポートとして扱う
+    if (size.x <= 0.0f || size.y <= 0.0f)
+    {
+        pos = { 0.0f,0.0f };
+        size = WinApp::kWindowSize_;
+    }
+
+    return raw.x >= pos.x && raw.x < pos.x + size.x &&
+           raw.y >= pos.y && raw.y < pos.y + size.y;
+}
+
+void Input::SetViewportRect(const Vector2& _pos, const Vector2& _size)
+{
+    viewportPos_ = _pos;
+    viewportSize_ = _size;
+}
+
+void Input::ResetViewportRect()
+{
+    viewportPos_ = { 0.0f,0.0f };
+    viewportSize_ = { 0.0f,0.0f };
 }
 void Input::GetMove(Vector3& _move, float _speed) const
 {
@@ -370,6 +414,11 @@ void Input::ImGui(bool* _open)
         ImGui::Text("Mouse middle : %s", IsMousePressed(2) ? "Pressed" : "Released");
         Vector2 mousePos = GetMousePosition();
         ImGui::Text("Mouse Pos : %f %f", mousePos.x, mousePos.y);
+        Vector2 rawMousePos = GetMousePositionRaw();
+        ImGui::Text("Mouse Pos (raw) : %f %f", rawMousePos.x, rawMousePos.y);
+        ImGui::Text("In Viewport : %s", IsMouseInViewport() ? "true" : "false");
+        ImGui::Text("Viewport Rect : (%.1f, %.1f) %.1f x %.1f",
+                    viewportPos_.x, viewportPos_.y, viewportSize_.x, viewportSize_.y);
         ImGui::Text("Mouse Wheel : %f", GetMouseWheel());
 
         ImGui::SeparatorText("Controller");

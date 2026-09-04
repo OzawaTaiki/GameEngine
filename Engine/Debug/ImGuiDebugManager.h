@@ -63,8 +63,10 @@ private:
 
     void MenuBar();
 
+    /// <summary> 登録されているデバッグウィンドウの一覧 (Hierarchy) </summary>
     void SelectItemWindow();
 
+    /// <summary> 選択されているデバッグウィンドウの中身 (Inspector) </summary>
     void SelectedItemWindow();
 
     void TabFlagsWindow();
@@ -72,12 +74,18 @@ private:
 private:
 #ifdef _DEBUG
     ImGuiTabBarFlags tabBarFlags_ = ImGuiTabBarFlags_None;
+    // Hierarchy の絞り込み
+    ImGuiTextFilter hierarchyFilter_;
 #endif // _DEBUG
 
     std::map<std::string, std::function<void()>> debugWindows_;
     std::map<std::string, std::function<void()>> colliderDebugWindows_;
-    std::vector<uint8_t> isSelect_;
-    std::vector<uint8_t> colliderIsSelect_;
+    // 選択状態。名前で引くのでウィンドウの増減で崩れない
+    std::map<std::string, bool> isSelect_;
+    std::map<std::string, bool> colliderIsSelect_;
+
+    bool isConsoleVisible_ = true;
+    bool isStatsVisible_ = true;
 
 
     bool isDemoWindowVisible_ = false;

@@ -4,6 +4,7 @@
 #include <Core/WinApp/WinApp.h>
 #include <Core/DXCommon/DXCommon.h>
 #include <Core/DXCommon/SRVManager/SRVManager.h>
+#include <Debug/EditorLayout.h>
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -20,6 +21,10 @@ void ImGuiManager::Initialize()
     DXCommon* dx = DXCommon::GetInstance();
 
     ImGui::CreateContext();
+
+    // imgui.ini を読み込む前に有無を調べる必要がある
+    EditorLayout::GetInstance()->Initialize();
+
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.Fonts->AddFontFromFileTTF("Resources/fonts/NotoSansJP-Regular.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
@@ -52,7 +57,11 @@ void ImGuiManager::Begin()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),ImGuiDockNodeFlags_PassthruCentralNode);
+    // レイアウトの構築は DockSpace の submit より前に行う必要があるため
+    // 前フレームで得たIDを使う(初回の構築は2フレーム目になる)
+    EditorLayout::GetInstance()->BuildIfNeeded(dockSpaceID_);
+
+    dockSpaceID_ = ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
 #endif // _DEBUG
 }

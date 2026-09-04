@@ -22,7 +22,9 @@ Sprite::Sprite(const std::string& _name, bool _debugWinddow)
 
 Sprite::~Sprite()
 {
-    //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+    // 消し忘れるとdanglingしたthisを掴んだコールバックが残る
+    if (!name_.empty())
+        ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 }
 
 void Sprite::Initialize()

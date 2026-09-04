@@ -166,6 +166,11 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Core\DXCommon\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Core\WinApp\WinApp.cpp" />
     <ClCompile Include="Debug\Debug.cpp" />
+    <ClCompile Include="Debug\GameViewportWindow.cpp" />
+    <ClCompile Include="Debug\DebugConsole.cpp" />
+    <ClCompile Include="Debug\DebugStats.cpp" />
+    <ClCompile Include="Debug\EditorLayout.cpp" />
+    <ClCompile Include="Debug\EditorWindowManager.cpp" />
     <ClCompile Include="Debug\ImGuiDebugManager.cpp" />
     <ClCompile Include="Debug\ImGuiHelper.cpp" />
     <ClCompile Include="Debug\ImGuiManager.cpp" />
@@ -341,6 +346,11 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Core\DXCommon\TextureManager\TextureManager.h" />
     <ClInclude Include="Core\WinApp\WinApp.h" />
     <ClInclude Include="Debug\Debug.h" />
+    <ClInclude Include="Debug\GameViewportWindow.h" />
+    <ClInclude Include="Debug\DebugConsole.h" />
+    <ClInclude Include="Debug\DebugStats.h" />
+    <ClInclude Include="Debug\EditorLayout.h" />
+    <ClInclude Include="Debug\EditorWindowManager.h" />
     <ClInclude Include="Debug\ImGuiDebugManager.h" />
     <ClInclude Include="Debug\ImGuiHelper.h" />
     <ClInclude Include="Debug\ImGuiManager.h" />

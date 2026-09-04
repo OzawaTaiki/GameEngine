@@ -74,7 +74,35 @@ public:
 
     float GetMouseWheel() const;
 
+	/// <summary>
+	/// マウス座標を取得する
+	/// ビューポート矩形が設定されている場合はゲーム画面内の座標に変換して返す
+	/// </summary>
 	Vector2 GetMousePosition() const;
+
+	/// <summary>
+	/// 補正なしのマウス座標(ウィンドウのクライアント座標)を取得する
+	/// </summary>
+	Vector2 GetMousePositionRaw() const;
+
+	/// <summary>
+	/// マウスがゲーム画面の内側にあるかどうか
+	/// </summary>
+	bool IsMouseInViewport() const;
+
+	/// <summary>
+	/// ゲーム画面が表示されている矩形を設定する
+	/// これ以降 GetMousePosition() はこの矩形内の座標をゲーム解像度に換算して返す
+	/// </summary>
+	/// <param name="_pos">矩形の左上(クライアント座標)</param>
+	/// <param name="_size">矩形のサイズ(クライアント座標)</param>
+	void SetViewportRect(const Vector2& _pos, const Vector2& _size);
+
+	/// <summary>
+	/// ビューポート矩形の設定を解除し，補正なしに戻す
+	/// </summary>
+	void ResetViewportRect();
+
     void GetMove(Vector3& _move, float _spped = 1.0f) const;
     void GetRotate(Vector3& _rot, float _sensi = 0.001f) const;
 
@@ -148,6 +176,11 @@ private:
 
 
 	WinApp* winApp_ = nullptr;
+
+    // ゲーム画面が表示されている矩形(クライアント座標)
+    // サイズが 0 のときは補正しない
+    Vector2 viewportPos_ = { 0.0f,0.0f };
+    Vector2 viewportSize_ = { 0.0f,0.0f };
 
 private:
     // コピーコンストラクタ
