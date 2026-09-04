@@ -1,14 +1,13 @@
 name: DebugBuild
 on:
   push:
-    branches:
-      - master
+    branches: [develop,master]
 env:
   #リポジトリのルートディレクトリを起点としたソリューションファイルのパス
   SOLUTION_FILE_PATH: Sample/SampleProject.sln
   #Visual Studio の構成
   CONFIGURATION: Debug
-  
+
 jobs:
   build:
     runs-on: windows-2022
@@ -16,15 +15,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with: 
+        with:
             submodules: recursive
-        
+
       - name: AddMsBuild to PATH
         uses: microsoft/setup-msbuild@v2
-        with: 
+        with:
           msbuild-architecture: x64
 
       - name: Build
-        run: | 
+        run: |
           msbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration=${{env.CONFIGURATION}}
-          
