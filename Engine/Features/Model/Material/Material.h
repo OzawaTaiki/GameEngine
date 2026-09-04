@@ -36,6 +36,7 @@ public:
     void SetColor(const Vector4& _color) { deffuseColor_ = _color; }
 
     void SetShininess(float _shininess) { shiness_ = _shininess; }
+    void SetSpecularStrength(float _specularStrength) { specularStrength_ = _specularStrength; }
     void SetEnableLighting(bool _enable) { enableLighting_ = _enable; }
     void SetEnableEnvironment(bool _enable) { enableEnvironment_ = _enable; }
     void SetEnvScale(float _scale) { envScale_ = _scale; }
@@ -64,6 +65,7 @@ private:
     bool enableLighting_ = true;                 // ライティングの有無
     float envScale_ = 0.0f;                 // 環境マッピングのスケール
     bool enableEnvironment_ = false; // 環境マッピングの有無
+    float specularStrength_;
 
     std::string     name_                           = {};
     std::string     texturePath_ = {};
@@ -81,7 +83,8 @@ private:
         float           envScale;
 
         int32_t         enableEnvironment = false; // 環境マッピングの有無
-        float           padding[3];
+        float           specularStrength; // 鏡面反射度
+        float           padding[2];
     };
 
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_ = nullptr;

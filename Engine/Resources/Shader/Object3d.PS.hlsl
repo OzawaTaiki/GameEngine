@@ -14,7 +14,8 @@ cbuffer gMaterial : register(b1)
     float envScale;
 
     int enableEnviroment;
-    float3 pad;
+    float specularStrength;
+    float2 pad;
 };
 
 cbuffer gColor : register(b2)
@@ -161,7 +162,7 @@ float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, fl
     float3 diffuse = deffuseColor.rgb * _textureColor.rgb * DL.color.rgb * cos * DL.intensity;
     float3 specular = DL.color.rgb * DL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
 
-    return diffuse + specular;
+    return diffuse + specular * specularStrength;
 }
 
 float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _lightIndex, float3 _toEye, float4 _textureColor)
@@ -186,7 +187,8 @@ float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _li
     float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _PL.color.rgb * cos * _PL.intensity * factor * shadowFactor;
     float3 specular = _PL.color.rgb * _PL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * shadowFactor;
 
-    return diffuse + specular;
+    return diffuse + specular * specularStrength;
+
 }
 
 float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _textureColor)
@@ -220,7 +222,7 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
     float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _SL.color.rgb * cos * _SL.intensity * factor * falloffFactor;
     float3 specular = _SL.color.rgb * _SL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
 
-    return diffuse + specular;
+    return diffuse + specular * specularStrength;
 
 }
 
