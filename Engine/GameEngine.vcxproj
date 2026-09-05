@@ -164,6 +164,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClCompile Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="Core\DXCommon\SRVManager\SRVManager.cpp" />
     <ClCompile Include="Core\DXCommon\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="Core\WinApp\Screen.cpp" />
     <ClCompile Include="Core\WinApp\WinApp.cpp" />
     <ClCompile Include="Debug\Debug.cpp" />
     <ClCompile Include="Debug\GameViewportWindow.cpp" />
@@ -344,6 +345,7 @@ xcopy  /E /Y /I  "$(projectDir)Resources\Shader\" "$(solutionDir)Resources\Shade
     <ClInclude Include="Core\DXCommon\ShaderCompiler\ShaderCompiler.h" />
     <ClInclude Include="Core\DXCommon\SRVManager\SRVManager.h" />
     <ClInclude Include="Core\DXCommon\TextureManager\TextureManager.h" />
+    <ClInclude Include="Core\WinApp\Screen.h" />
     <ClInclude Include="Core\WinApp\WinApp.h" />
     <ClInclude Include="Debug\Debug.h" />
     <ClInclude Include="Debug\GameViewportWindow.h" />

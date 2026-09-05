@@ -1,6 +1,7 @@
 #include "Input.h"
 
 #include <Debug/ImGuiDebugManager.h>
+#include <Core/WinApp/Screen.h>
 
 #include <cassert>
 #include <algorithm>
@@ -148,12 +149,20 @@ Vector2 Input::GetMousePosition() const
 {
     Vector2 result = GetMousePositionRaw();
 
-    // ビューポート表示中はゲーム解像度での座標に換算する
-    if (viewportSize_.x > 0.0f && viewportSize_.y > 0.0f)
+    Vector2 pos = viewportPos_;
+    Vector2 size = viewportSize_;
+
+    // ビューポート未設定のときはウィンドウ全体にゲーム画面が映っているとみなす
+    // ウィンドウサイズと描画解像度は一致しないので，この場合も換算は必要
+    if (size.x <= 0.0f || size.y <= 0.0f)
     {
-        result.x = (result.x - viewportPos_.x) * (WinApp::kWindowSize_.x / viewportSize_.x);
-        result.y = (result.y - viewportPos_.y) * (WinApp::kWindowSize_.y / viewportSize_.y);
+        pos = { 0.0f,0.0f };
+        size = Window::Size();
     }
+
+    // クライアント座標をゲーム解像度での座標に換算する
+    result.x = (result.x - pos.x) * (Screen::Size().x / size.x);
+    result.y = (result.y - pos.y) * (Screen::Size().y / size.y);
 
     return result;
 }
@@ -183,7 +192,7 @@ bool Input::IsMouseInViewport() const
     if (size.x <= 0.0f || size.y <= 0.0f)
     {
         pos = { 0.0f,0.0f };
-        size = WinApp::kWindowSize_;
+        size = Window::Size();
     }
 
     return raw.x >= pos.x && raw.x < pos.x + size.x &&

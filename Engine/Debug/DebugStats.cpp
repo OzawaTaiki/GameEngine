@@ -78,7 +78,8 @@ void DebugStats::Show([[maybe_unused]] bool* _open)
 
     ImGui::SeparatorText("Screen");
 
-    ImGui::Text("Game         : %u x %u", WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+    ImGui::Text("Render       : %u x %u  (%.3f)", Screen::Width(), Screen::Height(), Screen::Aspect());
+    ImGui::Text("Window       : %u x %u  (%.3f)", Window::Width(), Window::Height(), Window::Aspect());
 
     const GameViewportWindow* viewport = GameViewportWindow::GetInstance();
     const Vector2 viewportSize = viewport->GetImageSize();
@@ -86,7 +87,7 @@ void DebugStats::Show([[maybe_unused]] bool* _open)
                 viewportSize.x, viewportSize.y,
                 viewport->IsEnabled() ? "" : " (fullscreen)");
     if (viewportSize.x > 0.0f)
-        ImGui::Text("Scale        : %.3f", viewportSize.x / WinApp::kWindowSize_.x);
+        ImGui::Text("Scale        : %.3f", viewportSize.x / Screen::Size().x);
 
     ImGui::SeparatorText("ImGui");
 

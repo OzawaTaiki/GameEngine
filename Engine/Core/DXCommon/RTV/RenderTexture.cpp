@@ -2,7 +2,8 @@
 
 
 
-namespace Engine {
+namespace Engine
+{
 
 RenderTarget::RenderTarget() :
     renderTextureResource_(nullptr),
@@ -130,7 +131,7 @@ void RenderTarget::ChangeRTVState(D3D12_RESOURCE_STATES _after)
 
 }
 
-void RenderTarget::ChangeDSVState( D3D12_RESOURCE_STATES _after)
+void RenderTarget::ChangeDSVState(D3D12_RESOURCE_STATES _after)
 {
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
@@ -215,7 +216,7 @@ void RenderTarget::QueueCommandRTVtoSRV(uint32_t _index)
     auto DXCommon = DXCommon::GetInstance();
     auto commandList = DXCommon->GetCommandList();
     auto srvManager = SRVManager::GetInstance();
-    if (RTVCurrentState_!= D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+    if (RTVCurrentState_ != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
     {
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

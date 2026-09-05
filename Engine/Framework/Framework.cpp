@@ -1,6 +1,7 @@
 #include <Framework/Framework.h>
 
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Core/WinApp/Screen.h>
 #include <Core/DXCommon/ShaderCompiler/ShaderCompiler.h>
 #include <Core/DXCommon/PSOManager/PSOFactory.h>
 #include <Features/Light/System/LightingSystem.h>
@@ -43,13 +44,19 @@ void Framework::Initialize(const std::wstring& _winTitle)
         ? EngineSettings::current_.windowTitle.c_str()
         : _winTitle.c_str();
 
+    // ゲームの描画解像度。ビルド構成によらず同じ値にする
+    Screen::SetSize(EngineSettings::current_.renderWidth,
+                    EngineSettings::current_.renderHeight);
+
+    // OSウィンドウは Debug だけ広く取れる。実サイズは Window:: 側に入る
     winApp_ = WinApp::GetInstance();
     winApp_->Initilize(windowTitle,
-                       EngineSettings::current_.windowWidth,
-                       EngineSettings::current_.windowHeight);
+                       EngineSettings::current_.GetWindowWidth(),
+                       EngineSettings::current_.GetWindowHeight());
 
+    // スワップチェインはウィンドウと同じサイズ
     dxCommon_ = DXCommon::GetInstance();
-    dxCommon_->Initialize(winApp_, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+    dxCommon_->Initialize(winApp_, Window::Width(), Window::Height());
 
     srvManager_ = SRVManager::GetInstance();
     srvManager_->Initialize();
@@ -62,7 +69,8 @@ void Framework::Initialize(const std::wstring& _winTitle)
     imguiManager_->Initialize();
 
     rtvManager_ = RTVManager::GetInstance();
-    rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+    // RTVManager が持つビューポートはスワップチェイン描画用なのでウィンドウサイズ
+    rtvManager_->Initialize(dxCommon_->GetBackBufferSize(), Window::Width(), Window::Height());
 
     // ShaderCompiler と PSOFactory を PSOManager より前に初期化
     ShaderCompiler::GetInstance()->Initialize();
@@ -78,7 +86,7 @@ void Framework::Initialize(const std::wstring& _winTitle)
     TextureManager* instance = TextureManager::GetInstance();
     instance->Initialize();
 
-    Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+    Sprite::StaticInitialize(Screen::Width(), Screen::Height());
 
     ModelManager::GetInstance()->Initialize();
 
@@ -92,17 +100,19 @@ void Framework::Initialize(const std::wstring& _winTitle)
     particleManager_->Initialize();
 
     Time::Initialize();
+    // 固定デルタタイム時の1フレーム分の長さを設定に合わせる
+    Time::SetDefaultFramerate(static_cast<float>(EngineSettings::current_.targetFPS));
 
     gameTime_ = GameTime::GetInstance();
     gameTime_->Initialize();
 
     fontCache_ = FontCache::GetInstance();
     fontCache_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
-        WinApp::kWindowSize_);
+        Screen::Size());
 
     textRenderer_ = TextRenderer::GetInstance();
     textRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(),
-                              WinApp::kWindowSize_);
+                              Screen::Size());
 
     text3DRenderer_ = Text3DRenderer::GetInstance();
     text3DRenderer_->Initialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList());

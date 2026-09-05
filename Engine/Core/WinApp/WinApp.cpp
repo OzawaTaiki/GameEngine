@@ -15,9 +15,6 @@ namespace Engine {
 
 const wchar_t WinApp::kWindowClassName[] = L"WindowClass";
 
-uint32_t WinApp::kWindowWidth_ = 1280;
-uint32_t WinApp::kWindowHeight_ = 720;
-Vector2 WinApp::kWindowSize_ = Vector2{ static_cast<float>(kWindowWidth_), static_cast<float>(kWindowHeight_) };
 
 WinApp* WinApp::GetInstance()
 {
@@ -77,10 +74,29 @@ void WinApp::Initilize(const wchar_t* _title, uint32_t _width, uint32_t _height,
 
     RegisterClass(&wndClass_);
 
-    kWindowWidth_ = _width;
-    kWindowHeight_ = _height;
+    // デスクトップの作業領域に収まるようクライアントサイズを丸める
+    // Debug用に大きめの値が設定されていても，タイトルバーごと画面外に出ないようにする
+    {
+        RECT workArea = {};
+        if (SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0))
+        {
+            RECT frame = { 0,0,0,0 };
+            AdjustWindowRect(&frame, WS_OVERLAPPEDWINDOW, false);
 
-    kWindowSize_ = Vector2{ static_cast<float>(_width), static_cast<float>(_height) };
+            const LONG frameWidth = (frame.right - frame.left);
+            const LONG frameHeight = (frame.bottom - frame.top);
+
+            const LONG maxWidth = (workArea.right - workArea.left) - frameWidth;
+            const LONG maxHeight = (workArea.bottom - workArea.top) - frameHeight;
+
+            if (maxWidth > 0 && _width > static_cast<uint32_t>(maxWidth))
+                _width = static_cast<uint32_t>(maxWidth);
+            if (maxHeight > 0 && _height > static_cast<uint32_t>(maxHeight))
+                _height = static_cast<uint32_t>(maxHeight);
+        }
+    }
+
+    Window::SetSize(_width, _height);
 
     RECT wrc = { 0,0,(LONG)_width,(LONG)_height };
 

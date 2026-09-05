@@ -40,12 +40,13 @@ void GameViewportWindow::Show()
     if (input_->IsKeyTriggered(DIK_F2))
         isEnabled_ = !isEnabled_;
 
-    // 無効時は全画面描画のまま。マウス座標の補正も外す
+    // 無効時は全画面描画のまま
+    // 矩形を外すと Input 側がウィンドウ全体を使って換算してくれる
     if (!isEnabled_)
     {
         input_->ResetViewportRect();
         imagePos_ = { 0.0f,0.0f };
-        imageSize_ = WinApp::kWindowSize_;
+        imageSize_ = Window::Size();
         return;
     }
 
@@ -136,7 +137,7 @@ Vector2 GameViewportWindow::CalcFitSize([[maybe_unused]] const Vector2& _avail) 
     if (_avail.x <= 0.0f || _avail.y <= 0.0f)
         return result;
 
-    const float aspect = WinApp::kWindowSize_.x / WinApp::kWindowSize_.y;
+    const float aspect = Screen::Aspect();
 
     result = _avail;
     if (_avail.x / _avail.y > aspect)

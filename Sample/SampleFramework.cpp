@@ -1,6 +1,7 @@
 #include "SampleFramework.h"
 
 #include "SampleScene.h"
+#include <Core/WinApp/Screen.h>
 #include <Features/Scene/ParticleTestScene.h>
 #include "SceneFactory.h"
 
@@ -18,8 +19,8 @@ void SampleFramework::Initialize(const std::wstring& _winTitle)
     Framework::Initialize(L"GameEngine");
 
 
-    //rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
-    rtvManager_->CreateRenderTarget("default", WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
+    //rtvManager_->CreateRenderTarget("default", Screen::Width(), Screen::Height(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.4625f, 0.925f, 0.4625f, 1.0f), false);
+    rtvManager_->CreateRenderTarget("default", Screen::Width(), Screen::Height(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
     rtvManager_->CreateRenderTarget("ShadowMap", 4096, 4096, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(1.0f, 1.0f, 1.0f, 1.0f), true);
 
     sceneManager_->SetSceneFactory(std::make_unique<SceneFactory>());

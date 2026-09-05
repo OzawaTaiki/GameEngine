@@ -315,6 +315,9 @@
     <ClCompile Include="Core\DXCommon\TextureManager\TextureManager.cpp">
       <Filter>Core\DXCommon\TextureManager</Filter>
     </ClCompile>
+    <ClCompile Include="Core\WinApp\Screen.cpp">
+      <Filter>Core\WinApp</Filter>
+    </ClCompile>
     <ClCompile Include="Core\WinApp\WinApp.cpp">
       <Filter>Core\WinApp</Filter>
     </ClCompile>
@@ -801,6 +804,9 @@
     </ClInclude>
     <ClInclude Include="Core\DXCommon\TextureManager\TextureManager.h">
       <Filter>Core\DXCommon\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WinApp\Screen.h">
+      <Filter>Core\WinApp</Filter>
     </ClInclude>
     <ClInclude Include="Core\WinApp\WinApp.h">
       <Filter>Core\WinApp</Filter>
