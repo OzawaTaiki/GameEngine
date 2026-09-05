@@ -23,7 +23,9 @@ ParticleSystem* ParticleSystem::GetInstance()
 
 ParticleSystem::~ParticleSystem()
 {
-    ClearParticles();
+    // 終了時はSRVManagerが先に破棄されている可能性があるため、
+    // ディスクリプタを返却せずGPUリソースの所有権だけを破棄する。
+    particles_.clear();
 
     factory_ = nullptr;
 
@@ -46,10 +48,15 @@ void ParticleSystem::Update(float _deltaTime)
         return;
     }
 
+    std::vector<std::string> emptyGroups;
+
     for (auto& [groupName, particleList] : particles_)
     {
         if (particleList.particles.empty())
+        {
+            emptyGroups.push_back(groupName);
             continue;
+        }
         particleList.instanceCount = 0;
 
         auto& particles = particleList.particles;
@@ -85,10 +92,6 @@ void ParticleSystem::Update(float _deltaTime)
 
         for (auto it = particles.begin(); it != particles.end();)
         {
-            // group上限より大きいとき強制退場
-            if (particleList.instanceCount >= maxInstancesPerGroup)
-                break;
-
             auto& particle = *it;
 
             if (!particle->IsAlive())
@@ -98,17 +101,41 @@ void ParticleSystem::Update(float _deltaTime)
             }
             particle->Update(_deltaTime);
 
-            Matrix4x4 affineMatrix =
-                MakeScaleMatrix(particle->GetScale()) *
-                MakeRotateMatrix(particle->GetRotation()) *
-                billboardMatrix*
-                MakeTranslateMatrix(particle->GetPosition());
+            if (!particle->IsAlive())
+            {
+                it = particles.erase(it);
+                continue;
+            }
 
-            particleList.mappedInstanceBuffer[particleList.instanceCount].worldMatrix = affineMatrix;
-            particleList.mappedInstanceBuffer[particleList.instanceCount].color = particle->GetColor();
+            if (particleList.instanceCount < maxInstancesPerGroup)
+            {
+                Matrix4x4 affineMatrix =
+                    MakeScaleMatrix(particle->GetScale()) *
+                    MakeRotateMatrix(particle->GetRotation()) *
+                    billboardMatrix*
+                    MakeTranslateMatrix(particle->GetPosition());
 
-            particleList.instanceCount++;
+                particleList.mappedInstanceBuffer[particleList.instanceCount].worldMatrix = affineMatrix;
+                particleList.mappedInstanceBuffer[particleList.instanceCount].color = particle->GetColor();
+
+                particleList.instanceCount++;
+            }
             ++it;
+        }
+
+        if (particles.empty())
+            emptyGroups.push_back(groupName);
+    }
+
+    // 終了したグループのSRVとバッファを回収する。
+    // 放置すると、Effectの再生を繰り返すたびにディスクリプタが増え続ける。
+    for (const std::string& groupName : emptyGroups)
+    {
+        auto it = particles_.find(groupName);
+        if (it != particles_.end())
+        {
+            srvManager_->Free(it->second.srvIndex);
+            particles_.erase(it);
         }
     }
 }
@@ -197,6 +224,9 @@ void ParticleSystem::AddParticle(const std::string& _groupName, const std::strin
     }
     else
     {
+        if (it->second.particles.size() >= maxInstancesPerGroup)
+            return;
+
         PSOFlags psoFlags = _settings.GetPSOFlags();
         psoFlags = psoFlags | PSOFlags::Type::Particle | PSOFlags::DepthMode::Comb_mZero_fLessEqual;
 
@@ -235,6 +265,8 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
 
         for (auto& particle : _particles)
         {
+            if (group.particles.size() >= maxInstancesPerGroup)
+                break;
             group.particles.push_back(std::move(particle));
         }
 
@@ -264,6 +296,8 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
         // パーティクルだけを追加
         for (auto& particle : _particles)
         {
+            if (group.particles.size() >= maxInstancesPerGroup)
+                break;
             group.particles.push_back(std::move(particle));
         }
         group.textureHandle = _textureHandle;
@@ -296,6 +330,13 @@ void ParticleSystem::AddParticles(const std::string& _groupName, const std::stri
 
 void ParticleSystem::ClearParticles()
 {
+    if (srvManager_)
+    {
+        for (auto& [name, group] : particles_)
+        {
+            srvManager_->Free(group.srvIndex);
+        }
+    }
     particles_.clear();
 }
 
@@ -303,7 +344,17 @@ void ParticleSystem::ClearParticles(const std::string& _groupName)
 {
     auto it = particles_.find(_groupName);
     if (it != particles_.end())
-        it->second.particles.clear();
+    {
+        if (srvManager_)
+            srvManager_->Free(it->second.srvIndex);
+        particles_.erase(it);
+    }
+}
+
+bool ParticleSystem::HasParticles(const std::string& _groupName) const
+{
+    auto it = particles_.find(_groupName);
+    return it != particles_.end() && !it->second.particles.empty();
 }
 
 void ParticleSystem::CreateModifier(const std::string& _name)

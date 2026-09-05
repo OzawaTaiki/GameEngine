@@ -29,6 +29,7 @@ void Particle::Initialize(const ParticleInitParam& _param)
     currentTime_ = 0.0f;
 
     velocity_ = direction_.Normalize() * speed_;
+    accelerationVelocity_ = {};
 
     matWorld_ = MakeAffineMatrix(scale_, rotation_, translate_);
 
@@ -50,12 +51,10 @@ void Particle::Update(float _deltaTime)
         return;
     }
 
-    t_ = currentTime_ / lifeTime_;
+    t_ = lifeTime_ > 0.0f ? std::clamp(currentTime_ / lifeTime_, 0.0f, 1.0f) : 1.0f;
 
-
-    velocity_ = direction_.Normalize() * speed_;
-
-    velocity_ += acceleration_ * _deltaTime;
+    accelerationVelocity_ += acceleration_ * _deltaTime;
+    velocity_ = direction_.Normalize() * speed_ + accelerationVelocity_;
     translate_ += velocity_ * _deltaTime;
 
     // 回転の更新

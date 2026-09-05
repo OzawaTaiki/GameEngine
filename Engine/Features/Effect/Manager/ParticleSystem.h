@@ -11,6 +11,8 @@
 #include <list>
 #include <string>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 
 #include <d3d12.h>
@@ -80,6 +82,7 @@ public:
 
     void ClearParticles();
     void ClearParticles(const std::string& _groupName);
+    bool HasParticles(const std::string& _groupName) const;
 
     void SetCamera(Camera* _camera) { camera_ = _camera; }
 

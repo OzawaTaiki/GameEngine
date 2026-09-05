@@ -142,12 +142,13 @@ public:
     float GetDelayTime() const { return delayTime_; }
     float GetDuration() const { return lifeTime; }
     float GetElapsedTime() const { return elapsedTime_; }
+    bool HasLiveParticles() const;
 
     // === 変形・位置系 ===
     void SetParentTransform(WorldTransform* _parentTransform) { parentTransform_ = _parentTransform; }
     void SetOffset(const Vector3& _offset) { offset_ = _offset; }
     void SetPosition(const Vector3& _position) { position_ = _position; }
-    void SetRotation(const Quaternion& _rotation) { rotation_ = _rotation; }
+    void SetRotation(const Quaternion& _rotation);
     void SetScale(const Vector3& _scale) { scale_ = _scale; }
 
     const Vector3& GetPosition() const { return position_; }
@@ -197,13 +198,15 @@ private:
     // === 発生設定 ===
     uint32_t emitPerSecond_ = 10;
     uint32_t emitCount_ = 1;
+    float emissionAccumulator_ = 0.0f;
+    bool hasEmitted_ = false;
     std::string useModelName_ = "cube/cube.obj";
 
     // === タイミング ===
     bool isLoop_ = false;
     float elapsedTime_ = 0.0f;
     float delayTime_ = 0.0f;
-    float lifeTime = 0.0f;
+    float lifeTime = 1.0f;
     std::string timeChannel_ = "default";
 
     // === パーティクル初期値 ===
@@ -215,10 +218,13 @@ private:
     // === 統計・デバッグ ===
     mutable std::string lastError_;
 
+    // ParticleSystem上で同名エミッターを別グループとして扱うためのID
+    static uint64_t s_nextID_;
+    uint64_t instanceID_ = 0;
+    std::string particleGroupName_;
+
 #ifdef _DEBUG
     // === ImGui用バッファ ===
-    static int s_nextID_;
-    int instanceID_ = 0;
     char nameBuf_[256] = {};
     char modelPath_[256] = {};
     char modelName_[256] = {};
