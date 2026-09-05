@@ -58,26 +58,8 @@ bool Effect::Initialize(const std::string& _name)
 
     try
     {
-        jsonBinder_ = std::make_unique<JsonBinder>(_name, "Resources/Data/Particles/Effects/");
-
-        jsonBinder_->RegisterVariable("loop", reinterpret_cast<uint32_t*>(&isLoop_));
-        jsonBinder_->RegisterVariable("emitters", &emitterNames_);
-        jsonBinder_->RegisterVariable("playbackSpeed", &playbackSpeed_);
-        jsonBinder_->RegisterVariable("startDelay", &startDelay_);
-        jsonBinder_->RegisterVariable("position", &position_);
-        jsonBinder_->RegisterVariable("rotation", &rotation_);
-        jsonBinder_->RegisterVariable("scale", &scale_);
-        jsonBinder_->RegisterVariable("renderLayer", &renderLayer_);
-
-        // 既存のエミッターを読み込み
-        for (const std::string& emitterName : emitterNames_)
-        {
-            if (!AddEmitter(emitterName))
-            {
-                SetError("Failed to load emitter: " + emitterName);
-                // 警告として続行
-            }
-        }
+        if (!InitializeDataBinding("Resources/Data/Particles/Effects/"))
+            return false;
 
         gameTime_ = GameTime::GetInstance();
 
@@ -101,6 +83,7 @@ void Effect::Play()
     Reset();
     isActive_ = true;
     isPaused_ = false;
+    SetAllEmittersActive(true);
     InvokeCallback(onPlayCallback_);
 }
 
@@ -108,6 +91,7 @@ void Effect::Stop()
 {
     isActive_ = false;
     isPaused_ = false;
+    SetAllEmittersActive(false);
     InvokeCallback(onStopCallback_);
 }
 
@@ -147,7 +131,7 @@ bool Effect::IsComplete() const
     // 全エミッターが非アクティブかつ寿命切れの場合完了
     for (const auto& emitter : emitters_)
     {
-        if (emitter && (emitter->IsActive() || emitter->IsAlive()))
+        if (emitter && (emitter->IsActive() || emitter->IsAlive() || emitter->HasLiveParticles()))
         {
             return false;
         }
@@ -187,11 +171,12 @@ void Effect::Update()
         isActive_ = false;
         InvokeCallback(onCompleteCallback_);
     }
-    else if (isLoop_ && elapsedTime_ >= GetDuration())
+    else if (isLoop_ && GetDuration() > 0.0f && elapsedTime_ >= startDelay_ + GetDuration())
     {
         // ループ時のリセット
         Reset();
         isActive_ = true;
+        SetAllEmittersActive(true);
         InvokeCallback(onLoopCallback_);
     }
 
@@ -502,17 +487,24 @@ bool Effect::LoadFromFile(std::string_view _filePath)
 {
     try
     {
-        std::string name = std::filesystem::path(_filePath).stem().string();
-        if (!Initialize(name))
+        const std::filesystem::path filePath(_filePath);
+        if (!std::filesystem::exists(filePath))
         {
+            SetError("Effect file not found: " + filePath.string());
             return false;
         }
 
-        // JsonBinderから設定を読み込み
-        if (jsonBinder_)
-        {
-            // jsonBinder_->LoadFromFile(_filePath); // 実装が必要
-        }
+        ClearEmitters();
+        name_ = filePath.stem().string();
+        const std::string directory = filePath.has_parent_path() ? filePath.parent_path().generic_string() : ".";
+        if (!InitializeDataBinding(directory))
+            return false;
+
+        gameTime_ = GameTime::GetInstance();
+        isActive_ = false;
+        isPaused_ = false;
+        elapsedTime_ = 0.0f;
+        RebuildIndexMap();
 
         ClearError();
         return true;
@@ -522,6 +514,36 @@ bool Effect::LoadFromFile(std::string_view _filePath)
         SetError("Load failed: " + std::string(e.what()));
         return false;
     }
+}
+
+bool Effect::InitializeDataBinding(const std::string& _directory)
+{
+    jsonBinder_ = std::make_unique<JsonBinder>(name_, _directory.empty() ? "." : _directory);
+
+    // boolをuint32_t*として登録すると隣接メンバを破壊するため、型のまま登録する。
+    jsonBinder_->RegisterVariable("loop", &isLoop_);
+    jsonBinder_->RegisterVariable("emitters", &emitterNames_);
+    jsonBinder_->RegisterVariable("playbackSpeed", &playbackSpeed_);
+    jsonBinder_->RegisterVariable("startDelay", &startDelay_);
+    jsonBinder_->RegisterVariable("position", &position_);
+    jsonBinder_->RegisterVariable("rotation", &rotation_);
+    jsonBinder_->RegisterVariable("scale", &scale_);
+    jsonBinder_->RegisterVariable("renderLayer", &renderLayer_);
+
+    // AddEmitterがemitterNames_を変更するため、読み込み結果のコピー上を走査する。
+    const std::vector<std::string> loadedEmitterNames = emitterNames_;
+    emitterNames_.clear();
+    emitters_.clear();
+    for (const std::string& emitterName : loadedEmitterNames)
+    {
+        if (!AddEmitter(emitterName))
+        {
+            SetError("Failed to load emitter: " + emitterName);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Effect::SaveToFile() const

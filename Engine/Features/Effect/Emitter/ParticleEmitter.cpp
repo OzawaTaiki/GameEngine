@@ -4,15 +4,13 @@
 #include <Core/DXCommon/TextureManager/TextureManager.h>
 #include <Debug/ImguITools.h>
 #include <algorithm>
+#include <cmath>
 #include <cstring>
+#include <limits>
 
 
 namespace Engine {
-#ifdef _DEBUG
-int ParticleEmitter::s_nextID_ = 0;
-
-#endif // _DEBUG
-
+uint64_t ParticleEmitter::s_nextID_ = 0;
 
 namespace
 {
@@ -108,6 +106,8 @@ bool ParticleEmitter::Initialize(const std::string& _name)
 
     ClearError();
     name_ = _name;
+    instanceID_ = s_nextID_++;
+    particleGroupName_ = name_ + "##" + std::to_string(instanceID_);
     isActive_ = false;
     isAlive_ = true;
     elapsedTime_ = 0.0f;
@@ -117,9 +117,6 @@ bool ParticleEmitter::Initialize(const std::string& _name)
         InitJsonBinder();
 
 #ifdef _DEBUG
-        // 一意なIDを割り当て
-        instanceID_ = s_nextID_++;
-
         // 名前をbufにコピー（安全に）
         strncpy_s(nameBuf_, sizeof(nameBuf_), name_.c_str(), _TRUNCATE);
 #endif
@@ -137,41 +134,65 @@ void ParticleEmitter::Update(float _deltaTime)
 {
     if (!isActive_ || !isAlive_) return;
 
+    if (_deltaTime <= 0.0f) return;
+
     // エミッターの時間を更新
+    const float previousElapsedTime = elapsedTime_;
     elapsedTime_ += _deltaTime;
 
     // 遅延時間を超えてないとき
     if (elapsedTime_ < delayTime_) return;
 
-    // 時間ごとにパーティクルを発生させる
-    if (elapsedTime_ >= delayTime_)
+    // duration 0は1回だけ発生するバーストとして扱う
+    if (lifeTime <= 0.0f)
     {
-        // ループしているとき
+        if (!hasEmitted_)
+            GenerateParticles();
+        hasEmitted_ = true;
+        isActive_ = false;
+        isAlive_ = false;
+        return;
+    }
+
+    // 発生可能時間だけを蓄積し、フレームレートに依存しない発生数にする
+    const float emissionStart = (std::max)(previousElapsedTime, delayTime_);
+    const float emissionEnd = (std::min)(elapsedTime_, delayTime_ + lifeTime);
+    const float emissionDelta = (std::max)(0.0f, emissionEnd - emissionStart);
+    emissionAccumulator_ += emissionDelta * static_cast<float>(emitPerSecond_);
+
+    const uint32_t emissionEvents = static_cast<uint32_t>(emissionAccumulator_);
+    if (emissionEvents > 0)
+    {
+        emissionAccumulator_ -= static_cast<float>(emissionEvents);
+        const uint64_t totalCount = static_cast<uint64_t>(emissionEvents) * emitCount_;
+        EmitBurst(static_cast<uint32_t>((std::min)(totalCount, static_cast<uint64_t>((std::numeric_limits<uint32_t>::max)()))));
+    }
+
+    if (elapsedTime_ >= delayTime_ + lifeTime)
+    {
         if (isLoop_)
         {
-            // 一定時間ごとにパーティクルを発生させる
-            if (elapsedTime_ >= delayTime_ + lifeTime)
-            {
-                elapsedTime_ = 0.0f;
-            }
+            const float cycleDuration = delayTime_ + lifeTime;
+            elapsedTime_ = cycleDuration > 0.0f ? std::fmod(elapsedTime_, cycleDuration) : 0.0f;
+            emissionAccumulator_ = 0.0f;
+            hasEmitted_ = false;
         }
         else
         {
-            // ループしていないとき
-            if (elapsedTime_ >= delayTime_ + lifeTime)
-            {
-                isActive_ = false;
-                isAlive_ = false;
-                return;
-            }
+            isActive_ = false;
+            isAlive_ = false;
         }
-        GenerateParticles();
     }
 }
 
 void ParticleEmitter::Reset()
 {
+    if (!particleGroupName_.empty())
+        ParticleSystem::GetInstance()->ClearParticles(particleGroupName_);
+
     elapsedTime_ = 0.0f;
+    emissionAccumulator_ = 0.0f;
+    hasEmitted_ = false;
     isActive_ = false;
     isAlive_ = true;
 }
@@ -184,9 +205,9 @@ void ParticleEmitter::GenerateParticles()
 
     Quaternion q = Quaternion::EulerToQuaternion(rotationEuler_);
     Matrix4x4 emitterTransform = MakeAffineMatrix(
-        Vector3(1.0f, 1.0f, 1.0f), // スケール
+        scale_, // スケール
         q, // 回転
-        position_ // 平行移動
+        position_ + offset_ // 平行移動
     );
 
     Quaternion parentRotation = q;
@@ -216,7 +237,7 @@ void ParticleEmitter::GenerateParticles()
             initParam.lifeTime = initParams_.lifeTime.GetValue();
         }
 
-        Vector3 emitterWorldPos = position_;
+        Vector3 emitterWorldPos = Transform(Vector3(0.0f, 0.0f, 0.0f), emitterTransform);
 
         switch (shape_)
         {
@@ -299,8 +320,7 @@ void ParticleEmitter::GenerateParticles()
 
     uint32_t textureHandle = TextureManager::GetInstance()->Load(initParams_.textureName);
 
-    // groupnameには仮でエミッターの名前を入れている
-    ParticleSystem::GetInstance()->AddParticles(name_, useModelName_, std::move(particles), settings, textureHandle, initParams_.modifiers);
+    ParticleSystem::GetInstance()->AddParticles(particleGroupName_, useModelName_, std::move(particles), settings, textureHandle, initParams_.modifiers);
 
 }
 
@@ -351,6 +371,17 @@ void ParticleEmitter::SetTextureName(const std::string& _textureName)
 void ParticleEmitter::SetTimeChannel(const std::string& _channel)
 {
     timeChannel_ = _channel;
+}
+
+bool ParticleEmitter::HasLiveParticles() const
+{
+    return !particleGroupName_.empty() && ParticleSystem::GetInstance()->HasParticles(particleGroupName_);
+}
+
+void ParticleEmitter::SetRotation(const Quaternion& _rotation)
+{
+    rotation_ = _rotation;
+    rotationEuler_ = Vector3::QuaternionToEuler(_rotation);
 }
 
 bool ParticleEmitter::HasModifier(std::string_view _modifierName) const
@@ -472,7 +503,7 @@ void ParticleEmitter::InitJsonBinder()
     jsonBinder_->RegisterVariable("lifeTime", &lifeTime);
 
     jsonBinder_->RegisterVariable("position", &position_);
-    jsonBinder_->RegisterVariable("rotation", &rotation_); // TODO
+    jsonBinder_->RegisterVariable("rotation", &rotationEuler_);
     jsonBinder_->RegisterVariable("boxSize", &boxSize_);
     jsonBinder_->RegisterVariable("sphereRadius", &sphereRadius_);
 

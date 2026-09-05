@@ -10,6 +10,9 @@ void AlphaOverLifetime::Apply(Particle* _particle, [[maybe_unused]] float _delta
     if (_particle == nullptr)
         return;
 
+    if (_particle->IsInfiniteLife() || _particle->GetLifeTime() <= 0.0f)
+        return;
+
     // アルファ値を時間に応じて変化させる
     float alpha = 1.0f - (_particle->GetCurrentTime() / _particle->GetLifeTime());
 
