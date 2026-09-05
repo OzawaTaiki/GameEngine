@@ -193,6 +193,7 @@ private:
     // === 内部ヘルパー ===
     void UpdateWorldMatrix();
     void UpdateEmitters();
+    bool InitializeDataBinding(const std::string& _directory);
     void SetError(std::string_view _error) const { lastError_ = _error; }
     bool ValidateEmitterName(std::string_view _name) const;
     void RebuildIndexMap();

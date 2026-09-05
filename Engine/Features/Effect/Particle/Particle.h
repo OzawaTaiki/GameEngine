@@ -73,6 +73,9 @@ private:
     float t_ = 0;
 
     Vector3 velocity_ = {};
+    // accelerationによって増加した速度成分。direction/speedから作る基本速度と
+    // 分離することで、Modifierによるspeed変更と重力の累積を両立する。
+    Vector3 accelerationVelocity_ = {};
     float lifeTime_ = 1.0f;
 
     Vector3 translate_ = { 0.0f,0.0f ,0.0f };
