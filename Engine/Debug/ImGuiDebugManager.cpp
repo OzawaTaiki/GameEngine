@@ -2,6 +2,14 @@
 
 #include <System/input/Input.h>
 #include <Debug/ImguITools.h>
+#include <Debug/GameViewportWindow.h>
+#include <Debug/DebugConsole.h>
+#include <Debug/DebugStats.h>
+#include <Debug/EditorLayout.h>
+#include <Debug/EditorWindowManager.h>
+
+#include <algorithm>
+#include <set>
 
 
 namespace Engine {
@@ -37,17 +45,26 @@ void ImGuiDebugManager::Initialize()
     debugWindows_.clear();
     colliderDebugWindows_.clear();
     isSelect_.clear();
+    colliderIsSelect_.clear();
 
     windowsVisibility_.clear();
     menuItems_.clear();
 
     isAllWindowHidden_ = false;
 
+    // エディタとして常用する枠はデフォルトで開いておく
+    windowsVisibility_["Hierarchy"] = true;
+    windowsVisibility_["Inspector"] = true;
+    isConsoleVisible_ = true;
+    isStatsVisible_ = true;
 }
 
 void ImGuiDebugManager::ShowDebugWindow()
 {
 #ifdef _DEBUG
+
+    // 非表示中も計測は続ける
+    DebugStats::GetInstance()->Update();
 
     if (Input::GetInstance()->IsKeyTriggered(DIK_F3))
     {
@@ -71,6 +88,15 @@ void ImGuiDebugManager::ShowDebugWindow()
     SelectedItemWindow();
     SelectItemWindow();
     TabFlagsWindow();
+
+    if (isConsoleVisible_)
+        DebugConsole::GetInstance()->Show(&isConsoleVisible_);
+
+    if (isStatsVisible_)
+        DebugStats::GetInstance()->Show(&isStatsVisible_);
+
+    // 自前で登録されたウィンドウ
+    EditorWindowManager::GetInstance()->Draw();
 
 #endif // _DEBUG
 }
@@ -122,8 +148,7 @@ std::string ImGuiDebugManager::AddDebugWindow(const std::string& _name, std::fun
 
 
     debugWindows_[name] = _func;
-    if(isSelect_.size()<debugWindows_.size())
-        isSelect_.push_back(false);
+    isSelect_[name] = false;
 
     return name;
 }
@@ -134,6 +159,7 @@ void ImGuiDebugManager::RemoveDebugWindow(const std::string& _name)
     if (it != debugWindows_.end())
     {
         debugWindows_.erase(it);
+        isSelect_.erase(_name);
         return;
     }
 
@@ -141,6 +167,7 @@ void ImGuiDebugManager::RemoveDebugWindow(const std::string& _name)
     if (it != colliderDebugWindows_.end())
     {
         colliderDebugWindows_.erase(it);
+        colliderIsSelect_.erase(_name);
         return;
     }
 
@@ -177,8 +204,7 @@ std::string ImGuiDebugManager::AddColliderDebugWindow(const std::string& _name, 
 
 
     colliderDebugWindows_[name] = _func;
-    if (colliderIsSelect_.size() < colliderDebugWindows_.size())
-        colliderIsSelect_.push_back(false);
+    colliderIsSelect_[name] = false;
 
     return name;
 }
@@ -212,6 +238,30 @@ void ImGuiDebugManager::MenuBar()
             ImGui::EndMenu();
         }
         ImGui::Separator();  // 区切り線
+        if (ImGui::BeginMenu("View"))
+        {
+            ImGui::MenuItem("Game", "F2", GameViewportWindow::GetInstance()->GetEnablePtr());
+            ImGui::MenuItem("Hierarchy", nullptr, &windowsVisibility_["Hierarchy"]);
+            ImGui::MenuItem("Inspector", nullptr, &windowsVisibility_["Inspector"]);
+            ImGui::MenuItem("Console", nullptr, &isConsoleVisible_);
+            ImGui::MenuItem("Stats", nullptr, &isStatsVisible_);
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset Layout"))
+            {
+                // 閉じたままだと配置し直しても見えないので開く
+                windowsVisibility_["Hierarchy"] = true;
+                windowsVisibility_["Inspector"] = true;
+                isConsoleVisible_ = true;
+                isStatsVisible_ = true;
+                GameViewportWindow::GetInstance()->SetEnable(true);
+
+                EditorLayout::GetInstance()->RequestReset();
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();  // 区切り線
         if (ImGui::BeginMenu("Core"))
         {
             ImGui::MenuItem("Time Info", nullptr, &menuItemsVisibility_["TimeInfo"]);
@@ -232,6 +282,40 @@ void ImGuiDebugManager::MenuBar()
             ImGui::MenuItem("Collision Manager", nullptr, &menuItemsVisibility_["CollisionManager"]);
             ImGui::EndMenu();
         }
+        ImGui::Separator();  // 区切り線
+
+        ImGui::Separator();  // 区切り線
+        if (ImGui::BeginMenu("Custom"))
+        {
+            // EditorWindowManager に登録されたもの
+            EditorWindowManager::GetInstance()->DrawMenu();
+
+            // RegisterMenuItem で登録されたもののうち，上のメニューに直書きしていないもの
+            // これが無いとエンジン外から登録した項目に手が届かない
+            static const std::set<std::string> kBuiltInMenuItems =
+            {
+                "TimeInfo", "SceneManager", "InputStatus",
+                "TextureManager", "ModelManager", "CollisionManager",
+            };
+
+            bool hasCustomMenuItem = false;
+            for (auto& [name, func] : menuItems_)
+            {
+                if (kBuiltInMenuItems.contains(name))
+                    continue;
+
+                if (!hasCustomMenuItem)
+                {
+                    ImGui::Separator();
+                    hasCustomMenuItem = true;
+                }
+
+                ImGui::MenuItem(name.c_str(), nullptr, &menuItemsVisibility_[name]);
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::Separator();  // 区切り線
 
         // ->window Visivility
@@ -268,30 +352,60 @@ void ImGuiDebugManager::MenuBar()
 
 void ImGuiDebugManager::SelectItemWindow()
 {
-    // アイテムを選択するウィンドウ
+    // 登録されているデバッグウィンドウの一覧
 #ifdef _DEBUG
-    if (this->Begin("Items"))
+    if (this->Begin("Hierarchy"))
     {
-        size_t i = 0;
-        for (auto& [name, func] : debugWindows_)
-        {
-            bool flag = isSelect_[i];
-            if (ImGui::Selectable((name + "##Debug").c_str(), &flag))
-                isSelect_[i] = flag;
+        hierarchyFilter_.Draw("##HierarchyFilter", -1.0f);
 
-            ++i;
-        }
-
-        ImGui::SeparatorText("Colliders");
-        i = 0;
-        for (auto& [name, func] : colliderDebugWindows_)
+        if (ImGui::SmallButton("All"))
         {
-            if (name == "CollisionManager") continue;
-            bool flag = colliderIsSelect_[i];
-            if (ImGui::Selectable((name + "##ColliderDebug").c_str(), &flag))
-                colliderIsSelect_[i] = flag;
-            ++i;
+            for (auto& [name, isSelect] : isSelect_)
+                isSelect = true;
+            for (auto& [name, isSelect] : colliderIsSelect_)
+                isSelect = true;
         }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("None"))
+        {
+            for (auto& [name, isSelect] : isSelect_)
+                isSelect = false;
+            for (auto& [name, isSelect] : colliderIsSelect_)
+                isSelect = false;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("%zu items", debugWindows_.size() + colliderDebugWindows_.size());
+
+        ImGui::Separator();
+
+        if (ImGui::BeginChild("HierarchyList"))
+        {
+            ImGui::SeparatorText("Objects");
+            for (auto& [name, func] : debugWindows_)
+            {
+                if (!hierarchyFilter_.PassFilter(name.c_str()))
+                    continue;
+
+                bool flag = isSelect_[name];
+                if (ImGui::Selectable((name + "##Debug").c_str(), &flag))
+                    isSelect_[name] = flag;
+            }
+
+            ImGui::SeparatorText("Colliders");
+            for (auto& [name, func] : colliderDebugWindows_)
+            {
+                if (name == "CollisionManager") continue;
+
+                if (!hierarchyFilter_.PassFilter(name.c_str()))
+                    continue;
+
+                bool flag = colliderIsSelect_[name];
+                if (ImGui::Selectable((name + "##ColliderDebug").c_str(), &flag))
+                    colliderIsSelect_[name] = flag;
+            }
+        }
+        ImGui::EndChild();
+
         ImGui::End();
     }
 #endif // _DEBUG
@@ -304,32 +418,39 @@ void ImGuiDebugManager::SelectedItemWindow()
     static bool openDebugWindow = true;
     static bool openColliderDebugWindow = true;
 
-    if (this->Begin("Selected Items"))
+    if (this->Begin("Inspector"))
     {
         ImGui::Checkbox("DebugWindow", &openDebugWindow);
+        ImGui::SameLine();
         ImGui::Checkbox("ColliderWindow", &openColliderDebugWindow);
+
+        // 何も選ばれていないと空欄になって迷うので案内を出す
+        const bool hasSelection =
+            std::any_of(isSelect_.begin(), isSelect_.end(), [](const auto& _p) { return _p.second; }) ||
+            std::any_of(colliderIsSelect_.begin(), colliderIsSelect_.end(), [](const auto& _p) { return _p.second; });
+
+        if (!hasSelection)
+            ImGui::TextDisabled("Select an item in the Hierarchy.");
 
         if (openDebugWindow)
         {
 
             ImGui::BeginTabBar("DebugWindow", tabBarFlags_);
             {
-                size_t i = 0;
                 for (auto& [name, func] : debugWindows_)
                 {
                     std::string label = name + "##Debug";
 
-                    if (isSelect_[i])
+                    if (isSelect_[name])
                     {
-                        bool flag = isSelect_[i];
-                        if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
+                        bool flag = isSelect_[name];
+                        if (ImGui::BeginTabItem(label.c_str(), &flag))
                         {
                             func();
                             ImGui::EndTabItem();
                         }
-                        isSelect_[i] = flag;
+                        isSelect_[name] = flag;
                     }
-                    i++;
                 }
             }
             ImGui::EndTabBar();
@@ -340,26 +461,22 @@ void ImGuiDebugManager::SelectedItemWindow()
             ImGui::SeparatorText("Colliders");
             ImGui::BeginTabBar("ColliderDebugWindow", tabBarFlags_);
             {
-                size_t i = 0;
-                std::string label = "CollisionManager##Debug";
-
                 for (auto& [name, func] : colliderDebugWindows_)
                 {
                     if (name == "CollisionManager") continue;
 
-                    if (colliderIsSelect_[i])
+                    if (colliderIsSelect_[name])
                     {
-                        label = name + "##ColliderDebug";
+                        std::string label = name + "##ColliderDebug";
 
-                        bool flag = colliderIsSelect_[i];
-                        if (ImGui::BeginTabItem(label.c_str(), reinterpret_cast<bool*>(&flag)))
+                        bool flag = colliderIsSelect_[name];
+                        if (ImGui::BeginTabItem(label.c_str(), &flag))
                         {
                             func();
                             ImGui::EndTabItem();
                         }
-                        colliderIsSelect_[i] = flag;
+                        colliderIsSelect_[name] = flag;
                     }
-                    i++;
                 }
             }
             ImGui::EndTabBar();

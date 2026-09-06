@@ -4,6 +4,7 @@
 #include <Features/LineDrawer/LineDrawer.h>
 #include <Features/WaveformDisplay/WaveformAnalyzer.h>
 #include <Core/DXCommon/DXCommon.h>
+#include <Core/WinApp/Screen.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Debug/Debug.h>
 #include <Math/MyLib.h>
@@ -398,7 +399,7 @@ void WaveformDisplay::CreateConstantBuffer(const Matrix4x4& _matVP)
     mapData_->displayHeight = bounds_.size.y;
     mapData_->displayWidth = bounds_.size.x;
     mapData_->startTime = startTime_;
-    mapData_->screenSize = WinApp::kWindowSize_;
+    mapData_->screenSize = Screen::Size();
     mapData_->matViewProj = _matVP;
 
 }

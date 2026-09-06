@@ -22,7 +22,7 @@ UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
 #ifdef _DEBUG
     if (child)
         return;
-    ImGuiDebugManager::GetInstance()->AddDebugWindow(
+    debugWindowName_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(
         "UIElement: " + name_,
         [this]() { DrawImGuiInspector(); }
     );
@@ -33,7 +33,7 @@ UIElement::UIElement(const std::string& name, [[maybe_unused]]bool child):
 UIElement::~UIElement()
 {
 #ifdef _DEBUG
-    ImGuiDebugManager::GetInstance()->RemoveDebugWindow("UIElement: " + name_);
+    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(debugWindowName_);
 #endif
 }
 

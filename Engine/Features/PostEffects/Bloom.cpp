@@ -18,16 +18,16 @@ void Bloom::Initialize()
     // 中間テクスチャを作成
     RTVManager::GetInstance()->CreateRenderTarget(
         "bloom_temp0",
-        WinApp::kWindowWidth_>>1,
-        WinApp::kWindowHeight_>>1,
+        Screen::Width()>>1,
+        Screen::Height()>>1,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         { 0.0f,0.0f ,0.0f ,1.0f },
         false);
 
     RTVManager::GetInstance()->CreateRenderTarget(
         "bloom_temp1",
-        WinApp::kWindowWidth_>>1,
-        WinApp::kWindowHeight_>>1,
+        Screen::Width()>>1,
+        Screen::Height()>>1,
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
         { 0.0f,0.0f ,0.0f ,1.0f },
         false);

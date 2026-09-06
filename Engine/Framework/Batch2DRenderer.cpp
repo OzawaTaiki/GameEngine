@@ -122,7 +122,7 @@ void Batch2DRenderer::CreateViewProjectionResource()
 
     viewProjectionResource_->Map(0, nullptr, reinterpret_cast<void**>(&viewProjectionMap_));
 
-    *viewProjectionMap_ = MakeOrthographicMatrix(0, 0, WinApp::kWindowSize_.x, WinApp::kWindowSize_.y, -1.0f, 1.0f);
+    *viewProjectionMap_ = MakeOrthographicMatrix(0, 0, Screen::Size().x, Screen::Size().y, -1.0f, 1.0f);
 }
 
 void Batch2DRenderer::Reset()

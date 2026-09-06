@@ -17,7 +17,7 @@ void LayerSystem::Initialize()
     instance_->nameToID_.clear();
 
     RTVManager::GetInstance()->
-        CreateRenderTarget("final", WinApp::kWindowWidth_, WinApp::kWindowHeight_,
+        CreateRenderTarget("final", Screen::Width(), Screen::Height(),
                            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0190f, 0.0190f, 0.0933f, 1.0f), false);
 
     PSOManager::GetInstance()->CreatePSOForComposite(PSOFlags::BlendMode::PremultipliedAdd);
@@ -39,7 +39,7 @@ LayerID LayerSystem::CreateLayer(const std::string& layerName, int32_t _priority
 
     // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
-        CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
+        CreateComputeOutputTexture(layerName, Screen::Width(), Screen::Height(),
                                    DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
     // effectChain, finalEffectOutputを追加
@@ -86,7 +86,7 @@ LayerID LayerSystem::CreateOutputLayer(const std::string& layerName)
 
     // レイヤーのRenderTargetを作成
     LayerID layerID = RTVManager::GetInstance()->
-        CreateComputeOutputTexture(layerName, WinApp::kWindowWidth_, WinApp::kWindowHeight_,
+        CreateComputeOutputTexture(layerName, Screen::Width(), Screen::Height(),
                                    DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 
     instance_->layerInfos_.emplace(layerID, LayerInfo{

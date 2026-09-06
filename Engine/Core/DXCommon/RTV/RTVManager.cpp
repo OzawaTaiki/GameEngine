@@ -145,6 +145,19 @@ void RTVManager::SetSwapChainRenderTexture(IDXGISwapChain4* _swapChain)
     commandList->RSSetScissorRects(1, &scissorRect_);
 }
 
+void RTVManager::ClearSwapChainRenderTexture(IDXGISwapChain4* _swapChain, const Vector4& _color)
+{
+    UINT backBufferIndex = _swapChain->GetCurrentBackBufferIndex();
+
+    auto DXCommon = DXCommon::GetInstance();
+    auto commandList = DXCommon->GetCommandList();
+
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPURTVDescriptorHandle(backBufferIndex);
+
+    float clearColor[4] = { _color.x, _color.y, _color.z, _color.w };
+    commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+}
+
 uint32_t RTVManager::CreateRenderTarget(std::string _name, uint32_t _width, uint32_t _height, DXGI_FORMAT _colorFormat, const Vector4& _clearColor, bool _createDSV, bool _override)
 {
 
