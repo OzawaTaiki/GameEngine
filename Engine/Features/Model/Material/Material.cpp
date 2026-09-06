@@ -15,6 +15,8 @@ Material::Material(const Material& _other)
     , enableLighting_(_other.enableLighting_)
     , envScale_(_other.envScale_)
     , enableEnvironment_(_other.enableEnvironment_)
+    , shadingStrength_(_other.shadingStrength_)
+    , shadeColor_(_other.shadeColor_)
     , specularStrength_(_other.specularStrength_)
     , name_(_other.name_)
     , texturePath_(_other.texturePath_)
@@ -43,6 +45,8 @@ void Material::Initialize(const std::string& _texturepath)
 
 
 	shiness_ = 40.0f;
+    shadingStrength_ = 1.0f;
+    shadeColor_ = { 0.0f, 0.0f, 0.0f };
     specularStrength_ = 0.3f;
 
 	enableLighting_ = true;
@@ -74,6 +78,8 @@ void Material::TransferData()
     constMap_->envScale = envScale_;
     constMap_->enableEnvironment = enableEnvironment_ ? 1 : 0;
     constMap_->specularStrength = specularStrength_;
+    constMap_->shadingStrength = shadingStrength_;
+    constMap_->shadeColor = shadeColor_;
 }
 
 void Material::MaterialQueueCommand(ID3D12GraphicsCommandList* _commandList, UINT _index)
@@ -134,6 +140,8 @@ void Material::Imgui()
 
     ImGui::ColorEdit4("Diffuse Color", &deffuseColor_.x);
     ImGui::DragFloat("Shininess", &shiness_, 0.1f, 0.0f, 100.0f);
+    ImGui::DragFloat("Shading Strength", &shadingStrength_, 0.01f, 0.0f, 1.0f);
+    ImGui::ColorEdit3("Shade Color", &shadeColor_.x);
     ImGui::DragFloat("Specular", &specularStrength_, 0.01f, 0.0f, 1.0f);
     ImGui::Checkbox("Enable Lighting", &enableLighting_);
     ImGui::Checkbox("Enable Environment", &enableEnvironment_);
