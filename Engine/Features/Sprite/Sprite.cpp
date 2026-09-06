@@ -11,8 +11,8 @@
 
 namespace Engine {
 
-uint32_t Sprite::winWidth_ = WinApp::kWindowWidth_;
-uint32_t Sprite::winHeight_ = WinApp::kWindowHeight_;
+uint32_t Sprite::winWidth_ = Screen::Width();
+uint32_t Sprite::winHeight_ = Screen::Height();
 
 Sprite::Sprite(const std::string& _name, bool _debugWinddow)
 {
@@ -22,7 +22,9 @@ Sprite::Sprite(const std::string& _name, bool _debugWinddow)
 
 Sprite::~Sprite()
 {
-    //ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+    // 消し忘れるとdanglingしたthisを掴んだコールバックが残る
+    if (!name_.empty())
+        ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 }
 
 void Sprite::Initialize()

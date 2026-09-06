@@ -67,7 +67,7 @@ void EffectEditorScene::Initialize([[maybe_unused]] SceneData* _sceneData)
 
     uint32_t texture = TextureManager::GetInstance()->Load("white.png");
     backgroundSprite_ = Sprite::Create("particle_Editor_back", texture,{0.0f,0.0f });
-    backgroundSprite_->scale_ = WinApp::kWindowSize_;
+    backgroundSprite_->scale_ = Screen::Size();
 
     LayerSystem::Initialize();
     LayerSystem::CreateLayer("EffectEditorScene_Layer_0", 0, PSOFlags::BlendMode::Normal);

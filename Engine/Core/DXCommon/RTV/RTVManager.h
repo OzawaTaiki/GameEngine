@@ -35,6 +35,11 @@ public:
 
     void SetSwapChainRenderTexture(IDXGISwapChain4* _swapChain);
 
+    /// <summary>
+    /// 現在のバックバッファを指定色で塗りつぶす
+    /// </summary>
+    void ClearSwapChainRenderTexture(IDXGISwapChain4* _swapChain, const Vector4& _color);
+
     uint32_t CreateRenderTarget(std::string _name,
                                 uint32_t _width, uint32_t _height,
                                 DXGI_FORMAT _colorFormat,const Vector4& _clearColor,bool _createDSV,

@@ -26,7 +26,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	winApp->Initilize();
 
 	DXCommon* dxCommon = DXCommon::GetInstance();
-	dxCommon->Initialize(winApp, WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+	dxCommon->Initialize(winApp, Screen::Width(), Screen::Height());
 
 	SRVManager* srvManager = SRVManager::GetInstance();
 	srvManager->Initialize();
@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TextureManager::GetInstance()->Load("cube.jpg");
 	TextureManager::GetInstance()->Load("uvChecker.png");
 
-	Sprite::StaticInitialize(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+	Sprite::StaticInitialize(Screen::Width(), Screen::Height());
 	ModelManager::GetInstance()->Initialize();
 
 	LineDrawer* lineDrawer = LineDrawer::GetInstance();

@@ -4,6 +4,7 @@
 #include <Debug/Debug.h>
 #include <Utility/ConvertString/ConvertString.h>
 #include <Core/DXCommon/PSOManager/PSOManager.h>
+#include <Settings/EngineSettings.h>
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -118,7 +119,8 @@ void DXCommon::PostDraw()
 	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
 	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 	//GPUとOSに画面の交換を行うように通知する
-	swapChain_->Present(1, 0);			//	画面が切り替わる
+	//	画面が切り替わる。VSyncを切ると垂直同期を待たずに返る
+	swapChain_->Present(EngineSettings::current_.enableVSync ? 1 : 0, 0);
 
 	/// GPUにSignalを送る
 	WaitForGPU();
@@ -447,7 +449,8 @@ void DXCommon::CreateSwapChain()
 
 void DXCommon::CreateDepthBuffer()
 {
-	depthStencilResource_ = CreateDepthStencilTextureResource(WinApp::kWindowWidth_, WinApp::kWindowHeight_);
+	// スワップチェイン用の深度バッファなのでバックバッファと同じサイズにする
+	depthStencilResource_ = CreateDepthStencilTextureResource(backBufferWidth_, backBufferHeight_);
 }
 
 void DXCommon::CreateDescriptor()
@@ -514,8 +517,8 @@ void DXCommon::CreateFence()
 void DXCommon::InitializeViewport()
 {
 	// ビューポート領域のサイズを一緒にして画面全体を表示
-	viewport_.Width = static_cast<FLOAT>(WinApp::kWindowWidth_);
-	viewport_.Height = static_cast<FLOAT>(WinApp::kWindowHeight_);
+	viewport_.Width = static_cast<FLOAT>(backBufferWidth_);
+	viewport_.Height = static_cast<FLOAT>(backBufferHeight_);
 	viewport_.TopLeftX = 0;
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
@@ -528,9 +531,9 @@ void DXCommon::CreateScissorRect()
 	// シザー矩形
 	// scissorRect.left – ビューポートと同じ幅と高さに設定されることが多い
 	scissorRect_.left = 0;
-	scissorRect_.right = WinApp::kWindowWidth_;
+	scissorRect_.right = backBufferWidth_;
 	scissorRect_.top = 0;
-	scissorRect_.bottom = WinApp::kWindowHeight_;
+	scissorRect_.bottom = backBufferHeight_;
 }
 
 void DXCommon::CreateDXcCompiler()
@@ -572,7 +575,7 @@ void DXCommon::InitializeImGui()
 void DXCommon::CreateRenderTexture()
 {/*
     const Vector4 ClearColor = { 1.0f,0.0f,0.0f,1.0f };
-	renderTextureResource_ = CreateRenderTextureResource(WinApp::kWindowWidth_, WinApp::kWindowHeight_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, ClearColor);
+	renderTextureResource_ = CreateRenderTextureResource(Screen::Width(), Screen::Height(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, ClearColor);
 
 	uint32_t RTVSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -590,17 +593,21 @@ void DXCommon::InitializeFixFPS()
 
 void DXCommon::UpdateFixFPS()
 {
-	const std::chrono::microseconds kMinTime(static_cast<uint64_t>(1000000.0f / 60.0f));
-	const std::chrono::microseconds kMinCheckTime(static_cast<uint64_t>(1000000.0f / 65.0f));
+	// 目標フレームレートは設定から取る。0が入ると0除算になるので下限を設ける
+	const double targetFPS = static_cast<double>(EngineSettings::current_.targetFPS > 0
+												? EngineSettings::current_.targetFPS
+												: 60);
+
+	const std::chrono::microseconds kMinTime(static_cast<uint64_t>(1000000.0 / targetFPS));
 
 	// 現在時間を取得
 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 	// 前回記録からの経過時間を取得
 	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
 
-	// 1/60秒(よりわずかに短い時間)経っていないとき
+	// 目標フレーム時間(よりわずかに短い時間)経っていないとき
 	if (elapsed < kMinTime) {
-		//1/60秒経過するまで微小なスリープを繰り返す
+		//目標フレーム時間が経過するまで微小なスリープを繰り返す
 		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
 			//1マイクロ秒スリープ
 			std::this_thread::sleep_for(std::chrono::microseconds(1));

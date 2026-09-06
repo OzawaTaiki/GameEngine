@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cstdint>
 
+#include <Core/WinApp/Screen.h>
 #include <Math/Vector/Vector2.h>
 
 
@@ -10,11 +11,9 @@ namespace Engine {
 class WinApp
 {
 public: //静的メンバ変数
-	// ウィンドウサイズ
-	static uint32_t kWindowWidth_;		// 横
-	static uint32_t kWindowHeight_;		// 縦
-
-    static Vector2 kWindowSize_;	// サイズ
+	// 設定が無いときのウィンドウサイズ
+	static constexpr uint32_t kDefaultWidth_ = 1280;
+	static constexpr uint32_t kDefaultHeight_ = 720;
 
 	static const wchar_t kWindowClassName[];
 
@@ -24,8 +23,9 @@ public: // 静的メンバ関数
 	static LRESULT CALLBACK WindowProc(HWND _hwnd, UINT _msg, WPARAM _wparam, LPARAM _lparam);
 
 public: // メンバ関数
+	// 実際のウィンドウサイズは Screen::Width() / Screen::Height() から取得する
     void Initilize(const wchar_t* _title = L"GameEngine",
-		uint32_t _clientWidth = kWindowWidth_, uint32_t _clientHeight = kWindowHeight_,
+		uint32_t _clientWidth = kDefaultWidth_, uint32_t _clientHeight = kDefaultHeight_,
 		UINT _style = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME);
 
 	void Finalize() const;

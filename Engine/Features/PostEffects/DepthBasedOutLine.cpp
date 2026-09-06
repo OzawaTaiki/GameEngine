@@ -58,8 +58,8 @@ void DepthBasedOutLine::Apply(const std::string& _input, const std::string& _out
     //// UAV (u0) - 出力テクスチャ
 
     //// スレッドグループ数計算 (8x8のスレッドグループ)
-    //uint32_t dispatchX = (WinApp::kWindowWidth_ + 7) / 8;
-    //uint32_t dispatchY = (WinApp::kWindowHeight_ + 7) / 8;
+    //uint32_t dispatchX = (Screen::Width() + 7) / 8;
+    //uint32_t dispatchY = (Screen::Height() + 7) / 8;
 
     //// Dispatch実行
     //cmdList->Dispatch(dispatchX, dispatchY, 1);

@@ -128,6 +128,12 @@ protected:
     // 名前
     std::string name_;
 
+#ifdef _DEBUG
+    // 実際に登録されたデバッグウィンドウ名
+    // name_ は SetName() で後から変わるうえ，登録時に連番が付くこともあるので別に持つ
+    std::string debugWindowName_;
+#endif // _DEBUG
+
     // 親子関係
     UIElement* parent_ = nullptr;
     std::vector<std::unique_ptr<UIElement>> children_;

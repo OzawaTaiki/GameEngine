@@ -1,0 +1,15 @@
+{
+    "windowTitle": "GameEngine",
+
+    "renderWidth": 1280,
+    "renderHeight": 720,
+
+    "windowWidth": 1280,
+    "windowHeight": 720,
+
+    "debugWindowWidth": 1920,
+    "debugWindowHeight": 1080,
+
+    "enableVSync": true,
+    "targetFPS": 60
+}
