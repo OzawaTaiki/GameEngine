@@ -56,9 +56,6 @@ float3 CalculateEnViromentColor(VertexShaderOutput _input, float3 _cameraPos);
 
 float ComputeShadow(float4 shadowCoord, float3 worldNormal)
 {
-    if (DL.castShadow == 0 || shadowCoord.w <= 0.0f)
-        return 1.0f;
-
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.x = shadowCoord.x * 0.5 + 0.5;
     shadowCoord.y = -shadowCoord.y * 0.5 + 0.5;
@@ -69,34 +66,18 @@ float ComputeShadow(float4 shadowCoord, float3 worldNormal)
         shadowCoord.z < 0.0 || shadowCoord.z > 1.0)
         return 1.0f;
 
-    // 深度レンジは約200mなので、0.001でも約20cmに相当する。
-    // 以前はreceiverOffsetとbiasが二重に掛かり、背の低い物体の影を消していた。
+    float receiverOffset = 0.001f; // 調整可能
+    float currentDepth = shadowCoord.z - receiverOffset;
+
+    float closestDepth = gShadowMap.Sample(gSampler, shadowCoord.xy).r;
+
+    // 法線ベースの動的bias（Shadow Acne対策）
     float3 lightDir = normalize(-DL.direction);
     float NdotL = max(dot(normalize(worldNormal), lightDir), 0.0);
-    float bias = 0.00005f + 0.0002f * (1.0f - NdotL);
+    float bias = 0.001 + 0.005 * (1.0 - NdotL); // 角度に応じて調整
 
-    uint shadowWidth;
-    uint shadowHeight;
-    gShadowMap.GetDimensions(shadowWidth, shadowHeight);
-    float2 texelSize = 1.0f / float2(shadowWidth, shadowHeight);
-
-    // 3x3 PCF。比較結果1が照明、0が遮蔽。
-    float visibility = 0.0f;
-    [unroll]
-    for (int y = -1; y <= 1; ++y)
-    {
-        [unroll]
-        for (int x = -1; x <= 1; ++x)
-        {
-            visibility += gShadowMap.SampleCmpLevelZero(
-                gShadowSampler,
-                shadowCoord.xy + float2(x, y) * texelSize,
-                shadowCoord.z - bias);
-        }
-    }
-    visibility /= 9.0f;
-
-    return lerp(DL.shadowFactor, 1.0f, visibility);
+    float shadow = (currentDepth > closestDepth + bias) ? DL.shadowFactor : 1.0f;
+    return shadow;
 }
 
 
