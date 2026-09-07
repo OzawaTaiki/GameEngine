@@ -36,6 +36,8 @@ public:
     void SetColor(const Vector4& _color) { deffuseColor_ = _color; }
 
     void SetShininess(float _shininess) { shiness_ = _shininess; }
+    void SetShadingStrength(float _shadingStrength) { shadingStrength_ = _shadingStrength; }
+    void SetShadeColor(const Vector3& _shadeColor) { shadeColor_ = _shadeColor; }
     void SetSpecularStrength(float _specularStrength) { specularStrength_ = _specularStrength; }
     void SetEnableLighting(bool _enable) { enableLighting_ = _enable; }
     void SetEnableEnvironment(bool _enable) { enableEnvironment_ = _enable; }
@@ -65,7 +67,9 @@ private:
     bool enableLighting_ = true;                 // ライティングの有無
     float envScale_ = 0.0f;                 // 環境マッピングのスケール
     bool enableEnvironment_ = false; // 環境マッピングの有無
-    float specularStrength_;
+    float shadingStrength_ = 1.0f;
+    Vector3 shadeColor_ = { 0.0f, 0.0f, 0.0f };
+    float specularStrength_ = 0.3f;
 
     std::string     name_                           = {};
     std::string     texturePath_ = {};
@@ -84,7 +88,11 @@ private:
 
         int32_t         enableEnvironment = false; // 環境マッピングの有無
         float           specularStrength; // 鏡面反射度
-        float           padding[2];
+        float           shadingStrength; // ライティングによる陰影の強さ
+        float           padding;
+
+        Vector3         shadeColor; // ライティングによる陰影の色
+        float           shadeColorPadding;
     };
 
     Microsoft::WRL::ComPtr<ID3D12Resource>          resorces_ = nullptr;

@@ -15,7 +15,11 @@ cbuffer gMaterial : register(b1)
 
     int enableEnviroment;
     float specularStrength;
-    float2 pad;
+    float shadingStrength;
+    float pad;
+
+    float3 shadeColor;
+    float shadeColorPad;
 };
 
 
@@ -36,12 +40,12 @@ SamplerState gPointLightShadowSampler : register(s2);
 
 TextureCube<float4> gEnviromentTexture : register(t3);
 
-float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
-float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _lightIndex, float3 _toEye, float4 _textureColor);
-float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _textureColor);
+float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _baseColor);
+float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _lightIndex, float3 _toEye, float4 _baseColor);
+float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _baseColor);
 
-float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
-float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor);
+float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _baseColor);
+float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _baseColor);
 
 float3 CalculateEnViromentColor(VertexShaderOutput _input, float3 _cameraPos);
 
@@ -105,12 +109,12 @@ PixelShaderOutput main(VertexShaderOutput _input)
 {
     PixelShaderOutput output;
     output.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 textureColor = deffuseColor * _input.color;
+    float4 baseColor = deffuseColor * _input.color;
 
     if (hasTexture != 0)
     {
         float4 transformedUV = mul(float4(_input.texcoord, 0.0f, 1.0f), unTransform);
-        textureColor *= gTexture.Sample(gSampler, transformedUV.xy);
+        baseColor *= gTexture.Sample(gSampler, transformedUV.xy);
     }
 
     float3 toEye = normalize(worldPosition - _input.worldPosition);
@@ -118,22 +122,21 @@ PixelShaderOutput main(VertexShaderOutput _input)
     if (enableLighting != 0)
     {
         // シャドウファクターを適用したライティング
-        float3 directionalLight = CalculateDirectionalLighting(_input, toEye, textureColor) * ComputeShadow(_input.shadowPos, _input.normal);
-        float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, textureColor);
-        float3 spotLightcColor = CalculateLightingWithMultipleSpotLights(_input, toEye, textureColor);
+        float3 directionalLight = CalculateDirectionalLighting(_input, toEye, baseColor) * ComputeShadow(_input.shadowPos, _input.normal);
+        float3 pointLight = CalculateLightingWithMultiplePointLights(_input, toEye, baseColor);
+        float3 spotLightColor = CalculateLightingWithMultipleSpotLights(_input, toEye, baseColor);
 
         float3 envColor = float3(0, 0, 0);
         if (enableEnviroment != 0)
             envColor = CalculateEnViromentColor(_input, worldPosition) * envScale;
 
-        output.color.rgb = directionalLight + pointLight + spotLightcColor + envColor;
-        output.color.a = deffuseColor.a * textureColor.a;
+        output.color.rgb = directionalLight + pointLight + spotLightColor + envColor;
+        output.color.a = baseColor.a;
     }
     else
-        output.color = deffuseColor * textureColor;
+        output.color = baseColor;
 
-    if (textureColor.a == 0.0 ||
-        output.color.a == 0.0)
+    if (baseColor.a == 0.0)
     {
         discard;
     }
@@ -141,7 +144,7 @@ PixelShaderOutput main(VertexShaderOutput _input)
     return output;
 }
 
-float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
+float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, float4 _baseColor)
 {
     if (DL.intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
@@ -154,14 +157,16 @@ float3 CalculateDirectionalLighting(VertexShaderOutput _input, float3 _toEye, fl
     {
         cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     }
-    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * DL.color.rgb * cos * DL.intensity;
+    float3 shade = lerp(shadeColor, float3(1.0f, 1.0f, 1.0f), cos);
+    shade = lerp(float3(1.0f, 1.0f, 1.0f), shade, shadingStrength);
+    float3 diffuse = _baseColor.rgb * DL.color.rgb * shade * DL.intensity;
     float3 specular = DL.color.rgb * DL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
 
     return diffuse + specular * specularStrength;
 
 }
 
-float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _lightIndex, float3 _toEye, float4 _textureColor)
+float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _lightIndex, float3 _toEye, float4 _baseColor)
 {
     if (_PL.intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
@@ -175,18 +180,20 @@ float3 CalculatePointLighting(VertexShaderOutput _input, PointLight _PL, int _li
     {
         cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     }
+    float3 shade = lerp(shadeColor, float3(1.0f, 1.0f, 1.0f), cos);
+    shade = lerp(float3(1.0f, 1.0f, 1.0f), shade, shadingStrength);
     float distance = length(_PL.position - _input.worldPosition);
     float factor = pow(saturate(-distance / _PL.radius + 1.0f), _PL.decay);
 
     float shadowFactor = ComputePointLightShadow(_lightIndex, _input.worldPosition, _input.normal, _PL);
 
-    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _PL.color.rgb * cos * _PL.intensity * factor * shadowFactor;
+    float3 diffuse = _baseColor.rgb * _PL.color.rgb * shade * _PL.intensity * factor * shadowFactor;
     float3 specular = _PL.color.rgb * _PL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * shadowFactor;
 
     return diffuse + specular * specularStrength;
 }
 
-float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _textureColor)
+float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _toEye, float4 _baseColor)
 {
     if (_SL.intensity <= 0.0f)
         return float3(0.0f, 0.0f, 0.0f);
@@ -202,6 +209,8 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
     {
         cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     }
+    float3 shade = lerp(shadeColor, float3(1.0f, 1.0f, 1.0f), cos);
+    shade = lerp(float3(1.0f, 1.0f, 1.0f), shade, shadingStrength);
 
     float distance = length(_SL.position - _input.worldPosition);
     float factor = pow(saturate(-distance / _SL.distance + 1.0f), _SL.decay);
@@ -214,29 +223,29 @@ float3 CalculateSpotLighting(VertexShaderOutput _input, SpotLight _SL, float3 _t
     }
 
 
-    float3 diffuse = deffuseColor.rgb * _textureColor.rgb * _SL.color.rgb * cos * _SL.intensity * factor * falloffFactor;
+    float3 diffuse = _baseColor.rgb * _SL.color.rgb * shade * _SL.intensity * factor * falloffFactor;
     float3 specular = _SL.color.rgb * _SL.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * factor * falloffFactor;
 
     return diffuse + specular * specularStrength;
 
 }
 
-float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
+float3 CalculateLightingWithMultiplePointLights(VertexShaderOutput _input, float3 _toEye, float4 _baseColor)
 {
     float3 lighting = float3(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < numPointLight; i++)
     {
-        lighting += CalculatePointLighting(_input, PL[i], i, _toEye, _textureColor);
+        lighting += CalculatePointLighting(_input, PL[i], i, _toEye, _baseColor);
     }
     return lighting;
 }
 
-float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _textureColor)
+float3 CalculateLightingWithMultipleSpotLights(VertexShaderOutput _input, float3 _toEye, float4 _baseColor)
 {
     float3 lighting = float3(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < numSpotLight; i++)
     {
-        lighting += CalculateSpotLighting(_input, SL[i], _toEye, _textureColor);
+        lighting += CalculateSpotLighting(_input, SL[i], _toEye, _baseColor);
     }
     return lighting;
 }
