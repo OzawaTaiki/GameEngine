@@ -53,6 +53,20 @@ public:
 
     void AnalyzeMaterial(const aiMaterial* _material);
 
+    /// <summary>
+    /// マテリアル設定をJSONファイルへ保存する。
+    /// 拡張子が省略された場合は .json を付与する。
+    /// </summary>
+    bool SaveToFile(const std::string& _filePath) const;
+
+    /// <summary>
+    /// JSONファイルからマテリアル設定を読み込む。
+    /// </summary>
+    bool LoadFromFile(const std::string& _filePath);
+
+    void SetMaterialFilePath(const std::string& _filePath) { materialFilePath_ = _filePath; }
+    const std::string& GetMaterialFilePath() const { return materialFilePath_; }
+
     void Imgui();
 private:
 
@@ -73,6 +87,7 @@ private:
 
     std::string     name_                           = {};
     std::string     texturePath_ = {};
+    std::string     materialFilePath_ = {};
     uint32_t        textureHandle_ = 0;
 
     struct DataForGPU
