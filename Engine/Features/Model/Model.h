@@ -63,6 +63,7 @@ public:
     Material* GetMaterialPtr() { return material_[0].get(); }
 
     const std::vector<std::unique_ptr<Material>>& GetMaterials() { return material_; }
+    const std::string& GetName() const { return name_; }
 
     Vector3 GetMin(size_t _index = -1) const;
     Vector3 GetMax(size_t _index = -1) const;

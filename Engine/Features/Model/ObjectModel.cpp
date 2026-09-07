@@ -8,9 +8,31 @@
 #include <Core/DXCommon/PSOManager/PSOManager.h>
 #include <Debug/Debug.h>
 
+#include <filesystem>
+#include <string_view>
+
 
 
 namespace Engine {
+
+namespace {
+
+std::string MakeMaterialFileName(std::string _name, const std::string& _fallback)
+{
+    constexpr std::string_view invalidCharacters = "<>:\"/\\|?*";
+    for (char& character : _name)
+    {
+        if (static_cast<unsigned char>(character) < 32 || invalidCharacters.find(character) != std::string_view::npos)
+            character = '_';
+    }
+
+    while (!_name.empty() && (_name.back() == ' ' || _name.back() == '.'))
+        _name.pop_back();
+
+    return _name.empty() ? _fallback : _name;
+}
+
+} // namespace
 
 ObjectModel::ObjectModel(const std::string& _name)
 {
@@ -400,7 +422,6 @@ void ObjectModel::DrawShadow()
         PSOManager::GetInstance()->SetRootSignature(PSOFlags::Type::DLShadowMap);
 
         worldTransform_.QueueCommand(commandList, 0);
-
         if (uniqueAnimationController_)
             model_->QueueCommandForShadow(commandList, uniqueAnimationController_->GetMargedMesh());
         else if (sharedAnimationController_)
@@ -562,9 +583,32 @@ void ObjectModel::InitializeCommon()
 
     gameTime_ = GameTime::GetInstance();
 
-    for (auto& material : model_->GetMaterials())
+    std::string modelName = std::filesystem::path(model_->GetName()).stem().string();
+    modelName = MakeMaterialFileName(modelName, MakeMaterialFileName(name_, "Model"));
+
+    const auto& sourceMaterials = model_->GetMaterials();
+    for (size_t materialIndex = 0; materialIndex < sourceMaterials.size(); ++materialIndex)
     {
-        auto copyMaterial = std::make_unique<Material>(*(material.get()));
+        const auto& material = sourceMaterials[materialIndex];
+        if (!material)
+        {
+            materials_.push_back(nullptr);
+            continue;
+        }
+
+        auto copyMaterial = std::make_unique<Material>(*material);
+
+        const std::string materialName = MakeMaterialFileName(
+            copyMaterial->GetName(),
+            "Material" + std::to_string(materialIndex));
+        const std::filesystem::path materialFilePath =
+            std::filesystem::path("Resources/Data/Materials") /
+            modelName /
+            (std::to_string(materialIndex) + "_" + materialName + ".json");
+
+        copyMaterial->SetMaterialFilePath(materialFilePath.generic_string());
+        if (std::filesystem::exists(materialFilePath))
+            copyMaterial->LoadFromFile(materialFilePath.string());
 
         materials_.push_back(std::move(copyMaterial));
     }
