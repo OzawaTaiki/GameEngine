@@ -44,6 +44,10 @@ public:
     // シーンの変更
     static void ChangeScene();
 
+    // 現在のシーン名（デバッグ用途）
+    const std::string& GetCurrentSceneName() const { return currentSceneName_; }
+    bool IsTransitioning() const { return isTransition_; }
+
     // 終了処理
     void Finalize();
 
