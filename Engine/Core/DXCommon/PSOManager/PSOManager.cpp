@@ -338,6 +338,15 @@ void PSOManager::CreatePSOForDLShadowMap()
         PSOBuilder::Create()
         .SetShaders("DLShadowMap_VS", "DLShadowMap_PS")
         .SetFlags(flag)
+        // flag には DepthMode のビットが立っていないため、SetFlags() だけだと
+        // DepthMode::Disable 扱いになり DepthEnable = false の PSO ができる。
+        // D3D12 では DepthEnable = false のとき DepthWriteMask に関係なく深度が
+        // 一切書き込まれないので、シャドウマップの深度がクリア値 1.0 のままになり
+        // Object3d.PS.hlsl の ComputeShadow() が永久に「影なし」を返してしまう。
+        // ここは深度そのものが成果物なので、書き込みを明示的に有効化する。
+        // （flag は graphicsPipelineStates_ のキーでもあり、ObjectModel::DrawShadow() は
+        //   PSOFlags::Type::DLShadowMap 単体で引きに来るので、キーは変えずに desc だけ直す）
+        .SetDepthMode(PSOFlags::DepthMode::Comb_mAll_fLessEqual)
         .SetRootSignature(rootSignatures_[static_cast<uint64_t>(
             PSOFlags::Type::DLShadowMap)]
             .Get())
