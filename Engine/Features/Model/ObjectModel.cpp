@@ -503,6 +503,23 @@ std::unique_ptr<AnimationController> ObjectModel::GetAnimationController()
     }
 }
 
+void ObjectModel::UseSharedMaterialFile(const std::string& _filePath)
+{
+    if (_filePath.empty())
+        return;
+
+    const bool hasSavedMaterial = std::filesystem::exists(_filePath);
+    for (auto& material : materials_)
+    {
+        if (!material)
+            continue;
+
+        material->SetMaterialFilePath(_filePath);
+        if (hasSavedMaterial)
+            material->LoadFromFile(_filePath);
+    }
+}
+
 const Matrix4x4* ObjectModel::GetSkeletonSpaceMatrix(const std::string& _jointName) const
 {
     if (uniqueAnimationController_)
