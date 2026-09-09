@@ -13,7 +13,7 @@ class ObjectModel
 {
 public:
 
-    ObjectModel(const std::string& _name);
+    ObjectModel(const std::string& _name, bool _registerDebugWindow = true);
     ~ObjectModel();
 
     void Initialize(const std::string& _filePath);
@@ -59,6 +59,9 @@ public:
     Material* GetMaterial(size_t _index) { return materials_[_index].get(); }
     std::vector<std::unique_ptr<Material>>& GetMaterials() { return materials_; }
 
+    // 全マテリアルの保存先を同じJSONへ切り替え、保存済みならその場で読み込む。
+    void UseSharedMaterialFile(const std::string& _filePath);
+
     void SetTimeChannel(const std::string& _channelName) { timeChannel = _channelName; }
 
     std::string GetName() const{ return name_; }
@@ -91,6 +94,7 @@ private:
 
     Model* model_ = nullptr;
     std::string name_ = "";
+    bool isDebugWindowRegistered_ = false;
 
 
     std::string timeChannel = "default";

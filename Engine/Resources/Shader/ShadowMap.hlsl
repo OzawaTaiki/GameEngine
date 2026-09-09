@@ -84,6 +84,15 @@ struct VertexShaderInput
     float3 normal : NORMAL0;
 };
 
+struct InstanceData
+{
+    float4x4 World;
+    float4x4 worldInverseTranspose;
+    float4 color;
+};
+
+StructuredBuffer<InstanceData> models : register(t0);
+
 struct PixelShaderOutput
 {
     float4 data : SV_TARGET0;
@@ -105,5 +114,12 @@ PixelShaderOutput ShadowMapPS(VertexShaderOutput _input)
     float z = _input.position.z / _input.position.w; // NDC座標のZ値を取得
 
     output.data = float4(z, z, z, 1.0f);
+    return output;
+}
+
+VertexShaderOutput ShadowMapInstancedVS(VertexShaderInput _input, uint instanceID : SV_InstanceID)
+{
+    VertexShaderOutput output;
+    output.position = mul(_input.position, mul(models[instanceID].World, DL.lightVP));
     return output;
 }

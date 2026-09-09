@@ -53,20 +53,21 @@ std::vector<Collider*> SpatialHashGrid::CheckCollision(Collider* _col) const
     AABB bounds = _col->GetBounds();
 
 #ifdef _DEBUG
-    std::array<Vector3,8> vertices;
-    vertices[0] = bounds.min;
-    vertices[1]=Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
-    vertices[2]=Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
-    vertices[3]=Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
-    vertices[4]=Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
-    vertices[5]=Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
-    vertices[6]=Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
-    vertices[7]=Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
+    if (debugDrawEnabled_)
+    {
+        std::array<Vector3, 8> vertices;
+        vertices[0] = bounds.min;
+        vertices[1] = Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
+        vertices[2] = Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+        vertices[3] = Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+        vertices[4] = Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
+        vertices[5] = Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
+        vertices[6] = Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+        vertices[7] = Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
 
-    // デバッグ用にAABBの頂点を描画
-    LineDrawer::GetInstance()->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-    LineDrawer::GetInstance()->DrawOBB(vertices);
-    //(vertices, Matrix4x4::Identity());
+        LineDrawer::GetInstance()->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+        LineDrawer::GetInstance()->DrawOBB(vertices);
+    }
 #endif
 
 

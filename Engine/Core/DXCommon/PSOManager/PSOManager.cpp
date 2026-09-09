@@ -189,6 +189,11 @@ void PSOManager::CreateDefaultPSOs()
         factory->CreateOffScreenRootSignature();
     regiterRootSignature_["InstancedModel"] =
         factory->CreateInstancedModelRootSignature();
+    regiterRootSignature_["InstancedShadowMap"] =
+        factory->CreateInstancedShadowMapRootSignature();
+
+    ShaderCompiler::GetInstance()->Register(
+        "InstancedShadowMap_VS", L"ShadowMap.hlsl", L"vs_6_0", L"ShadowMapInstancedVS");
 
     CreatePSOForModel(PSOFlags::ForNormalModel());
     CreatePSOForModel(PSOFlags::ForAlphaModel());
@@ -203,6 +208,7 @@ void PSOManager::CreateDefaultPSOs()
     CreatePSOForPLShadowMap();
     CreatePSOForSkyBox();
     CreatePSOForInstancedModel();
+    CreatePSOForInstancedShadowMap();
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
@@ -225,6 +231,18 @@ void PSOManager::CreatePSOForInstancedModel()
         .SetShaders("InstancedModel_VS", "InstancedModel_PS")
         .SetFlags(PSOFlags::ForNormalModel())
         .SetRootSignature(regiterRootSignature_["InstancedModel"].Get())
+        .UseModelInputLayout()
+        .Build();
+}
+
+void PSOManager::CreatePSOForInstancedShadowMap()
+{
+    registerPSO_["InstancedShadowMap"] =
+        PSOBuilder::Create()
+        .SetShaders("InstancedShadowMap_VS", "DLShadowMap_PS")
+        .SetFlags(PSOFlags::Type::DLShadowMap)
+        .SetDepthMode(PSOFlags::DepthMode::Comb_mAll_fLessEqual)
+        .SetRootSignature(regiterRootSignature_["InstancedShadowMap"].Get())
         .UseModelInputLayout()
         .Build();
 }
@@ -338,6 +356,15 @@ void PSOManager::CreatePSOForDLShadowMap()
         PSOBuilder::Create()
         .SetShaders("DLShadowMap_VS", "DLShadowMap_PS")
         .SetFlags(flag)
+        // flag には DepthMode のビットが立っていないため、SetFlags() だけだと
+        // DepthMode::Disable 扱いになり DepthEnable = false の PSO ができる。
+        // D3D12 では DepthEnable = false のとき DepthWriteMask に関係なく深度が
+        // 一切書き込まれないので、シャドウマップの深度がクリア値 1.0 のままになり
+        // Object3d.PS.hlsl の ComputeShadow() が永久に「影なし」を返してしまう。
+        // ここは深度そのものが成果物なので、書き込みを明示的に有効化する。
+        // （flag は graphicsPipelineStates_ のキーでもあり、ObjectModel::DrawShadow() は
+        //   PSOFlags::Type::DLShadowMap 単体で引きに来るので、キーは変えずに desc だけ直す）
+        .SetDepthMode(PSOFlags::DepthMode::Comb_mAll_fLessEqual)
         .SetRootSignature(rootSignatures_[static_cast<uint64_t>(
             PSOFlags::Type::DLShadowMap)]
             .Get())

@@ -2,8 +2,14 @@
 #include <Core/DXCommon/DXCommon.h>
 #include <Math/Matrix/MatrixFunction.h>
 #include <Core/DXCommon/TextureManager/TextureManager.h>
+#include <Debug/Debug.h>
+#include <Features/Json/JsonSerializers.h>
+#include <Utility/FileDialog/FileDialog.h>
 
 #include <assimp/material.h>
+
+#include <filesystem>
+#include <fstream>
 
 namespace Engine {
 
@@ -20,6 +26,7 @@ Material::Material(const Material& _other)
     , specularStrength_(_other.specularStrength_)
     , name_(_other.name_)
     , texturePath_(_other.texturePath_)
+    , materialFilePath_(_other.materialFilePath_)
     , textureHandle_(_other.textureHandle_)
 {
     // 新しいリソースを作成（ディープコピー）
@@ -133,6 +140,124 @@ void Material::AnalyzeMaterial(const aiMaterial* _material)
 		hasTexture_ = false;
 }
 
+bool Material::SaveToFile(const std::string& _filePath) const
+{
+    if (_filePath.empty())
+        return false;
+
+    std::filesystem::path filePath(_filePath);
+    if (!filePath.has_extension())
+        filePath.replace_extension(".json");
+
+    try
+    {
+        if (filePath.has_parent_path())
+            std::filesystem::create_directories(filePath.parent_path());
+
+        const json materialJson = {
+            {"version", 1},
+            {"name", name_},
+            {"texturePath", texturePath_},
+            {"hasTexture", hasTexture_},
+            {"diffuseColor", deffuseColor_},
+            {"shininess", shiness_},
+            {"enableLighting", enableLighting_},
+            {"enableEnvironment", enableEnvironment_},
+            {"environmentScale", envScale_},
+            {"shadingStrength", shadingStrength_},
+            {"shadeColor", shadeColor_},
+            {"specularStrength", specularStrength_},
+            {"uvTransform", {
+                {"offset", uvTransform_.GetOffset()},
+                {"scale", uvTransform_.GetScale()},
+                {"rotation", uvTransform_.GetRotation()}
+            }}
+        };
+
+        std::ofstream output(filePath);
+        if (!output.is_open())
+        {
+            Debug::LogError("Material: failed to open save file: " + filePath.string() + "\n");
+            return false;
+        }
+
+        output << materialJson.dump(4);
+        if (!output.good())
+        {
+            Debug::LogError("Material: failed to write save file: " + filePath.string() + "\n");
+            return false;
+        }
+
+        Debug::Log("Material saved: " + filePath.string() + "\n");
+        return true;
+    }
+    catch (const std::exception& exception)
+    {
+        Debug::LogError("Material: save failed: " + std::string(exception.what()) + "\n");
+        return false;
+    }
+}
+
+bool Material::LoadFromFile(const std::string& _filePath)
+{
+    if (_filePath.empty())
+        return false;
+
+    try
+    {
+        std::ifstream input(_filePath);
+        if (!input.is_open())
+        {
+            Debug::LogError("Material: failed to open load file: " + _filePath + "\n");
+            return false;
+        }
+
+        json materialJson;
+        input >> materialJson;
+        if (!materialJson.is_object())
+        {
+            Debug::LogError("Material: JSON root must be an object: " + _filePath + "\n");
+            return false;
+        }
+
+        // 欠けている項目は現在値を維持し、旧データにも前方互換で対応する。
+        name_ = materialJson.value("name", name_);
+        const std::string loadedTexturePath = materialJson.value("texturePath", texturePath_);
+        hasTexture_ = materialJson.value("hasTexture", hasTexture_);
+        deffuseColor_ = materialJson.value("diffuseColor", deffuseColor_);
+        shiness_ = materialJson.value("shininess", shiness_);
+        enableLighting_ = materialJson.value("enableLighting", enableLighting_);
+        enableEnvironment_ = materialJson.value("enableEnvironment", enableEnvironment_);
+        envScale_ = materialJson.value("environmentScale", envScale_);
+        shadingStrength_ = materialJson.value("shadingStrength", shadingStrength_);
+        shadeColor_ = materialJson.value("shadeColor", shadeColor_);
+        specularStrength_ = materialJson.value("specularStrength", specularStrength_);
+
+        if (materialJson.contains("uvTransform") && materialJson["uvTransform"].is_object())
+        {
+            const json& uvJson = materialJson["uvTransform"];
+            uvTransform_.SetOffset(uvJson.value("offset", uvTransform_.GetOffset()));
+            uvTransform_.SetScale(uvJson.value("scale", uvTransform_.GetScale()));
+            uvTransform_.SetRotation(uvJson.value("rotation", uvTransform_.GetRotation()));
+        }
+
+        if (loadedTexturePath != texturePath_)
+        {
+            texturePath_ = loadedTexturePath;
+            LoadTexture();
+        }
+
+        TransferData();
+        Debug::Log("Material loaded: " + _filePath + "\n");
+        return true;
+    }
+    catch (const std::exception& exception)
+    {
+        Debug::LogError("Material: load failed: " + std::string(exception.what()) + "\n");
+        return false;
+    }
+}
+
 void Material::Imgui()
 {
 #ifdef _DEBUG
@@ -161,6 +286,39 @@ void Material::Imgui()
     uvTransform_.SetOffset(offset);
     uvTransform_.SetScale(scale);
     uvTransform_.SetRotation(rotation);
+
+    ImGui::Separator();
+
+    const std::string jsonFilter = FileFilterBuilder()
+        .AddCustom("Material JSON (*.json)", "*.json")
+        .Build();
+
+    if (!materialFilePath_.empty())
+    {
+        ImGui::TextWrapped("Material File: %s", materialFilePath_.c_str());
+        if (ImGui::Button("Save Material"))
+            SaveToFile(materialFilePath_);
+
+        ImGui::SameLine();
+        if (ImGui::Button("Reload Material"))
+            LoadFromFile(materialFilePath_);
+    }
+
+    if (ImGui::Button("Save Material As..."))
+    {
+        const std::string defaultName = name_.empty() ? "Material.json" : name_ + ".json";
+        const std::string filePath = FileDialog::SaveFileAs(jsonFilter, defaultName);
+        if (!filePath.empty())
+            SaveToFile(filePath);
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Load Material..."))
+    {
+        const std::string filePath = FileDialog::OpenFile(jsonFilter);
+        if (!filePath.empty())
+            LoadFromFile(filePath);
+    }
 
     ImGui::PopID();
 #endif // _DEBUG

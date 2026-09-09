@@ -336,7 +336,7 @@ void LineDrawer::Draw3DLines()
             : offset - startOffset;
 
         LayerSystem::SetLayer(layerID);
-        commandList->DrawInstanced(vertexCount, vertexCount / 2, startOffset, 0);
+        commandList->DrawInstanced(vertexCount, 1, startOffset, 0);
     }
 }
 
@@ -376,7 +376,7 @@ void LineDrawer::Draw3DLinesAlways()
             : offset - startOffset;
 
         LayerSystem::SetLayer(layerID);
-        commandList->DrawInstanced(vertexCount, vertexCount / 2, startOffset, 0);
+        commandList->DrawInstanced(vertexCount, 1, startOffset, 0);
     }
 
     // PSOを戻す
@@ -418,7 +418,7 @@ void LineDrawer::Draw2DLines()
             : offset - startOffset;
 
         LayerSystem::SetLayer(layerID);
-        commandList->DrawInstanced(vertexCount, vertexCount / 2, startOffset, 0);
+        commandList->DrawInstanced(vertexCount, 1, startOffset, 0);
     }
 }
 
