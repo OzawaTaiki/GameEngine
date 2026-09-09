@@ -13,7 +13,7 @@ class ObjectModel
 {
 public:
 
-    ObjectModel(const std::string& _name);
+    ObjectModel(const std::string& _name, bool _registerDebugWindow = true);
     ~ObjectModel();
 
     void Initialize(const std::string& _filePath);
@@ -94,6 +94,7 @@ private:
 
     Model* model_ = nullptr;
     std::string name_ = "";
+    bool isDebugWindowRegistered_ = false;
 
 
     std::string timeChannel = "default";

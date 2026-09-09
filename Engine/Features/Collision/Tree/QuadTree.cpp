@@ -78,10 +78,6 @@ void QuadTree::RegisterObj(Collider* _obj)
         cells_[belongingSpaceIndex]->RegisterData(oft);
     }
 
-    std::cout << "belongingSpace Level: " << result.level << "\n";
-    std::cout << "mortonNumber: " << result.mortonNumber << "\n";
-    std::cout << "registed index: " << belongingSpaceIndex << "\n";
-    std::cout << "----------------------------------------\n";
 }
 
 void QuadTree::GetCollisionPair(uint32_t _index, std::vector<std::pair<Collider*, Collider*>>& _pair, std::list<Collider*>& _stac)
@@ -168,9 +164,6 @@ MortonResult QuadTree::CalculateObjectMortonNumberAndLevel(const Vector2& _pos, 
     Vector2 halfSize = _size / 2.0f;
     int32_t lt_index = ConvertPointToMortonCode(_pos - halfSize);
     int32_t rb_index = ConvertPointToMortonCode(_pos + halfSize);
-
-    std::cout << "Left Top Index: " << lt_index << "\n";
-    std::cout << "Right Bottom Index: " << rb_index << "\n";
 
     if (lt_index < 0 || rb_index < 0)
     {

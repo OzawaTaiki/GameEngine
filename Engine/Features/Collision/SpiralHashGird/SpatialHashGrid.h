@@ -24,6 +24,11 @@ public:
 
     std::vector<Collider*> CheckCollision(Collider* _col) const;
 
+#ifdef _DEBUG
+    void SetDebugDrawEnabled(bool _enabled) { debugDrawEnabled_ = _enabled; }
+    bool IsDebugDrawEnabled() const { return debugDrawEnabled_; }
+#endif
+
 private:
 
     uint64_t GetHashKey(const Vector2& _position) const;
@@ -37,6 +42,9 @@ private:
     float cellSize_;
     std::unordered_map<uint64_t, std::vector<Collider*>> grid_;
 
+#ifdef _DEBUG
+    bool debugDrawEnabled_ = false;
+#endif
 
 };
 

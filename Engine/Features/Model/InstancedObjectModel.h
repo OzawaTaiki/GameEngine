@@ -3,7 +3,9 @@
 #include <Features/Camera/Camera/Camera.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -30,8 +32,15 @@ public:
     void Initialize(Model* model, uint32_t maxInstances = kDefaultMaxInstances);
 
     void AddInstance(const Matrix4x4& worldMatrix, const Vector4& color = {1.0f,1.0f ,1.0f ,1.0f });
+    void AddInstance(const Matrix4x4& worldMatrix, const Matrix4x4& worldInverseTranspose,
+                     const Vector4& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     void Draw(const Camera* camera);
+    void DrawShadow();
+
+    // バッチ全体で共有するマテリアル設定。テクスチャもこのマテリアルから参照する。
+    void UseSharedMaterialFile(const std::string& filePath);
+    std::vector<std::unique_ptr<Material>>& GetMaterials() { return materials_; }
 
     void Clear();
 
@@ -40,7 +49,7 @@ private:
 
     // バッファ・SRVの確保（Initializeの共通処理）
     void InitializeBuffers(uint32_t maxInstances);
-
+    void InitializeMaterials();
     struct InstanceData
     {
         Matrix4x4 world;
@@ -51,6 +60,7 @@ private:
 private:
 
     Model* model_ = nullptr;
+    std::vector<std::unique_ptr<Material>> materials_;
     uint32_t maxInstances_ = 0;
     uint32_t instanceCount_ = 0;
 

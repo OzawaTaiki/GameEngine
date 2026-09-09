@@ -189,6 +189,11 @@ void PSOManager::CreateDefaultPSOs()
         factory->CreateOffScreenRootSignature();
     regiterRootSignature_["InstancedModel"] =
         factory->CreateInstancedModelRootSignature();
+    regiterRootSignature_["InstancedShadowMap"] =
+        factory->CreateInstancedShadowMapRootSignature();
+
+    ShaderCompiler::GetInstance()->Register(
+        "InstancedShadowMap_VS", L"ShadowMap.hlsl", L"vs_6_0", L"ShadowMapInstancedVS");
 
     CreatePSOForModel(PSOFlags::ForNormalModel());
     CreatePSOForModel(PSOFlags::ForAlphaModel());
@@ -203,6 +208,7 @@ void PSOManager::CreateDefaultPSOs()
     CreatePSOForPLShadowMap();
     CreatePSOForSkyBox();
     CreatePSOForInstancedModel();
+    CreatePSOForInstancedShadowMap();
 }
 
 void PSOManager::CreatePSOForModel(PSOFlags _flags)
@@ -225,6 +231,18 @@ void PSOManager::CreatePSOForInstancedModel()
         .SetShaders("InstancedModel_VS", "InstancedModel_PS")
         .SetFlags(PSOFlags::ForNormalModel())
         .SetRootSignature(regiterRootSignature_["InstancedModel"].Get())
+        .UseModelInputLayout()
+        .Build();
+}
+
+void PSOManager::CreatePSOForInstancedShadowMap()
+{
+    registerPSO_["InstancedShadowMap"] =
+        PSOBuilder::Create()
+        .SetShaders("InstancedShadowMap_VS", "DLShadowMap_PS")
+        .SetFlags(PSOFlags::Type::DLShadowMap)
+        .SetDepthMode(PSOFlags::DepthMode::Comb_mAll_fLessEqual)
+        .SetRootSignature(regiterRootSignature_["InstancedShadowMap"].Get())
         .UseModelInputLayout()
         .Build();
 }

@@ -327,6 +327,15 @@ void CollisionManager::ImGui([[maybe_unused]] bool* _open)
     // デバッグ描画の有効/無効を設定
     ImGui::Checkbox("Draw Colliders", &isDrawEnabled_);
 
+    if (spiralHashGrid_)
+    {
+        bool drawSpatialHashBounds = spiralHashGrid_->IsDebugDrawEnabled();
+        if (ImGui::Checkbox("Draw Spatial Hash Query Bounds", &drawSpatialHashBounds))
+        {
+            spiralHashGrid_->SetDebugDrawEnabled(drawSpatialHashBounds);
+        }
+    }
+
     // 統計情報表示
     ImGui::Text("Registered Colliders: %d", colliderCount_); // 登録されたコライダーの数
     ImGui::Text("Static Colliders: %zu", staticColliders_.size()); // 静的コライダーの数

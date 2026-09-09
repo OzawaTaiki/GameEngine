@@ -157,6 +157,15 @@ PSOFactory::CreateShadowMapRootSignature()
 }
 
 Microsoft::WRL::ComPtr<ID3D12RootSignature>
+PSOFactory::CreateInstancedShadowMapRootSignature()
+{
+    return RootSignatureBuilder()
+        .AddSRVTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX) // InstanceData (t0)
+        .AddCBV(1, D3D12_SHADER_VISIBILITY_VERTEX)         // gLightGroup (b1)
+        .Build();
+}
+
+Microsoft::WRL::ComPtr<ID3D12RootSignature>
 PSOFactory::CreatePLShadowMapRootSignature()
 {
     return RootSignatureBuilder()

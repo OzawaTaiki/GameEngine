@@ -6,6 +6,8 @@
 #include <Math/Matrix/MatrixFunction.h>
 #include <Debug/Debug.h>
 
+#include <filesystem>
+
 Engine::InstancedObjectModel::~InstancedObjectModel()
 {
     if (srvIndex_ != kInvalidIndex)
@@ -23,6 +25,7 @@ void Engine::InstancedObjectModel::Initialize(const std::string& modelPath, uint
         return;
     }
 
+    InitializeMaterials();
     InitializeBuffers(maxInstances);
 }
 
@@ -35,7 +38,20 @@ void Engine::InstancedObjectModel::Initialize(Model* model, uint32_t maxInstance
         return;
     }
 
+    InitializeMaterials();
     InitializeBuffers(maxInstances);
+}
+
+void Engine::InstancedObjectModel::InitializeMaterials()
+{
+    materials_.clear();
+    for (const auto& source : model_->GetMaterials())
+    {
+        if (source)
+            materials_.push_back(std::make_unique<Material>(*source));
+        else
+            materials_.push_back(nullptr);
+    }
 }
 
 void Engine::InstancedObjectModel::InitializeBuffers(uint32_t maxInstances)
@@ -53,6 +69,13 @@ void Engine::InstancedObjectModel::InitializeBuffers(uint32_t maxInstances)
 
 void Engine::InstancedObjectModel::AddInstance(const Matrix4x4& worldMatrix, const Vector4& color)
 {
+    AddInstance(worldMatrix, Transpose(Inverse(worldMatrix)), color);
+}
+
+void Engine::InstancedObjectModel::AddInstance(const Matrix4x4& worldMatrix,
+                                                const Matrix4x4& worldInverseTranspose,
+                                                const Vector4& color)
+{
     if (instanceCount_ >= maxInstances_)
     {
         Debug::Log("Exceeded maximum instance count\n");
@@ -60,7 +83,7 @@ void Engine::InstancedObjectModel::AddInstance(const Matrix4x4& worldMatrix, con
     }
 
     instanceMap_[instanceCount_].world = worldMatrix;
-    instanceMap_[instanceCount_].worldInverseTranspose =Transpose(Inverse(worldMatrix));
+    instanceMap_[instanceCount_].worldInverseTranspose = worldInverseTranspose;
     instanceMap_[instanceCount_].color = color;
     instanceCount_++;
 }
@@ -99,7 +122,7 @@ void Engine::InstancedObjectModel::Draw(const Camera* camera)
         // [1] InstanceData SRV
         cmd->SetGraphicsRootDescriptorTable(1, srvHandle_);
         // [2] gMaterial
-        auto* mat = model_->GetMaterials()[mesh->GetUseMaterialIndex()].get();
+        auto* mat = materials_[mesh->GetUseMaterialIndex()].get();
         mat->TransferData();
         mat->MaterialQueueCommand(cmd, 2);
         // [3] gTexture
@@ -107,6 +130,47 @@ void Engine::InstancedObjectModel::Draw(const Camera* camera)
         // [4] gLightGroup + shadow maps
         model_->QueueLightCommand(cmd, 4);
 
+        cmd->DrawIndexedInstanced(mesh->GetIndexNum(), instanceCount_, 0, 0, 0);
+    }
+}
+
+void Engine::InstancedObjectModel::UseSharedMaterialFile(const std::string& filePath)
+{
+    if (filePath.empty())
+        return;
+
+    const bool hasSavedMaterial = std::filesystem::exists(filePath);
+    for (auto& material : materials_)
+    {
+        if (!material)
+            continue;
+
+        material->SetMaterialFilePath(filePath);
+        if (hasSavedMaterial)
+            material->LoadFromFile(filePath);
+    }
+}
+
+void Engine::InstancedObjectModel::DrawShadow()
+{
+    if (!model_ || instanceCount_ == 0)
+        return;
+
+    auto lightGroup = LightingSystem::GetInstance()->GetLightGroup();
+    if (!lightGroup || !lightGroup->GetDirectionalLight()->IsCastShadow())
+        return;
+
+    auto* cmd = DXCommon::GetInstance()->GetCommandList();
+    RTVManager::GetInstance()->SetRenderTexture("ShadowMap");
+    PSOManager::GetInstance()->SetRegisterRootSignature("InstancedShadowMap");
+    PSOManager::GetInstance()->SetRegisterPSO("InstancedShadowMap");
+    cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmd->SetGraphicsRootDescriptorTable(0, srvHandle_);
+    model_->QueueLightCommand(cmd, 1);
+
+    for (auto& mesh : model_->GetMeshes())
+    {
+        mesh->QueueCommand(cmd);
         cmd->DrawIndexedInstanced(mesh->GetIndexNum(), instanceCount_, 0, 0, 0);
     }
 }

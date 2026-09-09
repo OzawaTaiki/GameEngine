@@ -34,14 +34,23 @@ std::string MakeMaterialFileName(std::string _name, const std::string& _fallback
 
 } // namespace
 
-ObjectModel::ObjectModel(const std::string& _name)
+ObjectModel::ObjectModel(const std::string& _name, bool _registerDebugWindow)
 {
-    name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+    if (_registerDebugWindow)
+    {
+        name_ = ImGuiDebugManager::GetInstance()->AddDebugWindow(_name, [&]() {ImGui(); });
+        isDebugWindowRegistered_ = true;
+    }
+    else
+    {
+        name_ = _name;
+    }
 }
 
 ObjectModel::~ObjectModel()
 {
-    ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
+    if (isDebugWindowRegistered_)
+        ImGuiDebugManager::GetInstance()->RemoveDebugWindow(name_);
 }
 
 void ObjectModel::Initialize(const std::string& _filePath)

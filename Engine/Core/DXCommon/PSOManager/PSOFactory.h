@@ -35,6 +35,7 @@ public:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateOffScreenRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateSkyBoxRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateShadowMapRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateInstancedShadowMapRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreatePLShadowMapRootSignature();
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateTextRootSignature();
 
